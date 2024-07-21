@@ -1,7 +1,7 @@
 ---
 title: "Hello World"
 layout: default
-parent: "From FMC"
+parent: "Tutorials"
 nav_order: 01
 ---
 
