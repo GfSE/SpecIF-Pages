@@ -4,9 +4,9 @@ layout: default
 nav_order: 0
 ---
 
-![SpecIF - Specification Integration Facility](./assets/logo/SpecIF-Logo-120.png)
+![SpecIF - Specification Integration Facility](./assets/logos/SpecIF-Logo-120.png)
 
-# Specification Integration Facility (SpecIF)
+<!-- # Specification Integration Facility (SpecIF) -->
 
 ## Purpose
 
@@ -14,7 +14,7 @@ The Specification Integration Facility is a technology and standardization initi
 the domain of *Product Lifecycle Management* (PLM).
 The project is driven by the [*Gesellschaft für Systems Engineering*](https://www.gfse.de/) (GfSE e.V.) - German chapter of [INCOSE](https://www.incose.org/).  
 
-![GfSE logo](https://www.gfse.de/images/GfSE-Logo_web.jpg)
+<img class="my-align-right size-20" src="./assets/logos/GfSE-Incose-Logo.web.png" alt="GfSE-Logo">
 
 SpecIF represents the visible, i.e. the diagrams and the text, as well as the semantics of system specifications for model integration and model exchange.
 
