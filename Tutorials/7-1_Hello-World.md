@@ -5,7 +5,7 @@ parent: "Tutorials"
 nav_order: 01
 ---
 
-# Tutorial 1: 'Hello World'
+# Tutorial 1: Hello World
 
 At first, we would like to present the shortest SpecIF data-set ever. It contains only items minimally required by the SpecIF schema.
 
