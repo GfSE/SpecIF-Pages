@@ -1,8 +1,9 @@
-title: Just the Docs Template
-description: A starter template for a Jeykll site using the Just the Docs theme!
+title: SpecIF
+description: Home, Documentation and Tutorials of the Specification Integration Facility (SpecIF).
 theme: just-the-docs
 
-url: https://just-the-docs.github.io
+url: https://GfSE.github.io/SpecIF-Pages
+heading_anchors: true
 
 aux_links:
-  Template Repository: https://github.com/just-the-docs/just-the-docs-template
+  Repo: https://github.com/gfse/SpecIF-Pages

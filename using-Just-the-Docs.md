@@ -1,5 +1,5 @@
 ---
-title: Using Just-the-docs
+title: Using Just-the-Docs
 layout: default
 nav_order: 999
 ---

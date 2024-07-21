@@ -4,7 +4,7 @@ layout: default
 nav_order: 0
 ---
 
-![SpecIF - Specification Integration Facility](./assets/logo/SpecIF-Logo-80.png)
+![SpecIF - Specification Integration Facility](./assets/logo/SpecIF-Logo-120.png)
 
 # Specification Integration Facility (SpecIF)
 
