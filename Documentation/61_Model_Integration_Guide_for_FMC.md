@@ -2,7 +2,7 @@
 title: "Model-Integration Guide for FMC"
 layout: default
 parent: "Documentation"
-nav_order: 06
+nav_order: 61
 ---
 
 # Model-Integration Guide for FMC
@@ -29,15 +29,15 @@ We will show in the following the mapping of the entities and relationships real
 
 | [ARCWAY Cockpit](https://arcway.com) | [SpecIF](https://specif.de) |
 | --- | --- |
-| Plan | [SpecIF:View](https://specif.de/apps/view#import=../examples/Vocabulary.specifz;view=doc;node=N-vocjQYmvtlIzcGsieVchOGhCUmb) |
-| Function, Agent, Operation | [FMC:Actor](https://specif.de/apps/view#import=../examples/Vocabulary.specifz;view=doc;node=N-4NoXVcSzSs07Htg4959SJnDEm0D) |
-| Information, Channel, Location, Storage, Value | [FMC:State](https://specif.de/apps/view#import=../examples/Vocabulary.specifz;view=doc;node=N-yeUw4dc3iTxk7PHLdQo7efxLvBc) |
-| Event, Point in time | [FMC:Event](https://specif.de/apps/view#import=../examples/Vocabulary.specifz;view=doc;node=N-8HwdIxFap0pTQ5JiE31I1BQJ15z) |
-|  | [SpecIF:Collection](https://specif.de/apps/view#import=../examples/Vocabulary.specifz;view=doc;node=N-MCUw5EHwNYxa9wqMtctM4J2A2G8) |
+| Plan | [SpecIF:View](https://apps.specif.de/view#import=../examples/Vocabulary.specifz;view=doc;node=N-vocjQYmvtlIzcGsieVchOGhCUmb) |
+| Function, Agent, Operation | [FMC:Actor](https://apps.specif.de/view#import=../examples/Vocabulary.specifz;view=doc;node=N-4NoXVcSzSs07Htg4959SJnDEm0D) |
+| Information, Channel, Location, Storage, Value | [FMC:State](https://apps.specif.de/view#import=../examples/Vocabulary.specifz;view=doc;node=N-yeUw4dc3iTxk7PHLdQo7efxLvBc) |
+| Event, Point in time | [FMC:Event](https://apps.specif.de/view#import=../examples/Vocabulary.specifz;view=doc;node=N-8HwdIxFap0pTQ5JiE31I1BQJ15z) |
+|  | [SpecIF:Collection](https://apps.specif.de/view#import=../examples/Vocabulary.specifz;view=doc;node=N-MCUw5EHwNYxa9wqMtctM4J2A2G8) |
 
 Where:
 
-- All resource class terms are defined in the [Vocabulary](https://specif.de/apps/view#import=../examples/Vocabulary.specifz;view=doc;node=N-YpyUlWVLwxYblBgWOr154btbA9u).
+- All resource class terms are defined in the [Vocabulary](https://apps.specif.de/view#import=../examples/Vocabulary.specifz;view=doc;node=N-YpyUlWVLwxYblBgWOr154btbA9u).
 - The original model element type is stored in a property named _dcterms:type_. 
 
 ### Statements
@@ -60,7 +60,7 @@ Where:
 Where:
 
 - 'model-element' is one of [ 'FMC:Actor', 'FMC:State', 'FMC:Event' ].
-- All statement class terms are defined in the [Vocabulary](https://specif.de/apps/view#import=../examples/Vocabulary.specifz;view=doc;node=N-blM4lfyHM55YlbfBZ3NWj4SYwa3).
+- All statement class terms are defined in the [Vocabulary](https://apps.specif.de/view#import=../examples/Vocabulary.specifz;view=doc;node=N-blM4lfyHM55YlbfBZ3NWj4SYwa3).
 - The original model element type is stored in a property named _dcterms:type_. 
 
 ### Example
