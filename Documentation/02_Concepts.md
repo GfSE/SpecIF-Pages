@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Concepts"
 layout: default
 parent: "Documentation"
