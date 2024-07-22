@@ -1,6 +1,6 @@
 # SpecIF-Pages
 
-<img class="my-align-right size-20" src="./assets/logos/GfSE-Incose-Logo.web.png" alt="GfSE-Logo">
+![SpecIF-Logo](./assets/logos/SpecIF-Logo-120.png)
 
 The Specification Integration Facility is a technology and standardization initiative, addressing the topic of data exchange and data integration in 
 the domain of *Product Lifecycle Management* (PLM).
