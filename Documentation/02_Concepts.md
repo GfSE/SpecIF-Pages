@@ -11,7 +11,7 @@ nav_order: 02
 
 The Specification Integration Facility addresses the problem domain of product lifecycle management (PLM). PLM is used to manage all processes, information and data that will be created in an entire product life cycle. From the first product idea until end-of-life of the product.
 
-![Product Lifecycle Management (PLM), *source: Wikipedia*](https://en.wikipedia.org/wiki/File:Product_lifecycle_management.png)
+![Product Lifecycle Management (PLM), *source: Wikipedia*](https://upload.wikimedia.org/wikipedia/commons/9/90/Product_lifecycle_management.png)
 
 There are four phases defined to structure the [PLM](https://en.wikipedia.org/wiki/Product_lifecycle):
 
