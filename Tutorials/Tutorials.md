@@ -11,7 +11,7 @@ nav_order: 7
 
 A series of tutorials for the *Specification Integration Facility* (SpecIF). 
 
-The tutorials use the SpecIF v1.0 schema, because the format is easy to understand. It allows a simple JSON structure for simple applications. Alternative, more detailed structures provide additional features such as multi-language texts. SpecIF v1.1 has removed such structural alternatives to simplify the software at the cost of more complicated JSON structure in _all_ cases. The concept of SpecIF is however best explained using the v1.0 schema. At the end of each tutorial there is a link to the SpecIF data in both v1.0 and v1.2.
+The tutorials use the SpecIF v1.0 schema, because the format is easy to understand. It allows a simple JSON structure for simple applications. Alternative, more detailed structures provide additional features such as multi-language texts. SpecIF v1.1 has removed such structural alternatives to simplify the software at the cost of more complicated JSON structure in _all_ cases. The concept of SpecIF is however best explained using the v1.0 schema. At the end of each tutorial there is a link to the SpecIF data in both v1.0 and v1.1.
 
 <!-- 1. [Hello World](./v1.0/01_Hello-World.md)
 1. [Related Terms](./v1.0/02_Related-Terms.md)
