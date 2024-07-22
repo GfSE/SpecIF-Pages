@@ -141,5 +141,6 @@ Some more explanations:
 - The role of the added property is indicated by \"title\":\"dcterms:title\", where a vocabulary term is used. It takes precedence over the title attribute of the resource itself.
 - Note that the added title property has a title, whereas the description property has not. This is just for demonstration purposes: If a properties' title is specified, it takes of course precedence. I it is not specified, the respective propertyClass' title applies.
 
-
-You may also view/download the example [Requirement with Properties](https://specif.de/examples/03_Requirement-with-Properties.specif "SpecIF Example \'Requirement with Properties\'") or display it using the [SpecIF Viewer](https://apps.specif.de/view.html#import=https://specif.de/examples/03_Requirement-with-Properties.specif).
+You may view the example using the [SpecIF Viewer](https://apps.specif.de/view.html#import=https://specif.de/examples/03_Requirement-with-Properties.specif), or download the SpecIF data:
+- v1.0: [Very Simple Model with Requirements](https://specif.de/examples/03_Requirement-with-Properties.specif)
+- v1.1: [Very Simple Model with Requirements](https://github.com/GfSE/SpecIF-Examples-and-Test-cases/blob/master/examples/v1.1/03_Requirement-with-Properties.specif)

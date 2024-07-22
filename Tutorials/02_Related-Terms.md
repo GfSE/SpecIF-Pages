@@ -95,4 +95,6 @@ Some more explanations:
 - In the example, the statementCLass with \"id\":\"SC-isSpecializationOf\" determines that all it's instance statements may only have subjects and objects with a resourceClass \"id\":\"RC-ResourceTerm\". Have a look at the only instance with \"id\":\"S-X0lXi7lJP9DQs\": As required, it's subject and object are of type \"id\":\"RC-ResourceTerm\".
 - This discussion may appear somewhat irrelevant here, as there are only a single resourceClass and a single statementClass. But it is a strong feature of SpecIF which develops its power, when there are multiple resourceClasses as well as statementClasses and it comes to select all resources which can be taken into consideration as subject or object for a given statement. It is rarely seen elsewhere. 
 
-You may also view/download the example [Related Terms](https://specif.de/examples/02_Related-Terms.specif "SpecIF Example \'Related Terms\'") or work with it using the [SpecIF Viewer](https://apps.specif.de/view.html#import=https://specif.de/examples/02_Related-Terms.specif).
+You may view the example using the [SpecIF Viewer](https://apps.specif.de/view.html#import=https://specif.de/examples/02_Related-Terms.specif), or download the SpecIF data:
+- v1.0: [Very Simple Model with Requirements](https://specif.de/examples/02_Related-Terms.specif)
+- v1.1: [Very Simple Model with Requirements](https://github.com/GfSE/SpecIF-Examples-and-Test-cases/blob/master/examples/v1.1/02_Related-Terms.specif)
