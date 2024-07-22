@@ -7,7 +7,7 @@ nav_order: 04
 
 # Tutorial 4: Requirement with Image
 
-Next, we would like to present how to include an image in a resource description. The requirement known from the previous tutorial [Requirement with Properties](./03_Requirement-with-Properties.html) will serve as an example.
+Next, we would like to include an image in a resource description. The requirement known from the previous tutorial [Requirement with Properties](./03_Requirement-with-Properties.html) will serve as an example.
 
 The definitions including *dataTypes*, *propertyClasses* and *resourceClasses* are exactly the same. As the description property is an XHTML formatted text, we simply can add an HTML &lt;object&gt; tag with a link to the image:
 

@@ -1,5 +1,5 @@
 ---
-title: "Tutorials"
+title: "Tutorials for Developers"
 layout: default
 has_children: true
 nav_order: 7
@@ -7,11 +7,11 @@ nav_order: 7
 
 ![SpecIF logo](../assets/logos/SpecIF-Logo-120.png)
 
-# SpecIF Tutorials
+# SpecIF Tutorials for Developers
 
-A series of tutorials for the *Specification Integration Facility* (SpecIF). 
+A series of tutorials for the *Specification Integration Facility* (SpecIF) show how the SpecIF information model is represented using the JavaScript Object Notation (JSON) for which <a href="https://github.com/GfSE/SpecIF-Schema" target="_blank">schema and constraints</a> are available. Implementations using other syntax such as XML are possible.
 
-The tutorials use the SpecIF v1.0 schema, because the format is easy to understand. It allows a simple JSON structure for simple applications. Alternative, more detailed structures provide additional features such as multi-language texts. SpecIF v1.1 has removed such structural alternatives to simplify the software at the cost of more complicated JSON structure in _all_ cases. The concept of SpecIF is however best explained using the v1.0 schema. At the end of each tutorial there is a link to the SpecIF data in both v1.0 and v1.1.
+The tutorials use the SpecIF v1.0 schema, because the format is easy to understand. The JSON structure for simple applications is simple. Alternative, more detailed structures provide additional features such as multi-language texts. SpecIF v1.1 has removed such structural alternatives to simplify the software at the cost of more complicated JSON structure in _all_ cases. The concept of SpecIF is however best explained using the v1.0 schema. At the end of each tutorial there is a link to SpecIF data in both v1.0 and v1.1.
 
 <!-- 1. [Hello World](./v1.0/01_Hello-World.md)
 1. [Related Terms](./v1.0/02_Related-Terms.md)

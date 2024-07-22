@@ -5,10 +5,10 @@ parent: "Manuals"
 nav_order: 01
 ---
 
-# Quick Start Guide
-
 {: .highlight }
-Acknowledgement: Parts of the text have been translated with www.DeepL.com/Translator (free version).
+_Acknowledgement: Parts of the text have been translated with www.DeepL.com/Translator (free version)._
+
+# Quick Start Guide
 
 ## SpecIF Goals
 
@@ -21,21 +21,21 @@ The initiators assume that
 
 The following use cases are considered:
 <ol>
-<li>System engineering collaboration in the supply chain</li>
-<ul>
-<li>Automotive: „ReqIF for system models with linked requirements“</li>
-<li>Aerospace</li>
-<li>Utilities: Planning and maintaining renewable energy parks</li>
-</ul>
-<li>Model exchange between system modeling tools</li>
-<ul>
-<li>SysML: Enterprise Architect®, Cameo®, Rhapsody® and others</li>
-<li>Other notations</li>
-</ul>
-<li>Integration of models from different notations and tools</li>
-<ul>
-<li>Navigate, search and audit partial models in a common context</li>
-</ul>
+  <li>System engineering collaboration in the supply chain</li>
+  <ul>
+    <li>Automotive: „ReqIF for system models with linked requirements“</li>
+    <li>Aerospace</li>
+    <li>Utilities: Planning and maintaining renewable energy parks</li>
+  </ul>
+  <li>Model exchange between system modeling tools</li>
+  <ul>
+    <li>SysML: Enterprise Architect®, Cameo®, Rhapsody® and others</li>
+    <li>Other notations</li>
+  </ul>
+  <li>Integration of models from different notations and tools</li>
+  <ul>
+    <li>Navigate, search and audit partial models in a common context</li>
+  </ul>
 </ol>
 
 For this purpose, SpecIF offers a cross-method and cross-manufacturer solution. Existing formats and vocabularies are used as far as possible. The motivation of the GfSE working group PLM4MBSE is summarized in a position paper <a href="http://gfse.de/Dokumente_Mitglieder/ag_ergebnisse/PLM4MBSE/PLM4MBSE_Position_paper_V_1_1.pdf" target="_blank">10 Theses about MBSE and PLM</a>.
@@ -55,3 +55,33 @@ Download the last released program version “specIF-apps.vX.Y.zip” from <a hr
 #### Use the Installed SpecIF-Viewer/Editor
 
 If the guidelines of your network permit, you can use the <a href="https://apps.specif.de/view.html" target="_blank">SpecIF Viewer</a> or the <a href="https://apps.specif.de/edit.html" target="_blank">SpecIF Model Integrator and Editor</a>, provided for demonstration purposes. You always benefit from the latest release.
+
+### Prepare the Model-data
+
+Currently the formats SpecIF, ReqIF, UML/SysML (Cameo), BPMN (BPMN-XML), ArchiMate (Open-Exchange XML) and MS Excel® (XLSX. XLS and CSV) are supported.
+
+In case of SpecIF, ReqIF, BPMN and ArchiMate, no further preparations are required; files of this type can be imported directly.
+
+In Excel® files, meaning can be assigned to resources, statements and their attributes by applying certain conventions; see Chap. 3.
+
+### Import a Model
+
+The start page of the viewer / editor lets you first select the data format and gives you some specific information. Any formats other than SpecIF are converted into the SpecIF format during import.
+
+![Import Page](01-import-page.png)
+
+To import a file, after selecting the relevant type, click on [+ Select file](){: .btn } and the familiar file picker of your web browser will open; eligible files are filtered. Select the desired model file.
+
+Then, click on an action button:
+•	↗ Create loads the selected model.
+•	↗ Replace discards previously loaded models and loads the selected one.
+•	↗ Adopt adds the selected submodel to the already loaded one. In this case, resources that have already been imported adopt those of the new submodel if they have a compatible type and the same title; the identifier is ignored. This import mode is useful when partial models from different authoring tools are to be merged. For example, if a data object occurs in a BPMN process diagram and at the same time in an ArchiMate information model, then in the resulting semantic network the resource loaded first remains and all relations of the adopted resource are additionally adopted.
+It should be noted that all attribute values of the adopted resource are lost if the corresponding one of the adopting resource already has a value. In other words: An attribute value of the adopted resource is taken over only if the adopting resource has no corresponding value.
+•	↗ Update also adds the selected submodel to the previously loaded ones. In this case, existing resources, such as diagrams or model elements with the same identifier, are updated if the creation date of the new resource to be imported is more recent. The same applies to all other elements such as relations, files and hierarchies. For data types and classes, a check is made beforehand to ensure that the consistency of the entire semantic network is maintained. For example, it is always possible to add another attribute to a resource class, but an attribute can only be removed if no instance of the class has a value for that attribute.<br/>
+The relationships of both the existing and new revisions of the model element are associated with the latter, the now current revision.
+
+After successful loading, the view changes to "Read" resp. "Edit".
+
+
+{: .highlight }
+_Note: If you load data from your local file system, it will be processed locally by your web browser. The SpecIF viewer or editor does not send any user data over the Internet and does not save any user data on a server. All user data remain local in your web browser._
