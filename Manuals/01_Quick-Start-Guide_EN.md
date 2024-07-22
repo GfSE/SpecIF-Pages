@@ -89,7 +89,7 @@ _Note: If you load data from your local file system, it will be processed locall
 
 In the ↗ **Document** tab, the model is presented in a structure or outline chosen by the author.
 
-![Read Page](../assets/images/Manuals/02_document-tab_EN.png)
+![Document Tab](../assets/images/Manuals/02_document-tab_EN.png)
 
 You can open and close the structural levels on the left; the respective contents are shown on the right. In the main column, the properties designated as title, description and diagram are shown, plus any other properties in a narrow column on the right.
 
@@ -107,7 +107,7 @@ By the way, texts can also be formatted using XHTML and markdown in many authori
 
 In the ↗ **Relations** tab, the semantic relationships of the element selected in the outline to the left are shown. Most relationships are automatically created by graphically analyzing the model diagrams, such as “component XY contains function FR” when the block representing function FR is spatially contained in the block representing component XY. Some relationships have to be created manually as part of the analysis and system design, for example "Component XZ satisfies requirement 134".
 
-![Read Page](../assets/images/Manuals/03_relations-tab_EN.png)
+![Relations Tab](../assets/images/Manuals/03_relations-tab_EN.png)
 
 The selected element is a little darker and shown in the center of the spider. This example expresses the following dependencies:
 - the "Mail Room" is shown on 4 diagrams,
@@ -124,10 +124,61 @@ In this view, you can also double-click any element and navigate through the sem
 
 ### Create or Delete a Relation
 
-Likewise on tab ↗ **Relations**, two buttons for creating and deleting relations become active – if permissions are granted. 
+Likewise on tab ↗ **Relations**, two buttons for creating and deleting relations become active, if permissions are granted. 
 
 To create a relation ↗ **＋**, a dialog box is displayed, in which a valid relation type for the given model element and a suitable target element as subject or object can be selected. Only those options are offered that correspond to the ontology, so that only meaningful semantic relations are created.
 
 To delete a relation ↗ ❌, all relation targets of the selected model element are colored red. Double-clicking on a target element deletes the respective relation.
 
+### Export a Model
 
+Once the document has the desired structure and content, it can be saved in various formats by pressing ↗ **Export** at the top right:
+- ↗ **SpecIF** creates a ZIP file with the semantic network in SpecIF format and all referenced images and files. It can be easily read back into the SpecIF editor at a later time.
+- ↗ **HTML** with embedded SpecIF generates a file to be displayed in the web browser. All views and semantic relationships can be easily tracked and reviewed. The file contains Javascript and therefore some environments prohibit execution.
+- ↗ **ReqIF** generates an XML file according to the OMG Requirement Interchange Format, which can be read by several Requirement Management (RM) and Application Lifecycle Management (ALM) tools.
+- ↗ **Turtle** creates a file for reading into graph databases; it is a compact representation of the Resource Description Framework (RDF).
+- ↗ **Epub** generates a file for electronic document readers.
+- ↗ **MS Word®** creates an OOXML file that can be read and further edited using MS Word. Edited files are best saved in the compressed format DOCX. As is well known, Word files in change mode are a popular means of collaboration and adding content within a team.
+
+## Special Authoring Tools
+
+The term authoring tool is used here to describe software that is used to create partial models or compile other information related to a target system to be designed and specified.
+
+### Microsoft Excel®
+
+#### Folder
+
+When importing Excel® files, a folder with the file name as title is created in the hierarchy of the SpecIF data-set. For each worksheet a subfolder is created with it‘s name as a title. 
+
+#### Resources
+
+If there is a term in brackets in the name of a worksheet, it is used as the title of the resource class (SpecIF resourceClass, type of all resources/objects found on this worksheet). If the worksheet name does not contain a term in brackets, a term in brackets in the file name is used as a substitute. If no type designation is found there either, a generic title without a particular meaning is used for the resource class of the worksheet.
+
+Unfortunately, no vocabulary term ready to be interpreted by the system can be used in the filename, as certain characters (e.g. the colon) may not appear in filenames. However, the terms “requirement”, “feature”, “annotation”, “user-story” and “pain-point“ are interpreted correctly by the viewer or editor and replaced by a vocabulary term.
+
+For example, if an Excel file has the file name "Project-name (Requirement).xslx" and it contains two worksheets with the names "Functions (User Story)" and "Constraints", a resource-class with the title "User-Story" replaced by "SpecIF:UserStory" forthe first worksheet and a resource-class with the title "Requirement" repla¬ced by "IREB:Requirement" for the second worksheet are created.
+
+#### Properties
+
+Now for the contents of each worksheet. The property names (SpecIF property titles) are expected in the first table line of each worksheet and the resources ("instances") follow from the second line. Defined vocabulary terms are best used as attribute names, e.g. dcterms:title and dcterms:description from the <a href="https://www.dublincore.org/" target="_blank">Dublin Core Metadata Initiative</a>. The use of agreed terms conveys the meaning of the respective attributes so that, just one of the potential benefits, the user interface knows how to display the properties. For example, the title (denoted by dcterms:title) comes first in larger letters, underneath the description (denoted by dcterms:description) in the main column plus the remaining attributes in a narrower column on the right. However, there are many more benefits in the entire product development.
+
+By the way, formatting in text fields using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list.
+
+#### Relations
+
+The same goes for the names of relationships (SpecIF statements); for example _oslc_rm:refinedBy_ between two require¬ments or _oslc_rm:satisfies_ between a system component and a requirement. In order to successfully create relationships, the user-defined IDs (_dcterms:identifier_) or titles (_dcterms:title_) of the respective elements must be given between double or single quotation marks. Multiple resources can be specified separated by commas. See columns _IREB: refines_ and _oslc_rm:satisfiedBy_ in the following figure.
+
+![Excel Column Headers](../assets/images/Manuals/04_Excel-column-headers_EN.png)
+
+By the way, the target of a relation like "DMS" in the figure does not have to be found in the same file. The relation is also established to a resource that originates from a different source, as long as the title resp. ID are identical.
+
+Suitable terms are defined in the <a href="https://apps.specif.de/view.html#import=https://specif.de/v1.1/Ontology.specif" target="_blank">SpecIF Ontology</a>, namely for <a href="https://apps.specif.de/view.html#view=doc;project=P-SpecIF-Ontology;node=N-33z8X0jqbMdrd8PJDKyt2ke4yAB;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property names (propertyClasses)</a>, <a href="https://apps.specif.de/view.html#view=doc;project=P-SpecIF-Ontology;node=N-GXf6xVO7XO5ciMypRwD5WDR6DHR;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property values (propertyValues)</a> and for <a href="https://apps.specif.de/view.html#view=doc;project=P-SpecIF-Ontology;node=N-blM4lfyHM55YlbfBZ3NWj4SYwa3;import=https://specif.de/v1.1/Ontology.specif" target="_blank">statement names (statementClasses)</a>.
+
+#### Enumerated Values
+
+<img class="my-align-right size-50" src="../assets/images/Manuals/05_Excel_enumerations_EN.png" alt="Excel Enumerations"/>
+
+To define an attribute with enumerated values, a worksheet with name _(Enumerations)_ including the brackets is created. Here all values of a certain attribute are specified column by column. Here again, the first line specifies the attribute name and the values below that are taken over up to the next blank line. In worksheets with user data, these values are provided for attributes with the same name; in the example given to the left, these are the attributes named _IREB:RequirementType_ and _SpecIF:Priority_. While Excel® also allows the specification of deviating values, this is not possible in case of SpecIF, therefore all values that do not correspond to those in the worksheet _(Enumerations)_ are ignored during import.
+
+
+<!-- link template <a href="" target="_blank"></a> -->
