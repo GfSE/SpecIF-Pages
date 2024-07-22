@@ -1,5 +1,5 @@
 ﻿---
-title: "Preface"
+title: "Introduction"
 layout: default
 parent: "Documentation"
 nav_order: 01
@@ -26,7 +26,7 @@ The Specification Integration Facility (SpecIF) shall support the change from do
 SpecIF defines a language for describing system models with attention to both syntax and semantics. By creating a common context for graphical and textual content, an understanding (beyond mere communi­cation) is achieved on a logical level. 
 Existing technical formats and protocols such as ReqIF or RDF are adopted to take advantage of existing IT infra­structure.
 
-![End-to-end product lifecycle management](../assets/images/DocumentationEnd-to-end-Product-Lifecycle-Management-en-960-2ba1f6c4.png)
+![End-to-end product lifecycle management](../assets/images/Documentation/End-to-end-Product-Lifecycle-Management-en-960-2ba1f6c4.png)
 
 ## Goals
 
@@ -41,7 +41,7 @@ SpecIF contributes to the following objectives:
 * Standard-compliant: SpecIF draws on existing standards, most importantly from W3C, OMG and OASIS.
 * Open and cooperative: All results are published with [Creative Commons 4.0 CC BY-SA license](https://creativecommons.org/licenses/by-sa/4.0/legalcode); allowing commercial use. The results can be further developed, but the origin must be stated, and they must be published under similar terms; please consult the referenced license text. We encou­rage everyone interested to join our GfSE working group and to directly contribute to the results.
 
-![End-to-end product lifecycle management](../assets/images/DocumentationSpecif-Goals-en-960-b271de15.png)
+![End-to-end product lifecycle management](../assets/images/Documentation/Specif-Goals-en-960-b271de15.png)
 
 ## Use Cases
 
