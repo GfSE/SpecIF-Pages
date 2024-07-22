@@ -5,7 +5,7 @@ parent: "Documentation"
 nav_order: 06
 ---
 
-# SpecIF Model-Integration Guide for FMC
+# Model-Integration Guide for FMC
 
 ## FMC to SpecIF Mapping
 

@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Introduction"
 layout: default
 parent: "Documentation"
@@ -32,14 +32,14 @@ Existing technical formats and protocols such as ReqIF or RDF are adopted to tak
 
 SpecIF contributes to the following objectives:
 
-* Lifecycle-Management from the beginning: Structures and content from the early phases of system conception are seam­lessly made available for development.
-* Embracing disciplines: SpecIF creates a common context for models from disciplines such as Mechanics, Electronics, Software, Safety and others.
-* Embracing methods: Texts as well as structural and behavioral models of popular methods, among others BPMN, SysML and FMC can be integrated. This means that individual elements ("resources") exist once and may appear on several model diagrams.
-* Technology-neutral: SpecIF data can be transformed to various technical formats, such as ReqIF, OSLC, XMI, relational database, graph database or web linked-data (RDF).
-* Vendor-neutral and independent: SpecIF is not limited to certain tools or vendors; in contrast, SpecIF lets you exchange model data between different tools and organizations.
-* Schema-compliant: SpecIF data can be checked formally using a JSON- or XML-schema; the former has been made available at [SpecIF-Schema](https://specif.de/v1.1/schema.json).
-* Standard-compliant: SpecIF draws on existing standards, most importantly from W3C, OMG and OASIS.
-* Open and cooperative: All results are published with [Creative Commons 4.0 CC BY-SA license](https://creativecommons.org/licenses/by-sa/4.0/legalcode); allowing commercial use. The results can be further developed, but the origin must be stated, and they must be published under similar terms; please consult the referenced license text. We encou­rage everyone interested to join our GfSE working group and to directly contribute to the results.
+- Lifecycle-Management from the beginning: Structures and content from the early phases of system conception are seam­lessly made available for development.
+- Embracing disciplines: SpecIF creates a common context for models from disciplines such as Mechanics, Electronics, Software, Safety and others.
+- Embracing methods: Texts as well as structural and behavioral models of popular methods, among others BPMN, SysML and FMC can be integrated. This means that individual elements ("resources") exist once and may appear on several model diagrams.
+- Technology-neutral: SpecIF data can be transformed to various technical formats, such as ReqIF, OSLC, XMI, relational database, graph database or web linked-data (RDF).
+- Vendor-neutral and independent: SpecIF is not limited to certain tools or vendors; in contrast, SpecIF lets you exchange model data between different tools and organizations.
+- Schema-compliant: SpecIF data can be checked formally using a JSON- or XML-schema; the former has been made available at [SpecIF-Schema](https://specif.de/v1.1/schema.json).
+- Standard-compliant: SpecIF draws on existing standards, most importantly from W3C, OMG and OASIS.
+- Open and cooperative: All results are published with [Creative Commons 4.0 CC BY-SA license](https://creativecommons.org/licenses/by-sa/4.0/legalcode); allowing commercial use. The results can be further developed, but the origin must be stated, and they must be published under similar terms; please consult the referenced license text. We encou­rage everyone interested to join our GfSE working group and to directly contribute to the results.
 
 ![End-to-end product lifecycle management](../assets/images/Documentation/Specif-Goals-en-960-b271de15.png)
 
@@ -47,16 +47,16 @@ SpecIF contributes to the following objectives:
 
 Today, there is close cooperation between product OEMs, engineering service providers and suppliers. The business processes demand easy information exchange between all participating organizations:
 
-* Exchange requirement-specifications and model-based system-specifications along the supply-chain.
-* Publish results (including system models) from different authoring systems, usually requiring a high level of expertise, to a far bigger group of 'occasional' users for inquiry, commenting or auditing. Uniform access regardless of authoring system is best practice.
-* Show changes made over time and support the change management across organizations.
+- Exchange requirement-specifications and model-based system-specifications along the supply-chain.
+- Publish results (including system models) from different authoring systems, usually requiring a high level of expertise, to a far bigger group of 'occasional' users for inquiry, commenting or auditing. Uniform access regardless of authoring system is best practice.
+- Show changes made over time and support the change management across organizations.
 
 With respect to the content, information comes from different organizations and addresses product strategy and resulting requirements, laws and consumer protection, optimized user interaction, functions, system structure and behavior or even the validation of ratings by means of simulation. 
 The following tasks shall be supported:
 
-* Integrate information and models from different sources and in different formats,
-* Search and navigate consistently,
-* Find and consolidate identical elements in different models,
-* Detect and store dependencies and logical relations between model elements, essentially interrelating model elements with a semantic net,
-* Detect errors, inconsistencies or violations of design rules,
-* Reference ('trace') artifacts in subsequent development steps without copying.
+- Integrate information and models from different sources and in different formats,
+- Search and navigate consistently,
+- Find and consolidate identical elements in different models,
+- Detect and store dependencies and logical relations between model elements, essentially interrelating model elements with a semantic net,
+- Detect errors, inconsistencies or violations of design rules,
+- Reference ('trace') artifacts in subsequent development steps without copying.

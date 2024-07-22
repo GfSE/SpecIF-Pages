@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Preface"
 layout: default
 parent: "Documentation"
@@ -10,7 +10,7 @@ nav_order: 00
 Systems engineering has become an indispensable part of cooperation between companies in the manufacturing, utility, health and other industries. 
 In the whole lifecycle of products, engineers must exchange information in many formats from different sources. 
 For better understanding, the data must be semantically linked. This is where the *Specification Integration Facility* (SpecIF) comes into play, 
-which version 1.1 is described by this specification.
+which is described by this documentation in version 1.1.
 
 When manufacturers and suppliers want to coordinate the design of a complex product with all its components, the interaction between mechanics, 
 electronics and software must be analyzed and tested. 
