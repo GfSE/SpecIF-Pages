@@ -1,4 +1,4 @@
-﻿---
+---
 title: "References"
 layout: default
 parent: "Documentation"
