@@ -160,5 +160,5 @@ Finally let us have a look at the tab \"Reports\" of the SpecIF-Viewer. You may 
 - In one of the later tutorials we will see that the enumerated properties may also be used for a faceted filtering of resources.
 
 You may view the example using the [SpecIF Viewer](https://apps.specif.de/view#import=https://specif.de/examples/05_Requirement-with-Enumerated-Property.specif), or download the SpecIF data:
-- v1.0: [Very Simple Model with Requirements](https://specif.de/examples/05_Requirement-with-Enumerated-Property.specif)
-- v1.1: [Very Simple Model with Requirements](https://github.com/GfSE/SpecIF-Examples-and-Test-cases/blob/master/examples/v1.1/05_Requirement-with-Enumerated-Property.specif)
+- v1.0: [Requirement with Enumerated Property](https://specif.de/examples/05_Requirement-with-Enumerated-Property.specif)
+- v1.1: [Requirement with Enumerated Property](https://github.com/GfSE/SpecIF-Examples-and-Test-cases/blob/master/examples/v1.1/05_Requirement-with-Enumerated-Property.specif)

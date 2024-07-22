@@ -96,5 +96,5 @@ Some more explanations:
 - This discussion may appear somewhat irrelevant here, as there are only a single resourceClass and a single statementClass. But it is a strong feature of SpecIF which develops its power, when there are multiple resourceClasses as well as statementClasses and it comes to select all resources which can be taken into consideration as subject or object for a given statement. It is rarely seen elsewhere. 
 
 You may view the example using the [SpecIF Viewer](https://apps.specif.de/view.html#import=https://specif.de/examples/02_Related-Terms.specif), or download the SpecIF data:
-- v1.0: [Very Simple Model with Requirements](https://specif.de/examples/02_Related-Terms.specif)
-- v1.1: [Very Simple Model with Requirements](https://github.com/GfSE/SpecIF-Examples-and-Test-cases/blob/master/examples/v1.1/02_Related-Terms.specif)
+- v1.0: [Related Terms](https://specif.de/examples/02_Related-Terms.specif)
+- v1.1: [Related Terms](https://github.com/GfSE/SpecIF-Examples-and-Test-cases/blob/master/examples/v1.1/02_Related-Terms.specif)

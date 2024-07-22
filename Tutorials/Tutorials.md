@@ -7,7 +7,7 @@ nav_order: 7
 
 ![SpecIF logo](../assets/logos/SpecIF-Logo-120.png)
 
-# SpecIF Tutorials for Developers
+# Tutorials for Developers
 
 A series of tutorials for the *Specification Integration Facility* (SpecIF) show how the SpecIF information model is represented using the JavaScript Object Notation (JSON) for which <a href="https://github.com/GfSE/SpecIF-Schema" target="_blank">schema and constraints</a> are available. Implementations using other syntax such as XML are possible.
 

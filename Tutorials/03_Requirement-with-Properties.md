@@ -142,5 +142,5 @@ Some more explanations:
 - Note that the added title property has a title, whereas the description property has not. This is just for demonstration purposes: If a properties' title is specified, it takes of course precedence. I it is not specified, the respective propertyClass' title applies.
 
 You may view the example using the [SpecIF Viewer](https://apps.specif.de/view.html#import=https://specif.de/examples/03_Requirement-with-Properties.specif), or download the SpecIF data:
-- v1.0: [Very Simple Model with Requirements](https://specif.de/examples/03_Requirement-with-Properties.specif)
-- v1.1: [Very Simple Model with Requirements](https://github.com/GfSE/SpecIF-Examples-and-Test-cases/blob/master/examples/v1.1/03_Requirement-with-Properties.specif)
+- v1.0: [Requirement with Properties](https://specif.de/examples/03_Requirement-with-Properties.specif)
+- v1.1: [Requirement with Properties](https://github.com/GfSE/SpecIF-Examples-and-Test-cases/blob/master/examples/v1.1/03_Requirement-with-Properties.specif)
