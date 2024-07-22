@@ -99,7 +99,7 @@ With certain SVG model diagrams, e.g. with FMC- or BPMN-notation created by <a h
 
 If permissions allow, a pen icon ↗🖉 is active at the selected model element in the upper right corner. Clicking opens an editing window whose fields are determined by the current element type. Entries are checked key by key for correctness: For example, a red frame immediately indicates when a letter is entered in a number field.
 
-Fields of type text (data type xs:string) allow formatting by means of XHTML or markdown, which is interpreted accordingly during display or document generation.
+Fields of type text (data type xs:string) allow formatting by means of XHTML or <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a>, which is interpreted accordingly during display or document generation.
 
 By the way, texts can also be formatted using XHTML and markdown in many authoring tools, including Excel®, Archi, Camunda Modeler and Cameo. The formatting is preserved during import.
 
@@ -176,9 +176,54 @@ Suitable terms are defined in the <a href="https://apps.specif.de/view.html#impo
 
 #### Enumerated Values
 
-<img class="my-align-right size-50" src="../assets/images/Manuals/05_Excel_enumerations_EN.png" alt="Excel Enumerations"/>
+<img class="my-align-right size-60" src="../assets/images/Manuals/05_Excel_enumerations_EN.png" alt="Excel Enumerations"/>
 
-To define an attribute with enumerated values, a worksheet with name _(Enumerations)_ including the brackets is created. Here all values of a certain attribute are specified column by column. Here again, the first line specifies the attribute name and the values below that are taken over up to the next blank line. In worksheets with user data, these values are provided for attributes with the same name; in the example given to the left, these are the attributes named _IREB:RequirementType_ and _SpecIF:Priority_. While Excel® also allows the specification of deviating values, this is not possible in case of SpecIF, therefore all values that do not correspond to those in the worksheet _(Enumerations)_ are ignored during import.
+To define an attribute with enumerated values, a worksheet with name _(Enumerations)_ including the brackets is created. Here all values of a certain attribute are specified column by column. Again, the first line specifies the attribute name and the values below that are taken over up to the next blank line. In worksheets with user data, these values are provided for attributes with the same name; in the example given to the left, these are the attributes named _IREB:RequirementType_ and _SpecIF:Priority_. While Excel® also allows the specification of deviating values, this is not possible in case of SpecIF, therefore all values that do not correspond to those in the worksheet _(Enumerations)_ are ignored during import.
+
+{: .highlight }
+_Note: Excel® assists the user in entering values through a selection box when the values listed in the "(Enumerations)" worksheet are selected for the column in question using the menu Data > Data Tools > Data Validation._
+
+This <a href="https://specif.de/examples/Example Telephone-Connection-Request (Requirements).xlsx" target="_blank">example</a> shows the described conventions. Here vocabulary terms have also been chosen for the enumerated attribute values. These are replaced in SpecIF Editor/Viewer by terms of the active national language, for example SpecIF:priorityHigh becomes high if German is selected in the browser. Of course, any terms can be used in the Excel worksheet, which will then be used directly in SpecIF Editor/Viewer regardless of the active browser language.
+
+### Archi
+
+Archi is a freely available modeling tool that supports the ArchiMate 3.0 notation of the Open Group. It can be obtained from <a href="https://www.archimatetool.com/download/" target="_blank">https://www.archimatetool.com/download/</a>.
+
+A model created with Archi can be transformed into the SpecIF format or integrated with models from other sources as follows:
+1. In the Archi tool, export all diagrams individually as an image in PNG or SVG format. To do this, right-click on the diagram to open the context menu and select ↗ **Export**, ↗ **View As Image**, then select the destination folder in the dialog and press ↗ **Save**.
+2. Export the model in the "Open Exchange" format by selecting ↗ **File**, ↗ **Export* and ↗ **Export Model To Open Exchange File** from the main menu while the model is selected; then select the destination folder in the dialog and press ↗ **Save**. 
+3. Now switch to the web browser and select or load the SpecIF editor as described in the previous chapter. First select the ↗ **ArchiMate** format in the top button bar. Using ↗ **+** Select file, choose the previously exported model in the Open Exchange format, which usually has the file extension '.xml'. The permitted action buttons ↗ **Create**, ↗ **Replace**, ↗ **Update** and ↗ **Adopt** are activated (see Chapter 2).
+4. After the import is completed, the display automatically jumps to the ↗ Edit page in the ↗ **Document** tab. The sub-views and functions described in the previous chapter can be selected.
+5. All entries in the outline that are not required can be deleted by clicking the delete icon ↗ ❌ on the right side of the screen.
+6. The entries in the outline can also be moved using drag'n'drop.
+7. Now select all the diagrams in the outline one after the other. The texts have been taken over, but the images have to be added manually. To do this, click the pencil icon ↗ 🖉 on the right edge of the screen when the diagram is selected. A modal dialog window opens with all the attributes of the element. For the ↗ Diagram attribute, click the pencil icon again to open the file selection dialog and select the respective image file; the usual web formats SVG, PNG and JPG are supported. Finally, click ↗ **Update** at the bottom of the modal editing dialog. The document view now shows the model diagram in the main column.
+
+Also for Archi, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in italics or key points can be enumerated in a bullet list.
+
+### ADOIT
+
+ADOIT is a modeling tool licensed from the BOC Group, which supports the ArchiMate 3.0 notation of the Open Group. It can be obtained from <a href="https://www.boc-group.com" target="_blank">https://www.boc-group.com</a>.
+
+A model created with ADOIT can be transformed into SpecIF format or integrated with models from other sources as follows:
+1. In the ADOIT tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, open the diagram by double-clicking in the model structure on the left and then save it in the menu bar directly above the diagram by ↗ **Export** and selecting the desired format. The file will be saved according to the settings of the browser; often in the folder "Downloads".
+2. In the model structure, select all diagrams to be considered. Via context menu follow ↗ **Import/Export**, ↗ **ArchiMate exchange** and ↗ **Export**. A dialog window opens, in which the diagram selection is checked/changed if necessary and a name for project and file is assigned.
+3. From the third step on, the procedure is the same as described above for Archi.
+
+Also for ADOIT, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list.
+
+### Cameo
+
+... coming soon.
+
+## Terms of Use
+
+### License
+
+Both SpecIF as a format with schema and consistency checker as well as the SpecIF viewer/editor are open source and are subject to the <a href="https://github.com/GfSE/SpecIF/blob/master/LICENSE" target="_blank">Apache 2.0 license</a>, which also allows free use for commercial applications. If used in your own product, the source must be given.
+
+### No Guarantee and No Liability
+
+SpecIF and the SpecIF viewer are provided "as-is" and without guaranteed characteristics. Use is always at your own risk. Any liability and guarantee are excluded. The installation at <a href="http://apps.specif.de" target="_blank">http://apps.specif.de</a> and the code maintained at <a href="https://github.com/GfSE" target="_blank">https://github.com/GfSE</a> is a reference implementation and not designed for high loads and high availability.
 
 
 <!-- link template <a href="" target="_blank"></a> -->
