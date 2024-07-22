@@ -248,10 +248,10 @@ It is currently still work in progress and not yet complete.
 The first release of SpecIF will therefore not define a fully-complete mapping for each modeling environment, 
 but still tries to define a subset for the most important elements and how to map them to SpecIF.  
 
-1. [Model Integration Guide for FMC](./06_SpecIF_Model_Integration_Guide_for_FMC.md)
-1. [Model Integration Guide for BPMN](./06_SpecIF_Model_Integration_Guide_for_BPMN.md)
-1. [Model Integration Guide for Archimate](./06_SpecIF_Model_Integration_Guide_for_Archimate.md)
-1. [Model Integration Guide for UML and SysML](./06_SpecIF_Model_Integration_Guide_for_SysML.md)
+1. [Model Integration Guide for FMC](./61_Model_Integration_Guide_for_FMC.md)
+1. [Model Integration Guide for BPMN](./62_Model_Integration_Guide_for_BPMN.md)
+1. [Model Integration Guide for Archimate](./63_Model_Integration_Guide_for_Archimate.md)
+1. [Model Integration Guide for UML and SysML](./64_Model_Integration_Guide_for_SysML.md)
 
 
 
