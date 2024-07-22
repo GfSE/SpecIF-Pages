@@ -30,7 +30,7 @@ Thus very fundamentally, SpecIF is to represent entities, objects or nodes (call
 ```
 
 Some explanations may help to understand the principles:
-- *resourceClasses*, *resources* and *hierarchies* have been covered, before; see Tutorial 1: [Hello World](./7-1_Hello-World.md).
+- *resourceClasses*, *resources* and *hierarchies* have been covered, before; see Tutorial 1: [Hello World](./01_Hello-World.html).
 - Similarly to resources having *resourceClasses*, the statements have types called *statementClasses*.
 - According to the SpecIF schema, a statementClass requires *id*, *title* and *changedAt*, all other attributes are optional.
 - A *statement* is an instance of a *statementClass*. It is a triple of *subject*, predicate and *object*, where the predicate is defined by the statement's *title*. By default, it's statementClass *title* applies. Thus, the term \"is a specialization of\" is the predicate or verb of the given statement.
