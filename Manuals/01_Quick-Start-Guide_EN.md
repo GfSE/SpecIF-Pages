@@ -68,7 +68,7 @@ In Excel® files, meaning can be assigned to resources, statements and their att
 
 The start page of the viewer / editor lets you first select the data format and gives you some specific information. Any formats other than SpecIF are converted into the SpecIF format during import.
 
-![Import Page](01-import-page.png)
+![Import Page](../assets/images/Manuals/01-import-page.png)
 
 To import a file, after selecting the relevant type, click on ↗**+ Select file** and the familiar file picker of your web browser will open; eligible files are filtered. Select the desired model file.
 
