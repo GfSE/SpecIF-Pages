@@ -9,7 +9,7 @@ nav_order: 06
 
 In the previous tutorials we have introduced all concepts we need to represent a simple model with SpecIF. Let's start with a block-diagram using the notation of the [Fundamental Modelling Concepts (FMC)](http://f-m-c.org/). Let us first look at the model, itself:
 
-![Very Simple Model (FMC)](./../images/Very-Simple-Model-FMC.svg)
+![Very Simple Model (FMC)](../images/Tutorials/Very-Simple-Model-FMC.svg)
 
 - In fact, this is not a model, but a diagram representing a model. It is a view of the model for a specific communication purpose; it is meant to be interpreted by a human being. In this particularly simple case, the diagram shows the whole model, but usually there are more and each diagram depicts a certain aspect of a model.
 - We see two model elements with two relations. The upper box represents an IT-System with some business logic and the lower box represents the information being processed. The directed connections represent a writing and a reading relationship; thus this application can write and read the data.
@@ -19,7 +19,7 @@ In the previous tutorials we have introduced all concepts we need to represent a
 
 Let us first look at the relations of the model-elements. A relation is represented by a statement made with the respective resources. Below, the statements for one of the model-elements, namely \'FiCo-Application\' are shown:
 
-![Very Simple Model Relations](./../images/Very-Simple-Model-Relations.png)
+![Very Simple Model Relations](../images/Tutorials/Very-Simple-Model-Relations.png)
 
 - While the model-diagram shown first was created by an engineer to define an aspect of the model, the graph above shows all statements with a particular model-element, \'FiCo-Application\' in this case. 
 - An accumulation of *all* statements with this model-element is shown, no matter where they have been defined; it is the semantic net around the selected element with a radius of one. 
@@ -321,7 +321,7 @@ Let us at last have a look at the full example, now:
 The instances, the actual model content, have not been discussed, yet:
 - You can easily see the diagram and the two model-elements in *resources*. The *properties* carry the information payload; those without a defined value can be omitted, e.g. the diagram has no property of type \"PC-Description\" and the model-elements have no property of type \"PC-Type\".
 - The four *statements* are equally easy to interpret: One *shows* relationship per model-element plus the *writes* and *reads* relationships between the model-elements.
-- By the way, if you display this example with the [SpecIF Viewer](http://specif.de/apps-alpha/view.html#import=../examples/06_Very-Simple-Model-FMC.specifz) and you hover the mouse over one of the model-elements or double-click it, you can see the potential of web-technology. This is not by virtue of SpecIF, but when the SVG is generated in a way that the model-element *id* is associated to a graphic element and an app like the SpecIF Viewer finds it, such behaviour is easily implemented.
+- By the way, if you display this example with the [SpecIF Viewer](https://specif.de/apps-alpha/view.html#import=https://specif.de/examples/06_Very-Simple-Model-FMC.specifz) and you hover the mouse over one of the model-elements or double-click it, you can see the potential of web-technology. This is not by virtue of SpecIF, but when the SVG is generated in a way that the model-element *id* is associated to a graphic element and an app like the SpecIF Viewer finds it, such behaviour is easily implemented.
 
 
-You may also view/download the example [Very Simple Model (FMC)](http://specif.de/examples/06_Very-Simple-Model-FMC.specifz "SpecIF Example \'Very Simple Model (FMC)\'") or view it using the [SpecIF Viewer](http://specif.de/apps/view#import=../examples/06_Very-Simple-Model-FMC.specifz).
+You may also view/download the example [Very Simple Model (FMC)](https://specif.de/examples/06_Very-Simple-Model-FMC.specifz "SpecIF Example \'Very Simple Model (FMC)\'") or view it using the [SpecIF Viewer](https://apps.specif.de/view#import=https://specif.de/examples/06_Very-Simple-Model-FMC.specifz).

@@ -156,4 +156,4 @@ Let us at last have a look at the full example:
 }
 ```
 
-You may also view/download the example [Requirement with Multiple Languages](http://specif.de/examples/07_Requirement-with-Multiple-Languages.specif "SpecIF Example \'Requirement with Multiple Languages\'") or display it using the [SpecIF Viewer](http://specif.de/apps/view#import=../examples/07_Requirement-with-Multiple-Languages.specif).
+You may also view/download the example [Requirement with Multiple Languages](https://specif.de/examples/07_Requirement-with-Multiple-Languages.specif "SpecIF Example \'Requirement with Multiple Languages\'") or display it using the [SpecIF Viewer](https://apps.specif.de/view#import=https://specif.de/examples/07_Requirement-with-Multiple-Languages.specif).

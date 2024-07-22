@@ -42,7 +42,7 @@ Some explanations:
 - The first value with "id":"V-Prio-0" is provided as a string in a single language and the second value with "id":"V-Prio-1" is provided as a list of JSON objects with *text* and *language* attributes (see tutorial [Requirement with Multiple Languages](./07_Requirement-with-Multiple-Languages.md)). 
 - The last value with "id":"V-Prio-4" is a vocabulary term consisting of a namespace in front of the colon ':' and the term thereafter.
 - Agreed-upon vocabulary terms help both collaborators to communicate more clearly and systems to match data fields automatically. SpecIF adopts terms and their definitions from other initiatives, for example from the [Dublin Core Metadata Initiative (DCMI)](http://dublincore.org/), the [Open Services for Lifecycle Collaboration (OSLC)](http://open-services.net/) and the [International Requirements Engineering Board (IREB)](http://ireb.org/).
-- In fact, not only the last enumerated value, but also the *title* is a vocabulary term. Have a look at the currently defined [SpecIF Vocabulary Terms](https://specif.de/apps/view#import=../examples/Vocabulary.specifz). By the way, the vocabulary itself is represented in a SpecIF data-set.
+- In fact, not only the last enumerated value, but also the *title* is a vocabulary term. Have a look at the currently defined [SpecIF Vocabulary Terms](https://apps.specif.de/view#import=https://specif.de/examples/Vocabulary.specifz). By the way, the vocabulary itself is represented in a SpecIF data-set.
 
 Let us at last have a look at the full example:
 
@@ -162,4 +162,4 @@ When to use values with multiple languages or a vocabulary term? Some aspects ar
 - In case of multiple-language values, the SpecIF data-set carries some language options and thus the systems used do not need to lookup vocabulary terms.
 - Try with different language settings of your Web-Browser: In the example given below, the SpecIF Viewer shows the priority value "low", "niedrig" or "bas".
 
-You may also view/download the example [Requirement with Vocabulary Term](http://specif.de/examples/08_Requirement-with-Vocabulary-Term.specif "SpecIF Example \'Requirement with Vocabulary Term\'") or display it using the [SpecIF Viewer](http://specif.de/apps/view#import=../examples/08_Requirement-with-Vocabulary-Term.specif).
+You may also view/download the example [Requirement with Vocabulary Term](https://specif.de/examples/08_Requirement-with-Vocabulary-Term.specif "SpecIF Example \'Requirement with Vocabulary Term\'") or display it using the [SpecIF Viewer](https://apps.specif.de/view#import=https://specif.de/examples/08_Requirement-with-Vocabulary-Term.specif).

@@ -364,9 +364,9 @@ As we have discussed all concepts before, let's right away discuss the full exam
 ```
 
 
-Finally, let's inspect the relations of model-element 'FiCo-Application' in a graphical view. In addition to the 'shows', 'reads' and 'writes' relations already presented in [Tutorial 6](./7-06_Very-Simple-Model-FMC.md), we see the additional 'satisfies' relation with it's requirement named 'Response Time'. In practice, there will of course be many more related requirements. It is however obvious that requirements related to the affected model-elements are much easier to analyse when compared to a situation with a requirements list and a model side-by-side in different tools.
+Finally, let's inspect the relations of model-element 'FiCo-Application' in a graphical view. In addition to the 'shows', 'reads' and 'writes' relations already presented in [Tutorial 6](./06_Very-Simple-Model-FMC.md), we see the additional 'satisfies' relation with it's requirement named 'Response Time'. In practice, there will of course be many more related requirements. It is however obvious that requirements related to the affected model-elements are much easier to analyse when compared to a situation with a requirements list and a model side-by-side in different tools.
 
 ![Very Simple Model with Requirements - Relations](../images/Tutorials/Very-Simple-Model-with-Requirements-Relations.png)
 
 
-You may also download the example [Very Simple Model with Requirements](http://specif.de/examples/09_Very-Simple-Model-FMC-with-Requirements_PNG.specifz "SpecIF Example \'Very Simple Model with Requirements\'") or view it using the [SpecIF Viewer](http://apps.specif.de/view#import=../examples/09_Very-Simple-Model-FMC-with-Requirements_PNG.specifz).
+You may also download the example [Very Simple Model with Requirements](https://specif.de/examples/09_Very-Simple-Model-FMC-with-Requirements_PNG.specifz "SpecIF Example \'Very Simple Model with Requirements\'") or view it using the [SpecIF Viewer](https://apps.specif.de/view#import=https://specif.de/examples/09_Very-Simple-Model-FMC-with-Requirements_PNG.specifz).
