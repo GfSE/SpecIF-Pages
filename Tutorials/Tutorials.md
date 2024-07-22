@@ -1,5 +1,5 @@
 ---
-title: "Tutorials for Developers"
+title: "Tutorials"
 layout: default
 has_children: true
 nav_order: 7
