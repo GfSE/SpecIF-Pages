@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Open API"
 layout: default
 parent: "Documentation"

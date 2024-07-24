@@ -1,4 +1,4 @@
-﻿---
+---
 title: "SpecIF-ReqIF Mapping"
 layout: default
 parent: "Documentation"

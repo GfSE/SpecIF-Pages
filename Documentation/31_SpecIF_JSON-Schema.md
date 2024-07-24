@@ -9,7 +9,7 @@ nav_order: 31
 
 The SpecIF JSON-schema describes the syntax of SpecIF data as a concrete instance of the SpecIF-Metamodel, like it was described earlier in this specification.
 The JSON-schema builds a platform-specific model (PSM), following the OMG MDA approach, realizing a JSON representation for SpecIF, based on the SpecIF metamodel.
-Currently, <a href="http://json-schema.org/draft-04/schema#" target="_blank">JSON Schema draft-04</a> used.
+<a href=	"https://json-schema.org/draft/2019-09/schema#" target="_blank">JSON Schema draft 2019-09</a> is used; currently also <a href="http://json-schema.org/draft-04/schema#" target="_blank">JSON Schema draft-04</a> can be applied.
 
 The schema definition file for SpecIF is available under 
 
@@ -21,6 +21,8 @@ followed by the names defined in the metamodel to avoid naming conflicts in
 implementations and code, generated from the schema definition, with equal names defined by other standards 
 (e.g. the term *Node* is used in the JavaScript world by NodeJS and also defined in the SpecIF metamodel). 
 So the metamodel term *Node* is called *SpecifNode* in the JSON-schema definition etc.
+
+There is a series of <a href="https://gfse.github.io/SpecIF-Pages/Tutorials/Tutorials.html" target="_blank">tutorials</a> explaning the information model.
 
 ## SpecIF JSON example
 
