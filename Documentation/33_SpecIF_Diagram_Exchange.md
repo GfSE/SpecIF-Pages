@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Diagram Exchange"
 layout: default
 parent: "Documentation"

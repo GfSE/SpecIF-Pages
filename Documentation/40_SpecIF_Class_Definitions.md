@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Class Definitions"
 layout: default
 parent: "Documentation"
@@ -28,9 +28,9 @@ other domains are still under discussion and development and will be released at
 
 For SpecIF 1.1 three domains are selected to be part of the first release:
 
-* 01 - Base Definitions,
-* 02 - Requirements Engineering,
-* 03 - Model Integration.
+- 01 - Base Definitions,
+- 02 - Requirements Engineering,
+- 03 - Model Integration.
 
 The other domains are still under discussion and not yet part of an official SpecIF release. 
 It is planned to release them with a future release.
@@ -39,7 +39,7 @@ It is planned to release them with a future release.
 The following list shows the currently defined domains and their IDs:
 
 |Domain ID|Domain|Description|Release status|
-|---------|-|-|-|
+| --- | --- | --- | --- |
 |01|Base definitions|Common definitions relevant for all domains (e.g. primitive data types).|Released in 1.1|
 |02|Requirements Engineering|Classical requirements engineering following the IREB definitions.|Released in 1.1|
 |03|Model Integration|SpecIF mapping for the Fundamental Modeling Concepts approach usable to integrate system modeling data.|Released in 1.1|
