@@ -1,7 +1,8 @@
 ---
 title: "Model-Integration Guide for FMC"
 layout: default
-parent: "Documentation"
+parent: "Introduction to Model Integration"
+grand_parent: "Documentation"
 nav_order: 61
 ---
 

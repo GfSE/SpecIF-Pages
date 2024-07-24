@@ -7,6 +7,8 @@ nav_order: 41
 
 # SpecIF Domain Classes
 
+Domain classes are generated from the SpecIF Ontology. Here, the classes of release 1.1 are listed.
+
 ## Domain 01: Base Definitions
 
 ### Data types of domain 01: Base Definitions
