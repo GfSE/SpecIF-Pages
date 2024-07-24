@@ -1,5 +1,5 @@
 ---
-title: "Introduction to Model Integration"
+title: "Model Integration"
 layout: default
 parent: "Documentation"
 has_children: true

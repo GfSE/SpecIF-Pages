@@ -1,13 +1,14 @@
 ---
 title: "SpecIF-ReqIF Mapping"
 layout: default
-parent: "Documentation"
+parent: "Model Integration"
+grand_parent: "Documentation"
 nav_order: 69
 ---
 
 # SpecIF-ReqIF Mapping
 
-Transforming SpecIF to ReqIF is bidirectional. Files can be exported and imported back and forth without losing any data.
+Transforming SpecIF to ReqIF is bidirectional. Files can be exported and imported in a round-trip without losing any data (if the partner's tool is also capable of round-trips).
 
 Note that there are SpecIF-Attributes which don't have a ReqIF equivalent yet, such as "revisions", "replaces" and "alternativeIds".  A way to utilize those attributes is creating an additional ATTRIBUTE-DEFINITION in ReqIF.
 

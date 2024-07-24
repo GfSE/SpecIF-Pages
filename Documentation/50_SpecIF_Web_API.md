@@ -13,7 +13,7 @@ It is possible to use such a web-service as part of a microservice software arch
 This specification describes version 1.1 of the SpecIF Web API, which is the first official released version.
 
 Swagger resp. OpenAPI is used to define the REST endpoints for SpecIF data access. 
-You can find the formal API definition on GitHub under https://github.com/GfSE/SpecIF-OpenAPI.
+You can find the formal API definition on GitHub under <a href="https://github.com/GfSE/SpecIF-OpenAPI" target="_blank">https://github.com/GfSE/SpecIF-OpenAPI</a>.
 
 ## Structure of the SpecIF Web API
 

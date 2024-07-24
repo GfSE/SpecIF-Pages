@@ -1,7 +1,7 @@
 ---
 title: "Model Integration Guide for UML® / SysML®"
 layout: default
-parent: "Introduction to Model Integration"
+parent: "Model Integration"
 grand_parent: "Documentation"
 nav_order: 64
 ---

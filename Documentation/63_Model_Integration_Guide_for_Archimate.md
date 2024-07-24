@@ -1,7 +1,7 @@
 ---
 title: "Model Integration Guide for ArchiMate®"
 layout: default
-parent: "Introduction to Model Integration"
+parent: "Model Integration"
 grand_parent: "Documentation"
 nav_order: 63
 ---
