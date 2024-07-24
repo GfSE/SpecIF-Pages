@@ -7,7 +7,7 @@ nav_order: 03
 
 # Tutorial 3: Requirement with Properties
 
-Next, we would like to discuss how to add specific information to a resource or statement using properties. A requirement with name and description will serve as an example.
+Next, we would like to add specific information to a resource or statement using properties. A requirement with name and description will serve as an example.
 
 Again, let's start with the new elements of a SpecIF data-set.
 

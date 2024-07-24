@@ -7,7 +7,7 @@ nav_order: 05
 
 # Tutorial 5: Requirement with Enumerated Property
 
-Next, we would like to discuss how to add a property to a resource which may assume one of several predefined (\"enumerated\") values. The previously discussed requirement will now get a property indicating it's  priority.
+Next, we would like to add a property to a resource which may assume one of several predefined (\"enumerated\") values. The previously discussed requirement will now get a property indicating it's  priority.
 
 Again, let's start with the new elements of a SpecIF data-set.
 
