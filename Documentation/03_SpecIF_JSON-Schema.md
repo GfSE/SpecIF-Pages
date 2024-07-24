@@ -1,4 +1,4 @@
-﻿---
+---
 title: "JSON-Schema"
 layout: default
 parent: "Documentation"
