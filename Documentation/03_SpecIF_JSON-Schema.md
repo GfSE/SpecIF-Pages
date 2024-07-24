@@ -19,7 +19,7 @@ The schema definition file for SpecIF is available under
 __Remark:__ The names, internally used in the JSON-schema for SpecIF all get a prefix `Specif`, 
 followed by the names defined in the metamodel to avoid naming conflicts in 
 implementations and code, generated from the schema definition, with equal names defined by other standards 
-(e.g. the term *Node- is used in the JavaScript world by NodeJS and also defined in the SpecIF metamodel). 
+(e.g. the term *Node* is used in the JavaScript world by NodeJS and also defined in the SpecIF metamodel). 
 So the metamodel term *Node* is called *SpecifNode* in the JSON-schema definition etc.
 
 ## SpecIF JSON example
@@ -59,13 +59,13 @@ Not all JSON-properties are set, but the SpecIF schema defines just a subset as 
 The data and class definition in SpecIF is a cascading data structure: At first a data type is defined out of a set of primitive data types. 
 The list below shows the available primitive data types based on the data types defined in XML-schemas (XSD):
 
-- *xs:string- - a formatted or unformatted text string,
-- *xs:boolean- - a boolean value,
-- *xs:integer- - a number value,
-- *xs:double- - a floating point number,
-- *xs:dateTime- - a date value,
-- *xs:anyURI- - a uniform resource identifier (URI) including a uniform resource locator (URL),
-- *xs:duration- - a duration value.
+- *xs:string* - a formatted or unformatted text string,
+- *xs:boolean* - a boolean value,
+- *xs:integer* - a number value,
+- *xs:double* - a floating point number,
+- *xs:dateTime* - a date value,
+- *xs:anyURI* - a uniform resource identifier (URI) including a uniform resource locator (URL),
+- *xs:duration* - a duration value.
 
 Based on these primitive data types, a SpecIF user can define *DataType* elements. 
 These data types can be used as base for *PropertyClass*-definitions. 
@@ -75,9 +75,9 @@ Using this approach all kinds of data representation can be defined in SpecIF.
 The resources, statement, properties and hierarchies instantiate the class definitions. 
 A SpecIF-tool can automatically generate a property editor for a resource or statement element, because all necessary information is available in the class and data type definition elements. 
 
-A reference to another SpecIF element is always expressed using the *Key- -helper-element. 
-It contains the *ID- and the *revision*-ID of the referenced element.
-If no *revision- is given, the element with the newest ``changedAt`` date shall be used.
+A reference to another SpecIF element is always expressed using the *Key* -helper-element. 
+It contains the *ID* and the *revision*-ID of the referenced element.
+If no *revision* is given, the element with the newest ``changedAt`` date shall be used.
 
 ## Definition elements
 
@@ -88,6 +88,7 @@ SpecIF data types define the data types used in a property to store a PLM data v
 The JOSN-snippet below shows some data type definitions for non-enumeration types:
 
 ```json 
+"dataTypes": [
 {
     "id": "DT-Boolean",
     "title": "Boolean",
@@ -246,19 +247,20 @@ The JOSN-snippet below shows some data type definitions for non-enumeration type
     "maxLength": 256,
     "changedAt": "2016-05-26T08:59:00+02:00"
 }
+]
 ```
 
 ### Enumerations
 
-Any data type exept *'xs:boolean'- may define a set of enumerated values using the attribute *enumeration*.
+Any data type exept *xs:boolean* may define a set of enumerated values using the attribute *enumeration*.
 If defined, only those discrete values are eligible. For example,
-- a data type to be used for priority can be defined as *'xs:string'- with the enumerated values *['high', 'medium', 'low']*.
-- a data type to be used for an effort in planning poker can be defined as *'xs:integer'- with the enumerated values *[0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]*.
+- a data type to be used for priority can be defined as *xs:string* with the enumerated values *['high', 'medium', 'low']*.
+- a data type to be used for an effort in planning poker can be defined as *'xs:integer'* with the enumerated values *[0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]*.
 
 SpecIF supports enumeration with multiple selection, so more than one value of an enumeration can be selected in a SpecIF property. 
-If the JSON-attribute *multiple- is set to *true*, multiple selection is allowed.
+If the JSON-attribute *multiple* is set to *true*, multiple selection is allowed.
 
-The following data type definitions show an example for an enumeration data type definition with SpecIF using the *xs:string- data type:
+The following data type definitions show an example for an enumeration data type definition with SpecIF using the *xs:string* data type:
 
 ```json
 {
@@ -376,7 +378,7 @@ Resource and statement elements contain an array of defined property instances t
 
 The property class definitions are very important, because here the name resp. title of a property is defined. 
 Properties are in principle key/value pairs representing data. 
-The *title- JSON-property of the property class defines the term used for the property.
+The *title* JSON-property of the property class defines the term used for the property.
 
 The SpecIF standard also contains a standardized set of data type and class definitions. 
 The properties are one integral part of the standardized SpecIF data format vocabulary (syntax) and the standardization allows the data exchange between different tools without manual data mapping. 
@@ -385,6 +387,7 @@ An example of property class definitions is given below.
 If no ``format`` attribute is explicitly set, ``plain`` is used as default.
 
 ```json
+"propertyClasses": [
 {
     "id": "PC-Name",
     "title": "dcterms:title",
@@ -423,9 +426,10 @@ If no ``format`` attribute is explicitly set, ``plain`` is used as default.
     },
     "changedAt": "2016-05-26T08:59:00+02:00"
 }
+]
 ```
 
-In the example you can see that as title for the property with the ID *PC-Name- the term *dcterms:title- is used. So this property class defines a property where the name of an PLM data element can be stored.
+In the example you can see that as title for the property with the ID *PC-Name* the term *dcterms:title* is used. So this property class defines a property where the name of an PLM data element can be stored.
 
 ### Resource Classes
    
@@ -435,6 +439,7 @@ An example resource class definition is shown below.
 This example shows the resource class defining the data structure to store a requirement element following the IREB recommendation.
 
 ```json
+"resourceClasses": [
 {
     "id": "RC-Requirement",
     "title": "IREB:Requirement",
@@ -486,13 +491,15 @@ This example shows the resource class defining the data structure to store a req
     ],
     "changedAt": "2021-02-22T08:59:00+02:00"
 }
+]
 ```
 ### Statement Classes
    
-Statement classes define the statements (links between SpecIF data elements - resources, statements and files). Statements start at a subject data element and end on an object data element. It is possible to restrict the subjects and objects where a statement can be used by defining entries in the *subjectClasses-  and *objectClasses- JSON-properties of the statement class definition. If there are no entries, any element can be used as the statement's subject or object.
+Statement classes define the statements (links between SpecIF data elements - resources, statements and files). Statements start at a subject data element and end on an object data element. It is possible to restrict the subjects and objects where a statement can be used by defining entries in the *subjectClasses*  and *objectClasses* JSON-properties of the statement class definition. If there are no entries, any element can be used as the statement's subject or object.
 
-The following example of a statement class definition defines a statement that can be used between requirement resource elements. It defines the *IREB:refines- relationship. Also known as *deriveReqt- dependency in SysML:
+The following example of a statement class definition defines a statement that can be used between requirement resource elements. It defines the *IREB:refines* relationship. Also known as *deriveReqt* dependency in SysML:
 ```json
+"statementClasses": [
 {
     "id": "SC-refines",
     "title": "IREB:refines",
@@ -520,10 +527,11 @@ The following example of a statement class definition defines a statement that c
     ],
     "changedAt": "2016-05-26T08:59:00+02:00"
 }
+]
 ``` 
 ## Data elements
 
-The SpecIF data elements resource and statement represent concrete PLM data. All data elements shall have a reference to the definition class element (resource class or statement class) using the *class- JSON-property element. 
+The SpecIF data elements (or instances) *resource* and *statement* represent concrete PLM data. All data elements shall have a reference to the definition class element (resource class or statement class) using the *class* JSON-property element. 
 
 SpecIF-properties defined for a resource or statement are stored inside a resource or statement element containing the data value of the represented PLM data. 
 
@@ -533,12 +541,13 @@ Resources are the nodes in a SpecIF data set graph. They contain the concrete da
 
 The following example shows a resource representing a requirement element.
 In the description property value the attributes for ``format`` and ``language`` are not explicitly set. 
-So the default values are used: English as default language and the format defined in the *PropertyClass- of the property. 
+So the default values are used: English as default language and the format defined in the *PropertyClass* of the property. 
 
-The property values representing textual content are using the *MultilanguageText- data structure. 
+The property values representing textual content are using the *MultilanguageText* data structure. 
 The status value, defined as enumeration, uses a string with the ``EnumerationValue`` identifier (ID).
 
 ```json
+"resources": [
 {
     "id": "_73392B3D_CF8F_4ac0_BC77_E6A2C9415EF4",
     "revision": "F16C40BE-DFC4-46BB-85C4-FDF9433F8E73",
@@ -598,17 +607,19 @@ The status value, defined as enumeration, uses a string with the ``EnumerationVa
     "changedAt": "2021-03-07T11:16:21",
     "changedBy": "oa"
 }
+]
 ```
 
 ### Statements
 
-Statements are used in SpecIF to define relationships between concrete SpecIF data elements. Normally they express relationships between two resource elements. In some special cases they can also express relationships between two statements or a resource and a statement. This depends on what the given key for *subject- and *object- references.
+Statements are used in SpecIF to define relationships between concrete SpecIF data elements. Normally they express relationships between two resource elements. In some special cases they can also express relationships between two statements or a resource and a statement. This depends on what the given key for *subject* and *object* references.
 
 Statements can have a list of properties to store additional data.
 
 The following example shows a statement example. This statement has no properties defined.
 
 ```json
+"statements": [
 {
     "id": "_2186cb8d_390f_427c_9df3_a9756763b6ed",
     "revision": "820BFEE3-5808-4395-A0C2-F11E27FAFE59",
@@ -629,13 +640,14 @@ The following example shows a statement example. This statement has no propertie
     "changedAt": "2021-03-29T15:13:54.0813277+02:00",
     "changedBy": "oa"
 }
+]
 ``` 
 
 ## Hierarchies and Nodes
 
-The *hierarchies- array in the SpecIF data set contains a collection of *node- SpecIF elements. 
+The *hierarchies* array in the SpecIF data set contains a collection of *node* SpecIF elements. 
 It is possible to create a hierarchical view to a selected set of resource elements, using node elements.
-The *Node- is defined as a recursive data structure. 
+The *Node* is defined as a recursive data structure. 
 Each node includes a reference to a selected resource (JSON-property *resource*) and the node can contain a collection of child nodes in the JSON-property *nodes*. 
 This allows using the node to define a hierarchical view to SpecIF resource elements. 
 
@@ -710,6 +722,7 @@ The URL can be defined absolute or relative to the SpecIF data, where the file d
 If the URL is missing, the title applies as access path.
 
 ```json
+"files": [
 {
     "id": "_9DCD9463_74E4_49B8_8C63_0E0877CDD47E",
     "revision": "95C00759-5CB5-49CF-B2AE-174B2C938730",
@@ -725,4 +738,5 @@ If the URL is missing, the title applies as access path.
     "changedAt": "2021-03-30T13:13:53.8253311+02:00",
     "changedBy": "oa" 
 }
+]
 ```
