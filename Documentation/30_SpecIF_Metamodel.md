@@ -2,7 +2,7 @@
 title: "Metamodel"
 layout: default
 parent: "Documentation"
-nav_order: 33
+nav_order: 30
 ---
 
 # SpecIF Metamodel
