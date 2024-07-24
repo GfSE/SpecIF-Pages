@@ -2,6 +2,7 @@
 title: "Introduction to Model Integration"
 layout: default
 parent: "Documentation"
+has_children: true
 nav_order: 60
 ---
 
