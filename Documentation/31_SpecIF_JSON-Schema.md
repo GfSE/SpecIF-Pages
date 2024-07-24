@@ -2,7 +2,7 @@
 title: "JSON-Schema"
 layout: default
 parent: "Documentation"
-nav_order: 03
+nav_order: 31
 ---
 
 # SpecIF JSON-Schema
