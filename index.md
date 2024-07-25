@@ -34,7 +34,7 @@ SpecIF contributes to the following objectives:
 - **Vendor-neutral and independent:** SpecIF is not limited to certain tools or vendors; in contrast, SpecIF lets you exchange model data between different tools and organizations.
 - **Schema-compliant:** SpecIF data can be checked formally using a JSON- or XML-schema; the former has been made available at <a href="https://github.com/GfSE/SpecIF-Schema/tree/main/schema" target="_blank">SpecIF-Schema</a>.
 - **Standard-compliant:** SpecIF draws on existing standards, most importantly from W3C, OMG and OASIS.
-<img class="my-align-right" src="./assets/images/Home/CC_BY-SA_88x31.png" alt="Creative Commons BY-SA" />
+<img class="my-align-right size-20" src="./assets/logos/Home/CC_BY-SA_88x31.png" alt="Creative Commons BY-SA" />
 - **Open and cooperative:** All results are published with <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons 4.0 CC BY-SA</a> license; allowing commercial use. The results can be further developed, but the origin must be stated and they must be published under similar terms; please consult the referenced license text. We encou­rage everyone interested to join our GfSE working group and to directly contribute to the results.
 
 # Use Cases
@@ -131,7 +131,7 @@ The following five principles of semantic integration have been developed in var
 For system specifications represented by SpecIF data in JSON format a <a href="https://github.com/GfSE/SpecIF-Schema/tree/main/schema" target="_blank">schema</a> is being developed publicly on Github. Furthermore, implementations of a schema-check and a constraint-check have been made available.
 
 CORS-enabled hosting:
-- SpecIF Home: <a href="https://specif.de/v1.1/schema.json" target="_blank">SpecIF v1.1 schema</a> and <a href="https://specif.de/v1.1/CCheck.mjs" target="_blank">constraints<(a>
+- SpecIF Home: <a href="https://specif.de/v1.1/schema.json" target="_blank">SpecIF v1.1 schema</a> and <a href="https://specif.de/v1.1/CCheck.mjs" target="_blank">constraints</a>
 - Schemastore.org: <a href="https://json.schemastore.org/specif-1.1.json" target="_blank">SpecIF v1.1 schema</a>
 
 Applications and suggestions are welcome!
@@ -160,8 +160,8 @@ Are you interested and would like to investigate the SpecIF approach more in det
 - A series of <a href="https://gfse.github.io/SpecIF-Pages/tutorials/" target="_blank">tutorials</a> on how to create and interpret SpecIF data.
 - SpecIF <a href="https://gfse.github.io/SpecIF-Pages/Manuals/01_Quick-Start-Guide_EN.html" target="_blank">Introduction and Quick Start Guide</a>.
 - The <a href="https://apps.specif.de/view.html#import=%22https://specif.de/v1.1/Ontology.specif%22" target="_blank">SpecIF Ontology</a>.
-- Some examples using SpecIF are listed in the previous chapter.
-- A presentation <a href="https://specif.de/files/SpecIF/documents/2019-11-24%20Model-Integration%20with%20SpecIF" target="_blank">'Model Integration with SpecIF'</a> covering the status and future steps in development.
+- Some examples using SpecIF are listed in the <a href="https://gfse.github.io/SpecIF-Pages/#examples" target="_blank">previous chapter</a>.
+- A presentation <a href="https://specif.de/files/SpecIF/documents/2019-11-24%20Model-Integration%20with%20SpecIF" target="_blank">'Model Integration with SpecIF'</a> covering the status and future steps in development and a more recent concrete example <a href="https://specif.de/files/SpecIF/documents/TdSE-2021%20Dungern%20-%20Integrate%20BPMN%20and%20Archimate%20Models%20using%20SpecIF.pdf" target="_blank">'Integrate BPMN and Archimate Models using SpecIF'</a>.
 
 If you have any questions, please contact Uwe Kaufmann, Oliver Alt or Oskar v. Dungern using the contact information given below. Suggestions and contributions are welcome!
 
@@ -198,7 +198,7 @@ Interested to support the SpecIF Initiative with active collaboration on theoret
 
 # Institution
 
-<img class="my-align-right" src="./assets/logos/GfSE-Incose-Logo.web.png" alt="GfSE-Logo">
+<img class="my-align-right size-20" src="./assets/logos/GfSE-Incose-Logo.web.png" alt="GfSE-Logo">
 
 The SpecIF initiative is hosted by the <a href="http://www.gfse.org/" target="_blank">Gesellschaft für Systems Engineering e.V. (GfSE)</a>, German Chapter of <a href="http://www.incose.org/" target="_blank">INCOSE</a>.
 
