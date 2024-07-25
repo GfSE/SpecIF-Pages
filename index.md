@@ -34,7 +34,7 @@ SpecIF contributes to the following objectives:
 - **Vendor-neutral and independent:** SpecIF is not limited to certain tools or vendors; in contrast, SpecIF lets you exchange model data between different tools and organizations.
 - **Schema-compliant:** SpecIF data can be checked formally using a JSON- or XML-schema; the former has been made available at <a href="https://github.com/GfSE/SpecIF-Schema/tree/main/schema" target="_blank">SpecIF-Schema</a>.
 - **Standard-compliant:** SpecIF draws on existing standards, most importantly from W3C, OMG and OASIS.
-<img class="my-align-right size-20" src="./assets/logos/Home/CC_BY-SA_88x31.png" alt="Creative Commons BY-SA" />
+<img class="my-align-right size-20" src="./assets/logos/CC_BY-SA_88x31.png" alt="Creative Commons BY-SA" />
 - **Open and cooperative:** All results are published with <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons 4.0 CC BY-SA</a> license; allowing commercial use. The results can be further developed, but the origin must be stated and they must be published under similar terms; please consult the referenced license text. We encou­rage everyone interested to join our GfSE working group and to directly contribute to the results.
 
 # Use Cases
