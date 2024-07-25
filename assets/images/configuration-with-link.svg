@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="140.24999999980002mm" height="125.24999999980001mm" viewBox="0.0 0.0 140.24999999980002 125.24999999980001" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events" version="1.1">
+	<g>
+		<desc>Varianten in einer Übersicht, fmc.bd, 72b875ef0000c3a80141258b59013e0f</desc>
+		<a xlink:href="../../specObjects/MEl-72b8f6d20000c3a801415dd4efa0364a.html" xlink:show="new">
+			<desc>Einbausatz 39, fmc.bd.agent, 72b896f70000c3a80141028246defb07</desc>
+			<g>
+				<desc>null, figure.plane, null</desc>
+				<path d=" M 0.1249999999,90.1249999999 L 140.1249999999,90.1249999999 L 140.1249999999,35.1249999999 L 0.1249999999,35.1249999999 z" fill="rgb(255,255,204)"/>
+				<line x1="0.1249999999" y1="90.1249999999" x2="140.1249999999" y2="90.1249999999" stroke="rgb(0,0,0)" stroke-width="0.24999999999999972" stroke-linecap="round"/>
+				<line x1="140.1249999999" y1="90.1249999999" x2="140.1249999999" y2="35.1249999999" stroke="rgb(0,0,0)" stroke-width="0.24999999999999972" stroke-linecap="round"/>
+				<line x1="140.1249999999" y1="35.1249999999" x2="0.12499999990001243" y2="35.1249999999" stroke="rgb(0,0,0)" stroke-width="0.24999999999999972" stroke-linecap="round"/>
+				<line x1="0.1249999999" y1="35.1249999999" x2="0.1249999999" y2="90.1249999999" stroke="rgb(0,0,0)" stroke-width="0.24999999999999972" stroke-linecap="round"/>
+				<g>
+					<desc>null, supplement, null</desc>
+					<text x="1.6249999999" y="63.9749999999" textLength="25.44" lengthAdjust="spacingAndGlyphs" text-anchor="start" font-family="Arial" font-size="4.0200000000000005">Einbausatz 39</text>
+				</g>
+			</g>
+		</a>
+		<a xlink:href="../../specObjects/MEl-72ba03300000c3a80141c28e1ff15816.html" xlink:show="new">
+			<desc>Einbausatz 47, fmc.bd.agent, 72b9e7f30000c3a8014160f6d4286b88</desc>
+			<g>
+				<desc>null, figure.plane, null</desc>
+				<path d=" M 40.1249999999,125.1249999999 L 135.1249999999,125.1249999999 L 135.1249999999,40.1249999999 L 40.1249999999,40.1249999999 z" fill="rgb(203,227,244)"/>
+				<line x1="40.1249999999" y1="125.1249999999" x2="135.1249999999" y2="125.1249999999" stroke="rgb(0,0,0)" stroke-width="0.24999999999999972" stroke-linecap="round"/>
+				<line x1="135.1249999999" y1="125.1249999999" x2="135.1249999999" y2="40.1249999999" stroke="rgb(0,0,0)" stroke-width="0.24999999999999972" stroke-linecap="round"/>
+				<line x1="135.1249999999" y1="40.1249999999" x2="40.12499999990001" y2="40.1249999999" stroke="rgb(0,0,0)" stroke-width="0.24999999999999972" stroke-linecap="round"/>
+				<line x1="40.1249999999" y1="40.1249999999" x2="40.1249999999" y2="125.1249999999" stroke="rgb(0,0,0)" stroke-width="0.24999999999999972" stroke-linecap="round"/>
+				<g>
+					<desc>null, supplement, null</desc>
+					<text x="87.62499999990001" y="122.72499999989999" textLength="25.44" lengthAdjust="spacingAndGlyphs" text-anchor="middle" font-family="Arial" font-size="4.0200000000000005">Einbausatz 47</text>
+				</g>
+			</g>
+		</a>
+		<a xlink:href="../../specObjects/MEl-72b97dcc0000c3a80141bf7fdc85de4a.html" xlink:show="new">
+			<desc>Einbausatz 26, fmc.bd.agent, 72b95fd00000c3a8014143ab48b4205a</desc>
+			<g>
+				<desc>null, figure.plane, null</desc>
+				<path d=" M 85.1249999999,65.1249999999 L 130.1249999999,65.1249999999 L 130.1249999999,0.12499999989999999 L 85.1249999999,0.12499999989999999 z" fill="rgb(224,251,193)"/>
+				<line x1="85.1249999999" y1="65.1249999999" x2="130.1249999999" y2="65.1249999999" stroke="rgb(0,0,0)" stroke-width="0.24999999999999972" stroke-linecap="round"/>
+				<line x1="130.1249999999" y1="65.1249999999" x2="130.1249999999" y2="0.12499999989999822" stroke="rgb(0,0,0)" stroke-width="0.24999999999999972" stroke-linecap="round"/>
+				<line x1="130.1249999999" y1="0.12499999989999999" x2="85.1249999999" y2="0.12499999989999999" stroke="rgb(0,0,0)" stroke-width="0.24999999999999972" stroke-linecap="round"/>
+				<line x1="85.1249999999" y1="0.12499999989999999" x2="85.1249999999" y2="65.1249999999" stroke="rgb(0,0,0)" stroke-width="0.24999999999999972" stroke-linecap="round"/>
+				<g>
+					<desc>null, supplement, null</desc>
+					<text x="107.62499999990001" y="5.2249999999" textLength="25.44" lengthAdjust="spacingAndGlyphs" text-anchor="middle" font-family="Arial" font-size="4.0200000000000005">Einbausatz 26</text>
+				</g>
+			</g>
+		</a>
+		<a xlink:href="../../specObjects/MEl-72ba8aa70000c3a80141659c8238909d.html" xlink:show="new">
+			<desc>Schwimmschalter, fmc.bd.agent, 72ba674f0000c3a801414cb6a926fa69</desc>
+			<g>
+				<desc>null, figure.plane, null</desc>
+				<path d=" M 90.1249999999,60.1249999999 L 125.1249999999,60.1249999999 L 125.1249999999,45.1249999999 L 90.1249999999,45.1249999999 z" fill="rgb(255,255,255)"/>
+				<line x1="90.1249999999" y1="60.1249999999" x2="125.1249999999" y2="60.1249999999" stroke="rgb(0,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="125.1249999999" y1="60.1249999999" x2="125.1249999999" y2="45.1249999999" stroke="rgb(0,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="125.1249999999" y1="45.1249999999" x2="90.1249999999" y2="45.1249999999" stroke="rgb(0,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="90.1249999999" y1="45.1249999999" x2="90.1249999999" y2="60.1249999999" stroke="rgb(0,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<g>
+					<desc>null, supplement, null</desc>
+					<text x="107.6249999999" y="53.9749999999" textLength="31.619999999999997" lengthAdjust="spacingAndGlyphs" text-anchor="middle" font-family="Arial" font-size="4.0200000000000005">Schwimmschalter</text>
+				</g>
+			</g>
+		</a>
+		<a xlink:href="../../specObjects/MEl-72babe150000c3a8014168c3167649d3.html" xlink:show="new">
+			<desc>Bilgepumpe &lt;12m, fmc.bd.agent, 72baa7890000c3a80141c73972f0529c</desc>
+			<g>
+				<desc>null, figure.plane, null</desc>
+				<path d=" M 90.1249999999,85.1249999999 L 125.1249999999,85.1249999999 L 125.1249999999,70.1249999999 L 90.1249999999,70.1249999999 z" fill="rgb(255,255,255)"/>
+				<line x1="90.1249999999" y1="85.1249999999" x2="125.1249999999" y2="85.1249999999" stroke="rgb(0,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="125.1249999999" y1="85.1249999999" x2="125.1249999999" y2="70.1249999999" stroke="rgb(0,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="125.1249999999" y1="70.1249999999" x2="90.1249999999" y2="70.1249999999" stroke="rgb(0,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="90.1249999999" y1="70.1249999999" x2="90.1249999999" y2="85.1249999999" stroke="rgb(0,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<g>
+					<desc>null, supplement, null</desc>
+					<text x="107.6249999999" y="76.72499999989999" textLength="21.24" lengthAdjust="spacingAndGlyphs" text-anchor="middle" font-family="Arial" font-size="4.0200000000000005">Bilgepumpe</text>
+					<text x="107.6249999999" y="81.22499999989999" textLength="10.2" lengthAdjust="spacingAndGlyphs" text-anchor="middle" font-family="Arial" font-size="4.0200000000000005">&lt;12m</text>
+				</g>
+			</g>
+		</a>
+		<a xlink:href="../../specObjects/MEl-72bb1e2f0000c3a801412d0dc2576bf0.html" xlink:show="new">
+			<desc>Steuereinheit Bilgenalarm, fmc.bd.agent, 72bb08ac0000c3a801415eada7577240</desc>
+			<g>
+				<desc>null, figure.plane, null</desc>
+				<path d=" M 90.1249999999,30.124999999899998 L 125.1249999999,30.124999999899998 L 125.1249999999,15.1249999999 L 90.1249999999,15.1249999999 z" fill="rgb(255,255,255)"/>
+				<line x1="90.1249999999" y1="30.124999999899998" x2="125.1249999999" y2="30.124999999899998" stroke="rgb(255,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="125.1249999999" y1="30.124999999899998" x2="125.1249999999" y2="15.1249999999" stroke="rgb(255,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="125.1249999999" y1="15.1249999999" x2="90.1249999999" y2="15.1249999999" stroke="rgb(255,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="90.1249999999" y1="15.1249999999" x2="90.1249999999" y2="30.124999999899998" stroke="rgb(255,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<g>
+					<desc>null, supplement, null</desc>
+					<text x="107.6249999999" y="21.7249999999" textLength="23.639999999999997" lengthAdjust="spacingAndGlyphs" text-anchor="middle" font-family="Arial" fill="rgb(255,0,0)" font-size="4.0200000000000005">Steuereinheit</text>
+					<text x="107.6249999999" y="26.2249999999" textLength="21.24" lengthAdjust="spacingAndGlyphs" text-anchor="middle" font-family="Arial" fill="rgb(255,0,0)" font-size="4.0200000000000005">Bilgenalarm</text>
+				</g>
+			</g>
+		</a>
+		<a xlink:href="../../specObjects/MEl-72bbab120000c3a801418918b7989ac4.html" xlink:show="new">
+			<desc>Steuereinheit Bilgenalarm/pumpe, fmc.bd.agent, 72bb92d10000c3a801416e7bf89556b3</desc>
+			<g>
+				<desc>null, figure.plane, null</desc>
+				<path d=" M 45.1249999999,60.1249999999 L 80.1249999999,60.1249999999 L 80.1249999999,45.1249999999 L 45.1249999999,45.1249999999 z" fill="rgb(255,255,255)"/>
+				<line x1="45.1249999999" y1="60.1249999999" x2="80.1249999999" y2="60.1249999999" stroke="rgb(255,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="80.1249999999" y1="60.1249999999" x2="80.1249999999" y2="45.1249999999" stroke="rgb(255,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="80.1249999999" y1="45.1249999999" x2="45.1249999999" y2="45.1249999999" stroke="rgb(255,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="45.1249999999" y1="45.1249999999" x2="45.1249999999" y2="60.1249999999" stroke="rgb(255,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<g>
+					<desc>null, supplement, null</desc>
+					<text x="62.6249999999" y="49.4749999999" textLength="23.639999999999997" lengthAdjust="spacingAndGlyphs" text-anchor="middle" font-family="Arial" fill="rgb(255,0,0)" font-size="4.0200000000000005">Steuereinheit</text>
+					<text x="62.6249999999" y="53.9749999999" textLength="22.380000000000003" lengthAdjust="spacingAndGlyphs" text-anchor="middle" font-family="Arial" fill="rgb(255,0,0)" font-size="4.0200000000000005">Bilgenalarm/</text>
+					<text x="62.6249999999" y="58.4749999999" textLength="12.3" lengthAdjust="spacingAndGlyphs" text-anchor="middle" font-family="Arial" fill="rgb(255,0,0)" font-size="4.0200000000000005">pumpe</text>
+				</g>
+			</g>
+		</a>
+		<a xlink:href="../../specObjects/MEl-72bc53570000c3a80141ffcf85d483e6.html" xlink:show="new">
+			<desc>Bilgepumpe &lt;8m, fmc.bd.agent, 72bc42a40000c3a80141a7cb701c932e</desc>
+			<g>
+				<desc>null, figure.plane, null</desc>
+				<path d=" M 90.1249999999,110.1249999999 L 125.1249999999,110.1249999999 L 125.1249999999,95.1249999999 L 90.1249999999,95.1249999999 z" fill="rgb(255,255,255)"/>
+				<line x1="90.1249999999" y1="110.1249999999" x2="125.1249999999" y2="110.1249999999" stroke="rgb(0,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="125.1249999999" y1="110.1249999999" x2="125.1249999999" y2="95.1249999999" stroke="rgb(0,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="125.1249999999" y1="95.1249999999" x2="90.1249999999" y2="95.1249999999" stroke="rgb(0,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<line x1="90.1249999999" y1="95.1249999999" x2="90.1249999999" y2="110.1249999999" stroke="rgb(0,0,0)" stroke-width="0.49999999999999944" stroke-linecap="round"/>
+				<g>
+					<desc>null, supplement, null</desc>
+					<text x="107.6249999999" y="101.72499999989999" textLength="21.24" lengthAdjust="spacingAndGlyphs" text-anchor="middle" font-family="Arial" font-size="4.0200000000000005">Bilgepumpe</text>
+					<text x="107.6249999999" y="106.22499999989999" textLength="7.98" lengthAdjust="spacingAndGlyphs" text-anchor="middle" font-family="Arial" font-size="4.0200000000000005">&lt;8m</text>
+				</g>
+			</g>
+		</a>
+	</g>
+</svg>
