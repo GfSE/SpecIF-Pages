@@ -368,6 +368,6 @@ Finally, let's inspect the relations of model-element "FiCo-Application" in a gr
 
 ![Very Simple Model with Requirements - Relations](../assets/images/Tutorials/Very-Simple-Model-with-Requirements-Relations.png)
 
-You may view the example using the [SpecIF Viewer](https://apps.specif.de/view#import=https://specif.de/examples/09_Very-Simple-Model-FMC-with-Requirements.specifz), or download the SpecIF data:
-- v1.0: [Very Simple Model with Requirements](https://specif.de/examples/09_Very-Simple-Model-FMC-with-Requirements.specifz)
-- v1.1: [Very Simple Model with Requirements](https://github.com/GfSE/SpecIF-Examples-and-Test-cases/blob/master/examples/v1.1/09_Very-Simple-Model-FMC-with-Requirements.specif)
+You may view the example using the <a href="https://apps.specif.de/view#import=https://specif.de/examples/09_Very-Simple-Model-FMC-with-Requirements.specifz" target="_blank">SpecIF Viewer</a>, or download the SpecIF data:
+- v1.0: <a href="https://specif.de/examples/09_Very-Simple-Model-FMC-with-Requirements.specifz" target="_blank">Very Simple Model with Requirements</a>
+- v1.1: <a href="https://github.com/GfSE/SpecIF-Examples-and-Test-cases/blob/master/examples/v1.1/09_Very-Simple-Model-FMC-with-Requirements.specif" target="_blank">Very Simple Model with Requirements</a>

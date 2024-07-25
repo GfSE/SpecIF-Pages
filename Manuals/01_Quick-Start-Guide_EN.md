@@ -190,7 +190,7 @@ This <a href="https://specif.de/examples/Example Telephone-Connection-Request (R
 Archi is a freely available modeling tool that supports the ArchiMate 3.0 notation of the Open Group. It can be obtained from <a href="https://www.archimatetool.com/download/" target="_blank">https://www.archimatetool.com/download/</a>.
 
 A model created with Archi can be transformed into the SpecIF format or integrated with models from other sources as follows:
-1. In the Archi tool, export all diagrams individually as an image in PNG or SVG format. To do this, right-click on the diagram to open the context menu and select ↗ **Export**, ↗ **View As Image**, then select the destination folder in the dialog and press ↗ **Save**.
+1. In the Archi tool, export all diagrams individually as an image in PNG or SVG format. To do this, right-click on a diagram to open the context menu and select ↗ **Export**, ↗ **View As Image**, then select the destination folder in the dialog and press ↗ **Save**.
 2. Export the model in the "Open Exchange" format by selecting ↗ **File**, ↗ **Export* and ↗ **Export Model To Open Exchange File** from the main menu while the model is selected; then select the destination folder in the dialog and press ↗ **Save**. 
 3. Now switch to the web browser and select or load the SpecIF editor as described in the previous chapter. First select the ↗ **ArchiMate** format in the top button bar. Using ↗ **+** Select file, choose the previously exported model in the Open Exchange format, which usually has the file extension '.xml'. The permitted action buttons ↗ **Create**, ↗ **Replace**, ↗ **Update** and ↗ **Adopt** are activated (see Chapter 2).
 4. After the import is completed, the display automatically jumps to the ↗ Edit page in the ↗ **Document** tab. The sub-views and functions described in the previous chapter can be selected.
@@ -205,7 +205,7 @@ Also for Archi, formatting in diagram or element descriptions using <a href="htt
 ADOIT is a modeling tool licensed from the BOC Group, which supports the ArchiMate 3.0 notation of the Open Group. It can be obtained from <a href="https://www.boc-group.com" target="_blank">https://www.boc-group.com</a>.
 
 A model created with ADOIT can be transformed into SpecIF format or integrated with models from other sources as follows:
-1. In the ADOIT tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, open the diagram by double-clicking in the model structure on the left and then save it in the menu bar directly above the diagram by ↗ **Export** and selecting the desired format. The file will be saved according to the settings of the browser; often in the folder "Downloads".
+1. In the ADOIT tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, open a diagram by double-clicking in the model structure on the left and then save it in the menu bar directly above the diagram by ↗ **Export** and selecting the desired format. The file will be saved according to the settings of the browser; often in the folder "Downloads".
 2. In the model structure, select all diagrams to be considered. Via context menu follow ↗ **Import/Export**, ↗ **ArchiMate exchange** and ↗ **Export**. A dialog window opens, in which the diagram selection is checked/changed if necessary and a name for project and file is assigned.
 3. From the third step on, the procedure is the same as described above for Archi.
 
@@ -215,9 +215,12 @@ Also for ADOIT, formatting in diagram or element descriptions using <a href="htt
 
 Cameo Systems Modeler is a commercial modeling tool licensed by <a href="https://www.3ds.com/" target="_blank">Dassault Systèmes</a> supporting the UML and SysML notation of the OMG. It can be obtained from <a href="https://www.3ds.com/products/catia/no-magic/cameo-systems-modeler" target="_blank">https://www.3ds.com/products/catia/no-magic/cameo-systems-modeler</a>.
 
+{: .highlight }
+Note: The transformation of UML/SysML models authored with Cameo to SpecIF is in development. Currently the UML Class Diagram, SysML Block Diagram (bdd) and Internal Block Diagram (ibd) are transformed.
+
 A model created with Cameo can be transformed into SpecIF format or integrated with models from other sources as follows:
-1. In the Cameo tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, open the diagram by double-clicking in the model structure on the left and then save it via main menu 'File' > 'Save as image'; select the desired file path and format. 
-2. Save the model via main menu 'File' > 'Save project' to obtein a *.mdzip file, which is accepted by the SpecIF Viewer and Editor.
+1. In the Cameo tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, open a diagram by double-clicking in the model structure on the left and then save it via main menu 'File' > 'Save as Image'; select the desired file path and format. 
+2. Save the model via main menu 'File' > 'Save project' to obtein a *.mdzip file, which is accepted for import by the SpecIF Viewer and Editor.
 3. From the third step on, the procedure is the same as described above for Archi; however choose the format 'UML/SysML'.
 
 Also for Cameo, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list. It is recommended to use markdown instead of the HTML feature offered by the input field _documentation_ available for most model elements.
