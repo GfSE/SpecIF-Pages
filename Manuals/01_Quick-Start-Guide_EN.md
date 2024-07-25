@@ -70,14 +70,14 @@ The start page of the viewer / editor lets you first select the data format and 
 
 ![Import Page](../assets/images/Manuals/01_import-page_EN.png)
 
-To import a file, after selecting the relevant type, click on ↗ `**+ Select file**` and the familiar file picker of your web browser will open; eligible files are filtered. Select the desired model file.
+To import a file, after selecting the relevant type, click on ↗ `+ Select file` and the familiar file picker of your web browser will open; eligible files are filtered. Select the desired model file.
 
 Then, click on an action button:
-- ↗ `**Create**` loads the selected model.
-- ↗ `**Replace**` discards previously loaded models and loads the selected one.
-- ↗ `**Adopt**` adds the selected submodel to the already loaded one. In this case, resources that have already been imported adopt those of the new submodel if they have a compatible type and the same title; the identifier is ignored. This import mode is useful when partial models from different authoring tools are to be merged. For example, if a data object occurs in a BPMN process diagram and at the same time in an ArchiMate information model, then in the resulting semantic network the resource loaded first remains and all relations of the adopted resource are additionally adopted.
+- ↗ `Create` loads the selected model.
+- ↗ `Replace` discards previously loaded models and loads the selected one.
+- ↗ `Adopt` adds the selected submodel to the already loaded one. In this case, resources that have already been imported adopt those of the new submodel if they have a compatible type and the same title; the identifier is ignored. This import mode is useful when partial models from different authoring tools are to be merged. For example, if a data object occurs in a BPMN process diagram and at the same time in an ArchiMate information model, then in the resulting semantic network the resource loaded first remains and all relations of the adopted resource are additionally adopted.
 It should be noted that all attribute values of the adopted resource are lost if the corresponding one of the adopting resource already has a value. In other words: An attribute value of the adopted resource is taken over only if the adopting resource has no corresponding value.
-- ↗ `**Update**` also adds the selected submodel to the previously loaded ones. In this case, existing resources, such as diagrams or model elements with the same identifier, are updated if the creation date of the new resource to be imported is more recent. The same applies to all other elements such as relations, files and hierarchies. For data types and classes, a check is made beforehand to ensure that the consistency of the entire semantic network is maintained. For example, it is always possible to add another attribute to a resource class, but an attribute can only be removed if no instance of the class has a value for that attribute.<br/>
+- ↗ `Update` also adds the selected submodel to the previously loaded ones. In this case, existing resources, such as diagrams or model elements with the same identifier, are updated if the creation date of the new resource to be imported is more recent. The same applies to all other elements such as relations, files and hierarchies. For data types and classes, a check is made beforehand to ensure that the consistency of the entire semantic network is maintained. For example, it is always possible to add another attribute to a resource class, but an attribute can only be removed if no instance of the class has a value for that attribute.<br/>
 The relationships of both the existing and new revisions of the model element are associated with the latter, the now current revision.
 
 After successful loading, the view changes to "Read" resp. "Edit".
@@ -87,7 +87,7 @@ _Note: If you load data from your local file system, it will be processed locall
 
 ### Read a SpecIF Model
 
-In the ↗ `**Document**` tab, the model is presented in a structure or outline chosen by the author.
+In the ↗ `Document` tab, the model is presented in a structure or outline chosen by the author.
 
 ![Document Tab](../assets/images/Manuals/02_document-tab_EN.png)
 
@@ -97,7 +97,7 @@ With certain SVG model diagrams, e.g. with FMC- or BPMN-notation created by <a h
 
 ### Edit a Model Element
 
-If permissions allow, a pen icon ↗🖉 is active at the selected model element in the upper right corner. Clicking opens an editing window whose fields are determined by the current element type. Entries are checked key by key for correctness: For example, a red frame immediately indicates when a letter is entered in a number field.
+If permissions allow, a pen icon ↗ `🖉` is active at the selected model element in the upper right corner. Clicking opens an editing window whose fields are determined by the current element type. Entries are checked key by key for correctness: For example, a red frame immediately indicates when a letter is entered in a number field.
 
 Fields of type text (data type xs:string) allow formatting by means of XHTML or <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a>, which is interpreted accordingly during display or document generation.
 
@@ -105,7 +105,7 @@ By the way, texts can also be formatted using XHTML and markdown in many authori
 
 ### Investigate Semantic Relationships
 
-In the ↗ `**Relations**` tab, the semantic relationships of the element selected in the outline to the left are shown. Most relationships are automatically created by graphically analyzing the model diagrams, such as “component XY contains function FR” when the block representing function FR is spatially contained in the block representing component XY. Some relationships have to be created manually as part of the analysis and system design, for example "Component XZ satisfies requirement 134".
+In the ↗ `Relations` tab, the semantic relationships of the element selected in the outline to the left are shown. Most relationships are automatically created by graphically analyzing the model diagrams, such as “component XY contains function FR” when the block representing function FR is spatially contained in the block representing component XY. Some relationships have to be created manually as part of the analysis and system design, for example "Component XZ satisfies requirement 134".
 
 ![Relations Tab](../assets/images/Manuals/03_relations-tab_EN.png)
 
@@ -124,21 +124,21 @@ In this view, you can also double-click any element and navigate through the sem
 
 ### Create or Delete a Relation
 
-Likewise on tab ↗ `**Relations**, two buttons for creating and deleting relations become active, if permissions are granted. 
+Likewise on tab ↗ `Relations`, two buttons for creating and deleting relations become active, if permissions are granted. 
 
-To create a relation ↗ `**＋**, a dialog box is displayed, in which a valid relation type for the given model element and a suitable target element as subject or object can be selected. Only those options are offered that correspond to the ontology, so that only meaningful semantic relations are created.
+To create a relation ↗ `＋`, a dialog box is displayed, in which a valid relation type for the given model element and a suitable target element as subject or object can be selected. Only those options are offered that correspond to the ontology, so that only meaningful semantic relations are created.
 
 To delete a relation ↗ ❌, all relation targets of the selected model element are colored red. Double-clicking on a target element deletes the respective relation.
 
 ### Export a Model
 
-Once the document has the desired structure and content, it can be saved in various formats by pressing ↗ `**Export**` at the top right:
-- ↗ `**SpecIF**` creates a ZIP file with the semantic network in SpecIF format and all referenced images and files. It can be easily read back into the SpecIF editor at a later time.
-- ↗ `**HTML**` with embedded SpecIF generates a file to be displayed in the web browser. All views and semantic relationships can be easily tracked and reviewed. The file contains Javascript and therefore some environments prohibit execution.
-- ↗ `**ReqIF**` generates an XML file according to the OMG Requirement Interchange Format, which can be read by several Requirement Management (RM) and Application Lifecycle Management (ALM) tools.
-- ↗ `**Turtle**` creates a file for reading into graph databases; it is a compact representation of the Resource Description Framework (RDF).
-- ↗ `**Epub**` generates a file for electronic document readers.
-- ↗ `**MS Word®**` creates an OOXML file that can be read and further edited using MS Word. Edited files are best saved in the compressed format DOCX. As is well known, Word files in change mode are a popular means of collaboration and adding content within a team.
+Once the document has the desired structure and content, it can be saved in various formats by pressing ↗ `Export` at the top right:
+- ↗ `SpecIF` creates a ZIP file with the semantic network in SpecIF format and all referenced images and files. It can be easily read back into the SpecIF editor at a later time.
+- ↗ `HTML` with embedded SpecIF generates a file to be displayed in the web browser. All views and semantic relationships can be easily tracked and reviewed. The file contains Javascript and therefore some environments prohibit execution.
+- ↗ `ReqIF` generates an XML file according to the OMG Requirement Interchange Format, which can be read by several Requirement Management (RM) and Application Lifecycle Management (ALM) tools.
+- ↗ `Turtle` creates a file for reading into graph databases; it is a compact representation of the Resource Description Framework (RDF).
+- ↗ `Epub` generates a file for electronic document readers.
+- ↗ `MS Word®` creates an OOXML file that can be read and further edited using MS Word. Edited files are best saved in the compressed format DOCX. As is well known, Word files in change mode are a popular means of collaboration and adding content within a team.
 
 ## Special Authoring Tools
 
@@ -190,13 +190,13 @@ This <a href="https://specif.de/examples/Example Telephone-Connection-Request (R
 Archi is a freely available modeling tool that supports the ArchiMate 3.0 notation of the Open Group. It can be obtained from <a href="https://www.archimatetool.com/download/" target="_blank">https://www.archimatetool.com/download/</a>.
 
 A model created with Archi can be transformed into the SpecIF format or integrated with models from other sources as follows:
-1. In the Archi tool, export all diagrams individually as an image in PNG or SVG format. To do this, right-click on a diagram to open the context menu and select ↗ `**Export**, ↗ `**View As Image**, then select the destination folder in the dialog and press ↗ `**Save**`.
-2. Export the model in the "Open Exchange" format by selecting ↗ `**File**, ↗ `**Export* and ↗ `**Export Model To Open Exchange File**` from the main menu while the model is selected; then select the destination folder in the dialog and press ↗ `**Save**`. 
-3. Now switch to the web browser and select or load the SpecIF editor as described in the previous chapter. First select the ↗ `**ArchiMate**` format in the top button bar. Using ↗ `**+**` Select file, choose the previously exported model in the Open Exchange format, which usually has the file extension '.xml'. The permitted action buttons ↗ `**Create**, ↗ `**Replace**, ↗ `**Update**` and ↗ `**Adopt**` are activated (see Chapter 2).
-4. After the import is completed, the display automatically jumps to the ↗ Edit page in the ↗ `**Document**` tab. The sub-views and functions described in the previous chapter can be selected.
-5. All entries in the outline that are not required can be deleted by clicking the delete icon ↗ ❌ on the right side of the screen.
+1. In the Archi tool, export all diagrams individually as an image in PNG or SVG format. To do this, right-click on a diagram to open the context menu and select ↗ `Export`, ↗ `View As Image`, then select the destination folder in the dialog and press ↗ `Save`.
+2. Export the model in the "Open Exchange" format by selecting ↗ `File`, ↗ `Export* and ↗ `Export Model To Open Exchange File` from the main menu while the model is selected; then select the destination folder in the dialog and press ↗ `Save`. 
+3. Now switch to the web browser and select or load the SpecIF editor as described in the previous chapter. First select the ↗ `ArchiMate` format in the top button bar. Using ↗ `+` Select file, choose the previously exported model in the Open Exchange format, which usually has the file extension '.xml'. The permitted action buttons ↗ `Create`, ↗ `Replace`, ↗ `Update` and ↗ `Adopt` are activated (see Chapter 2).
+4. After the import is completed, the display automatically jumps to the ↗ Edit page in the ↗ `Document` tab. The sub-views and functions described in the previous chapter can be selected.
+5. All entries in the outline that are not required can be deleted by clicking the delete icon ↗ `❌` on the right side of the screen.
 6. The entries in the outline can also be moved using drag'n'drop.
-7. Now select all the diagrams in the outline one after the other. The texts have been taken over, but the images have to be added manually. To do this, click the pencil icon ↗ 🖉 on the right edge of the screen when the diagram is selected. A modal dialog window opens with all the attributes of the element. For the ↗ Diagram attribute, click the pencil icon again to open the file selection dialog and select the respective image file; the usual web formats SVG, PNG and JPG are supported. Finally, click ↗ `**Update**` at the bottom of the modal editing dialog. The document view now shows the model diagram in the main column.
+7. Now select all the diagrams in the outline one after the other. The texts have been taken over, but the images have to be added manually. To do this, click the pencil icon ↗ `🖉` on the right edge of the screen when the diagram is selected. A modal dialog window opens with all the attributes of the element. For the ↗ Diagram attribute, click the pencil icon again to open the file selection dialog and select the respective image file; the usual web formats SVG, PNG and JPG are supported. Finally, click ↗ `Update` at the bottom of the modal editing dialog. The document view now shows the model diagram in the main column.
 
 Also for Archi, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in italics or key points can be enumerated in a bullet list.
 
@@ -205,8 +205,8 @@ Also for Archi, formatting in diagram or element descriptions using <a href="htt
 ADOIT is a modeling tool licensed from the BOC Group, which supports the ArchiMate 3.0 notation of the Open Group. It can be obtained from <a href="https://www.boc-group.com" target="_blank">https://www.boc-group.com</a>.
 
 A model created with ADOIT can be transformed into SpecIF format or integrated with models from other sources as follows:
-1. In the ADOIT tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, open a diagram by double-clicking in the model structure on the left and then save it in the menu bar directly above the diagram by ↗ `**Export**` and selecting the desired format. The file will be saved according to the settings of the browser; often in the folder "Downloads".
-2. In the model structure, select all diagrams to be considered. Via context menu follow ↗ `**Import/Export**, ↗ `**ArchiMate exchange**` and ↗ `**Export**`. A dialog window opens, in which the diagram selection is checked/changed if necessary and a name for project and file is assigned.
+1. In the ADOIT tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, open a diagram by double-clicking in the model structure on the left and then save it in the menu bar directly above the diagram by ↗ `Export` and selecting the desired format. The file will be saved according to the settings of the browser; often in the folder "Downloads".
+2. In the model structure, select all diagrams to be considered. Via context menu follow ↗ `Import/Export`, ↗ `ArchiMate exchange` and ↗ `Export`. A dialog window opens, in which the diagram selection is checked/changed if necessary and a name for project and file is assigned.
 3. From the third step on, the procedure is the same as described above for Archi.
 
 Also for ADOIT, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list.
@@ -219,8 +219,8 @@ Cameo Systems Modeler is a commercial modeling tool licensed by <a href="https:/
 _Note: The transformation of UML/SysML models authored with Cameo to SpecIF is in development. Currently the UML Class Diagram, SysML Block Diagram (bdd) and Internal Block Diagram (ibd) are transformed._
 
 A model created with Cameo can be transformed into SpecIF format or integrated with models from other sources as follows:
-1. In the Cameo tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, open a diagram by double-clicking in the model structure on the left and then save it via main menu ↗ `**File**` > `**Save as Image**; select the desired file path and format. 
-2. Save the model via main menu ↗ `**File**` > `**Save Project**` to obtain a *.mdzip file, which is accepted for import by the SpecIF Viewer and Editor.
+1. In the Cameo tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, open a diagram by double-clicking in the model structure on the left and then save it via main menu ↗ `File` > `Save as Image; select the desired file path and format. 
+2. Save the model via main menu ↗ `File` > `Save Project` to obtain a *.mdzip file, which is accepted for import by the SpecIF Viewer and Editor.
 3. From the third step on, the procedure is the same as described above for Archi; however choose the format 'UML/SysML'.
 
 Also for Cameo, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list. It is recommended to use markdown instead of the HTML feature offered by the input field _documentation_ available for most model elements.
