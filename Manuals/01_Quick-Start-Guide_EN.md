@@ -128,7 +128,7 @@ Likewise on tab ↗ `Relations`, two buttons for creating and deleting relations
 
 To create a relation ↗ `＋`, a dialog box is displayed, in which a valid relation type for the given model element and a suitable target element as subject or object can be selected. Only those options are offered that correspond to the ontology, so that only meaningful semantic relations are created.
 
-To delete a relation ↗ ❌, all relation targets of the selected model element are colored red. Double-clicking on a target element deletes the respective relation.
+To delete a relation ↗ `❌`, all relation targets of the selected model element are colored red. Double-clicking on a target element deletes the respective relation.
 
 ### Export a Model
 
@@ -191,12 +191,12 @@ Archi is a freely available modeling tool that supports the ArchiMate 3.0 notati
 
 A model created with Archi can be transformed into the SpecIF format or integrated with models from other sources as follows:
 1. In the Archi tool, export all diagrams individually as an image in PNG or SVG format. To do this, right-click on a diagram to open the context menu and select ↗ `Export`, ↗ `View As Image`, then select the destination folder in the dialog and press ↗ `Save`.
-2. Export the model in the "Open Exchange" format by selecting ↗ `File`, ↗ `Export* and ↗ `Export Model To Open Exchange File` from the main menu while the model is selected; then select the destination folder in the dialog and press ↗ `Save`. 
+2. Export the model in the "Open Exchange" format by selecting ↗ `File`, ↗ `Export` and ↗ `Export Model To Open Exchange File` from the main menu while the model is selected; then select the destination folder in the dialog and press ↗ `Save`. 
 3. Now switch to the web browser and select or load the SpecIF editor as described in the previous chapter. First select the ↗ `ArchiMate` format in the top button bar. Using ↗ `+` Select file, choose the previously exported model in the Open Exchange format, which usually has the file extension '.xml'. The permitted action buttons ↗ `Create`, ↗ `Replace`, ↗ `Update` and ↗ `Adopt` are activated (see Chapter 2).
 4. After the import is completed, the display automatically jumps to the ↗ Edit page in the ↗ `Document` tab. The sub-views and functions described in the previous chapter can be selected.
 5. All entries in the outline that are not required can be deleted by clicking the delete icon ↗ `❌` on the right side of the screen.
 6. The entries in the outline can also be moved using drag'n'drop.
-7. Now select all the diagrams in the outline one after the other. The texts have been taken over, but the images have to be added manually. To do this, click the pencil icon ↗ `🖉` on the right edge of the screen when the diagram is selected. A modal dialog window opens with all the attributes of the element. For the ↗ Diagram attribute, click the pencil icon again to open the file selection dialog and select the respective image file; the usual web formats SVG, PNG and JPG are supported. Finally, click ↗ `Update` at the bottom of the modal editing dialog. The document view now shows the model diagram in the main column.
+7. Now select all the diagrams in the outline one after the other. The texts have been taken over, but the images have to be added manually. To do this, click the pencil icon ↗ `🖉` on the right edge of the screen when the diagram is selected. A modal dialog window opens with all the attributes of the element. For the ↗ `Diagram` attribute, click the pencil icon ↗ `🖉` again to open the file selection dialog and select the respective image file; the usual web formats SVG, PNG and JPG are supported. Finally, click ↗ `Update` at the bottom of the modal editing dialog. The document view now shows the model diagram in the main column.
 
 Also for Archi, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in italics or key points can be enumerated in a bullet list.
 
@@ -219,9 +219,9 @@ Cameo Systems Modeler is a commercial modeling tool licensed by <a href="https:/
 _Note: The transformation of UML/SysML models authored with Cameo to SpecIF is in development. Currently the UML Class Diagram, SysML Block Diagram (bdd) and Internal Block Diagram (ibd) are transformed._
 
 A model created with Cameo can be transformed into SpecIF format or integrated with models from other sources as follows:
-1. In the Cameo tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, open a diagram by double-clicking in the model structure on the left and then save it via main menu ↗ `File` > `Save as Image; select the desired file path and format. 
+1. In the Cameo tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, open a diagram by double-clicking in the model structure on the left and then save it via main menu ↗ `File` > `Save as Image`; select the desired file path and format. 
 2. Save the model via main menu ↗ `File` > `Save Project` to obtain a *.mdzip file, which is accepted for import by the SpecIF Viewer and Editor.
-3. From the third step on, the procedure is the same as described above for Archi; however choose the format 'UML/SysML'.
+3. From the third step on, the procedure is the same as described above for Archi; however choose the format `UML/SysML`.
 
 Also for Cameo, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list. It is recommended to use markdown instead of the HTML feature offered by the input field _documentation_ available for most model elements.
 
