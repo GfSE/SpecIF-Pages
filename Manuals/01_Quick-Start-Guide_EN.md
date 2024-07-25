@@ -148,7 +148,7 @@ The term authoring tool is used here to describe software that is used to create
 
 #### Folder
 
-When importing Excel® files, a folder with the file name as title is created in the hierarchy of the SpecIF data-set. For each worksheet a subfolder is created with it‘s name as a title. 
+When importing Excel® files, a folder with the file name as title is created in the hierarchy of the SpecIF data-set. For each worksheet a subfolder is created with its name as a title. 
 
 #### Resources
 
@@ -213,7 +213,14 @@ Also for ADOIT, formatting in diagram or element descriptions using <a href="htt
 
 ### Cameo
 
-... coming soon.
+Cameo Systems Modeler is a commercial modeling tool licensed by <a href="https://www.3ds.com/" target="_blank">Dassault Systèmes</a> supporting the UML and SysML notation of the OMG. It can be obtained from <a href="https://www.3ds.com/products/catia/no-magic/cameo-systems-modeler" target="_blank">https://www.3ds.com/products/catia/no-magic/cameo-systems-modeler</a>.
+
+A model created with Cameo can be transformed into SpecIF format or integrated with models from other sources as follows:
+1. In the Cameo tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, open the diagram by double-clicking in the model structure on the left and then save it via main menu 'File' > 'Save as image'; select the desired file path and format. 
+2. Save the model via main menu 'File' > 'Save project' to obtein a *.mdzip file, which is accepted by the SpecIF Viewer and Editor.
+3. From the third step on, the procedure is the same as described above for Archi; however choose the format 'UML/SysML'.
+
+Also for Cameo, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list. It is recommended to use markdown instead of the HTML feature offered by the input field _documentation_ available for most model elements.
 
 ## Terms of Use
 
