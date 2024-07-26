@@ -172,15 +172,16 @@ moduleManager.construct({
             }
             ;
         }
-        function getOntologyURL(uParms) {
-            return uParms[CONFIG.keyOntology];
+        function getOntologyURL(uP) {
+            return uP ? uP[CONFIG.keyOntology] : undefined;
         }
         urlP = opts.urlParams;
+        urlOntology = getOntologyURL(urlP) || urlOntology;
+		console.debug('+1',urlOntology);
         if (urlP && urlP[CONFIG.keyImport]) {
             importMode = { id: urlP[CONFIG.keyMode] || 'replace' };
             self.file.name = urlP[CONFIG.keyImport];
             self.format = getFormat(urlP);
-            urlOntology = getOntologyURL(urlP) || urlOntology;
             if (self.format && app[self.format.name]) {
                 app[self.format.name].init(self.format.opts);
                 if (app[self.format.name].verify({ name: urlP[CONFIG.keyImport] })) {
@@ -204,7 +205,9 @@ moduleManager.construct({
                             fail: handleError
                         });
                     })
-                        .catch(handleError);
+                        .catch((xhr) => {
+                        handleError(new resultMsg(xhr.status, xhr.statusText, "text", "Ontology not found"));
+                    });
                     return;
                 }
             }
@@ -325,7 +328,11 @@ moduleManager.construct({
             self.projectName = textValue(i18n.LblProjectName);
             readFile(self.file, app[self.format.name].toSpecif);
         })
-            .catch(handleError);
+	//	.catch(handleError);
+            .catch((xhr) => {
+				console.debug('+',xhr);
+            handleError(new resultMsg(xhr.status, xhr.statusText, "text", "Ontology not found"));
+        });
         return;
         function readFile(f, fn) {
             let rdr = new FileReader();

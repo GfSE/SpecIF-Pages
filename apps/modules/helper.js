@@ -335,7 +335,7 @@ LIB.stdError = (xhr, cb) => {
             break;
         case 404:
             xhrCl.responseType = 'text';
-            xhrCl.response = i18n.Err404NotFound;
+            xhrCl.response = typeof (xhrCl.response) == 'string' ? xhrCl.response : i18n.Err404NotFound;
             message.show(xhrCl);
             break;
         default:
