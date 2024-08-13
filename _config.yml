@@ -2,8 +2,8 @@ title: SpecIF
 description: Home, Documentation and Tutorials of the Specification Integration Facility (SpecIF).
 theme: just-the-docs
 
-url: https://GfSE.github.io/SpecIF-Pages
+url: https://gfse.github.io/SpecIF-Pages
 heading_anchors: true
 
 aux_links:
-  Repo: https://github.com/gfse/SpecIF-Pages
+  Repo: https://github.com/GfSE/SpecIF-Pages
