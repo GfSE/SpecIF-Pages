@@ -1,11 +1,11 @@
 "use strict";
 const CONFIG = {};
-CONFIG.appVersion = "1.1.s.13",
+CONFIG.appVersion = "1.1.r.25",
     CONFIG.specifVersion = "1.1";
-CONFIG.imgURL = './assets/images';
+CONFIG.imgURL = './vendor/assets/images';
 CONFIG.ontologyURL = 'https://specif.de/v1.1/Ontology.specif';
-CONFIG.QuickStartGuideEn = "https://gfse.github.io/SpecIF-Pages/Manuals/01_Quick-Start-Guide_EN.html";
-CONFIG.QuickStartGuideDe = "https://gfse.github.io/SpecIF-Pages/downloads/SpecIF-Einfuehrung.pdf";
+CONFIG.QuickStartGuideEn = "https://specif.de/files/SpecIF/documents/SpecIF-Introduction.pdf";
+CONFIG.QuickStartGuideDe = "https://specif.de/files/SpecIF/documents/SpecIF-Einfuehrung.pdf";
 CONFIG.userNameAnonymous = 'Anonymous';
 CONFIG.passwordAnonymous = '';
 CONFIG.placeholder = 'to-be-replaced';
@@ -51,8 +51,7 @@ CONFIG.keyProject = 'project';
 CONFIG.keyItem = 'item';
 CONFIG.keyNode = 'node';
 CONFIG.keyView = 'view';
-CONFIG.keyOntology = 'ontology';
-CONFIG.urlParamTags = [CONFIG.keyImport, CONFIG.keyMode, CONFIG.keyFormat, CONFIG.keyProject, CONFIG.keyItem, CONFIG.keyNode, CONFIG.keyView, CONFIG.keyOntology];
+CONFIG.urlParamTags = [CONFIG.keyImport, CONFIG.keyMode, CONFIG.keyFormat, CONFIG.keyProject, CONFIG.keyItem, CONFIG.keyNode, CONFIG.keyView];
 CONFIG.project = 'project';
 CONFIG.projects = 'projects';
 CONFIG.specification = 'specification';

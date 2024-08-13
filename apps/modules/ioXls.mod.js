@@ -6,17 +6,14 @@
     License: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
     We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
     .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
-
-    ToDo:
-    - This code assumes that certain dataTypes including DT-Text and DT-ShortString are retrieved from the ontology.
-    - Need to make that more robust ... and deal with the dataTypes actually returned.
 */
 moduleManager.construct({
     name: 'ioXls'
 }, function (self) {
     "use strict";
-    var fDate;
+    var fDate, ontologyStatementClasses = [];
     self.init = function () {
+        ontologyStatementClasses = app.ontology.getTerms('statementClass');
         return true;
     };
     self.verify = function (f) {
@@ -54,7 +51,6 @@ moduleManager.construct({
     return self;
     function xlsx2specif(buf, pN, chAt) {
         "use strict";
-        let ontologyStatementClasses = app.ontology.getTerms('statementClass');
         class Coord {
             constructor(addr) {
                 let res = addr.match(/([A-Z]+)(\d+)/);
@@ -85,14 +81,15 @@ moduleManager.construct({
                 this.col2dT = new Map();
             }
         }
+        var xlsTerms = ["xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI", CONFIG.propClassId, CONFIG.propClassType, CONFIG.resClassFolder];
         function dataTypeId(str) {
             return CONFIG.prefixDT + simpleHash(str);
         }
         class PropClass {
-            constructor(nm, ti, dTid) {
+            constructor(nm, ti, dT) {
                 this.id = propClassId(nm);
                 this.title = ti;
-                this.dataType = LIB.makeKey(dTid);
+                this.dataType = LIB.makeKey(CONFIG.prefixDT + dT);
                 this.changedAt = chAt;
             }
         }
@@ -115,7 +112,7 @@ moduleManager.construct({
         class StaClass {
             constructor(ti) {
                 this.title = ti;
-                this.id = staClassId(ti);
+                this.id = staClassId(this.title);
                 this.description = LIB.makeMultiLanguageValue('For statements created by columns whose title is declared as a statement');
                 this.instantiation = [SpecifInstantiation.User];
                 this.changedAt = chAt;
@@ -466,7 +463,7 @@ moduleManager.construct({
                                 pC = 'Text';
                         }
                         ;
-                        return new PropClass(ws.name + cX, pTi, CONFIG.prefixDT + pC);
+                        return new PropClass(ws.name + cX, pTi, pC);
                         function classOf(cell) {
                             if (isBool(cell))
                                 return 'Boolean';
@@ -482,13 +479,13 @@ moduleManager.construct({
                         }
                     }
                 }
-                function getStaClasses(ws) {
-                    var sTi, sC, sCL = [];
+                function getStaClasses(ws, sCL) {
+                    var sTi, sC;
                     for (var c = ws.firstCell.col, C = ws.lastCell.col + 1; c < C; c++) {
                         sTi = ws.data[cellName(c, ws.firstCell.row)];
                         if (sTi) {
                             sTi = sTi.w || sTi.v;
-                            if (sTi && ontologyStatementClasses.includes(sTi)) {
+                            if (sTi && LIB.indexById(sCL, staClassId(sTi)) < 0 && ontologyStatementClasses.includes(sTi)) {
                                 sC = new StaClass(sTi);
                                 sCL.push(sC);
                             }
@@ -497,20 +494,19 @@ moduleManager.construct({
                         ;
                     }
                     ;
-                    return sCL;
                 }
                 if (ws.range) {
-                    LIB.cacheL(specifData.statementClasses, getStaClasses(ws));
-                    let rC = new ResClass(ws.resClass, inBracketsAtEnd(ws.name) || inBracketsAtEnd(pN) || CONFIG.resClassXlsRow);
+                    var rC = new ResClass(ws.resClass, inBracketsAtEnd(ws.name) || inBracketsAtEnd(pN) || CONFIG.resClassXlsRow);
                     rC.propertyClasses = getPropClasses(ws);
                     specifData.resourceClasses.push(rC);
+                    getStaClasses(ws, specifData.statementClasses);
                     createFld(ws);
                 }
             }
         }
         let xDta = new Uint8Array(buf), wb = XLSX.read(xDta, { type: 'array', cellDates: true, cellStyles: true }), wsCnt = wb.SheetNames.length;
         console.info('SheetNames: ' + wb.SheetNames + ' (' + wsCnt + ')');
-        var xlsTerms = ["xs:string", "xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI", CONFIG.propClassId, CONFIG.propClassTitle, CONFIG.propClassDesc, CONFIG.propClassType, CONFIG.resClassFolder], specifData = app.ontology.generateSpecifClasses({ terms: xlsTerms, adoptOntologyDataTypes: true });
+        var specifData = app.ontology.generateSpecifClasses({ terms: xlsTerms, adoptOntologyDataTypes: true });
         specifData.resources.push({
             id: CONFIG.prefixR + pN.toSpecifId(),
             class: LIB.makeKey("RC-Folder"),

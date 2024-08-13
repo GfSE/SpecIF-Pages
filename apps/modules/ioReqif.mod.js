@@ -23,13 +23,12 @@ moduleManager.construct({
     name: 'ioReqif'
 }, (self) => {
     "use strict";
-    let mime, zipped, opts, errNoOptions = new resultMsg(896, 'No options or no mediaTypes defined.'), errNoReqifFile = new resultMsg(897, 'No ReqIF file found in the reqifz container.'), errInvalidXML = new resultMsg(898, 'ReqIF data is not valid XML.');
+    let mime, zipped, opts, errNoOptions = new xhrMessage(896, 'No options or no mediaTypes defined.'), errNoReqifFile = new xhrMessage(897, 'No ReqIF file in the reqifz container.'), errInvalidXML = new xhrMessage(898, 'ReqIF data is not valid XML.');
     self.init = (options) => {
         mime = undefined;
         opts = options;
         return true;
     };
-    self.abortFlag = false;
     self.verify = (f) => {
         function reqifFile2mediaType(fname) {
             if (fname.endsWith('.reqifz') || fname.endsWith('.reqif.zip')) {
@@ -58,7 +57,7 @@ moduleManager.construct({
                 fileL = zip.filter((relPath, file) => { return file.name.endsWith('.reqif'); });
                 if (fileL.length < 1) {
                     zDO.reject(errNoReqifFile);
-                    return;
+                    return zDO;
                 }
                 ;
                 pend = fileL.length;
@@ -67,13 +66,13 @@ moduleManager.construct({
                         .then((dta) => {
                         if (!LIB.validXML(dta)) {
                             zDO.reject(errInvalidXML);
-                            return;
+                            return zDO;
                         }
                         ;
                         let result = reqif2Specif(dta);
                         if (result.status != 0) {
                             zDO.reject(result);
-                            return;
+                            return zDO;
                         }
                         ;
                         resL.unshift(result.response);

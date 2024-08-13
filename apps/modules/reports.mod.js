@@ -50,7 +50,7 @@ moduleManager.construct({
         if (!opts || !opts.urlParams)
             setUrlParams({
                 project: selPrj.id,
-                view: self.view
+                view: self.view.substring(1)
             });
         app.busy.set();
         showNotice(i18n.MsgAnalyzing);

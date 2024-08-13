@@ -27,7 +27,8 @@ app.specif2turtle = (specifData, opts) => {
         }
         ;
         pfxL += emptyLine()
-            + tier0RdfEntry(`@prefix : <${opts.baseURI}${projectID}#> .`);
+            + tier0RdfEntry(`@prefix : <${opts.baseURI}${projectID}#> .`)
+            + tier0RdfEntry(`@prefix this: <${opts.baseURI}${projectID}#> .`);
         return pfxL;
     }
     ;
@@ -43,7 +44,7 @@ app.specif2turtle = (specifData, opts) => {
     function transformNativeAttributes(project) {
         let { id, title, description, $schema, generator, generatorVersion, rights, createdAt, createdBy } = project;
         let baseProjectTtlString = emptyLine()
-            + tier0RdfEntry(`: a SpecIF:Project ;`)
+            + tier0RdfEntry(`this: a SpecIF:Project ;`)
             + tier1RdfEntry(`dcterms:identifier '${escapeTtl(id)}' ;`)
             + (title ? tier1RdfEntry(`rdfs:label ${textWithLang(title)} ;`) : '')
             + (description ? tier1RdfEntry(`rdfs:comment ${textWithLang(description)} ;`) : '')
@@ -173,7 +174,7 @@ app.specif2turtle = (specifData, opts) => {
                                     ct += appendVal(ct, textWithLang(v));
                                     break;
                                 default:
-                                    let txt = "'" + escapeTtl(v[0].text) + "'";
+                                    let nSp = hasNamespace(v[0].text), txt = (nSp ? shapeEntity(v[0].text) : "'" + escapeTtl(v[0].text) + "'");
                                     ct += appendVal(ct, txt);
                             }
                             ;

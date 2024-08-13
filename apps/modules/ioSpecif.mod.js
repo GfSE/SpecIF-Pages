@@ -12,7 +12,7 @@ moduleManager.construct({
 }, (self) => {
     "use strict";
     let zipped, opts;
-    const errNoOptions = new resultMsg(899, 'Programming flaw: No options or no mediaTypes defined.'), errNoSpecif = new resultMsg(901, 'No SpecIF file in the specifz container.'), errInvalidJson = new resultMsg(900, 'SpecIF data is not valid JSON.');
+    const errNoOptions = new xhrMessage(899, 'Programming flaw: No options or no mediaTypes defined.'), errNoSpecif = new xhrMessage(901, 'No SpecIF file in the specifz container.'), errInvalidJson = new xhrMessage(900, 'SpecIF data is not valid JSON.');
     self.init = (options) => {
         opts = options;
         return true;

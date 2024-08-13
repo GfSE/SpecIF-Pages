@@ -294,15 +294,15 @@ class CCheckDialogInput {
         return allOk;
     }
 }
-class resultMsg {
-    constructor(st, sTxt, rTyp, resp) {
+class xhrMessage {
+    constructor(st, sTxt, rTyp, rTxt) {
         this.status = st;
         this.statusText = sTxt;
         this.responseType = rTyp;
-        this.response = resp;
+        this.responseText = rTxt;
     }
     asString() {
-        return this.statusText + " (" + this.status + (this.responseType == 'text' ? "): " + (this.response || this.responseText) : ")");
+        return this.statusText + " (" + this.status + (this.responseType == 'text' ? "): " + this.responseText : ")");
     }
     log() {
         console.log(this.asString());
@@ -314,7 +314,7 @@ class resultMsg {
     }
 }
 LIB.stdError = (xhr, cb) => {
-    let xhrCl = new resultMsg(xhr.status, xhr.statusText, xhr.responseType, xhr.responseType == 'text' ? (xhr.response || xhr.responseText) : '');
+    let xhrCl = new xhrMessage(xhr.status, xhr.statusText, xhr.responseType, xhr.responseType == 'text' ? xhr.responseText : '');
     switch (xhr.status) {
         case 0:
         case 200:
@@ -325,17 +325,17 @@ LIB.stdError = (xhr, cb) => {
             break;
         case 402:
             xhrCl.responseType = 'text';
-            xhrCl.response = i18n.Err402InsufficientLicense;
+            xhrCl.responseText = i18n.Err402InsufficientLicense;
             message.show(xhrCl);
             break;
         case 403:
             xhrCl.responseType = 'text';
-            xhrCl.response = i18n.Err403Forbidden;
+            xhrCl.responseText = i18n.Err403Forbidden;
             message.show(xhrCl);
             break;
         case 404:
             xhrCl.responseType = 'text';
-            xhrCl.response = typeof (xhrCl.response) == 'string' ? xhrCl.response : i18n.Err404NotFound;
+            xhrCl.responseText = i18n.Err404NotFound;
             message.show(xhrCl);
             break;
         default:
@@ -376,7 +376,7 @@ class CMessage {
                         opts.severity = msg.status < 202 ? 'success' : 'danger';
                     msg = (msg.statusText || i18n.Error)
                         + " (" + msg.status
-                        + (msg.responseType == 'text' ? "): " + (msg.response || msg.responseText) : ")");
+                        + (msg.responseText ? "): " + msg.responseText : ")");
                     break;
                 }
                 ;
@@ -408,7 +408,7 @@ LIB.keyOf = (itm) => {
     return itm.revision ? { id: itm.id, revision: itm.revision } : { id: itm.id };
 };
 LIB.makeKey = (el) => {
-    return el ? (typeof (el) == 'string' ? { id: el } : LIB.keyOf(el)) : undefined;
+    return typeof (el) == 'string' ? { id: el } : LIB.keyOf(el);
 };
 LIB.replacePrefix = (newPrefix, id) => {
     return id.replace(RE.isolatePrefix, (match, $1, $2) => {
@@ -801,7 +801,7 @@ LIB.addPCReference = (eC, key) => {
         eC.propertyClasses = [key];
     }
 };
-LIB.addProperty = (el, prp) => {
+LIB.addProp = (el, prp) => {
     if (Array.isArray(el.properties))
         el.properties.unshift(prp);
     else
@@ -809,6 +809,7 @@ LIB.addProperty = (el, prp) => {
 };
 LIB.addClassesTo = (term, dta) => {
     let items = app.ontology.generateSpecifClasses({ terms: [term], delta: true, referencesWithoutRevision: true }), item;
+    console.debug("Adding classes for '" + term + "':", items);
     for (var Ln of ['dataTypes', 'propertyClasses', 'resourceClasses', 'statementClasses']) {
         LIB.cacheL(dta[Ln], items[Ln]);
         let idx = LIB.indexBy(dta[Ln], 'title', term);
@@ -820,6 +821,22 @@ LIB.addClassesTo = (term, dta) => {
         console.error('No class found for term ' + term + '.');
     return item;
 };
+LIB.getClassesWithParents = (L, clK) => {
+    let resL = [], cK = simpleClone(clK);
+    do {
+        let c = LIB.itemByKey(L, cK);
+        if (c) {
+            cK = c['extends'];
+            resL.unshift(c);
+        }
+        else {
+            console.error('Programming Error: Did not find extending class ' + cK.id);
+            cK = undefined;
+        }
+        ;
+    } while (cK);
+    return resL;
+};
 LIB.getExtendedClasses = (cL, toGet) => {
     let resL = [];
     for (var clk of toGet) {
@@ -827,37 +844,16 @@ LIB.getExtendedClasses = (cL, toGet) => {
     }
     ;
     return resL;
-    function getClassWithParents(L, clK) {
-        let resL = [], cK = simpleClone(clK);
-        do {
-            let c = LIB.itemByKey(L, cK);
-            if (c) {
-                cK = c['extends'];
-                resL.unshift(c);
-            }
-            else {
-                throw Error('Did not find extending class ' + cK.id);
-            }
-            ;
-        } while (cK);
-        return resL;
-    }
     function extendClass(k) {
         let rC = {};
-        getClassWithParents(cL, k)
+        LIB.getClassesWithParents(cL, k)
             .forEach((c) => {
             for (let att in c) {
-                if (["propertyClasses"].includes(att)) {
-                    if (Array.isArray(c[att]))
-                        if (Array.isArray(rC[att]))
-                            LIB.cacheL(rC[att], c[att]);
-                        else
-                            rC[att] = c[att];
-                }
+                if (["propertyClasses"].includes(att) && Array.isArray(c[att]) && Array.isArray(rC[att]))
+                    LIB.cacheL(rC[att], c[att]);
                 else
-                    rC[att] = simpleClone(c[att]);
+                    rC[att] = c[att];
             }
-            ;
         });
         delete rC['extends'];
         return rC;
@@ -1278,7 +1274,7 @@ LIB.referencedResourcesByClass = (rL, h, rCIdL) => {
 };
 LIB.dataTypeOf = (key, prj) => {
     if (LIB.isKey(key)) {
-        let pC = LIB.itemByKey(prj.propertyClasses, key), dT = pC ? LIB.itemByKey(prj.dataTypes, pC.dataType) : undefined;
+        let dT = LIB.itemByKey(prj.dataTypes, LIB.itemByKey(prj.propertyClasses, key).dataType);
         if (dT)
             return dT;
         else
@@ -1315,13 +1311,11 @@ LIB.createProp = (pC, key) => {
     };
 };
 LIB.propByTitle = (itm, pN, dta) => {
-    var iCL = LIB.getExtendedClasses(dta.resourceClasses, [itm['class']]), prp;
-    if (iCL.length < 1)
-        throw Error("Data inconsistent: LIB.getExtendedClasses doesn't return a result for " + itm['class'].id);
+    var iC = LIB.itemByKey(dta.resourceClasses, itm['class']), prp;
     for (var pC of dta.propertyClasses) {
-        if (LIB.referenceIndex(iCL[0].propertyClasses, pC) > -1
+        if (LIB.indexByKey(iC.propertyClasses, pC) > -1
             && pC.title == pN) {
-            prp = LIB.referenceItemBy(itm.properties, 'class', pC);
+            prp = LIB.itemBy(itm.properties, 'class', pC);
             if (prp)
                 return prp;
             prp = LIB.createProp(pC);
@@ -1372,7 +1366,7 @@ LIB.titleIdx = (pL, pCs) => {
     ;
     return -1;
 };
-LIB.titleFromProperties = (pL, pCs, opts) => {
+LIB.getTitleFromProperties = (pL, pCs, opts) => {
     let idx = LIB.titleIdx(pL, pCs);
     if (idx > -1) {
         let ti = LIB.languageTextOf(pL[idx].values[0], opts).stripHTML();
@@ -1456,16 +1450,16 @@ function getUrlParams(opts) {
 function setUrlParams(actSt) {
     if (!browser.supportsHtml5History || !actSt)
         return;
-    let quO = getUrlParams(), view = actSt.view.substring(1);
+    let quO = getUrlParams();
     if (quO.project == actSt.project
-        && quO[CONFIG.keyView] == view
+        && quO[CONFIG.keyView] == actSt.view
         && quO[CONFIG.keyNode] == actSt.node) {
         return;
     }
     ;
     let path = window.location.pathname.split('/'), newParams = path[path.length - 1], is = '=', sep = ';';
     newParams += '#'
-        + CONFIG.keyView + is + view
+        + CONFIG.keyView + is + actSt.view
         + (actSt.project ? sep + CONFIG.keyProject + is + actSt.project : "")
         + (actSt.node ? sep + CONFIG.keyNode + is + actSt.node : (actSt.item ? sep + CONFIG.keyItem + is + actSt.item : ''));
     history.pushState('', '', newParams);

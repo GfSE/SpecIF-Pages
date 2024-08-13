@@ -146,8 +146,8 @@ class CPropertyToEdit extends CPropertyToShow {
                 else {
                     val = textValue(ti);
                     if (LIB.hasContent(val)) {
-                        let term = app.ontology.getTermResource('propertyClass', this.pC.title);
-                        if (term && app.ontology.valueByTitle(term, "SpecIF:multiLanguage") == 'true') {
+                        let termL = app.ontology.getTermResources('propertyClass', this.pC.title);
+                        if (termL.length > 0 && app.ontology.valueByTitle(termL[0], "SpecIF:multiLanguage") == 'true') {
                             if (this.values.length > 0 && LIB.multiLanguageValueHasContent(this.values[0])) {
                                 let langV = LIB.languageValueOf(this.values[0], { targetLanguage: localOpts.targetLanguage, dontReturnDefaultValue: true });
                                 if (langV) {

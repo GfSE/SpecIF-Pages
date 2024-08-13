@@ -15,7 +15,7 @@ moduleManager.construct({
     name: 'ioDdpSchema'
 }, (self) => {
     "use strict";
-    const errInvalidXML = new resultMsg(898, 'DDP Schema is not valid XML.'), errTransformationCancelled = new resultMsg(999, 'Transformation cancelled on user request.'), errTransformationFailed = new resultMsg(999, 'Input file could not be transformed to SpecIF.'), domainOfDDPElements = "V-Domain-20";
+    const errInvalidXML = new xhrMessage(898, 'DDP Schema is not valid XML.'), errTransformationCancelled = new xhrMessage(999, 'Transformation cancelled on user request.'), errTransformationFailed = new xhrMessage(999, 'Input file could not be transformed to SpecIF.'), domainOfDDPElements = "V-Domain-20";
     self.init = () => {
         return true;
     };
@@ -87,7 +87,7 @@ moduleManager.construct({
     return self;
     function ddpSchema2specifClasses(xsd) {
         "use strict";
-        var xlsTerms = ["xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI", CONFIG.propClassId, CONFIG.propClassType, CONFIG.resClassFolder], spD = app.ontology.generateSpecifClasses({ terms: xlsTerms });
+        var xlsTerms = ["xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI", CONFIG.propClassId, CONFIG.propClassType, CONFIG.resClassFolder], spD = app.ontology.generateSpecifClasses({ terms: xlsTerms, adoptOntologyDataTypes: true });
         spD.title = [{ text: "SpecIF Classes for prostep iViP DDP (Data Model)" }];
         spD.description = [{ text: "SpecIF Classes derived from DDP Schema Version 2.0 created 10.03.2023 08:09:28 by Michael Kirsch, :em engineering methods AG on behalf of prostep iViP Association" }];
         spD.id = "P-DDP-Schema-V20";
@@ -139,12 +139,12 @@ moduleManager.construct({
                     objectClasses: [],
                     changedAt: spD.createdAt
                 };
-                let entities = Array.from(rel.getElementsByTagName('xs:element')), sbj = entities.filter((en) => {
+                let entities = Array.from(rel.getElementsByTagName('xs:element')), subj = entities.filter((en) => {
                     return en.getAttribute("name").includes("subject");
                 }), obj = entities.filter((en) => {
                     return en.getAttribute("name").includes("object");
                 });
-                let sTi = sbj[0].getAttribute("name").substring(7), oTi = obj[0].getAttribute("name").substring(6);
+                let sTi = subj[0].getAttribute("name").substring(7), oTi = obj[0].getAttribute("name").substring(6);
                 sC.subjectClasses.push({
                     id: CONFIG.prefixRC + simpleHash(sTi)
                 });
@@ -159,7 +159,7 @@ moduleManager.construct({
     }
     function ddpSchema2specifOntology(xsd) {
         "use strict";
-        let spD = app.ontology.generateSpecifClasses({ domains: ["SpecIF:DomainOntology"] }), termPropertyClasses = new Map();
+        let spD = app.ontology.generateSpecifClasses({ domains: ["SpecIF:DomainOntology"], adoptOntologyDataTypes: true }), termPropertyClasses = new Map();
         app.ontology.primitiveDataTypes.forEach((v, k) => {
             termPropertyClasses.set(v, k);
         });
@@ -234,23 +234,23 @@ moduleManager.construct({
                 sT.properties.push({ "class": { "id": "PC-SpecifTerm" }, "values": [[{ "text": ti }]] }, { "class": { "id": "PC-Description" }, "values": [getDesc(rel)] }, { "class": { "id": "PC-TermStatus" }, "values": ["V-TermStatus-50"] }, { "class": { "id": "PC-Domain" }, "values": [domainOfDDPElements] }, { "class": { "id": "PC-Instantiation" }, "values": ["V-Instantiation-10", "V-Instantiation-20"] });
                 LIB.cacheE(spD.resources, sT);
                 add2Hierarchy(sT.id, "N-FolderTermsStatementClass");
-                let entities = Array.from(rel.getElementsByTagName('xs:element')), sbj = entities.filter((en) => {
+                let entities = Array.from(rel.getElementsByTagName('xs:element')), subj = entities.filter((en) => {
                     return en.getAttribute("name").includes("subject");
                 }), obj = entities.filter((en) => {
                     return en.getAttribute("name").includes("object");
                 });
-                let sTi = sbj[0].getAttribute("name").substring(7), oTi = obj[0].getAttribute("name").substring(6), sbjId = CONFIG.prefixR + simpleHash(sTi), objId = CONFIG.prefixR + simpleHash(oTi);
+                let sTi = subj[0].getAttribute("name").substring(7), oTi = obj[0].getAttribute("name").substring(6), subId = CONFIG.prefixR + simpleHash(sTi), obId = CONFIG.prefixR + simpleHash(oTi);
                 spD.statements.push({
-                    id: CONFIG.prefixS + simpleHash(sT.id + 'subject' + sbjId),
+                    id: CONFIG.prefixS + simpleHash(sT.id + 'subject' + subId),
                     class: { id: "SC-isEligibleAsSubject" },
-                    subject: { id: sbjId },
+                    subject: { id: subId },
                     object: { id: sT.id },
                     changedAt: spD.createdAt
                 });
                 spD.statements.push({
-                    id: CONFIG.prefixS + simpleHash(sT.id + 'object' + objId),
+                    id: CONFIG.prefixS + simpleHash(sT.id + 'object' + obId),
                     class: { id: "SC-isEligibleAsObject" },
-                    subject: { id: objId },
+                    subject: { id: obId },
                     object: { id: sT.id },
                     changedAt: spD.createdAt
                 });

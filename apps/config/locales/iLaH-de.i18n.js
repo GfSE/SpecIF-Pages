@@ -31,7 +31,6 @@ function LanguageTextsDe() {
     self.IcoReport = '<i class="bi-bar-chart-line" ></i>';
     self.LblAll = "Alle";
     self.LblAllObjects = "Alle Ressourcen";
-    self.LblOntology = "Ontologie";
     self.LblImport = 'Importieren';
     self.LblExport = 'Exportieren';
     self.LblExportReqif = 'ReqIF-Datei exportieren';
@@ -127,10 +126,8 @@ function LanguageTextsDe() {
     self.LblFileFormat = 'Dateiformat';
     self.modelElements = 'Modell-Elemente';
     self.withOtherProperties = 'mit weiteren Eigenschaften';
-    self.showEmptyProperties = 'einschließlich leerer Eigenschaften';
+    self.showEmptyProperties = 'leere Eigenschaften zeigen';
     self.withStatements = 'mit Relationen (Aussagen)';
-    self.elementsWithIcons = 'mit Symbolen';
-    self.elementsWithOrdernumbers = 'mit Gliederungsnummern';
     self.LblStringMatch = 'Text<mark>such</mark>e';
     self.LblWordBeginnings = 'Nur Wortanfänge berücksichtigen';
     self.LblWholeWords = 'Nur ganze Worte berücksichtigen';
@@ -244,7 +241,7 @@ function LanguageTextsDe() {
     self.MsgNoRelatedObjects = 'Zu dieser Ressource gibt es keine Relationen (Aussagen).';
     self.MsgNoComments = 'Zu dieser Ressource gibt es keine Kommentare.';
     self.MsgNoFiles = 'Keine Datei gefunden.';
-    self.MsgAnalyzing = 'Führe Analyse durch ...';
+    self.MsgAnalyzing = 'Setze Analyse fort ...';
     self.MsgNoReports = 'Keine Auswertungen für dieses Projekt.';
     self.MsgTypeNoObjectType = "Mindestens eine Ressource-Klasse anlegen, sonst können keine Ressourcen erzeugt werden.";
     self.MsgTypeNoAttribute = "Mindestens ein Attribut anlegen, sonst ist der Typ nicht brauchbar.";

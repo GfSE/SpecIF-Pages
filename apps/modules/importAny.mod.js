@@ -60,13 +60,6 @@ moduleManager.construct({
             extensions: [".bpmn"],
             help: i18n.MsgImportBpmn
         }, {
-            id: 'sysml',
-            name: 'ioSysml',
-            desc: 'System Modeling Language',
-            label: 'UML/SysML',
-            extensions: [".mdzip"],
-            help: "Experimental: Import an XMI file from Cameo v19.0."
-        }, {
             id: 'reqif',
             name: 'ioReqif',
             desc: 'Requirement Interchange Format',
@@ -82,12 +75,17 @@ moduleManager.construct({
             extensions: [".xlsx", ".xls", ".csv"],
             help: i18n.MsgImportXls,
             opts: { dontCheck: ["statement.object"] }
+        }, {
+            id: 'mm',
+            name: 'ioMm',
+            desc: 'Freemind Mindmap',
+            label: 'MM',
+            extensions: [".mm"],
+            help: i18n.MsgImportMm
         }];
     self.projectName = '';
     self.format = undefined;
-    var showFileSelect, importMode = { id: 'replace' }, myFullName = 'app.' + self.loadAs, urlP, urlOntology = (window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html') ?
-        CONFIG.ontologyURL
-        : '../../SpecIF/vocabulary/Ontology.specif'), importing = false, cacheLoaded = false, allValid = false;
+    var showFileSelect, importMode = { id: 'replace' }, myFullName = 'app.' + self.loadAs, urlP, importing = false, cacheLoaded = false, allValid = false;
     self.clear = function () {
         $('input[type=file]').val('');
         setTextValue(i18n.LblFileName, '');
@@ -106,12 +104,6 @@ moduleManager.construct({
         }
         ;
         let h = '<div style="max-width:768px; margin-top:1em">'
-            + '<div class="fileSelect" style="display:none;" >'
-            + '<div class="attribute-label" style="vertical-align:top; padding-top:0.2em" >' + i18n.LblOntology + '</div>'
-            + '<div class="attribute-value" >'
-            + '<div id="ontologySelector" style="margin: 0 0 0.4em 0" ></div>'
-            + '</div>'
-            + '</div>'
             + '<div class="fileSelect" style="display:none;" >'
             + '<div class="attribute-label" style="vertical-align:top; font-size:140%; padding-top:0.2em" >' + i18n.LblImport + '</div>'
             + '<div class="attribute-value" >'
@@ -172,12 +164,7 @@ moduleManager.construct({
             }
             ;
         }
-        function getOntologyURL(uP) {
-            return uP ? uP[CONFIG.keyOntology] : undefined;
-        }
         urlP = opts.urlParams;
-        urlOntology = getOntologyURL(urlP) || urlOntology;
-		console.debug('+1',urlOntology);
         if (urlP && urlP[CONFIG.keyImport]) {
             importMode = { id: urlP[CONFIG.keyMode] || 'replace' };
             self.file.name = urlP[CONFIG.keyImport];
@@ -189,24 +176,17 @@ moduleManager.construct({
                     $("#formNames").html(rF);
                     self.projectName = self.file.name.fileName();
                     setImporting(true);
-                    getOntology(urlOntology)
-                        .then((ont) => {
-                        app.ontology = ont;
-                        LIB.httpGet({
-                            url: urlP[CONFIG.keyImport] + '?' + Date.now().toString(),
-                            responseType: 'arraybuffer',
-                            withCredentials: false,
-                            done: function (result) {
-                                app[self.format.name].toSpecif(result.response)
-                                    .progress(setProgress)
-                                    .done(handleResult)
-                                    .fail(handleError);
-                            },
-                            fail: handleError
-                        });
-                    })
-                        .catch((xhr) => {
-                        handleError(new resultMsg(xhr.status, xhr.statusText, "text", "Ontology not found"));
+                    LIB.httpGet({
+                        url: urlP[CONFIG.keyImport] + '?' + Date.now().toString(),
+                        responseType: 'arraybuffer',
+                        withCredentials: false,
+                        done: function (result) {
+                            app[self.format.name].toSpecif(result.response)
+                                .progress(setProgress)
+                                .done(handleResult)
+                                .fail(handleError);
+                        },
+                        fail: handleError
                     });
                     return;
                 }
@@ -233,7 +213,6 @@ moduleManager.construct({
             ;
         });
         $('#formatSelector').html(str);
-        $('#ontologySelector').html(urlOntology);
         showFileSelect.set();
         setImporting(false);
     };
@@ -322,17 +301,8 @@ moduleManager.construct({
         setImporting(true);
         importMode = { id: mode };
         setProgress(i18n.MsgReading, 10);
-        getOntology(urlOntology)
-            .then((ont) => {
-            app.ontology = ont;
-            self.projectName = textValue(i18n.LblProjectName);
-            readFile(self.file, app[self.format.name].toSpecif);
-        })
-	//	.catch(handleError);
-            .catch((xhr) => {
-				console.debug('+',xhr);
-            handleError(new resultMsg(xhr.status, xhr.statusText, "text", "Ontology not found"));
-        });
+        self.projectName = textValue(i18n.LblProjectName);
+        readFile(self.file, app[self.format.name].toSpecif);
         return;
         function readFile(f, fn) {
             let rdr = new FileReader();
@@ -360,14 +330,16 @@ moduleManager.construct({
         LIB.stdError(xhr);
         self.show();
     }
+    var resQ = [], resIdx = 0;
     function handleResult(data) {
-        var resQ = [], resIdx = 0;
         if (Array.isArray(data)) {
             resQ = data;
+            resIdx = 0;
             handle(resQ.shift(), resIdx);
         }
         else {
             resQ.length = 0;
+            resIdx = 0;
             handle(data, 0);
         }
         ;
@@ -381,11 +353,11 @@ moduleManager.construct({
         function handle(dta, idx) {
             setProgress(importMode.id + ' project', 20);
             let opts = self.format.opts || {};
-            opts.mode = idx < 1 ? importMode.id : opts.multipleMode || 'update';
+            opts.mode = idx < 1 ? importMode.id : opts.multipleMode;
             opts.normalizeTerms = true;
-            opts.deduplicate =
-                opts.addGlossary =
-                    opts.addUnreferencedResources = resQ.length < 1;
+            opts.deduplicate = true;
+            opts.addGlossary = true;
+            opts.addUnreferencedResources = true;
             switch (opts.mode) {
                 case 'create':
                 case 'replace':
@@ -417,20 +389,6 @@ moduleManager.construct({
     ;
     function setProgress(msg, perc) {
         $('#progress .progress-bar').css('width', perc + '%').html(msg);
-    }
-    function getOntology(urlO) {
-        return new Promise((resolve, reject) => {
-            LIB.httpGet({
-                url: urlO + "?" + new Date().toISOString(),
-                responseType: 'arraybuffer',
-                withCredentials: false,
-                done: (xhr) => {
-                    let ont = JSON.parse(LIB.ab2str(xhr.response));
-                    resolve(new COntology(ont));
-                },
-                fail: reject
-            });
-        });
     }
     self.abort = function () {
         console.info('abort pressed');

@@ -860,7 +860,6 @@ moduleManager.construct({
         })
             .then(() => {
             self.updateTree({
-                lookupTitles: true,
                 targetLanguage: self.selPrj.language
             });
             self.doRefresh({ forced: true });
@@ -928,7 +927,7 @@ moduleManager.construct({
             if (nd && !opts.urlParams)
                 setUrlParams({
                     project: selPrj.id,
-                    view: self.view,
+                    view: self.view.substring(1),
                     node: nd.id
                 });
             for (var i = CONFIG.objToGetCount - 1; nd && i > -1; i--) {
@@ -1082,7 +1081,7 @@ moduleManager.construct({
         if (nd && !opts.urlParams)
             setUrlParams({
                 project: selPrj.id,
-                view: self.view,
+                view: self.view.substring(1),
                 node: nd.id
             });
         selPrj.readStatementsOf(nd.ref, { dontCheckStatementVisibility: aDiagramWithoutShowsStatementsForEdges(), asSubject: true, asObject: true })

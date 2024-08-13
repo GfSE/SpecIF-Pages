@@ -31,7 +31,6 @@ function LanguageTextsFr() {
     self.IcoReport = '<i class="bi-bar-chart-line" ></i>';
     self.LblAll = "Tous";
     self.LblAllObjects = "Tous les ressources";
-    self.LblOntology = "Ontologie";
     self.LblImport = 'Importer';
     self.LblExport = 'Exporter';
     self.LblExportReqif = 'Exporter fichier ReqIF';
@@ -127,10 +126,8 @@ function LanguageTextsFr() {
     self.LblFileFormat = 'Format de fichier';
     self.modelElements = '�lements de mod�le';
     self.withOtherProperties = "avec les autres attributs";
-    self.showEmptyProperties = 'attributs vides inclus';
-    self.withStatements = 'avec relations (affirmations)';
-    self.elementsWithIcons = 'avec symboles';
-    self.elementsWithOrdernumbers = "avec num�ro d'ordre";
+    self.showEmptyProperties = 'montrer les attributs vides';
+    self.withStatements = 'avec affirmations';
     self.LblStringMatch = 'Recherche de <mark>texte</mark>';
     self.LblWordBeginnings = 'Seulement mots commen�ant par';
     self.LblWholeWords = 'Seulement mots entiers';

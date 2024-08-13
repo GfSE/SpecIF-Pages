@@ -91,7 +91,7 @@ moduleManager.construct({
         if (!opts.urlParams)
             setUrlParams({
                 project: selPrj.id,
-                view: self.view
+                view: self.view.substring(1)
             });
         self.parent.showLeft.set(false);
         let fps = '';
@@ -401,7 +401,7 @@ moduleManager.construct({
                     oTF.options.push({
                         title: LIB.titleOf(rC, displayOptions),
                         id: rC.id,
-                        checked: (pre && pre.selected) ? pre.selected.includes(rC.id) : true
+                        checked: (pre && pre.selected) ? pre.selected.indexOf(rC.id) > -1 : true
                     });
                 }
             });

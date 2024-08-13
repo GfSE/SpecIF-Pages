@@ -79,24 +79,19 @@ class CSpecIF {
     }
     set(spD, opts) {
         return new Promise((resolve, reject) => {
-            let msg;
             if (this.isValid(spD)) {
-                msg = this.toInt(spD, opts);
-                if (msg.status == 0) {
-                    if (opts && opts.noCheck) {
-                        resolve(this);
-                    }
-                    else {
-                        this.check(this, opts)
-                            .then(() => { resolve(this); }, reject);
-                    }
-                    ;
+                if (opts && opts.noCheck) {
+                    this.toInt(spD, opts);
+                    resolve(this);
                 }
-                else
-                    reject(msg);
+                else {
+                    this.toInt(spD, opts);
+                    this.check(this, opts)
+                        .then(() => { resolve(this); }, reject);
+                }
             }
             else {
-                msg = new resultMsg(999, "SpecIF id is not defined or version is not supported.").warn();
+                let msg = new xhrMessage(999, "SpecIF id is not defined or version is not supported.").warn();
                 reject(msg);
             }
         });
@@ -120,11 +115,11 @@ class CSpecIF {
                         .catch(handleError);
                 }
                 else {
-                    throw "Programming Error: Inexpected check of SpecIF data set < v1.1";
+                    throw Error("Inexpected check of SpecIF data set < v1.1");
                 }
             }
             else {
-                reject(new resultMsg(999, 'No SpecIF data provided for checking'));
+                reject(new xhrMessage(999, 'No SpecIF data to check'));
             }
             ;
             return;
@@ -141,7 +136,6 @@ class CSpecIF {
                         }
                     }
                     ;
-                    console.info("The invalid SpecIF data set: ", spD);
                     reject(rc);
                 }
                 else
@@ -151,7 +145,7 @@ class CSpecIF {
                 switch (xhr.status) {
                     case 404:
                         let v = spD.specifVersion ? 'version ' + spD.specifVersion : 'with Schema ' + spD['$schema'];
-                        xhr = new resultMsg(903, 'SpecIF ' + v + ' is not supported by this program!');
+                        xhr = new xhrMessage(903, 'SpecIF ' + v + ' is not supported by the program!');
                     default:
                         reject(xhr);
                 }
@@ -202,9 +196,10 @@ class CSpecIF {
             });
         }
         catch (e) {
-            let txt = "Error when importing the project '" + LIB.displayValueOf(spD.title, { targetLanguage: spD.language || browser.language }) + "': " + e;
-            console.error(txt);
-            return new resultMsg(904, txt);
+            let txt = "Error when importing the project '" + LIB.displayValueOf(spD.title, { targetLanguage: spD.language || browser.language }) + "'.";
+            console.warn(txt);
+            message.show(new xhrMessage(999, txt), { severity: 'danger' });
+            return;
         }
         ;
         if (spD.rights)
@@ -227,7 +222,7 @@ class CSpecIF {
             this.title = makeMultiLanguageText(spD.title);
         this.id = spD.id;
         this.$schema = 'https://specif.de/v' + CONFIG.specifVersion + '/schema.json';
-        return new resultMsg(0, 'SpecIF data has been successfully imported!');
+        return;
         function i2int(iE) {
             var oE = {
                 id: iE.id ? iE.id.toSpecifId() : undefined,
@@ -295,16 +290,10 @@ class CSpecIF {
             oE.title = makeTitle('propertyClass', iE.title);
             oE.dataType = LIB.makeKey(iE.dataType.id || iE.dataType);
             let dT = LIB.itemByKey(spD.dataTypes, oE.dataType);
-            if (dT) {
-                if (typeof (iE.multiple) == 'boolean')
-                    oE.multiple = iE.multiple;
-                else if (dT.multiple)
-                    oE.multiple = true;
-            }
-            else {
-                throw "The dataType " + oE.dataType.id + " for propertyClass " + oE.id + " has not been found.";
-            }
-            ;
+            if (typeof (iE.multiple) == 'boolean')
+                oE.multiple = iE.multiple;
+            else if (dT.multiple)
+                oE.multiple = true;
             dT = LIB.itemByKey(self.dataTypes, oE.dataType);
             if (iE.value || iE.values) {
                 let vL = makeValues(iE, dT);
@@ -432,8 +421,8 @@ class CSpecIF {
                 { name: 'title', nativePrp: iE.title, tiL: CONFIG.titleProperties, cl: CONFIG.propClassTitle }
             ].forEach((pD) => {
                 if (pD.nativePrp && propertyMissing(pD.tiL, oE)) {
-                    LIB.addProperty(oE, {
-                        class: { id: suitablePropertyClassId(pD, eCkey) },
+                    LIB.addProp(oE, {
+                        class: { id: getPropertyClassId(pD, eCkey) },
                         values: [makeMultiLanguageText(pD.nativePrp)]
                     });
                     console.info("Added a " + pD.name + " property to element with id '" + oE.id + "'");
@@ -450,7 +439,7 @@ class CSpecIF {
                 ;
                 return true;
             }
-            function suitablePropertyClassId(pDef, eCk) {
+            function getPropertyClassId(pDef, eCk) {
                 let eC = LIB.itemByKey((iE.subject ? self.statementClasses : self.resourceClasses), eCk);
                 for (var pCk of eC.propertyClasses) {
                     let pC = LIB.itemByKey(self.propertyClasses, pCk);
@@ -581,10 +570,7 @@ class CSpecIF {
                                 else
                                     return;
                             case XsDataType.DateTime:
-                                if (typeof (val) == 'string')
-                                    return makeISODate(LIB.cleanValue(val));
-                                else
-                                    throw "Property Value of " + prp.id + " with class " + val['class'] + " must be a string.";
+                                return makeISODate(LIB.cleanValue(val));
                             case XsDataType.Boolean:
                                 if (CONFIG.valuesTrue.includes(LIB.cleanValue(val)))
                                     return "true";
@@ -630,7 +616,7 @@ class CSpecIF {
                 }
             }
             else
-                throw "Invalid property with class " + prp[names.pClass] + ".";
+                throw Error("Invalid property with class " + prp[names.pClass] + ".");
             function makeISODate(str) {
                 return LIB.addTimezoneIfMissing(str.replace(/(\d\+|\d-)(\d\d)(\d\d)$/, (match, $1, $2, $3) => {
                     return $1 + $2 + ':' + $3;
@@ -658,7 +644,7 @@ class CSpecIF {
                 for (var i = this.hierarchies.length - 1; i > -1; i--) {
                     let r = LIB.itemByKey(this.resources, this.hierarchies[i].resource);
                     if (nodeIsNoRoot(r)) {
-                        let oC = app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder], referencesWithoutRevision: true, delta: true });
+                        let oC = app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder], adoptOntologyDataTypes: true, referencesWithoutRevision: true, delta: true });
                         ['dataTypes', 'propertyClasses', 'resourceClasses'].forEach((li) => { LIB.cacheL(spD[li], oC[li]); });
                         break;
                     }
@@ -1298,7 +1284,7 @@ class CSpecIF {
                                 });
                                 break;
                             default:
-                                reject(new resultMsg(999, "Cannot transform file '" + iE.title + "' of type '" + iE.type + "' to an image."));
+                                reject(new xhrMessage(999, "Cannot transform file '" + iE.title + "' of type '" + iE.type + "' to an image."));
                         }
                     }
                 });

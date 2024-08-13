@@ -11,12 +11,6 @@ class COntology {
     constructor(dta) {
         this.headings = [];
         this.modelElementClasses = [];
-        this.termCategories = new Map([
-            ["resourceClass", { synonymStatement: "SpecIF:isSynonymOfResource", prefix: CONFIG.prefixRC }],
-            ["statementClass", { synonymStatement: "SpecIF:isSynonymOfStatement", prefix: CONFIG.prefixSC }],
-            ["propertyClass", { synonymStatement: "SpecIF:isSynonymOfProperty", prefix: CONFIG.prefixPC }],
-            ["propertyValue", { synonymStatement: "SpecIF:isSynonymOfValue", prefix: CONFIG.prefixV }]
-        ]);
         this.termPrincipalClasses = new Map([
             ["SpecIF:TermResourceClass", "R-FolderTermsResourceClass"],
             ["SpecIF:TermStatementClass", "R-FolderTermsStatementClass"],
@@ -53,6 +47,12 @@ class COntology {
             "SpecIF:DefaultValueDuration",
             "SpecIF:DefaultValueAnyURI",
         ];
+        this.synonymStatements = new Map([
+            ["resourceClass", "SpecIF:isSynonymOfResource"],
+            ["statementClass", "SpecIF:isSynonymOfStatement"],
+            ["propertyClass", "SpecIF:isSynonymOfProperty"],
+            ["propertyValue", "SpecIF:isSynonymOfValue"]
+        ]);
         this.eligibleLifecycleStatus = [
             "SpecIF:LifecycleStatusReleased",
             "SpecIF:LifecycleStatusEquivalent",
@@ -90,15 +90,8 @@ class COntology {
                 && (ctg == 'all' || LIB.classTitleOf(r['class'], this.data.resourceClasses).toLowerCase().includes(ctg)));
         });
     }
-    getTermResource(ctg, term) {
-        let resL = this.getTermResources(ctg, term);
-        if (resL.length > 1)
-            console.warn("Multiple resources describe term '" + term + "': " + resL.map((r) => { return r.id; }).toString());
-        if (resL.length > 0)
-            return resL[0];
-    }
     getTerms(ctg) {
-        let ctgL = Array.from(this.termCategories.keys());
+        let ctgL = ['resourceClass', 'statementClass', 'propertyClass', 'propertyValue'];
         if (ctgL.includes(ctg)) {
             ctg = ctg.toLowerCase();
             return this.data.resources
@@ -110,31 +103,17 @@ class COntology {
             });
         }
         ;
-        throw Error("Programming Error: Unknown category '" + ctg + "'; must be one of " + ctgL.toString());
-    }
-    getClassId(ctg, term) {
-        if (RE.vocabularyTerm.test(term)) {
-            let tR = this.getTermResource(ctg, term);
-            if (tR) {
-                let c = this.termCategories.get(ctg);
-                if (c)
-                    return this.makeIdAndTitle(tR, c.prefix).id;
-                else
-                    throw Error("Programming Error: Unknown category '" + ctg + "'");
-            }
-            ;
-        }
-        ;
+        throw Error("Programming Error: Category must be one of " + ctgL.toString());
     }
     localize(term, opts) {
         if (RE.vocabularyTerm.test(term)) {
-            let tR = this.getTermResource('all', term);
-            if (tR) {
+            let rL = this.getTermResources('all', term);
+            if (rL.length > 0) {
                 let lnL = [];
                 if (opts.plural) {
-                    lnL = LIB.valuesByTitle(tR, ["SpecIF:LocalTermPlural"], this.data);
+                    lnL = LIB.valuesByTitle(rL[0], ["SpecIF:LocalTermPlural"], this.data);
                     if (lnL.length < 1) {
-                        let stL = this.statementsByTitle(tR, ["SpecIF:isPluralOfResource"], { asSubject: false, asObject: true });
+                        let stL = this.statementsByTitle(rL[0], ["SpecIF:isPluralOfResource"], { asSubject: false, asObject: true });
                         if (stL.length > 0) {
                             let tR = LIB.itemByKey(this.data.resources, stL[0].subject);
                             lnL = LIB.valuesByTitle(tR, ["SpecIF:LocalTerm"], this.data);
@@ -142,7 +121,7 @@ class COntology {
                     }
                 }
                 else {
-                    lnL = LIB.valuesByTitle(tR, ["SpecIF:LocalTerm"], this.data);
+                    lnL = LIB.valuesByTitle(rL[0], ["SpecIF:LocalTerm"], this.data);
                 }
                 ;
                 if (lnL.length > 0) {
@@ -190,13 +169,14 @@ class COntology {
     getPreferredTerm(ctg, term) {
         if (term.startsWith('dcterms:'))
             return term;
-        let tR = this.getTermResource(ctg, term);
-        if (tR) {
-            if (this.valueByTitle(tR, "SpecIF:TermStatus") == "SpecIF:LifecycleStatusReleased")
+        let rL = this.getTermResources(ctg, term);
+        if (rL.length > 0) {
+            let r = rL[0];
+            if (this.valueByTitle(r, "SpecIF:TermStatus") == "SpecIF:LifecycleStatusReleased")
                 return term;
-            let ctgV = this.termCategories.get(ctg), ctgL = ctgV ? [ctgV] : Array.from(this.termCategories.values()), staL = this.statementsByTitle(tR, ctgL.map(c => c.synonymStatement), { asSubject: true, asObject: true }), resL = staL.map((st) => {
-                return LIB.itemById(this.data.resources, (st.object.id == tR.id ? st.subject.id : st.object.id));
-            }), synL = resL.filter((r) => {
+            let stL = this.statementsByTitle(r, [this.synonymStatements.get(ctg)], { asSubject: true, asObject: true }), rsL = stL.map((st) => {
+                return LIB.itemById(this.data.resources, (st.object.id == r.id ? st.subject.id : st.object.id));
+            }), synL = rsL.filter((r) => {
                 return this.valueByTitle(r, "SpecIF:TermStatus") == "SpecIF:LifecycleStatusReleased";
             });
             if (synL.length < 1)
@@ -216,9 +196,9 @@ class COntology {
         return str;
     }
     getTermValue(ctg, term, title) {
-        let tR = this.getTermResource(ctg, term);
-        if (tR) {
-            return this.valueByTitle(tR, title);
+        let rL = this.getTermResources(ctg, term);
+        if (rL.length > 0) {
+            return this.valueByTitle(rL[0], title);
         }
         ;
     }
@@ -243,11 +223,14 @@ class COntology {
                 return term;
         }
         ;
-        let tR = this.getTermResource('all', term);
-        if (tR) {
-            let v = findSynonymStatementOf(tR['class']), staL = this.statementsByTitle(tR, [v], { asSubject: true, asObject: true }), resL = staL.map((st) => {
-                return LIB.itemById(this.data.resources, (st.object.id == tR.id ? st.subject.id : st.object.id));
-            }), synL = findSynonym(resL, opts.targetNamespaces);
+        let rL = this.getTermResources('all', term);
+        if (rL.length > 1)
+            console.warn('Multiple definitions of the term found: ', rL.map((r) => { return r.id; }).toString());
+        if (rL.length > 0) {
+            let r = rL[0];
+            let v = findSynonymStatementOf(r['class']), stL = this.statementsByTitle(r, [v], { asSubject: true, asObject: true }), rsL = stL.map((st) => {
+                return LIB.itemById(this.data.resources, (st.object.id == r.id ? st.subject.id : st.object.id));
+            }), synL = findSynonym(rsL, opts.targetNamespaces);
             if (synL.length < 1)
                 return term;
             if (synL.length > 1)
@@ -260,12 +243,12 @@ class COntology {
         return term;
         function findSynonymStatementOf(rCk) {
             let rC = LIB.itemByKey(self.data.resourceClasses, rCk);
-            for (let [ctg, syn] of self.termCategories) {
-                if (rC.title.toLowerCase().includes(ctg.toLowerCase()))
-                    return syn;
+            for (let [key, value] of self.synonymStatements) {
+                if (rC.title.toLowerCase().includes(key.toLowerCase()))
+                    return value;
             }
             ;
-            throw (new Error("No synonym statement found for '" + rCk.id + "'."));
+            throw (new Error("No synonymStatement found for '" + rCk.id + "'."));
         }
         function findSynonym(rL, nspL) {
             let sL = [];
@@ -356,7 +339,7 @@ class COntology {
                 this.generated.hL.push(h);
             }
             ;
-            return Object.assign(opts.delta ? {} : this.makeTemplate(), opts.delta ? {} : {
+            return Object.assign(opts.delta ? {} : this.makeTemplate(), {
                 "id": spId,
                 "title": [{
                         "text": "SpecIF Classes" + (opts.domains ? (" for " + opts.domains.toString().replace(/:/g, " ")) : ""),
@@ -368,7 +351,6 @@ class COntology {
                         "format": SpecifTextFormat.Plain,
                         "language": "en"
                     }],
-            }, {
                 "dataTypes": this.generated.dTL,
                 "propertyClasses": this.generated.pCL,
                 "resourceClasses": this.generated.rCL,
@@ -532,76 +514,6 @@ class COntology {
             values: (defaultVL.length > 0 && (dT.type != XsDataType.Boolean || defaultVL[0] == "true") ? defaultVL : undefined)
         });
     }
-    makeRC(r) {
-        let iL = LIB.valuesByTitle(r, ["SpecIF:Instantiation"], this.data), eC = this.extendingClassOf(r, CONFIG.prefixRC), eCk, pCL = this.propertyClassesOf(r);
-        if (eC) {
-            eCk = LIB.makeKey(eC.id);
-            if (Array.isArray(eC.propertyClasses) && eC.propertyClasses.length > 0 && pCL.length > 0) {
-                eC = LIB.getExtendedClasses(this.generated.rCL, [eCk])[0];
-                pCL = pCL.filter((p) => {
-                    return LIB.referenceIndex(eC.propertyClasses, p) < 0;
-                });
-            }
-            ;
-        }
-        ;
-        return Object.assign(this.makeItem(r, CONFIG.prefixRC), {
-            extends: eCk,
-            instantiation: iL.map((ins) => { return LIB.displayValueOf(ins, { targetLanguage: 'default' }); }),
-            isHeading: LIB.isTrue(this.valueByTitle(r, "SpecIF:isHeading")) ? true : undefined,
-            icon: this.valueByTitle(r, "SpecIF:Icon"),
-            propertyClasses: pCL.length > 0 ? pCL : undefined
-        });
-    }
-    makeSC(r) {
-        let iL = LIB.valuesByTitle(r, ["SpecIF:Instantiation"], this.data), eC = this.extendingClassOf(r, CONFIG.prefixSC), eCk, pCL = this.propertyClassesOf(r), sCL = this.eligibleClassesOf(r, ["SpecIF:isEligibleAsSubject"]), oCL = this.eligibleClassesOf(r, ["SpecIF:isEligibleAsObject"]);
-        if (eC) {
-            eCk = LIB.makeKey(eC.id);
-            if (Array.isArray(eC.propertyClasses) && eC.propertyClasses.length > 0 && pCL.length > 0) {
-                eC = LIB.getExtendedClasses(this.generated.sCL, [eCk])[0];
-                pCL = pCL.filter((p) => {
-                    return LIB.referenceIndex(eC.propertyClasses, p) < 0;
-                });
-            }
-            ;
-        }
-        ;
-        return Object.assign(this.makeItem(r, CONFIG.prefixSC), {
-            extends: eCk,
-            instantiation: iL.map((ins) => { return LIB.displayValueOf(ins, { targetLanguage: 'default' }); }),
-            isUndirected: LIB.isTrue(this.valueByTitle(r, "SpecIF:isUndirected")) ? true : undefined,
-            icon: this.valueByTitle(r, "SpecIF:Icon"),
-            subjectClasses: sCL.length > 0 ? sCL : undefined,
-            objectClasses: oCL.length > 0 ? oCL : undefined,
-            propertyClasses: pCL.length > 0 ? pCL : undefined
-        });
-    }
-    extendingClassOf(el, pfx) {
-        if ([CONFIG.prefixRC, CONFIG.prefixSC].includes(pfx)) {
-            let sL = this.statementsByTitle(el, (pfx == CONFIG.prefixRC ? ["SpecIF:isSpecializationOfResource"] : ["SpecIF:isSpecializationOfStatement"]), { asSubject: true });
-            if (sL.length > 1) {
-                console.warn('Term ' + el.id + ' has more than one extended class; the first found prevails.');
-                sL.length = 1;
-            }
-            ;
-            if (sL.length > 0) {
-                let term = LIB.itemByKey(this.data.resources, sL[0].object), eC;
-                switch (pfx) {
-                    case CONFIG.prefixRC:
-                        eC = this.makeRC(term);
-                        LIB.cacheE(this.generated.rCL, eC);
-                        break;
-                    case CONFIG.prefixSC:
-                        eC = this.makeSC(term);
-                        LIB.cacheE(this.generated.sCL, eC);
-                }
-                ;
-                return eC;
-            }
-            ;
-        }
-        ;
-    }
     propertyClassesOf(el) {
         let pCL = [];
         let pL = this.statementsByTitle(el, ["SpecIF:hasProperty"], { asSubject: true });
@@ -612,6 +524,16 @@ class COntology {
         }
         ;
         return pCL;
+    }
+    makeRC(r) {
+        let iL = LIB.valuesByTitle(r, ["SpecIF:Instantiation"], this.data), pCL = this.propertyClassesOf(r);
+        return Object.assign(this.makeItem(r, CONFIG.prefixRC), {
+            extends: this.extendingClassOf(r, CONFIG.prefixRC),
+            instantiation: iL.map((ins) => { return LIB.displayValueOf(ins, { targetLanguage: 'default' }); }),
+            isHeading: LIB.isTrue(this.valueByTitle(r, "SpecIF:isHeading")) ? true : undefined,
+            icon: this.valueByTitle(r, "SpecIF:Icon"),
+            propertyClasses: pCL.length > 0 ? pCL : undefined
+        });
     }
     eligibleClassesOf(el, clL) {
         let iCL = [], sL = this.statementsByTitle(el, clL, { asObject: true });
@@ -631,6 +553,40 @@ class COntology {
         }
         ;
         return iCL;
+    }
+    makeSC(r) {
+        let iL = LIB.valuesByTitle(r, ["SpecIF:Instantiation"], this.data), pCL = this.propertyClassesOf(r), sCL = this.eligibleClassesOf(r, ["SpecIF:isEligibleAsSubject"]), oCL = this.eligibleClassesOf(r, ["SpecIF:isEligibleAsObject"]);
+        return Object.assign(this.makeItem(r, CONFIG.prefixSC), {
+            extends: this.extendingClassOf(r, CONFIG.prefixSC),
+            instantiation: iL.map((ins) => { return LIB.displayValueOf(ins, { targetLanguage: 'default' }); }),
+            isUndirected: LIB.isTrue(this.valueByTitle(r, "SpecIF:isUndirected")) ? true : undefined,
+            icon: this.valueByTitle(r, "SpecIF:Icon"),
+            subjectClasses: sCL.length > 0 ? sCL : undefined,
+            objectClasses: oCL.length > 0 ? oCL : undefined,
+            propertyClasses: pCL.length > 0 ? pCL : undefined
+        });
+    }
+    extendingClassOf(el, pfx) {
+        if ([CONFIG.prefixRC, CONFIG.prefixSC].includes(pfx)) {
+            let sL = this.statementsByTitle(el, (pfx == CONFIG.prefixRC ? ["SpecIF:isSpecializationOfResource"] : ["SpecIF:isSpecializationOfStatement"]), { asSubject: true });
+            if (sL.length > 1) {
+                console.warn('Term ' + el.id + ' has more than one extended class; the first found prevails.');
+                sL.length = 1;
+            }
+            ;
+            if (sL.length > 0) {
+                let term = LIB.itemByKey(this.data.resources, sL[0].object), prep = this.makeIdAndTitle(term, pfx);
+                switch (pfx) {
+                    case CONFIG.prefixRC:
+                        LIB.cacheE(this.generated.rCL, this.makeRC(term));
+                        break;
+                    case CONFIG.prefixSC:
+                        LIB.cacheE(this.generated.sCL, this.makeSC(term));
+                }
+                ;
+                return LIB.makeKey(prep.id);
+            }
+        }
     }
     makeItem(r, prefix) {
         let prep = this.makeIdAndTitle(r, prefix), dscL = LIB.valuesByTitle(r, [CONFIG.propClassDesc], this.data), dsc;
@@ -682,9 +638,9 @@ class COntology {
         console.error("No item with id '" + termId + "' found in the Ontology or it has no value");
     }
     getModelElementClasses() {
-        let tR = this.getTermResource('resourceClass', "SpecIF:ModelElement"), sL = [];
-        if (tR) {
-            sL = this.statementsByTitle(tR, ["SpecIF:isSpecializationOfResource"], { asObject: true })
+        let rL = this.getTermResources('resourceClass', "SpecIF:ModelElement"), sL = [];
+        if (rL.length > 0) {
+            sL = this.statementsByTitle(rL[0], ["SpecIF:isSpecializationOfResource"], { asObject: true })
                 .map((s) => {
                 let r = LIB.itemByKey(this.data.resources, s.subject);
                 return this.valueByTitle(r, CONFIG.propClassTerm);

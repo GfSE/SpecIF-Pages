@@ -23,15 +23,15 @@ moduleManager.construct({
         const isEditor = app.title == i18n.LblEditor, isReviewer = app.title == i18n.LblReviewer, padding = '16px';
         if (!(opts && opts.urlParams))
             setUrlParams({
-                view: self.view
+                view: self.view.substring(1)
             });
         $('#pageTitle').html(app.title);
         $('#about').html('<div class="col-md-6" style="padding-right:' + padding + '; padding-left:' + padding + ';">'
             + '<p>An app for your web-browser to ' + (isEditor ? 'integrate, edit and transform' : (isReviewer ? 'review' : 'view')) + ' system specifications.</p>'
-            + '<p>SpecIF is the \'Specification Integration Facility\'. It combines partial specifications from different tools in a semantic net for</p>'
+            + '<p>SpecIF is the \'Specification Integration Facility\'. It\'s purpose is to combine partial specifications from different tools in a single model to allow</p>'
             + '<ul>'
-            + '<li>searching, navigating and auditing partial results in a common context as well as</li>'
-            + '<li>exchanging model information between organizations and tools.</li>'
+            + '<li>to search, navigate and audit partial results in a common context,</li>'
+            + '<li>to exchange model information between organizations and tools.</li>'
             + '</ul>'
             + '<p>The <a href="https://specif.de" target="_blank">SpecIF Homepage</a> provides further information.</p>'
             + '<p>The software code published on <a href="https://github.com/GfSE/SpecIF-Viewer" target="_blank">github.com</a>'
@@ -43,7 +43,7 @@ moduleManager.construct({
             + '</p>'
             + '<p>Version: ' + CONFIG.appVersion + ' supporting SpecIF up to version ' + CONFIG.specifVersion + '.</p>'
             + '<p>License: <a href="https://github.com/GfSE/SpecIF-Viewer/blob/master/LICENSE" target="_blank">Apache 2.0</a></p>'
-            + '<h2>Features</h2>'
+            + '<h3>Features</h3>'
             + '<ul>'
             + (isReviewer ?
                 "<li>Display SpecIF data embedded in an HTML-file</li>"
@@ -51,21 +51,20 @@ moduleManager.construct({
                     "<li>Import 'specif' and 'specif.zip' file with schema and consistency check</li>"
                         + (moduleManager.isReady('ioReqif') ? "<li>Import 'reqif' and 'reqifz' file</li>" : "")
                         + (isEditor && moduleManager.isReady('ioArchimate') ? "<li>Import ArchiMate Open-Exchange file</li>" : "")
-                        + (moduleManager.isReady('ioBpmn') ? "<li>Import 'BPMN-XML' file</li>" : "")
-                        + (isEditor && moduleManager.isReady('ioSysml') ? "<li>Import SysML Metadata Interchange (XMI) file <em>(experimental)</em></li>" : "")
                         + (moduleManager.isReady('ioXls') ? "<li>Import MS-Excel 'XLSX', 'XLS' and 'CSV' file</li>" : "")
+                        + (moduleManager.isReady('ioBpmn') ? "<li>Import 'BPMN-XML' file</li>" : "")
                         + "<li>Import from an URL or the local file system</li>")
             + (isEditor ? "<li>Merge models of different tools and notations</li>" : "")
             + "<li>Browse the content ('resources') along any supplied hierarchy</li>"
             + "<li>Display model-element details when hovering over a representation on a diagram (in case of SVG images with annotated model-element identifier)</li>"
-            + (isEditor ? "<li>Create, clone and update resource with an input form derived from the respective resource class</li>" : "")
-            + (isEditor ? "<li>Move single node or subtree in the hierarchy by drag'n'drop</li>" : "")
+            + (isEditor ? "<li>Create, clone and update resources with an input form derived from the respective resource class</li>" : "")
+            + (isEditor ? "<li>Move single nodes and subtrees in the hierarchy by drag'n'drop</li>" : "")
             + (isReviewer ? "<li>Edit properties for review status and comment according to the Stakeholder Request Clarification (SRC) process by prostep IVIP</li>" : "")
             + "<li>Inspect the semantic net ('statements')</li>"
-            + (isEditor ? "<li>Create statement according to the eligible subject and object classes per statement class</li>" : "")
-            + (isEditor ? "<li>Delete selected resource or statement</li>" : "")
+            + (isEditor ? "<li>Create statements according to the options defined in the statement classes</li>" : "")
+            + (isEditor ? "<li>Delete selected resources and statements</li>" : "")
             + "<li>Filter using text fragments ('full text search'), resource classes or enumerated property values</li>"
-            + "<li>Report model-based statistics, such as used resource classes or used property enumerated values</li>"
+            + "<li>Report some model-based statistics, such as used resource classes or used property enumerated values</li>"
             + (isEditor ? "<li>Export 'specif.zip' file</li>" : "")
             + (isEditor && moduleManager.isReady('toHtml') ? "<li>Export 'specif.html' file with embedded SpecIF data</li>" : "")
             + (isEditor && moduleManager.isReady('reqif2specif') ? "<li>Export 'reqifz' file</li>" : "")
@@ -74,7 +73,7 @@ moduleManager.construct({
             + (isEditor && moduleManager.isReady('toEpub') ? "<li>Export 'ePub' file</li>" : "")
             + (isEditor && moduleManager.isReady('toOxml') ? "<li>Export MS-Word OOXML file</li>" : "")
             + '</ul>'
-            + '<h2>Compatibility</h2>'
+            + '<h3>Compatibility</h3>'
             + '<ul>'
             + "<li>Mozilla Firefox</li>"
             + "<li>Google Chromium and Chrome</li>"
@@ -85,7 +84,7 @@ moduleManager.construct({
             + '</ul>'
             + '</div>'
             + '<div class="col-md-6" style="padding-right:' + padding + '; padding-left:' + padding + ';">'
-            + '<h2>Support</h2>'
+            + '<h3>Support</h3>'
             + '<p>'
             + 'In case you discover a conceptual inconsistency, a software bug or a flaw in documentation,'
             + ' we appreciate if you open an <a href="https://github.com/GfSE/SpecIF-Viewer/issues" target="_blank">issue</a>'
@@ -93,7 +92,7 @@ moduleManager.construct({
             + ' <a href="mailto:maintenance@specif.de">maintenance(at)specif.de</a>.'
             + ' We are highly interested to supply high-quality concepts and useful software.'
             + '</p>'
-            + '<h2>Credits and License Information</h2>'
+            + '<h3>Credits and License Information</h3>'
             + '<p>The SpecIF web-apps have been built with the open source components listed below. These are fine pieces of software'
             + ' and we gratefully thank the contributors for their effort.'
             + '</p>'

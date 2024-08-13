@@ -323,8 +323,8 @@ var app, browser, i18n, message, moduleManager = function () {
                     getScript('https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.35.4/js/bootstrap-dialog.min.js');
                     return true;
                 case "tree":
-                    getCss("https://cdn.jsdelivr.net/npm/jqtree@1.8.4/jqtree.css");
-                    getScript('https://cdn.jsdelivr.net/npm/jqtree@1.8.4/tree.jquery.js');
+                    getCss("https://cdnjs.cloudflare.com/ajax/libs/jqtree/1.8.2/jqtree.css");
+                    getScript('https://cdnjs.cloudflare.com/ajax/libs/jqtree/1.8.2/tree.jquery.js');
                     return true;
                 case "fileSaver":
                     getScript('https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js');
@@ -336,20 +336,20 @@ var app, browser, i18n, message, moduleManager = function () {
                     getScript('https://cdnjs.cloudflare.com/ajax/libs/ajv/4.11.8/ajv.min.js');
                     return true;
                 case "excel":
-                    getScript('https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js');
+                    getScript('https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js');
                     return true;
                 case "bpmnViewer":
-                    getScript('https://unpkg.com/bpmn-js@17.9.1/dist/bpmn-viewer.production.min.js');
+                    getScript('https://unpkg.com/bpmn-js@17.2.2/dist/bpmn-viewer.production.min.js');
                     return true;
                 case "graphViz":
                     getScript('https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/standalone/umd/vis-network.min.js');
                     return true;
                 case "markdown":
-                    getScript('https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js')
+                    getScript('https://cdn.jsdelivr.net/npm/markdown-it@13.0.2/dist/markdown-it.min.js')
                         .done(() => { window.markdown = window.markdownit({ html: true, xhtmlOut: true, breaks: true, linkify: false }); });
                     return true;
                 case "mainCSS":
-                    getCss(loadPath + 'assets/stylesheets/SpecIF.default.css');
+                    getCss(loadPath + 'vendor/assets/stylesheets/SpecIF.default.css');
                     setReady(mod);
                     return true;
                 case "types":
@@ -380,6 +380,9 @@ var app, browser, i18n, message, moduleManager = function () {
                 case 'ioOntology':
                     getScript(loadPath + 'modules/ioOntology.js');
                     return true;
+                case "Ontology":
+                    getOntology();
+                    return true;
                 case "helperTree":
                     getScript(loadPath + 'modules/helperTree.js');
                     return true;
@@ -387,6 +390,7 @@ var app, browser, i18n, message, moduleManager = function () {
                     getScript(loadPath + 'modules/xSpecif.js');
                     return true;
                 case "cache":
+                    loadModule("Ontology");
                     getScript(loadPath + 'modules/cache.mod.js');
                     return true;
                 case "profileAnonymous":
@@ -397,29 +401,29 @@ var app, browser, i18n, message, moduleManager = function () {
                     getScript(loadPath + 'modules/specif2html.js');
                     return true;
                 case "toXhtml":
-                    getScript(loadPath + 'assets/javascripts/toXhtml.js');
+                    getScript(loadPath + 'vendor/assets/javascripts/toXhtml.js');
                     return true;
                 case "toEpub":
                     loadModule('toXhtml');
-                    getScript(loadPath + 'assets/javascripts/toEpub.js');
+                    getScript(loadPath + 'vendor/assets/javascripts/toEpub.js');
                     return true;
                 case "toOxml":
-                    getScript(loadPath + 'assets/javascripts/toOxml.js');
+                    getScript(loadPath + 'vendor/assets/javascripts/toOxml.js');
                     return true;
                 case "toTurtle":
                     getScript(loadPath + 'modules/specif2turtle.js');
                     return true;
                 case 'bpmn2specif':
-                    getScript(loadPath + 'assets/javascripts/BPMN2SpecIF.js');
+                    getScript(loadPath + 'vendor/assets/javascripts/BPMN2SpecIF.js');
                     return true;
                 case 'archimate2specif':
-                    getScript(loadPath + 'assets/javascripts/archimate2SpecIF.js');
+                    getScript(loadPath + 'vendor/assets/javascripts/archimate2SpecIF.js');
                     return true;
                 case "sysml2specif":
                     getScript(loadPath + 'modules/sysml2specif.js');
                     return true;
                 case 'reqif2specif':
-                    getScript(loadPath + 'assets/javascripts/reqif2specif.js');
+                    getScript(loadPath + 'vendor/assets/javascripts/reqif2specif.js');
                     return true;
                 case 'vicinityGraph':
                     loadModule('graphViz');
@@ -497,6 +501,21 @@ var app, browser, i18n, message, moduleManager = function () {
             else
                 return $.ajax(settings)
                     .done(() => { setReady(module.name); });
+        }
+        function getOntology() {
+            LIB.httpGet({
+                url: (window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html') ?
+                    CONFIG.ontologyURL
+                    : '../../SpecIF/vocabulary/Ontology.specif') + "?" + new Date().toISOString(),
+                responseType: 'arraybuffer',
+                withCredentials: false,
+                done: (xhr) => {
+                    let ont = JSON.parse(LIB.ab2str(xhr.response));
+                    app.ontology = new COntology(ont);
+                    setReady(module.name);
+                },
+                fail: LIB.stdError
+            });
         }
         function loadAfterRequiredModules(mod, fn) {
             if (!Array.isArray(mod.requires) || LIB.containsAllStrings(self.ready, mod.requires))

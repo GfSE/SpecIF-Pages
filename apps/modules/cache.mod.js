@@ -82,16 +82,20 @@ class CCache {
         if (req) {
             let itmL = this[app.standards.listName.get(ctg)];
             if (Array.isArray(req)) {
-                let idx, rL = [];
-                for (var k of req) {
-                    idx = LIB.indexByKey(itmL, k);
-                    if (idx > -1)
+                let allFound = true, i = 0, I = req.length, idx;
+                var rL = [];
+                while (allFound && i < I) {
+                    idx = LIB.indexByKey(itmL, req[i]);
+                    if (idx > -1) {
                         rL.push(itmL[idx]);
+                        i++;
+                    }
                     else
-                        console.error("Cache: Requested element with id '" + k.id + "' of category '" + ctg + "' not found");
+                        allFound = false;
                 }
                 ;
-                return simpleClone(rL);
+                if (allFound)
+                    return simpleClone(rL);
             }
             else if (typeof (req) == 'function') {
                 return simpleClone(itmL.filter(req));
@@ -184,12 +188,12 @@ class CCache {
                 return '';
             let ti = "";
             if (el.subject) {
-                ti = LIB.titleFromProperties(el.properties, self.propertyClasses, opts)
+                ti = LIB.getTitleFromProperties(el.properties, self.propertyClasses, opts)
                     || LIB.classTitleOf(el['class'], self.statementClasses, opts);
             }
             else {
                 let rC = LIB.itemByKey(self.resourceClasses, el['class']);
-                ti = LIB.titleFromProperties(el.properties, self.propertyClasses, {
+                ti = LIB.getTitleFromProperties(el.properties, self.propertyClasses, {
                     lookupValues: opts.lookupValues && rC && rC.isHeading,
                     targetLanguage: opts.targetLanguage
                 });
@@ -615,7 +619,7 @@ class CProject {
                     let selOpts = Object.assign({}, opts, { targetLanguage: self.language || newD.language });
                     if (LIB.hasResClass(newR, app.ontology.modelElementClasses.concat(CONFIG.diagramClasses), newD)
                         && !LIB.hasType(newR, CONFIG.excludedFromDeduplication, newD, opts)) {
-                        existR = self.cache.resourcesByTitle(LIB.titleFromProperties(newR.properties, newD.propertyClasses, selOpts), selOpts)[0];
+                        existR = self.cache.resourcesByTitle(LIB.getTitleFromProperties(newR.properties, newD.propertyClasses, selOpts), selOpts)[0];
                         if (existR
                             && !LIB.hasType(existR, CONFIG.excludedFromDeduplication, dta, opts)
                             && LIB.classTitleOf(newR['class'], newD.resourceClasses) == LIB.classTitleOf(existR['class'], dta.resourceClasses)) {
@@ -697,11 +701,11 @@ class CProject {
             case 'propertyClass':
             case 'resourceClass':
             case 'statementClass':
-                LIB.cacheE(this[app.standards.listName.get(ctg)], LIB.makeKey(itm.id));
+                LIB.cacheE(this[app.standards.listName.get(ctg)], { id: itm.id });
                 break;
             case 'hierarchy':
             case 'node':
-                LIB.cacheE(this.hierarchies, (itm.predecessor ? { id: itm.id, predecessor: LIB.makeKey(itm.predecessor) } : LIB.makeKey(itm.id)));
+                LIB.cacheE(this.hierarchies, (itm.predecessor ? { id: itm.id, predecessor: LIB.makeKey(itm.predecessor) } : { id: itm.id }));
         }
     }
     createItems(ctg, itmL) {
@@ -777,12 +781,6 @@ class CProject {
             self.cache.put(ctg, itmL)
                 .forEach((toMemorize, i) => { if (toMemorize)
                 self.memorizeScope(ctg, itmL[i]); });
-            switch (ctg) {
-                case 'hierarchy':
-                case 'node':
-                    self.hierarchies = self.cache.get('hierarchy', 'all').map(h => LIB.makeKey(h.id));
-            }
-            ;
             resolve();
         });
     }
@@ -803,7 +801,7 @@ class CProject {
                 default:
                     if (this.cache.delete(ctg, itmL))
                         break;
-                    reject(new resultMsg(999, 'One or more items of ' + ctg + ' not found and thus not deleted.'));
+                    reject(new xhrMessage(999, 'One or more items of ' + ctg + ' not found and thus not deleted.'));
                     return;
             }
             ;
@@ -963,7 +961,7 @@ class CProject {
                 if (resL.length > 0) {
                     self.deleteItems('node', fldL.slice(1))
                         .then(() => {
-                        LIB.sortBy(resL, (el) => LIB.titleFromProperties(el.r.properties, dta.propertyClasses, { targetLanguage: self.language }));
+                        LIB.sortBy(resL, (el) => LIB.getTitleFromProperties(el.r.properties, dta.propertyClasses, { targetLanguage: self.language }));
                         if (fldL.length > 0) {
                             let nd = fldL[0];
                             nd.nodes = nodesOf(resL);
@@ -971,11 +969,11 @@ class CProject {
                                 .then(resolve, reject);
                         }
                         else {
-                            let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder] }), {
-                                resources: Folders(r2c.folderNamePrefix + apx, CONFIG.resClassProcesses),
+                            let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder], adoptOntologyDataTypes: true }), {
+                                resources: Folder(r2c.folderNamePrefix + apx, CONFIG.resClassProcesses),
                                 hierarchies: Nodes(r2c, resL)
                             });
-                            self.adopt(newD, { noCheck: true, deduplicate: true })
+                            self.adopt(newD, { noCheck: true })
                                 .done(resolve)
                                 .fail(reject);
                         }
@@ -986,7 +984,7 @@ class CProject {
                         .then(resolve, reject);
             });
             return;
-            function Folders(fId, ti, ty) {
+            function Folder(fId, ti, ty) {
                 return [{
                         id: fId,
                         class: LIB.makeKey("RC-Folder"),
@@ -1054,11 +1052,11 @@ class CProject {
                         .then(resolve)
                         .catch(reject);
                 else {
-                    let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder] }), {
-                        resources: Folders(),
+                    let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder], adoptOntologyDataTypes: true }), {
+                        resources: Folder(),
                         hierarchies: Nodes(resL)
                     });
-                    self.adopt(newD, { noCheck: true, deduplicate: true })
+                    self.adopt(newD, { noCheck: true })
                         .done(resolve)
                         .fail(reject);
                 }
@@ -1072,7 +1070,7 @@ class CProject {
             }
             ;
             return;
-            function Folders() {
+            function Folder() {
                 return [{
                         id: "FolderUnreferencedResources-" + apx,
                         class: LIB.makeKey("RC-Folder"),
@@ -1087,7 +1085,7 @@ class CProject {
                     }];
             }
             function Nodes(resources) {
-                LIB.sortBy(resources, (r) => { return LIB.titleFromProperties(r.properties, dta.propertyClasses, { targetLanguage: self.language }); });
+                LIB.sortBy(resources, (r) => { return LIB.getTitleFromProperties(r.properties, dta.propertyClasses, { targetLanguage: self.language }); });
                 let gl = {
                     id: "H-FolderUnreferencedResources-" + apx,
                     predecessor: hL.length > 0 ? hL[hL.length - 1].id : undefined,
@@ -1108,7 +1106,7 @@ class CProject {
                 return;
             }
             ;
-            let gloL = [], resL = [], diagramL = [], apx = simpleHash(self.id), tim = new Date().toISOString(), lastContentH, hL = dta.get("hierarchy", self.hierarchies)
+            let gloL = [], resL = [], keepNodes = false, diagramL = [], apx = simpleHash(self.id), tim = new Date().toISOString(), lastContentH, hL = dta.get("hierarchy", self.hierarchies)
                 .filter((nd) => {
                 let res = dta.get("resource", [nd.resource])[0];
                 if (res && !LIB.hasType(res, [CONFIG.resClassGlossary, CONFIG.resClassUnreferencedResources], dta, opts))
@@ -1120,6 +1118,11 @@ class CProject {
                 if (LIB.hasType(res, [CONFIG.resClassGlossary], dta, opts)) {
                     gloL.push(nd);
                     resL.push(nd.resource);
+                    if (nd.nodes)
+                        for (var ch of nd.nodes)
+                            resL.push(ch.resource);
+                    if (gloL.length < 2)
+                        keepNodes = nd.resource.id == "FolderGlossary-" + apx;
                 }
                 ;
                 if (isDiagram(res)) {
@@ -1129,20 +1132,31 @@ class CProject {
                 return true;
             });
             if (diagramL.length > 0) {
-                self.deleteItems('node', gloL)
-                    .then(() => {
-                    return self.deleteItems('resource', resL);
-                })
-                    .then(() => {
-                    let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder] }), {
-                        resources: Folders(),
-                        hierarchies: FolderNodes(lastContentH)
-                    });
-                    self.adopt(newD, { noCheck: true, deduplicate: true })
-                        .done(resolve)
-                        .fail(reject);
-                })
-                    .catch(reject);
+                if (keepNodes) {
+                    if (gloL.length > 1) {
+                        console.warn("There are more than one glossary trees; only the first is further considered.");
+                        self.deleteItems('node', gloL.splice(1));
+                    }
+                    ;
+                    self.updateItems('node', Nodes(gloL[0]))
+                        .then(resolve, reject);
+                }
+                else {
+                    self.deleteItems('node', gloL)
+                        .then(() => {
+                        return self.deleteItems('resource', resL);
+                    })
+                        .then(() => {
+                        let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder], adoptOntologyDataTypes: true }), {
+                            resources: Folders(),
+                            hierarchies: FolderNodes(lastContentH)
+                        });
+                        self.adopt(newD, { noCheck: true })
+                            .done(resolve)
+                            .fail(reject);
+                    })
+                        .catch(reject);
+                }
             }
             else {
                 self.deleteItems('node', gloL)
@@ -1162,14 +1176,14 @@ class CProject {
                     }).length > 0;
             }
             function Folders() {
-                let term = app.ontology.getTermResource('resourceClass', CONFIG.resClassGlossary);
-                if (term) {
+                let termL = app.ontology.getTermResources('resourceClass', CONFIG.resClassGlossary);
+                if (termL.length > 0) {
                     let fL = [{
                             id: "FolderGlossary-" + apx,
                             class: LIB.makeKey("RC-Folder"),
                             properties: [{
                                     class: LIB.makeKey("PC-Name"),
-                                    values: LIB.valuesByTitle(term, ["SpecIF:LocalTerm"], app.ontology.data)
+                                    values: LIB.valuesByTitle(termL[0], ["SpecIF:LocalTerm"], app.ontology.data)
                                 }, {
                                     class: LIB.makeKey("PC-Type"),
                                     values: [LIB.makeMultiLanguageValue(CONFIG.resClassGlossary)]
@@ -1195,7 +1209,7 @@ class CProject {
             function Nodes(gl) {
                 let staL = dta.get("statement", (s) => { return LIB.classTitleOf(s['class'], dta.statementClasses) == CONFIG.staClassShows && LIB.indexByKey(diagramL, s.subject) > -1; });
                 let resL = dta.get("resource", (r) => { return LIB.referenceIndexBy(staL, 'object', r) > -1; });
-                LIB.sortBy(resL, (r) => { return LIB.titleFromProperties(r.properties, dta.propertyClasses, { targetLanguage: self.language }); });
+                LIB.sortBy(resL, (r) => { return LIB.getTitleFromProperties(r.properties, dta.propertyClasses, { targetLanguage: self.language }); });
                 resL.forEach((r) => {
                     gl.nodes.push({
                         id: CONFIG.prefixN + simpleHash(r.id + '-gen'),
@@ -1252,8 +1266,6 @@ class CProject {
             case 'epub':
             case 'oxml':
                 pnl += makeCheckboxField(i18n.LblOptions, [
-                    { title: i18n.elementsWithIcons, id: 'elementsWithIcons', checked: true },
-                    { title: i18n.elementsWithOrdernumbers, id: 'elementsWithOrdernumbers', checked: false },
                     { title: i18n.withStatements, id: 'withStatements', checked: false },
                     { title: i18n.withOtherProperties, id: 'withOtherProperties', checked: false },
                     { title: i18n.showEmptyProperties, id: 'showEmptyProperties', checked: CONFIG.showEmptyProperties }
@@ -1268,7 +1280,7 @@ class CProject {
                 ;
                 break;
             case 'specifClasses':
-                let domains = LIB.enumeratedValuesOf(LIB.makeKey('DT-Domain'));
+                let domains = LIB.enumeratedValuesOf(LIB.makeKey('DT-Domain'), this);
                 if (domains.length > 0)
                     pnl += makeCheckboxField(i18n.LblOptions, domains.map((d) => {
                         return { title: app.ontology.localize(d, { targetLanguage: browser.language }), id: d.toJsId(), checked: false };
@@ -1297,7 +1309,6 @@ class CProject {
                         { title: 'HTML with embedded SpecIF v' + CONFIG.specifVersion, id: 'html' },
                         { title: 'ReqIF v1.0', id: 'reqif' },
                         { title: 'MS Excel® (experimental)', id: 'xlsx' },
-                        { title: 'Turtle (experimental)', id: 'turtle' },
                         { title: 'ePub v2', id: 'epub' },
                         { title: 'MS Word® (Open XML)', id: 'oxml' }
                     ]
@@ -1395,7 +1406,7 @@ class CProject {
             opts.format = 'specif';
         return new Promise((resolve, reject) => {
             if (self.exporting) {
-                reject(new resultMsg(999, "Export in process, please wait a little while"));
+                reject(new xhrMessage(999, "Export in process, please wait a little while"));
             }
             else {
                 self.exporting = true;
@@ -1444,8 +1455,6 @@ class CProject {
                         showEmptyProperties: opts.showEmptyProperties,
                         imgExtensions: CONFIG.imgExtensions,
                         applExtensions: CONFIG.applExtensions,
-                        addIcon: opts.elementsWithIcons,
-                        addOrder: opts.elementsWithOrdernumbers,
                         propertiesLabel: opts.withOtherProperties ? app.ontology.localize('SpecIF:Property', optsLabel) : undefined,
                         statementsLabel: opts.withStatements ? app.ontology.localize('SpecIF:Statement', optsLabel) : undefined,
                         fileName: self.exportParams.fileName,
@@ -1500,7 +1509,7 @@ class CProject {
                         opts.adoptOntologyDataTypes = true;
                         break;
                     default:
-                        reject(new resultMsg(999, "Programming Error: Invalid format selector on export."));
+                        reject(new xhrMessage(999, "Programming Error: Invalid format selector on export."));
                         return;
                 }
                 ;
@@ -1546,7 +1555,7 @@ class CProject {
                             fName += ".specif";
                             zName = fName + '.zip';
                             if (!Array.isArray(opts.domains) || opts.domains.length < 1) {
-                                reject(new resultMsg(999, "No domain selected, so no classes will be generated."));
+                                reject(new xhrMessage(999, "No domain selected, so no classes will be generated."));
                                 return;
                             }
                             ;
@@ -1609,20 +1618,20 @@ class CProject {
                     return true;
                 case XsDataType.Double:
                     if (refC.fractionDigits < newC.fractionDigits) {
-                        new resultMsg(952, "new dataType '" + newC.id + "' of type '" + newC.type + "' is incompatible").log();
+                        new xhrMessage(952, "new dataType '" + newC.id + "' of type '" + newC.type + "' is incompatible").log();
                         return false;
                     }
                     ;
                 case XsDataType.Integer:
                     if (refC.maxInclusive < newC.maxInclusive || refC.minInclusive > newC.minInclusive) {
-                        new resultMsg(953, "new dataType '" + newC.id + "' of type '" + newC.type + "' is incompatible").log();
+                        new xhrMessage(953, "new dataType '" + newC.id + "' of type '" + newC.type + "' is incompatible").log();
                         return false;
                     }
                     ;
                     break;
                 case XsDataType.String:
                     if (refC.maxLength && (newC.maxLength == undefined || refC.maxLength < newC.maxLength)) {
-                        new resultMsg(951, "new dataType '" + newC.id + "' of type '" + newC.type + "' is incompatible").log();
+                        new xhrMessage(951, "new dataType '" + newC.id + "' of type '" + newC.type + "' is incompatible").log();
                         return false;
                         ;
                     }
@@ -1648,7 +1657,7 @@ class CProject {
             for (var v = newC.enumeration.length - 1; v > -1; v--) {
                 idx = LIB.indexById(refC.enumeration, newC.enumeration[v].id);
                 if (idx < 0) {
-                    new resultMsg(954, "new dataType '" + newC.id + "' of type '" + newC.type + "' is incompatible").log();
+                    new xhrMessage(954, "new dataType '" + newC.id + "' of type '" + newC.type + "' is incompatible").log();
                     return false;
                 }
                 ;
@@ -1661,7 +1670,7 @@ class CProject {
     compatiblePC(refC, newC) {
         if (LIB.equalPC(refC, newC))
             return true;
-        new resultMsg(956, "new propertyClass '" + newC.id + "' is incompatible").log();
+        new xhrMessage(956, "new propertyClass '" + newC.id + "' is incompatible").log();
         return false;
     }
     compatiblePCReferences(rCL, nCL, opts) {
@@ -1708,27 +1717,27 @@ class CProject {
     compatibleRC(refC, newC, opts) {
         if (this.compatiblePCReferences(refC.propertyClasses, newC.propertyClasses, opts))
             return true;
-        new resultMsg(963, "new resourceClass '" + newC.id + "' is incompatible; propertyClasses don't match").log();
+        new xhrMessage(963, "new resourceClass '" + newC.id + "' is incompatible; propertyClasses don't match").log();
         return false;
     }
     compatibleSC(refC, newC, opts) {
         if (refC.title != newC.title) {
-            new resultMsg(961, "new statementClass '" + newC.id + "' is incompatible; titles don't match").log();
+            new xhrMessage(961, "new statementClass '" + newC.id + "' is incompatible; titles don't match").log();
             return false;
         }
         if (!this.compatibleECReferences(refC.subjectClasses, newC.subjectClasses)) {
-            new resultMsg(962, "new statementClass '" + newC.id + "' is incompatible; subjectClasses don't match").log();
+            new xhrMessage(962, "new statementClass '" + newC.id + "' is incompatible; subjectClasses don't match").log();
             return false;
         }
         ;
         if (!this.compatibleECReferences(refC.objectClasses, newC.objectClasses)) {
-            new resultMsg(962, "new statementClass '" + newC.id + "' is incompatible; objectClasses don't match").log();
+            new xhrMessage(962, "new statementClass '" + newC.id + "' is incompatible; objectClasses don't match").log();
             return false;
         }
         ;
         if (this.compatiblePCReferences(refC.propertyClasses, newC.propertyClasses, opts))
             return true;
-        new resultMsg(963, "new statementClass '" + newC.id + "' is incompatible; propertyClasses don't match").log();
+        new xhrMessage(963, "new statementClass '" + newC.id + "' is incompatible; propertyClasses don't match").log();
         return false;
     }
     substituteProp(L, propN, rK, dK) {

@@ -25,8 +25,6 @@ function SpecifApp() {
                     }, {
                         name: 'ioBpmn'
                     }, {
-                        name: 'ioSysml'
-                    }, {
                         name: 'ioReqif'
                     }, {
                         name: 'ioXls'
