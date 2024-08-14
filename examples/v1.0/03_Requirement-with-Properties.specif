@@ -1,0 +1,66 @@
+{
+    "id": "P-Requirement-with-Properties",
+    "title": "Project 'Requirement with Properties'",
+    "$schema": "https://specif.de/v1.0/schema.json",
+    "rights": {
+        "title": "Creative Commons 4.0 CC BY-SA",
+        "type": "dcterms:rights",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+    },
+    "createdAt": "2019-05-29T14:12:59.960Z",
+    "dataTypes": [{
+      "id": "DT-ShortString",
+      "title": "String[256]",
+      "description": "String with max. length 256",
+      "type": "xs:string",
+      "maxLength": 256,
+      "changedAt": "2016-05-26T08:59:00+02:00"
+    },{
+      "id": "DT-Text",
+      "title": "Plain or formatted Text",
+      "description": "A text string, plain, or formatted with XHTML or markdown",
+      "type": "xs:string",
+      "changedAt": "2021-02-14T08:59:00+02:00"
+    }],
+    "propertyClasses": [{
+      "id": "PC-Name",
+      "title": "dcterms:title",
+      "description": "A name given to the resource.",
+      "dataType": "DT-ShortString",
+      "changedAt": "2016-05-26T08:59:00+02:00"
+    },{
+      "id": "PC-Description",
+      "title": "dcterms:description",
+      "description": "An account of the resource. Descriptive text about the resource represented as rich text in XHTML.",
+      "dataType": "DT-Text",
+      "changedAt": "2021-02-14T08:59:00+02:00"
+    }],
+    "resourceClasses": [{
+      "id": "RC-Requirement",
+      "title": "IREB:Requirement",
+      "description": "A 'Requirement' is a singular documented physical and functional need that a particular design, product or process must be able to perform.",
+      "icon": "&#8623;",
+      "propertyClasses": [ "PC-Name", "PC-Description" ],
+      "changedAt": "2016-05-26T08:59:00+02:00"
+    }],
+    "statementClasses": [],
+    "resources": [{
+        "id": "Req-5ba3512b0000bca",
+        "title": "Minimum button size",
+        "class": "RC-Requirement",
+        "properties": [{
+            "class": "PC-Name",
+            "value": "Minimum button size"
+        },{
+            "class": "PC-Description",
+            "value": "<p>The <i>button size</i> MUST not be less than 20mm in diameter.</p>"
+        }],
+        "changedAt": "2017-06-19T20:13:08+02:00"
+    }],
+    "statements": [],
+    "hierarchies": [{
+        "id": "N-bca801377e3d1525",
+        "resource": "Req-5ba3512b0000bca",
+        "changedAt": "2019-05-29T13:19:28.546Z"
+    }]
+}

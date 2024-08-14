@@ -1,0 +1,50 @@
+{
+  "$schema": "https://specif.de/v1.1/schema.json",
+  "id": "P-Hello-World",
+  "title": [{"text":"Project 'Hello World'"}],
+  "rights": {
+    "title": "Creative Commons 4.0 CC BY-SA",
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  "language": "en",
+  "createdAt": "2021-03-16T22:59:00+02:00",
+  "dataTypes": [{
+    "id": "DT-ShortString",
+    "title": "String[256]",
+    "description": [{"text":"String with max. length 256"}],
+    "type": "xs:string",
+    "maxLength": 256,
+    "changedAt": "2016-05-26T08:59:00+02:00"
+  }],
+  "propertyClasses": [{
+    "id": "PC-Name",
+    "title": "dcterms:title",
+    "description": [{"text":"A name given to the resource."}],
+    "dataType": {"id":"DT-ShortString"},
+    "changedAt": "2020-03-26T22:59:00+02:00"
+  }],
+  "resourceClasses": [{
+    "id": "RC-94e50023b1a8015d57",
+    "title": "SpecIF:Paragraph",
+    "propertyClasses": [ {"id":"PC-Name"} ],
+    "changedAt": "2020-03-01T07:59:00+01:00"
+  }],
+  "statementClasses": [],
+  "resources": [{
+    "id": "R-d5b994e50023",
+    "properties": [{
+      "class": {"id":"PC-Name"},
+      "values": [[{
+        "text": "Hello World!"
+      }]]
+    }],
+    "class": {"id":"RC-94e50023b1a8015d57"},
+    "changedAt": "2020-03-01T07:59:00+01:00"
+  }],
+  "statements": [],
+  "hierarchies": [{
+    "id": "N-78cf736b254",
+    "resource": {"id":"R-d5b994e50023"},
+    "changedAt": "2020-03-01T07:59:00+01:00"
+  }]
+}
