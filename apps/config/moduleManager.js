@@ -591,6 +591,7 @@ function doResize() {
     $('.pane-details').outerHeight(pH);
     $('.pane-filter').outerHeight(pH);
     $('.contentCtrl').css("top", hH);
+    $('#aboutFrame').outerHeight(pH - 8);
 }
 function bindResizer() {
     $(window).resize(() => {
