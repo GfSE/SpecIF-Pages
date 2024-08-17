@@ -65,7 +65,7 @@ Where:
 - 'activity' is one of [ task, manualTask, userTask, scriptTask, serviceTask, sendTask, receiveTask, callActivity, transaction, subProcess ], thus a FMC:Actor.
 - 'data' is one of [ dataObjectReference, dataStoreReference ], thus a FMC:State.
 - 'event' is one of [ startEvent, intermediateThrowEvent, intermediateCatchEvent, boundaryEvent, endEvent ], thus a FMC:Event.
-- All SpecIF statement class terms are defined in the [Vocabulary](https://specif.de/apps/view#import=../examples/Vocabulary.specifz;view=doc;node=N-blM4lfyHM55YlbfBZ3NWj4SYwa3).
+- All SpecIF statement class terms are defined in the [Ontology](https://specif.de/apps/view#import=../v1.1/Ontology.specif;view=doc).
 - The original model element type is stored in a property named _dcterms:type_. 
  
 ### Example
@@ -80,10 +80,10 @@ The following SpecIF graph expresses the same:
 
 The full example can be inspected, here:
 
-- [Telephone Connection Request (BPMN-XML)](https://specif.de/examples/Telephone-Connection-Request.bpmn)
-- [Telephone Connection Request (specif)](https://specif.de/examples/Telephone-Connection-Request.specif)
-- [Telephone Connection Request (SpecIF-Viewer)](https://specif.de/apps/view#import=../examples/Telephone-Connection-Request.specif.zip)
+- <a href="https://specif.de/examples/Process-1%20Telephone-Connection-Request.bpmn" target="_blank">Telephone Connection Request (BPMN-XML)</a>
+- <a href="https://specif.de/examples/Telephone-Connection-Request.specif.zip" target="_blank">Telephone Connection Request (SpecIF)</a>
+- <a href="https://specif.de/apps/view#import=../examples/Telephone-Connection-Request.specif.zip" target="_blank">Telephone Connection Request (SpecIF-Viewer)</a>
 
 ### Transformation Code
 
-Here you may look at the current code of the [BPMN to SpecIF transformation](https://github.com/GfSE/BPMN-SpecIF-Bridge/blob/master/source/js/BPMN2SpecIF.js).
+Here you may look at the current code of the <a href="https://github.com/GfSE/BPMN-SpecIF-Bridge/blob/master/source/js/BPMN2SpecIF.js" target="_blank">BPMN to SpecIF transformation</a>.

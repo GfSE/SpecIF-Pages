@@ -16,7 +16,7 @@ Very basically, SpecIF defines two types of permissions:
 - By *Class*: An instance of resource or statement can be accessed, if the most specialized class has a corresponding permission.
 If no permission by class is granted at all, access is *prohibited*.
 - By *Hierarchy*: An instance of resource can be accessed, if the closest node in the hierarchy has a corresponding permission.
-If no permission by hierarchy is defined at all, access is *allowed* (in fact it is rather a prohibition in this case).  
+If no permission by hierarchy is defined at all, access is *allowed*.  
 
 Permissions are inherited:
 - By Class: project ← resourceClass ← propertyClass or project ← statementClass ← propertyClass. 
