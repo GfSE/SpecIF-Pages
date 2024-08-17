@@ -159,8 +159,11 @@ moduleManager.construct({
         $('#pageTitle').html(app.title);
         function getFormat(uParms) {
             for (var f of formats) {
-                if (f.extensions.includes('.' + uParms[CONFIG.keyImport].fileExt()) && moduleManager.isReady(f.name))
-                    return f;
+                for (var ext of f.extensions) {
+                    if (uParms[CONFIG.keyImport].endsWith(ext) && moduleManager.isReady(f.name))
+                        return f;
+                }
+                ;
             }
             ;
         }
