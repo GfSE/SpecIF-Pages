@@ -323,6 +323,6 @@ The instances, the actual model content, have not been discussed, yet:
 - The four *statements* are equally easy to interpret: One *shows* relationship per model-element plus the *writes* and *reads* relationships between the model-elements.
 - By the way, if you display this example with the [SpecIF Viewer](https://apps.specif.de/view#import=https://specif.de/examples/06_Very-Simple-Model-FMC.specifz) and you hover the mouse over one of the model-elements or double-click it, you can see the potential of web-technology. This is not by virtue of SpecIF, but when the SVG is generated in a way that the model-element *id* is associated to a graphic element and an app like the SpecIF Viewer finds it, such behaviour is easily implemented.
 
-You may view the example using the [SpecIF Viewer](https://apps.specif.de/view#import=https://specif.de/examples/06_Very-Simple-Model-FMC.specifz), or download the SpecIF data:
-- v1.0: [Very Simple Model (FMC)](https://specif.de/examples/06_Very-Simple-Model-FMC.specifz)
-- v1.1: [Very Simple Model (FMC)](https://github.com/GfSE/SpecIF-Examples-and-Test-cases/blob/master/examples/v1.1/06_Very-Simple-Model-FMC.specif)
+You may view the example using the [SpecIF Viewer](https://specif.de/apps/view#import=../examples/v1.1/06_Very-Simple-Model-FMC.specifz), or download the SpecIF data:
+- v1.0: [Very Simple Model (FMC)](https://specif.de/examples/v1.0/06_Very-Simple-Model-FMC.specifz)
+- v1.1: [Very Simple Model (FMC)](https://specif.de/examples/v1.1/06_Very-Simple-Model-FMC.specifz)

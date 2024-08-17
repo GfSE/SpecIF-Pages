@@ -110,6 +110,6 @@ Let us have a look at the full example, now:
 }
 ```
 
-You may view the example using the [SpecIF Viewer](https://apps.specif.de/view#import=https://specif.de/examples/04_Requirement-with-Image.specifz), or download the SpecIF data:
-- v1.0: [Requirement with Image](https://specif.de/examples/04_Requirement-with-Image.specifz)
-- v1.1: [Requirement with Image](https://github.com/GfSE/SpecIF-Examples-and-Test-cases/blob/master/examples/v1.1/04_Requirement-with-Image.specif)
+You may view the example using the [SpecIF Viewer](https://specif.de/apps/view#import=..examples/v1.1/04_Requirement-with-Image.specifz), or download the SpecIF data:
+- v1.0: [Requirement with Image](https://specif.de/examples/v1.0/04_Requirement-with-Image.specifz)
+- v1.1: [Requirement with Image](https://specif.de/examples/v1.1/04_Requirement-with-Image.specifz)

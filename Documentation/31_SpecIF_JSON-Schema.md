@@ -22,7 +22,7 @@ implementations and code, generated from the schema definition, with equal names
 (e.g. the term *Node* is used in the JavaScript world by NodeJS and also defined in the SpecIF metamodel). 
 So the metamodel term *Node* is called *SpecifNode* in the JSON-schema definition etc.
 
-There is a series of <a href="https://gfse.github.io/SpecIF-Pages/Tutorials/Tutorials.html" target="_blank">tutorials</a> explaning the information model.
+There is a series of <a href="https://gfse.github.io/SpecIF-Pages/Tutorials/" target="_blank">tutorials</a> explaning the information model.
 
 ## SpecIF JSON example
 

@@ -142,11 +142,11 @@ Two examples belonging to the application domains mechatronic systems and enterp
 
 The examples are stored in a data set following the current version of SpecIF. Technically speaking you find ZIP-files containing the model-information in JSON format plus the images referenced by the model. A hierarchical document outline lets you comfortably read the content, whereas the relations let you browse the semantic net.
 
-- Semantically integrated system model of a dimmer: <a href="https://specif.de/examples/Dimmer.specifz" target="_blank">ZIP-file with JSON pursuant SpecIF v1.0</a>, <a href="https://specif.de/examples/Dimmer.epub" target="_blank">ePub-file</a> and <a href="https://apps.specif.de/view.html#import=%22https://specif.de/examples/Dimmer.specifz%22" target="_blank">Online Demo</a>
-- Semantically integrated Process- und IT-Documentation: <a href="https://specif.de/examples/IT-Documentation.specifz" target="_blank">ZIP-file with JSON pursuant SpecIF v1.0</a>, <a href="https://specif.de/examples/IT-Documentation.epub" target="_blank">ePub-file</a> and <a href="https://apps.specif.de/view.html#import=%22https://specif.de/IT-Documentation.specifz%22" target="_blank">Online Demo</a>
-- A simple <a href="" target="_blank">BPMN Model</a> as an example of model transformation to SpecIF. The data is available <a href="" target="_blank">here</a>.
-- Archimate, BPMN and Excel integrated: <a href="https://specif.de/examples/Telephone-Connection-Request.specif.zip" target="_blank">ZIP-file with JSON pursuant SpecIF v1.0</a> and <a href="https://apps.specif.de/view.html#import=%22https://specif.de/Telephone-Connection-Request.specif.zip" target="_blank">Online Demo</a>
-- Manually transformed from SysML to SpecIF: <a href="https://specif.de/examples/SmAV.specifz" target="_blank">ZIP-file with JSON pursuant SpecIF v1.0</a> and <a href="https://apps.specif.de/view.html#import=%22https://specif.de/examples/SmAV.specifz;view=doc;node=N-Folder-Requirements" target="_blank">Online Demo</a>
+- Semantically integrated system model of a dimmer: <a href="./examples/Dimmer.specifz" target="_blank">ZIP-file with JSON pursuant SpecIF v1.1</a> and <a href="https://specif.de/apps/view.html#import=%22../examples/Dimmer.specifz%22" target="_blank">Online Demo</a>.
+- Semantically integrated Process- und IT-Documentation: <a href="./examples/IT-Documentation.specifz" target="_blank">ZIP-file with JSON pursuant SpecIF v1.1</a> and <a href="https://specif.de/apps/view.html#import=%22../examples/IT-Documentation.specifz%22" target="_blank">Online Demo</a>.
+<!-- - A simple <a href="" target="_blank">BPMN Model</a> as an example of model transformation to SpecIF. The data is available <a href="" target="_blank">here</a>. -->
+- Archimate, BPMN and Excel integrated: <a href="./examples/Telephone-Connection-Request.specif.zip" target="_blank">ZIP-file with JSON pursuant SpecIF v1.1</a> and <a href="https://specif.de/apps/view.html#import=%22../examples/Telephone-Connection-Request.specif.zip" target="_blank">Online Demo</a>
+<! - Manually transformed from SysML to SpecIF: <a href="./examples/SmAV.specifz" target="_blank">ZIP-file with JSON pursuant SpecIF v1.1</a> and <a href="https://specif.de/apps/view.html#import=%22./examples/SmAV.specifz;view=doc;node=N-Folder-Requirements" target="_blank">Online Demo</a> -->
 
 Notice: The first two examples have been created using the method 'Fundamental Modelling Concepts' (FMC). Please do not infer that model integration with SpecIF can only be achieved using FMC. In contrary, current research shows that transformation of SysML Model diagrams to SpecIF is possible; the first results are shown in the third example. We are looking for further examples to formalize the transformation.
 
@@ -156,12 +156,13 @@ The goal of SpecIF is to develop conventions to facilitate the use of system mod
 
 Are you interested and would like to investigate the SpecIF approach more in detail? Let us give you some links where you could start:
 
-- A description of <a href="https://gfse.github.io/SpecIF-Pages/Documentation/" target="_blank">basic concepts</a>.
-- A series of <a href="https://gfse.github.io/SpecIF-Pages/tutorials/" target="_blank">tutorials</a> on how to create and interpret SpecIF data.
-- SpecIF <a href="https://gfse.github.io/SpecIF-Pages/Manuals/01_Quick-Start-Guide_EN.html" target="_blank">Introduction and Quick Start Guide</a>.
-- The <a href="https://apps.specif.de/view.html#import=%22https://specif.de/v1.1/Ontology.specif%22" target="_blank">SpecIF Ontology</a>.
-- Some examples using SpecIF are listed in the <a href="https://gfse.github.io/SpecIF-Pages/#examples" target="_blank">previous chapter</a>.
-- A presentation <a href="https://specif.de/files/SpecIF/documents/2019-11-24%20Model-Integration%20with%20SpecIF" target="_blank">'Model Integration with SpecIF'</a> covering the status and future steps in development and a more recent concrete example <a href="https://specif.de/files/SpecIF/documents/TdSE-2021%20Dungern%20-%20Integrate%20BPMN%20and%20Archimate%20Models%20using%20SpecIF.pdf" target="_blank">'Integrate BPMN and Archimate Models using SpecIF'</a>.
+- A description of <a href="./Documentation/" target="_blank">basic concepts</a>,
+- A series of <a href="./Tutorials/" target="_blank">tutorials</a> on how to create and interpret SpecIF data,
+- SpecIF <a href="../Manuals/01_Quick-Start-Guide_EN.html" target="_blank">Introduction and Quick Start Guide</a>,
+- The <a href="https://specif.de/apps/view.html#import=%22./v1.1/Ontology.specif%22" target="_blank">SpecIF Ontology</a>,
+- Some examples using SpecIF are listed in the <a href="#examples" target="_blank">previous chapter</a> and
+<!-- - A presentation <a href="https://specif.de/files/SpecIF/documents/2019-11-24%20Model-Integration%20with%20SpecIF" target="_blank">'Model Integration with SpecIF'</a> covering the status and future steps in development and -->
+- a concrete example <a href="./downloads/TdSE-2021%20Dungern%20-%20Integrate%20BPMN%20and%20Archimate%20Models%20using%20SpecIF.pdf" target="_blank">'Integrate BPMN and Archimate Models using SpecIF'</a>.
 
 If you have any questions, please contact Uwe Kaufmann, Oliver Alt or Oskar v. Dungern using the contact information given below. Suggestions and contributions are welcome!
 
