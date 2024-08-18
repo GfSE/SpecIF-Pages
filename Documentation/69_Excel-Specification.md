@@ -144,7 +144,7 @@ is used for example to recognize a statement to create when importing an xls she
 
 ## Excel file example
 
-![Excel](./../assets/images/DocumentationSpecIF_ViewerVocabs.png)
+![Excel](../assets/images/Documentation/SpecIF_ViewerVocabs.png)
 
 The first row is reserved for attribute names (SpecIF Vocabaulary if possible), where:
 **dcterms:identifier**, **dcterms:title**, **dcterms:description**, **dcterms:modified**, **SpecIF:Priority** and **IREB:RequirementType** 
@@ -161,7 +161,7 @@ Upon loading the Excel file to the viewer it will have the following structure:
 
 Property terms are shown on the right next to title and paragraph blocks.
 
-![SpecIF Viewer](./../assets/images/DocumentationSpecIF_Viewer_Excel_Import.png)
+![SpecIF Viewer](../assets/images/Documentation/SpecIF_Viewer_Excel_Import.png)
 
 
 As seen dcterms:title is a title element and dcterms:description the corresponding description element to it on the same row. 
@@ -175,11 +175,11 @@ for **Recource-Terms**, **Predicate-Terms**, **Property-Terms** and **Value-Term
 ## Enumerations
 
 In order to assign properties easily there are so called (enumerations) in an extra sheet.
-![Excel Enum Sheet](./../assets/images/DocumentationExcel_Enum_Sheet.png)
+![Excel Enum Sheet](../assets/images/Documentation/Excel_Enum_Sheet.png)
 
 Specify values for a property in the (Enumerations) sheet. 
 
-![Enum Vals](./../assets/images/DocumentationExcel_Enum_Sheet_Value.png)
+![Enum Vals](../assets/images/Documentation/Excel_Enum_Sheet_Value.png)
 
 Once you have entered values in the (enumerations) sheet reuse the values in the main sheet:
  
@@ -189,7 +189,7 @@ Once you have entered values in the (enumerations) sheet reuse the values in the
 >4.  Click in  **Source**, type the text or numbers (separated by commas, for a comma-delimited list) that you want in your drop-down list, and click  **OK**.
 
 
-![Enum Dropdown](./../assets/images/DocumentationExcel_Enum_Dropdown.png)
+![Enum Dropdown](../assets/images/Documentation/Excel_Enum_Dropdown.png)
 
 Afterwards it is possible to choose between all specified values in the main sheet via dropdown.
 
