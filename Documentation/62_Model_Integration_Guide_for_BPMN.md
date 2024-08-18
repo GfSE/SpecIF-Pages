@@ -80,8 +80,8 @@ The following SpecIF graph expresses the same:
 
 The full example can be inspected, here:
 
-- <a href="https://specif.de/examples/Process-1%20Telephone-Connection-Request.bpmn" target="_blank">Telephone Connection Request (BPMN-XML)</a>
-- <a href="https://specif.de/examples/Telephone-Connection-Request.specif.zip" target="_blank">Telephone Connection Request (SpecIF)</a>
+- <a href="https://specif.de/examples/Process-1%20Telephone-Connection-Request.bpmn">Telephone Connection Request (BPMN-XML)</a>
+- <a href="https://specif.de/examples/Telephone-Connection-Request.specif.zip">Telephone Connection Request (SpecIF)</a>
 - <a href="https://specif.de/apps/view#import=../examples/Telephone-Connection-Request.specif.zip" target="_blank">Telephone Connection Request (SpecIF-Viewer)</a>
 
 ### Transformation Code
