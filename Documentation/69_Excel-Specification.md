@@ -6,12 +6,13 @@ grand_parent: "Documentation"
 nav_order: 69
 ---
 
-# Guidelines for importing Excel-files to the SpecIF-Viewer/Editor
-The tutorial explains how resources such as requirements can be imported using Excel spreadsheets and transformed to valid SpecIF. 
+# Importing Excel-files to the SpecIF-Viewer/Editor
+
+It is explained how resources such as requirements can be imported using Excel spreadsheets and transformed to valid SpecIF. 
 Semantic notion can be transported by using suitable vocabulary terms.
 
 ## Introduction
-Excel sheets may use the [SpecIF Vocabulary Terms](https://specif.de/apps/edit#import=../examples/Vocabulary.specifz).
+Excel sheets may use the [SpecIF Ontology Terms](https://specif.de/apps/edit#import=../v1.1/Ontology.specif).
 
 ### Resources 
 Resources represent artefacts, e.g. requirements or user-stories. 
@@ -174,14 +175,14 @@ for **Recource-Terms**, **Predicate-Terms**, **Property-Terms** and **Value-Term
 
 ## Enumerations
 
-In order to assign properties easily there are so called (enumerations) in an extra sheet.
+Enumerated values for properties are defined in an extra sheet named '(Enumerations)':
 ![Excel Enum Sheet](../assets/images/Documentation/Excel_Enum_Sheet.png)
 
-Specify values for a property in the (Enumerations) sheet. 
+Specify the property name in the first row and list the enumerated values below: 
 
 ![Enum Vals](../assets/images/Documentation/Excel_Enum_Sheet_Value.png)
 
-Once you have entered values in the (enumerations) sheet reuse the values in the main sheet:
+Once you have entered values in the (Enumerations) sheet reuse the values in the main sheet:
  
 >1.  Select the cells that you want to contain the lists.
 >2.  On the ribbon, click  **DATA**  >  **Data Validation**.
@@ -191,6 +192,6 @@ Once you have entered values in the (enumerations) sheet reuse the values in the
 
 ![Enum Dropdown](../assets/images/Documentation/Excel_Enum_Dropdown.png)
 
-Afterwards it is possible to choose between all specified values in the main sheet via dropdown.
+Then it is possible to choose between all specified values in the main sheet via dropdown.
 
 ---

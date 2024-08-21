@@ -112,9 +112,6 @@ class CPropertyToShow {
                     ti = this.cData.instanceTitleOf(cR, opts);
                     if (!ti || m != ti.toLowerCase())
                         return true;
-                    rC = LIB.itemByKey(this.cData.resourceClasses, cR['class']);
-                    if (opts.titleLinkTargets.indexOf(rC.title) < 0)
-                        return true;
                     target = cR;
                     return false;
                 });
