@@ -7,13 +7,13 @@ nav_order: 06
 
 # Tutorial 6: Very Simple Model (FMC)
 
-In the previous tutorials we have introduced all concepts we need to represent a simple model with SpecIF. Let's start with a block-diagram using the notation of the [Fundamental Modelling Concepts (FMC)](http://f-m-c.org/). Let us first look at the model, itself:
+In the previous tutorials we have introduced all concepts we need to represent a simple model with SpecIF. Let's start with a block-diagram using the notation of the [Fundamental Modeling Concepts (FMC)](http://f-m-c.org/). Let us first look at the model, itself:
 
 ![Very Simple Model (FMC)](../assets/images/Tutorials/Very-Simple-Model-FMC.svg)
 
 - In fact, this is not a model, but a diagram representing a model. It is a view of the model for a specific communication purpose; it is meant to be interpreted by a human being. In this particularly simple case, the diagram shows the whole model, but usually there are more and each diagram depicts a certain aspect of a model.
 - We see two model elements with two relations. The upper box represents an IT-System with some business logic and the lower box represents the information being processed. The directed connections represent a writing and a reading relationship; thus this application can write and read the data.
-- The notation being used is known as a block-diagram of the *Fundamental Modelling Concepts (FMC)*. A box with sharp corners represents an active element called *Actor*, while a box with rounded corners represents a passive element called *State*. *Actor* is a concept used for a system, tool, human role or function, whereas *State* is a concept used for information in general, a document, a database, a form or color.
+- The notation being used is known as a block-diagram of the *Fundamental Modeling Concepts (FMC)*. A box with sharp corners represents an active element called *Actor*, while a box with rounded corners represents a passive element called *State*. *Actor* is a concept used for a system, tool, human role or function, whereas *State* is a concept used for information in general, a document, a database, a form or color.
 - The model-diagram above defines three resources, namely each of the depicted model-elements plus the diagram itself.
 
 
@@ -321,7 +321,7 @@ Let us at last have a look at the full example, now:
 The instances, the actual model content, have not been discussed, yet:
 - You can easily see the diagram and the two model-elements in *resources*. The *properties* carry the information payload; those without a defined value can be omitted, e.g. the diagram has no property of type \"PC-Description\" and the model-elements have no property of type \"PC-Type\".
 - The four *statements* are equally easy to interpret: One *shows* relationship per model-element plus the *writes* and *reads* relationships between the model-elements.
-- By the way, if you display this example with the [SpecIF Viewer](https://apps.specif.de/view#import=https://specif.de/examples/06_Very-Simple-Model-FMC.specifz) and you hover the mouse over one of the model-elements or double-click it, you can see the potential of web-technology. This is not by virtue of SpecIF, but when the SVG is generated in a way that the model-element *id* is associated to a graphic element and an app like the SpecIF Viewer finds it, such behaviour is easily implemented.
+- By the way, if you display this example with the <a href="https://specif.de/apps/view#import=../examples/v1.1/06_Very-Simple-Model-FMC.specifz" target="_blank">SpecIF Viewer</a> and you hover the mouse over one of the model-elements or double-click it, you can see the potential of web-technology. This is not by virtue of SpecIF, but when the SVG is generated in a way that the model-element *id* is associated to a graphic element and an app like the SpecIF Viewer finds it, such behaviour is easily implemented.
 
 You may view the example using the <a href="https://specif.de/apps/view#import=../examples/v1.1/06_Very-Simple-Model-FMC.specifz" target="_blank">SpecIF Viewer</a>, or download the SpecIF data:
 - v1.0: [Very Simple Model (FMC)](https://specif.de/examples/v1.0/06_Very-Simple-Model-FMC.specifz)
