@@ -5218,7 +5218,7 @@
             "id": "PC-TermStatus"
           },
           "values": [
-            "V-TermStatus-48"
+            "V-TermStatus-50"
           ]
         },
         {
@@ -5274,7 +5274,7 @@
       ]
     },
     {
-      "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK",
+      "id": "R-UmlClass",
       "changedAt": "2024-08-29T13:56:10.140Z",
       "revision": "rev-11537051014",
       "class": {
@@ -5336,7 +5336,7 @@
             "id": "PC-TermStatus"
           },
           "values": [
-            "V-TermStatus-50"
+            "V-TermStatus-48"
           ]
         },
         {
@@ -52979,10 +52979,10 @@
         "id": "SC-isSynonymOfResource"
       },
       "subject": {
-        "id": "R-SpecifModelelement"
+        "id": "R-UmlClass"
       },
       "object": {
-        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+        "id": "R-SpecifModelelement"
       }
     },
     {
@@ -52995,7 +52995,7 @@
         "id": "R-FmcActor"
       },
       "object": {
-        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+        "id": "R-UmlClass"
       }
     },
     {
@@ -53008,7 +53008,7 @@
         "id": "R-FmcState"
       },
       "object": {
-        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+        "id": "R-UmlClass"
       }
     },
     {
@@ -53021,7 +53021,7 @@
         "id": "R-FmcEvent"
       },
       "object": {
-        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+        "id": "R-UmlClass"
       }
     },
     {
@@ -53034,7 +53034,7 @@
         "id": "R-SpecifCollection"
       },
       "object": {
-        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+        "id": "R-UmlClass"
       }
     },
     {
@@ -53044,7 +53044,7 @@
         "id": "SC-isSpecializationOfResource"
       },
       "subject": {
-        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+        "id": "R-UmlClass"
       },
       "object": {
         "id": "R-SpecifParagraph"
@@ -53161,7 +53161,7 @@
         "id": "SC-isEligibleAsSubject"
       },
       "subject": {
-        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+        "id": "R-UmlClass"
       },
       "object": {
         "id": "R-dcterms_hasPart"
@@ -53174,7 +53174,7 @@
         "id": "SC-isEligibleAsObject"
       },
       "subject": {
-        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+        "id": "R-UmlClass"
       },
       "object": {
         "id": "R-dcterms_hasPart"
@@ -53528,7 +53528,7 @@
             {
               "id": "N-kb7b8eclxar8zXHrOhn3fc4L5Yt",
               "resource": {
-                "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+                "id": "R-UmlClass"
               },
               "changedAt": "2024-08-29T13:56:10.140Z"
             },
