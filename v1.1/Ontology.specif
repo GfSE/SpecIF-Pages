@@ -10,8 +10,8 @@
     }
   ],
   "generator": "SpecIF Model-Integrator and Editor",
-  "generatorVersion": "1.1.r.24",
-  "createdAt": "2024-07-21T14:15:51.537Z",
+  "generatorVersion": "1.1.r.27",
+  "createdAt": "2024-08-30T08:34:25.038Z",
   "rights": {
     "title": "Creative Commons 4.0 CC BY-SA",
     "url": "https://creativecommons.org/licenses/by-sa/4.0/"
@@ -42,34 +42,6 @@
         }
       ],
       "revision": "1.1",
-      "type": "xs:string",
-      "maxLength": 256
-    },
-    {
-      "id": "DT-String",
-      "changedAt": "2024-02-23T08:59:00+02:00",
-      "title": "Plain or formatted Text",
-      "description": [
-        {
-          "text": "A text string, plain or formatted with XHTML or markdown.",
-          "format": "plain",
-          "language": "en"
-        }
-      ],
-      "revision": "1.2",
-      "type": "xs:string"
-    },
-    {
-      "id": "DT-String-LE256",
-      "changedAt": "2024-02-23T08:59:00+02:00",
-      "title": "String[256]",
-      "description": [
-        {
-          "text": "String with length <=256",
-          "language": "en"
-        }
-      ],
-      "revision": "1.2",
       "type": "xs:string",
       "maxLength": 256
     },
@@ -429,7 +401,7 @@
       ],
       "revision": "1.1",
       "dataType": {
-        "id": "DT-String-LE256"
+        "id": "DT-ShortString"
       },
       "format": "plain"
     },
@@ -445,7 +417,7 @@
       ],
       "revision": "1.2",
       "dataType": {
-        "id": "DT-String-LE256"
+        "id": "DT-ShortString"
       },
       "format": "plain"
     },
@@ -461,7 +433,7 @@
       ],
       "revision": "1.2",
       "dataType": {
-        "id": "DT-String-LE256"
+        "id": "DT-ShortString"
       },
       "multiple": true,
       "format": "plain"
@@ -478,7 +450,7 @@
       ],
       "revision": "1.2",
       "dataType": {
-        "id": "DT-String-LE256"
+        "id": "DT-ShortString"
       },
       "multiple": true,
       "format": "plain"
@@ -495,7 +467,7 @@
       ],
       "revision": "1.1",
       "dataType": {
-        "id": "DT-String"
+        "id": "DT-Text"
       },
       "format": "xhtml"
     },
@@ -511,7 +483,7 @@
       ],
       "revision": "1.1",
       "dataType": {
-        "id": "DT-String"
+        "id": "DT-Text"
       },
       "multiple": true,
       "format": "xhtml"
@@ -545,7 +517,7 @@
       ],
       "revision": "1.1",
       "dataType": {
-        "id": "DT-String-LE256"
+        "id": "DT-ShortString"
       },
       "format": "plain"
     },
@@ -571,7 +543,7 @@
       ],
       "revision": "1.1",
       "dataType": {
-        "id": "DT-String-LE256"
+        "id": "DT-ShortString"
       },
       "format": "plain"
     },
@@ -603,7 +575,7 @@
       ],
       "revision": "v1.2",
       "dataType": {
-        "id": "DT-String-LE256"
+        "id": "DT-ShortString"
       },
       "multiple": true,
       "format": "xhtml"
@@ -857,7 +829,7 @@
       ],
       "revision": "1.1",
       "dataType": {
-        "id": "DT-String"
+        "id": "DT-Text"
       },
       "format": "xhtml"
     },
@@ -3693,10 +3665,10 @@
     },
     {
       "id": "R-SpecifView",
-      "changedAt": "2024-06-13T07:51:28.439Z",
-      "revision": "rev-11665083525",
+      "changedAt": "2024-08-30T07:52:27.802Z",
+      "revision": "rev-10881182080",
       "replaces": [
-        "rev-9144069983"
+        "rev-11665083525"
       ],
       "class": {
         "id": "RC-SpecifTermresourceclass"
@@ -3752,6 +3724,7 @@
             "id": "PC-Domain"
           },
           "values": [
+            "V-Domain-20",
             "V-Domain-26"
           ]
         },
@@ -3770,7 +3743,7 @@
           "values": [
             [
               {
-                "text": "Model Diagram",
+                "text": "Model Diagram, Diagram, Plan",
                 "language": "en"
               },
               {
@@ -3839,6 +3812,127 @@
           "values": [
             "V-Instantiation-10",
             "V-Instantiation-20"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R-UmlDiagram",
+      "changedAt": "2024-08-30T07:51:44.846Z",
+      "revision": "rev-10082793124",
+      "replaces": [
+        "7"
+      ],
+      "class": {
+        "id": "RC-SpecifTermresourceclass"
+      },
+      "properties": [
+        {
+          "class": {
+            "id": "PC-SpecifRevision"
+          },
+          "values": [
+            [
+              {
+                "text": "1.2"
+              }
+            ]
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-SpecifTerm"
+          },
+          "values": [
+            [
+              {
+                "text": "uml:Diagram"
+              }
+            ]
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-Description"
+          },
+          "values": [
+            [
+              {
+                "text": "<p>A 'Diagram' is a graphical model view with a specific communication purpose, e.g. a business process or system composition.</p>",
+                "language": "en"
+              },
+              {
+                "text": "<p>Ein Diagramm ist eine graphische Modellsicht zur Vermittlung eines bestimmten Sachverhalts, z.B. ein Geschäftsprozess oder Systemaufbau.</p>",
+                "language": "de"
+              }
+            ]
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-Domain"
+          },
+          "values": [
+            "V-Domain-20",
+            "V-Domain-26"
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-TermStatus"
+          },
+          "values": [
+            "V-TermStatus-50"
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-SpecifLocalterm"
+          },
+          "values": [
+            [
+              {
+                "text": "Model Diagram",
+                "language": "en"
+              },
+              {
+                "text": "Modelldiagramm",
+                "language": "de"
+              }
+            ]
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-SpecifLocaltermplural"
+          },
+          "values": [
+            [
+              {
+                "text": "Model Diagrams",
+                "language": "en"
+              },
+              {
+                "text": "Modelldiagramme",
+                "language": "de"
+              }
+            ]
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-isHeading"
+          },
+          "values": [
+            "false"
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-Instantiation"
+          },
+          "values": [
+            "V-Instantiation-10"
           ]
         }
       ]
@@ -5061,8 +5155,11 @@
     },
     {
       "id": "R-SpecifModelelement",
-      "changedAt": "2024-06-09T18:23:40.090Z",
-      "revision": "rev-10987165742",
+      "changedAt": "2024-08-29T13:56:35.407Z",
+      "revision": "rev-9160322581",
+      "replaces": [
+        "rev-10987165742"
+      ],
       "class": {
         "id": "RC-SpecifTermresourceclass"
       },
@@ -5121,7 +5218,7 @@
             "id": "PC-TermStatus"
           },
           "values": [
-            "V-TermStatus-50"
+            "V-TermStatus-48"
           ]
         },
         {
@@ -5153,6 +5250,124 @@
               },
               {
                 "text": "Modellelemente",
+                "language": "de"
+              }
+            ]
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-isHeading"
+          },
+          "values": [
+            "false"
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-Instantiation"
+          },
+          "values": [
+            "V-Instantiation-10"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK",
+      "changedAt": "2024-08-29T13:56:10.140Z",
+      "revision": "rev-11537051014",
+      "class": {
+        "id": "RC-SpecifTermresourceclass"
+      },
+      "properties": [
+        {
+          "class": {
+            "id": "PC-SpecifRevision"
+          },
+          "values": [
+            [
+              {
+                "text": "1.2"
+              }
+            ]
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-SpecifTerm"
+          },
+          "values": [
+            [
+              {
+                "text": "uml:Class"
+              }
+            ]
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-Description"
+          },
+          "values": [
+            [
+              {
+                "text": "Is a generalized type for model elements.",
+                "language": "en"
+              },
+              {
+                "text": "Ist ein generalisierter Typ für Modellelemente.",
+                "language": "de"
+              }
+            ]
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-Domain"
+          },
+          "values": [
+            "V-Domain-20",
+            "V-Domain-26"
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-TermStatus"
+          },
+          "values": [
+            "V-TermStatus-50"
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-SpecifLocalterm"
+          },
+          "values": [
+            [
+              {
+                "text": "Class",
+                "language": "en"
+              },
+              {
+                "text": "Klasse",
+                "language": "de"
+              }
+            ]
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-SpecifLocaltermplural"
+          },
+          "values": [
+            [
+              {
+                "text": "Classes",
+                "language": "en"
+              },
+              {
+                "text": "Klassen",
                 "language": "de"
               }
             ]
@@ -18846,110 +19061,6 @@
               },
               {
                 "text": "réalise",
-                "language": "fr"
-              }
-            ]
-          ]
-        },
-        {
-          "class": {
-            "id": "PC-isUndirected"
-          },
-          "values": [
-            "false"
-          ]
-        },
-        {
-          "class": {
-            "id": "PC-Instantiation"
-          },
-          "values": [
-            "V-Instantiation-10"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "R-UmlSpecialization",
-      "changedAt": "2024-07-17T15:17:49.643Z",
-      "revision": "rev-7891674075",
-      "replaces": [
-        "rev-9441319146"
-      ],
-      "class": {
-        "id": "RC-SpecifTermstatementclass"
-      },
-      "properties": [
-        {
-          "class": {
-            "id": "PC-SpecifRevision"
-          },
-          "values": [
-            [
-              {
-                "text": "1.2"
-              }
-            ]
-          ]
-        },
-        {
-          "class": {
-            "id": "PC-SpecifTerm"
-          },
-          "values": [
-            [
-              {
-                "text": "uml:Specialization"
-              }
-            ]
-          ]
-        },
-        {
-          "class": {
-            "id": "PC-Description"
-          },
-          "values": [
-            [
-              {
-                "text": "<p>A [[FMC:Actor]] is a specialization of another [[FMC:Actor]]; similarly for [[FMC:State]] and [[FMC:Event]].</p><p>Is deprecated, because this term actually does not exist - just [[uml:Generalization]] is used!",
-                "language": "en"
-              }
-            ]
-          ]
-        },
-        {
-          "class": {
-            "id": "PC-Domain"
-          },
-          "values": [
-            "V-Domain-20",
-            "V-Domain-26"
-          ]
-        },
-        {
-          "class": {
-            "id": "PC-TermStatus"
-          },
-          "values": [
-            "V-TermStatus-90"
-          ]
-        },
-        {
-          "class": {
-            "id": "PC-SpecifLocalterm"
-          },
-          "values": [
-            [
-              {
-                "text": "specializes",
-                "language": "en"
-              },
-              {
-                "text": "spezialisiert",
-                "language": "de"
-              },
-              {
-                "text": "spécialise",
                 "language": "fr"
               }
             ]
@@ -42747,21 +42858,6 @@
       }
     },
     {
-      "id": "S-NcR3JrRuyDKbUZTBgRdyB7mXsqz",
-      "changedAt": "2018-03-21T18:14:10+01:00",
-      "revision": "195",
-      "changedBy": "od",
-      "class": {
-        "id": "SC-isAntonymOfStatement"
-      },
-      "subject": {
-        "id": "R-UmlGeneralization"
-      },
-      "object": {
-        "id": "R-UmlSpecialization"
-      }
-    },
-    {
       "id": "S-e83R47P87bSg4tpnNWkGjReGEpO",
       "changedAt": "2018-02-17T14:52:13+01:00",
       "revision": "108",
@@ -43696,58 +43792,6 @@
       },
       "object": {
         "id": "R-DctermsType"
-      }
-    },
-    {
-      "id": "S-KKbAcfGIMjHRpOJ5gFLpndwfyuD",
-      "changedAt": "2023-02-26T20:58:14.741Z",
-      "class": {
-        "id": "SC-isSpecializationOfResource"
-      },
-      "subject": {
-        "id": "R-FmcActor"
-      },
-      "object": {
-        "id": "R-SpecifModelelement"
-      }
-    },
-    {
-      "id": "S-5wFinJDl1ECUC0Aks5XQSSreDVj",
-      "changedAt": "2023-02-26T20:58:28.671Z",
-      "class": {
-        "id": "SC-isSpecializationOfResource"
-      },
-      "subject": {
-        "id": "R-FmcState"
-      },
-      "object": {
-        "id": "R-SpecifModelelement"
-      }
-    },
-    {
-      "id": "S-XV64fcxjgzgPc8ai2xNNKFz74Q1",
-      "changedAt": "2023-02-26T20:58:39.082Z",
-      "class": {
-        "id": "SC-isSpecializationOfResource"
-      },
-      "subject": {
-        "id": "R-FmcEvent"
-      },
-      "object": {
-        "id": "R-SpecifModelelement"
-      }
-    },
-    {
-      "id": "S-vFCHO9YjhmjeuzmQ6ufShPzY8ZN",
-      "changedAt": "2023-02-26T21:24:20.979Z",
-      "class": {
-        "id": "SC-isSpecializationOfResource"
-      },
-      "subject": {
-        "id": "R-SpecifCollection"
-      },
-      "object": {
-        "id": "R-SpecifModelelement"
       }
     },
     {
@@ -47414,19 +47458,6 @@
       },
       "object": {
         "id": "R-SpecifParagraph"
-      }
-    },
-    {
-      "id": "S-XpoDPX7YTSacqWIRqI2vrRtbN4c",
-      "changedAt": "2023-08-09T12:27:10.136Z",
-      "class": {
-        "id": "SC-isNamespace"
-      },
-      "subject": {
-        "id": "R-SfcWtgiLtGsiXRkCUdHcA21E9ks"
-      },
-      "object": {
-        "id": "R-UmlSpecialization"
       }
     },
     {
@@ -51382,19 +51413,6 @@
       }
     },
     {
-      "id": "S-PmrBlqKzBouwmQPNeRG9FOIOXlN",
-      "changedAt": "2024-04-11T20:41:27.185Z",
-      "class": {
-        "id": "SC-isSynonymOfProperty"
-      },
-      "subject": {
-        "id": "R-pKmNIMAt4uBz31Qre16K9b0rFDk"
-      },
-      "object": {
-        "id": "R-SpecifTerm"
-      }
-    },
-    {
       "id": "S-7bxnSr6HnaGqH4Q4bDelXKKg026",
       "changedAt": "2024-04-12T10:30:16.349Z",
       "class": {
@@ -51889,19 +51907,6 @@
       }
     },
     {
-      "id": "S-fW9Boq1iX4WTltO4W9iEYo1lAda",
-      "changedAt": "2024-06-09T13:05:31.849Z",
-      "class": {
-        "id": "SC-isSpecializationOfStatement"
-      },
-      "subject": {
-        "id": "R-UmlSpecialization"
-      },
-      "object": {
-        "id": "R-SpecifRelates"
-      }
-    },
-    {
       "id": "S-b3YbPceDCpF9U2WwNcGpeD1OrNr",
       "changedAt": "2024-06-13T07:52:54.467Z",
       "class": {
@@ -52237,19 +52242,6 @@
       },
       "object": {
         "id": "R-iNXvWPrSvlEzwrBgWrYIOapitNn"
-      }
-    },
-    {
-      "id": "S-gXCrXKdn0BzonvOeuSQhp3hNQyX",
-      "changedAt": "2024-07-09T05:36:29.802Z",
-      "class": {
-        "id": "SC-isNamespace"
-      },
-      "subject": {
-        "id": "R-SfcWtgiLtGsiXRkCUdHcA21E9ks"
-      },
-      "object": {
-        "id": "R-5gcQLJMvCf5uvsCq8fbf2zCw1v7"
       }
     },
     {
@@ -52682,19 +52674,6 @@
       }
     },
     {
-      "id": "S-VeXowSzstfD4dzXGzvqeCCo18kB",
-      "changedAt": "2024-07-17T15:19:35.860Z",
-      "class": {
-        "id": "SC-isSynonymOfStatement"
-      },
-      "subject": {
-        "id": "R-UmlSpecialization"
-      },
-      "object": {
-        "id": "R-SpecifIsspecializationof"
-      }
-    },
-    {
       "id": "S-bVGXRKKDefyOmlsFmCLEWgVgDdM",
       "changedAt": "2024-07-17T15:19:52.456Z",
       "class": {
@@ -52979,6 +52958,227 @@
       "object": {
         "id": "R-SpecifHandles"
       }
+    },
+    {
+      "id": "S-oec2AjPxLgSYsXCzL20uGdLyx6M",
+      "changedAt": "2024-08-29T13:53:36.105Z",
+      "class": {
+        "id": "SC-isNamespace"
+      },
+      "subject": {
+        "id": "R-B1kBh6u4wXOiHErs9C4xpTqk6tt"
+      },
+      "object": {
+        "id": "R-5gcQLJMvCf5uvsCq8fbf2zCw1v7"
+      }
+    },
+    {
+      "id": "S-jlrn2ODte4MVuLTXnhlU928egUa",
+      "changedAt": "2024-08-29T13:57:11.234Z",
+      "class": {
+        "id": "SC-isSynonymOfResource"
+      },
+      "subject": {
+        "id": "R-SpecifModelelement"
+      },
+      "object": {
+        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+      }
+    },
+    {
+      "id": "S-UvRJdczHpi8nlvE5AXlQsM9ykwD",
+      "changedAt": "2024-08-29T13:58:50.618Z",
+      "class": {
+        "id": "SC-isSpecializationOfResource"
+      },
+      "subject": {
+        "id": "R-FmcActor"
+      },
+      "object": {
+        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+      }
+    },
+    {
+      "id": "S-TgPIwPryCMdthFWdijwkrzhFAu3",
+      "changedAt": "2024-08-29T13:59:39.808Z",
+      "class": {
+        "id": "SC-isSpecializationOfResource"
+      },
+      "subject": {
+        "id": "R-FmcState"
+      },
+      "object": {
+        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+      }
+    },
+    {
+      "id": "S-UiILyMSi4x62IY0DPziZmDIzD8b",
+      "changedAt": "2024-08-29T13:59:49.461Z",
+      "class": {
+        "id": "SC-isSpecializationOfResource"
+      },
+      "subject": {
+        "id": "R-FmcEvent"
+      },
+      "object": {
+        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+      }
+    },
+    {
+      "id": "S-XWwygVWfNWCaR7r2VkY0XZzIxZK",
+      "changedAt": "2024-08-29T14:00:00.574Z",
+      "class": {
+        "id": "SC-isSpecializationOfResource"
+      },
+      "subject": {
+        "id": "R-SpecifCollection"
+      },
+      "object": {
+        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+      }
+    },
+    {
+      "id": "S-o6xPlLOK5MPzxNr0h6CuEFAVKtf",
+      "changedAt": "2024-08-29T14:00:34.713Z",
+      "class": {
+        "id": "SC-isSpecializationOfResource"
+      },
+      "subject": {
+        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+      },
+      "object": {
+        "id": "R-SpecifParagraph"
+      }
+    },
+    {
+      "id": "S-FdRIgAMMUuBESos4sAhkRcKRCfR",
+      "changedAt": "2024-08-30T07:49:06.838Z",
+      "class": {
+        "id": "SC-isNamespace"
+      },
+      "subject": {
+        "id": "R-SfcWtgiLtGsiXRkCUdHcA21E9ks"
+      },
+      "object": {
+        "id": "R-Llnjwolu1K82gcZEUeITQ18Xsva"
+      }
+    },
+    {
+      "id": "S-aGGbVHq4FzPKbraOTcU1htNqIfQ",
+      "changedAt": "2024-08-30T07:49:18.770Z",
+      "class": {
+        "id": "SC-isNamespace"
+      },
+      "subject": {
+        "id": "R-SfcWtgiLtGsiXRkCUdHcA21E9ks"
+      },
+      "object": {
+        "id": "R-Me4FKTcsW8fHygKxxCHAayD9IxM"
+      }
+    },
+    {
+      "id": "S-V9xNyPGKywbrhKaidJq1p3ZbGfx",
+      "changedAt": "2024-08-30T07:49:32.700Z",
+      "class": {
+        "id": "SC-isNamespace"
+      },
+      "subject": {
+        "id": "R-RmZDcwhH5iTqRxkjTW1YiYAe9Nf"
+      },
+      "object": {
+        "id": "R-2K86y9ppjVccODGiLD5189a1hsi"
+      }
+    },
+    {
+      "id": "S-NdaJgqxOqTfFOhG5WZzxJ8UUAgk",
+      "changedAt": "2024-08-30T07:49:41.680Z",
+      "class": {
+        "id": "SC-isNamespace"
+      },
+      "subject": {
+        "id": "R-RmZDcwhH5iTqRxkjTW1YiYAe9Nf"
+      },
+      "object": {
+        "id": "R-sSV4JGge5dzIulz4thQIgMXSkQ9"
+      }
+    },
+    {
+      "id": "S-LcsdpCXU4o3InzxOGEeUFOJsJkM",
+      "changedAt": "2024-08-30T07:49:51.338Z",
+      "class": {
+        "id": "SC-isNamespace"
+      },
+      "subject": {
+        "id": "R-RmZDcwhH5iTqRxkjTW1YiYAe9Nf"
+      },
+      "object": {
+        "id": "R-m702dK0uAzllaIwkAw8wT8beRXm"
+      }
+    },
+    {
+      "id": "S-M4wZdBpKEtwbludHe3FQ3mEhdnk",
+      "changedAt": "2024-08-30T07:53:29.639Z",
+      "class": {
+        "id": "SC-isSynonymOfResource"
+      },
+      "subject": {
+        "id": "R-UmlDiagram"
+      },
+      "object": {
+        "id": "R-SpecifView"
+      }
+    },
+    {
+      "id": "S-JRnKDfjSG9BEt2Oe4sEAM5AUvnj",
+      "changedAt": "2024-08-30T07:55:00.483Z",
+      "class": {
+        "id": "SC-isNamespace"
+      },
+      "subject": {
+        "id": "R-SfcWtgiLtGsiXRkCUdHcA21E9ks"
+      },
+      "object": {
+        "id": "R-UmlDiagram"
+      }
+    },
+    {
+      "id": "S-XI3ISR5sxmCku2JY2Nb1IWMelqz",
+      "changedAt": "2024-08-30T08:13:55.382Z",
+      "class": {
+        "id": "SC-isSpecializationOfResource"
+      },
+      "subject": {
+        "id": "R-UmlDiagram"
+      },
+      "object": {
+        "id": "R-SpecifParagraph"
+      }
+    },
+    {
+      "id": "S-kqaf7smVCzwSXmcgWe40tnwcLzu",
+      "changedAt": "2024-08-30T08:33:07.357Z",
+      "class": {
+        "id": "SC-isEligibleAsSubject"
+      },
+      "subject": {
+        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+      },
+      "object": {
+        "id": "R-dcterms_hasPart"
+      }
+    },
+    {
+      "id": "S-DN1v8tufzkrONjjknVx2wDojCKE",
+      "changedAt": "2024-08-30T08:33:26.304Z",
+      "class": {
+        "id": "SC-isEligibleAsObject"
+      },
+      "subject": {
+        "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+      },
+      "object": {
+        "id": "R-dcterms_hasPart"
+      }
     }
   ],
   "files": [],
@@ -53233,6 +53433,13 @@
               "changedAt": "2023-02-26T20:21:41.620Z"
             },
             {
+              "id": "N-CVAvZ6kJv8gOO8VxKdOz985VoPw",
+              "resource": {
+                "id": "R-UmlDiagram"
+              },
+              "changedAt": "2024-08-30T07:51:51.583Z"
+            },
+            {
               "id": "N-CKfg4iZWEoicdQ2qnGoTaX9stEx",
               "resource": {
                 "id": "R-SpecifViews"
@@ -53317,6 +53524,13 @@
                 "id": "R-SpecifModelelement"
               },
               "changedAt": "2023-08-23T17:50:17.032Z"
+            },
+            {
+              "id": "N-kb7b8eclxar8zXHrOhn3fc4L5Yt",
+              "resource": {
+                "id": "R-S5q7VpEBVGTDgRvhvrJ1wv0icRK"
+              },
+              "changedAt": "2024-08-29T13:56:10.140Z"
             },
             {
               "id": "N-4NoXVcSzSs07Htg4959SJnDEm0D",
@@ -54363,14 +54577,6 @@
                 "id": "R-FXvnWzK3PNQVARvDOqILmxLONRN"
               },
               "changedAt": "2024-06-19T23:49:27.024Z"
-            },
-            {
-              "id": "N-rFgSojoH8KY2IPsmY49TGtgVWnd",
-              "resource": {
-                "id": "R-UmlSpecialization"
-              },
-              "changedAt": "2019-05-30T14:52:25+01:00",
-              "revision": "114"
             },
             {
               "id": "N-8pUc6Vjp86KYxpBFwvbnduOoHKp",
@@ -56322,7 +56528,7 @@
   ],
   "description": [
     {
-      "text": "A set of SpecIF Classes derived from a SpecIF Ontology for the domain Ontology.",
+      "text": "An ontology for the Specification Integration Facility (SpecIF).",
       "format": "plain",
       "language": "en"
     }

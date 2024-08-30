@@ -162,7 +162,7 @@ Are you interested and would like to investigate the SpecIF approach more in det
 - The <a href="https://specif.de/apps/view.html#import=%22./v1.1/Ontology.specif%22" target="_blank">SpecIF Ontology</a>,
 - Some examples using SpecIF are listed in the <a href="#examples" target="_blank">previous chapter</a> and
 <!-- - A presentation <a href="https://specif.de/files/SpecIF/documents/2019-11-24%20Model-Integration%20with%20SpecIF" target="_blank">'Model Integration with SpecIF'</a> covering the status and future steps in development and -->
-- a concrete example <a href="./downloads/TdSE-2021%20Dungern%20-%20Integrate%20BPMN%20and%20Archimate%20Models%20using%20SpecIF.pdf" target="_blank">'Integrate BPMN and Archimate Models using SpecIF'</a>.
+- a concrete example <a href="./files/literature/TdSE-2021%20Dungern%20-%20Integrate%20BPMN%20and%20Archimate%20Models%20using%20SpecIF.pdf" target="_blank">'Integrate BPMN and Archimate Models using SpecIF'</a>.
 
 If you have any questions, please contact Uwe Kaufmann, Oliver Alt or Oskar v. Dungern using the contact information given below. Suggestions and contributions are welcome!
 
