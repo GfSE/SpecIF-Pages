@@ -44,4 +44,21 @@ svg.my-align-left {
     float: left;
     margin-right: 1.6rem; }
 }
+/* supersede Just-the-Docs styles */
+@media (min-width: 31.25rem) {
+	h2 {
+		font-size: 1.9rem !important;
+		font-weight: 300;
+	}
+	h3 {
+		font-size: 1.6rem !important;
+		font-weight: 300;
+	}
+	h4 {
+		font-size: 1.3rem !important;
+		text-transform: none;
+		letter-spacing: normal;
+		font-weight: 300;
+	}
+}
 

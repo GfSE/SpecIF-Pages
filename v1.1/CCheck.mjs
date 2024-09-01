@@ -324,6 +324,7 @@ export class CCheck {
 
                 let staC = itemByKey( data[sClasses], sta[sClass] );   // the statement's class
                 
+				// The existence of a valid class has been checked before, but a crash shall be avoided:
 				if(staC) {
 					// If there are no staC[subClasses], all subjectClasses are eligible and so no checking is necessary.
 					if( Array.isArray(staC[subClasses]) && subj ) {
@@ -344,9 +345,7 @@ export class CCheck {
 						if( uniqueByKey( eligibleCL, obj[[rClass]] ) )
 							errorL.push({status:981, statusText: "the object of statement["+i+"] with identifier '"+sta.id+"' has a class which is not listed in the "+objClasses+" of the statement's class"});
 					};
-				}
-				else
-                    errorL.push({status:982, statusText: "the class of statement["+i+"] with identifier '"+sta.id+"' has not been found"});
+				};
             });
 
             // property values ("content") must fit the respective class' range:

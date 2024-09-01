@@ -1,8 +1,8 @@
 {
-  "$id": "https://specif.de/v1.1/schema#",
+  "$id": "https://specif.de/v1.2/schema#",
   "$schema": "https://json-schema.org/draft/2019-09/schema#",
-  "title": "JSON-Schema for SpecIF v1.1",
-  "description": "The Specification Integration Facility (SpecIF) integrates partial system models from different methods and tools in a semantic net. Collaborators shall browse, search and audit engineering results in a common context. Also, the exchange of model information between organizations and tools is facilitated. SpecIF represents the visible, i.e. the diagrams and the text, as well as the semantics of system specifications.",
+  "title": "JSON-Schema for SpecIF v1.2",
+  "description": "The Specification Integration Facility (SpecIF) integrates partial system models from different methods and tools in a semantic net. Collaborators shall browse, search and audit engineering results in a common context. Also, the exchange of model information between organizations and tools is facilitated. SpecIF represents the visible, i.e. the diagrams and the text, as well as the semantics of system specifications. UTF-8 encoding is preferred.",
   "definitions": {
     "SpecifId": {
       "description": "A globally unique identifier.",
@@ -124,28 +124,32 @@
       "type": "string",
       "enum": [ "plain", "xhtml" ]
     },
+    "SpecifLanguageText": {
+      "description": "A Text with optional indication of format and language.",
+      "type": "object",
+      "properties": {
+        "text": {
+          "description": "A string containing some text.",
+          "type": "string"
+        },
+        "format": {
+          "description": "By default, the format is assumed 'plain'.",
+          "$ref": "#/definitions/SpecifTextFormat"
+        },
+        "language": {
+          "description": "An IETF language tag such as 'en', 'en-US, 'fr' or 'de'.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [ "text" ]
+    },
     "SpecifMultiLanguageText": {
-      "description": "A list of items with text and language properties. If the information is be provided in multiple languages, the language must be specified for proper selection; it is however not required by the schema to avoid a lot of overhead in most cases with a single language.",
+      "description": "A list of items with text and language properties. If the information is provided in multiple languages, the language must be specified for proper selection; it is however not required by the schema to avoid a lot of overhead in most cases with a single language.",
       "type": "array",
       "uniqueItems": true,
       "items": {
-        "type": "object",
-        "properties": {
-          "text": {
-            "description": "A string containing some text.",
-            "type": "string"
-          },
-          "format": {
-            "description": "By default, the format is assumed 'plain'.",
-            "$ref": "#/definitions/SpecifTextFormat"
-          },
-          "language": {
-            "description": "An IETF language tag such as 'en', 'en-US, 'fr' or 'de'.",
-            "type": "string"
-          }
-        },
-        "additionalProperties": false,
-        "required": [ "text" ]
+        "$ref": "#/definitions/SpecifLanguageText"
       }
     },
     "SpecifValue": {
@@ -161,7 +165,7 @@
       ]
     },
     "SpecifValues": {
-      "description": "If 'multiple' of the propertyClass is undefined or false, the array must contain one item. If the value is unknown, omit the whole property. By default, the class' value applies.",
+      "description": "If 'multiple' of the propertyClass is undefined or false, the array must contain one item. If the value is unknown, omit the whole property. By default, the class' values apply.",
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
@@ -203,12 +207,12 @@
       "type": "string"
     },
     "SpecifInstantiation": {
-      "description": "Indicates whether an instance of the class is created automatically, manually or both. All is allowed, if the property is omitted. The class is abstract and cannot be instantiated, if the property list is present, but empty.",
+      "description": "Indicates whether an instance of the class is created automatically, manually or both. Manual and automatic instantiation is allowed, if the property is omitted. The class is abstract and cannot be instantiated, if the value is 'never' or the property list is present, but empty. The explicit case using 'never' is preferred; the latter is used by earlier versions.",
       "type": "array",
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "enum": [ "auto", "user" ]
+        "enum": [ "never", "auto", "user" ]
       }
     },
     "SpecifDataType": {
@@ -270,7 +274,7 @@
               "$ref": "#/definitions/SpecifEnumeratedValues"
             },
             "multiple": {
-              "description": "Indicates whether multiple values are allowed; by default the value is 'false'.",
+              "description": "Indicates whether multiple values are allowed; by default the value is 'false'. Is DEPRECATED for a dataType - use the 'multiple' attribute for a propertyClass instead.",
               "type": "boolean"
             },
             "revision": {
@@ -322,7 +326,7 @@
               "$ref": "#/definitions/SpecifEnumeratedValues"
             },
             "multiple": {
-              "description": "Indicates whether multiple values are allowed; by default the value is 'false'.",
+              "description": "Indicates whether multiple values are allowed; by default the value is 'false'. Is DEPRECATED for a dataType - use the 'multiple' attribute for a propertyClass instead.",
               "type": "boolean"
             },
             "revision": {
@@ -380,7 +384,7 @@
               "$ref": "#/definitions/SpecifEnumeratedValues"
             },
             "multiple": {
-              "description": "Indicates whether multiple values are allowed; by default the value is 'false'.",
+              "description": "Indicates whether multiple values are allowed; by default the value is 'false'. Is DEPRECATED for a dataType - use the 'multiple' attribute for a propertyClass instead.",
               "type": "boolean"
             },
             "revision": {
@@ -428,7 +432,7 @@
               "$ref": "#/definitions/SpecifEnumeratedValues"
             },
             "multiple": {
-              "description": "Indicates whether multiple values are allowed; by default the value is 'false'.",
+              "description": "Indicates whether multiple values are allowed; by default the value is 'false'. Is DEPRECATED for a dataType - use the 'multiple' attribute for a propertyClass instead.",
               "type": "boolean"
             },
             "revision": {
@@ -465,12 +469,20 @@
           "description": "Must be a member of dataTypes.",
           "$ref": "#/definitions/SpecifKey"
         },
+        "isMandatory": {
+          "description": "Optional use. Indicates whether an instance must be assigned; by default it is 'false'. If 'true', any 'values' defined in this class are ueseless.",
+          "type": "boolean"
+        },
         "multiple": {
-          "description": "Optional use by all propertyClasses. Indicates whether multiple values can be given. If omitted, the 'multiple' property of the dataType applies; by default the value is 'false'.",
+          "description": "Optional use. Indicates whether multiple values can be given to an instance. By default, it is 'false'.",
+          "type": "boolean"
+        },
+        "multiLanguage": {
+          "description": "Optional use by propertyClasses with dataType 'xs:string'. Indicates whether an instance value can be assigned in multiple languages; by default the value is 'false'.",
           "type": "boolean"
         },
         "values": {
-          "description": "An optional list of default values in case the instantiated resource's or statement's property is missing.",
+          "description": "An optional list of default values in case the instantiated resource's or statement's property is missing. Is useless, if 'isMandatory' is true.",
           "$ref": "#/definitions/SpecifValues"
         },
         "format": {
@@ -478,7 +490,7 @@
           "$ref": "#/definitions/SpecifTextFormat"
         },
         "unit": {
-          "description": "The unit of a property's numeric value; preferrably an SI unit symbol such as 'm^3/kg' (Système international (d'unités)) or a currency symbol.",
+          "description": "The unit of a property's numeric value; preferably an SI unit symbol such as 'm^3/kg' (Système international (d'unités)) or a currency symbol.",
           "type": "string"
         },
         "revision": {
@@ -747,7 +759,7 @@
           "$ref": "#/definitions/SpecifId"
         },
         "title": {
-          "description": "The file's name.",
+          "description": "The file's name, usually with an extension indicating it's type.",
           "type": "string"
         },
         "description": {
