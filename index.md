@@ -10,7 +10,7 @@ nav_order: 0
 
 ## News: GfSE releases SpecIF v1.1
 
-On it's conference Tag des Systems Engineering (TdSE) 2021 the Gesellschaft für Systems Engineering (GfSE), German chapter of INCOSE, has released SpecIF v1.1. A <a href="https://specif.de/files/SpecIF/documents/2021-11%20GfSE-Announcement%20SpecIF%20v1.1.pdf" target="_blank">press statement</a> highlights the importance for collaboration in system design. Like all other results of the working group, the <a href="https://gfse.github.io/SpecIF-Pages/Documentation/" target="_blank">documentation</a> has been openly published on Github.
+On it's conference Tag des Systems Engineering (TdSE) 2021 the Gesellschaft für Systems Engineering (GfSE), German chapter of INCOSE, has released SpecIF v1.1. A <a href="https://specif.de/files/documents/2021-11%20GfSE-Announcement%20SpecIF%20v1.1.pdf" target="_blank">press statement</a> (<a href="https://specif.de/files/documents/2021-11%20GfSE-Ankündigung%20SpecIF%20v1.1.pdf" target="_blank">Pressererklärung</a>) highlights the importance for collaboration in system design. Like all other results of the working group, the <a href="https://gfse.github.io/SpecIF-Pages/Documentation/" target="_blank">documentation</a> has been openly published on Github.
 
 # Motivation
 
