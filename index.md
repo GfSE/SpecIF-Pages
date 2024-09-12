@@ -10,7 +10,7 @@ nav_order: 0
 
 ## News: GfSE releases SpecIF v1.1
 
-On it's conference Tag des Systems Engineering (TdSE) 2021 the Gesellschaft für Systems Engineering (GfSE), German chapter of INCOSE, has released SpecIF v1.1. A <a href="https://specif.de/files/documents/2021-11%20GfSE-Announcement%20SpecIF%20v1.1.pdf" target="_blank">press statement</a> (<a href="https://specif.de/files/documents/2021-11%20GfSE-Ankündigung%20SpecIF%20v1.1.pdf" target="_blank">Pressererklärung</a>) highlights the importance for collaboration in system design. Like all other results of the working group, the <a href="https://gfse.github.io/SpecIF-Pages/Documentation/" target="_blank">documentation</a> has been openly published on Github.
+On it's conference _Tag des Systems Engineering (TdSE) 2021_ the Gesellschaft für Systems Engineering (GfSE), German chapter of INCOSE, has released SpecIF v1.1. A <a href="https://specif.de/files/documents/2021-11%20GfSE-Announcement%20SpecIF%20v1.1.pdf" target="_blank">press statement</a> (<a href="https://specif.de/files/documents/2021-11%20GfSE-Ankündigung%20SpecIF%20v1.1.pdf" target="_blank">Pressererklärung</a>) highlights the importance for collaboration in system design. Like all other results of the working group, the <a href="https://gfse.github.io/SpecIF-Pages/Documentation/" target="_blank">documentation</a> has been openly published on Github.
 
 # Motivation
 
@@ -21,6 +21,8 @@ In the field of Systems Engineering (SE) a multitude of methods is being used wi
 In practice, it is difficult or even impossible with acceptable effort to join the information and to put it in relation. Information from diffe­rent sources ("silos") is often inconsistent, because it is main­tained by different organi­zations with their own background and purpose. Popular modelling standards such as UML/SysML are notations, but leave semantic inter­pretation to tool-makers or users. For data (model) exchange there are several standards with respect to syntax, but very few which address the semantics as well.
 
 The Specification Integration Facility (SpecIF) shall support the change from document-centric to artefact-centric colla­boration, which is a generally accepted goal in the domains of systems engineering and product lifecycle management (PLM). SpecIF defines a language for describing system models with attention to both syntax and semantics. By creating a common context for graphical and textual content, an understanding (beyond mere communi­cation) is achieved on a logical level. Existing technical formats and protocols such as ReqIF or RDF are adopted to take advantage of existing IT infra­structure.
+
+The motivation is also discussed in an interview <a href="https://www.se-trends.de/systemmodelle-zusammen-fuehren-mit-specif/" target="_blank">Systemmodelle zusammen führen mit SpecIF</a> on _System Engineering Trends_. The interview was conducted in July 2016, but is just as relevant today as it was then.
 
 # Goals
 
