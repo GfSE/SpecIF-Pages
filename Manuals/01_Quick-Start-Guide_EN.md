@@ -64,8 +64,8 @@ Of course, "domain.tld/path" has to be replaced according to your installation.
 
 #### Use the Installed SpecIF-Viewer/Editor
 
-If the guidelines of your network permit, you can use the <a href="https://apps.specif.de/view.html" target="_blank">SpecIF Viewer</a> 
-or the <a href="https://apps.specif.de/edit.html" target="_blank">SpecIF Model Integrator and Editor</a>, provided for demonstration purposes. 
+If the guidelines of your network permit, you can use the <a href="https://specif.de/apps/view.html" target="_blank">SpecIF Viewer</a> 
+or the <a href="https://specif.de/apps/edit.html" target="_blank">SpecIF Model Integrator and Editor</a>, provided for demonstration purposes. 
 You always benefit from the latest release.
 
 ### Prepare the Model-data
@@ -105,7 +105,7 @@ In the ↗ `Document` tab, the model is presented in a structure or outline chos
 
 You can open and close the structural levels on the left; the respective contents are shown on the right. In the main column, the properties designated as title, description and diagram are shown, plus any other properties in a narrow column on the right.
 
-With certain SVG model diagrams, e.g. with FMC- or BPMN-notation created by <a href="http://arcway.com" target="_blank">ARCWAY Cockpit</a>, the diagram elements are linked to the corresponding data elements such that their title and description are displayed when the mouse is hovered over them. The element is jumped to with a double click. Here is a small <a href="https://apps.specif.de/edit#view=doc;node=N-Diagram-aec0df7900010000017001eaf53e8876;import=https://specif.de/examples/09_Very-Simple-Model-FMC-with-Requirements.specifz" target="_blank">example</a>.
+With certain SVG model diagrams, e.g. with FMC- or BPMN-notation created by <a href="http://arcway.com" target="_blank">ARCWAY Cockpit</a>, the diagram elements are linked to the corresponding data elements such that their title and description are displayed when the mouse is hovered over them. The element is jumped to with a double click. Here is a small <a href="https://specif.de/apps/edit#view=doc;node=N-Diagram-aec0df7900010000017001eaf53e8876;import=https://specif.de/examples/09_Very-Simple-Model-FMC-with-Requirements.specifz" target="_blank">example</a>.
 
 ### Edit a Model Element
 
@@ -202,7 +202,7 @@ The same goes for the names of relationships (SpecIF statements); for example _o
 
 By the way, the target of a relation like "DMS" in the figure does not have to be found in the same file. The relation is also established to a resource that originates from a different source, as long as the title resp. ID are identical.
 
-Suitable terms are defined in the <a href="https://apps.specif.de/view.html#import=https://specif.de/v1.1/Ontology.specif" target="_blank">SpecIF Ontology</a>, namely for <a href="https://apps.specif.de/view.html#view=doc;project=P-SpecIF-Ontology;node=N-33z8X0jqbMdrd8PJDKyt2ke4yAB;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property names (propertyClasses)</a>, <a href="https://apps.specif.de/view.html#view=doc;project=P-SpecIF-Ontology;node=N-GXf6xVO7XO5ciMypRwD5WDR6DHR;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property values (propertyValues)</a> and for <a href="https://apps.specif.de/view.html#view=doc;project=P-SpecIF-Ontology;node=N-blM4lfyHM55YlbfBZ3NWj4SYwa3;import=https://specif.de/v1.1/Ontology.specif" target="_blank">statement names (statementClasses)</a>.
+Suitable terms are defined in the <a href="https://specif.de/apps/view.html#import=https://specif.de/v1.1/Ontology.specif" target="_blank">SpecIF Ontology</a>, namely for <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-33z8X0jqbMdrd8PJDKyt2ke4yAB;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property names (propertyClasses)</a>, <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-GXf6xVO7XO5ciMypRwD5WDR6DHR;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property values (propertyValues)</a> and for <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-blM4lfyHM55YlbfBZ3NWj4SYwa3;import=https://specif.de/v1.1/Ontology.specif" target="_blank">statement names (statementClasses)</a>.
 
 ### Archi
 

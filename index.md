@@ -103,7 +103,7 @@ Good understanding is based on a clear vocabulary or ontology for the respective
 
 For example, ReqIF is a format for information exchange standardized by the OMG [5], but is effectively used when applying the naming convention for the information elements which have been introduced by the ReqIF Implementor Forum of the ProSTEP iViP e.V.. Similar conventions have been published by the OSLC initiative. Interestingly, in both cases there are only names for the attributes, but not for the resources themselves: For example, the property carrying a descriptive text is named ReqIF.Text resp. dcterms:description, but there is no name for the requirement as a whole, such as ReqIF.Requirement oder oslc_rm:requirement (or whatever term may have been chosen).
 
-SpecIF proposes an <a href="https://apps.specif.de/view.html#import=%22https://specif.de/v1.1/Ontology.specif%22" target="_blank">ontology</a> comprising names for resources and statements, as well as their properties and values. The conventions or definitions of Dublin Core, OSLC, IREB and other open standards are re-used whenever possible. The ontology itself is available in SpecIF-Format.
+SpecIF proposes an <a href="https://specif.de/apps/view.html#import=%22https://specif.de/v1.1/Ontology.specif%22" target="_blank">ontology</a> comprising names for resources and statements, as well as their properties and values. The conventions or definitions of Dublin Core, OSLC, IREB and other open standards are re-used whenever possible. The ontology itself is available in SpecIF-Format.
 
 ### Logical Statements
 
