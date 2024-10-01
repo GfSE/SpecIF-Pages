@@ -105,7 +105,7 @@ In the ↗ `Document` tab, the model is presented in a structure or outline chos
 
 You can open and close the structural levels on the left; the respective contents are shown on the right. In the main column, the properties designated as title, description and diagram are shown, plus any other properties in a narrow column on the right.
 
-With certain SVG model diagrams, e.g. with FMC- or BPMN-notation created by <a href="http://arcway.com" target="_blank">ARCWAY Cockpit</a>, the diagram elements are linked to the corresponding data elements such that their title and description are displayed when the mouse is hovered over them. The element is jumped to with a double click. Here is a small <a href="https://specif.de/apps/edit#view=doc;node=N-Diagram-aec0df7900010000017001eaf53e8876;import=https://specif.de/examples/09_Very-Simple-Model-FMC-with-Requirements.specifz" target="_blank">example</a>.
+With certain SVG model diagrams, e.g. with FMC- or BPMN-notation created by <a href="http://arcway.com" target="_blank">ARCWAY Cockpit</a>, the diagram elements are linked to the corresponding data elements such that their title and description are displayed when the mouse is hovered over them. The element is jumped to with a double click. Here is a small <a href="https://specif.de/apps/edit#view=doc;node=N-Diagram-aec0df7900010000017001eaf53e8876;import=https://specif.de/examples/v1.1/09_Very-Simple-Model-FMC-with-Requirements.specifz" target="_blank">example</a>.
 
 ### Edit a Model Element
 
@@ -192,17 +192,28 @@ that do not correspond to those in the worksheet _(Enumerations)_ are ignored du
 _Note: Excel® assists the user in entering values through a selection box when the values listed in the "(Enumerations)" 
 worksheet are selected for the column in question using the menu Data > Data Tools > Data Validation._
 
-This <a href="https://specif.de/examples/Example Telephone-Connection-Request (Requirements).xlsx" target="_blank">example</a> shows the described conventions. Here vocabulary terms have also been chosen for the enumerated attribute values. These are replaced in SpecIF Editor/Viewer by terms of the active national language, for example SpecIF:priorityHigh becomes high if German is selected in the browser. Of course, any terms can be used in the Excel worksheet, which will then be used directly in SpecIF Editor/Viewer regardless of the active browser language.
+This <a href="https://specif.de/examples/Example%20Telephone-Connection-Request%20(Requirements).xlsx" target="_blank">example</a> 
+shows the described conventions. Here vocabulary terms have also been chosen for the enumerated attribute values. 
+These are replaced in SpecIF Editor/Viewer by terms of the active national language, 
+for example _SpecIF:priorityHigh_ is displayed as _hoch_ if German is selected in the browser. 
+Of course, any terms can be used in the Excel worksheet, which will then be used directly in 
+SpecIF Editor/Viewer regardless of the active browser language (without a defined meaning).
 
 #### Relations
 
-The same goes for the names of relationships (SpecIF statements); for example _oslc_rm:refinedBy_ between two require¬ments or _oslc_rm:satisfies_ between a system component and a requirement. In order to successfully create relationships, the user-defined IDs (_dcterms:identifier_) or titles (_dcterms:title_) of the respective elements must be given between double or single quotation marks. Multiple resources can be specified separated by commas. See columns _IREB: refines_ and _oslc_rm:satisfiedBy_ in the following figure.
+The same goes for the names of relationships (SpecIF statements); for example _oslc_rm:refinedBy_ between two require¬ments 
+or _oslc_rm:satisfies_ between a system component and a requirement. In order to successfully create relationships, 
+the user-defined IDs (_dcterms:identifier_) or titles (_dcterms:title_) of the respective elements must be given 
+between double or single quotation marks. Multiple resources can be specified separated by commas. 
+See columns _IREB: refines_ and _oslc_rm:satisfiedBy_ in the following figure.
 
 ![Excel Column Headers](../assets/images/Manuals/04_Excel-column-headers_EN.png)
 
-By the way, the target of a relation like "DMS" in the figure does not have to be found in the same file. The relation is also established to a resource that originates from a different source, as long as the title resp. ID are identical.
+By the way, the target of a relation like "DMS" in the figure does not have to be found in the same file. 
+The relation is also established to a resource that originates from a different source, as long as the title resp. ID are identical.
 
-Suitable terms are defined in the <a href="https://specif.de/apps/view.html#import=https://specif.de/v1.1/Ontology.specif" target="_blank">SpecIF Ontology</a>, namely for <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-33z8X0jqbMdrd8PJDKyt2ke4yAB;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property names (propertyClasses)</a>, <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-GXf6xVO7XO5ciMypRwD5WDR6DHR;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property values (propertyValues)</a> and for <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-blM4lfyHM55YlbfBZ3NWj4SYwa3;import=https://specif.de/v1.1/Ontology.specif" target="_blank">statement names (statementClasses)</a>.
+Suitable terms are defined in the <a href="https://specif.de/apps/view.html#import=https://specif.de/v1.1/Ontology.specif" target="_blank">SpecIF Ontology</a>, 
+namely for <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-33z8X0jqbMdrd8PJDKyt2ke4yAB;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property names (propertyClasses)</a>, <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-GXf6xVO7XO5ciMypRwD5WDR6DHR;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property values (propertyValues)</a> and for <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-blM4lfyHM55YlbfBZ3NWj4SYwa3;import=https://specif.de/v1.1/Ontology.specif" target="_blank">statement names (statementClasses)</a>.
 
 ### Archi
 

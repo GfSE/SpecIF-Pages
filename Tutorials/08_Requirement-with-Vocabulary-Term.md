@@ -39,9 +39,13 @@ The previously discussed requirement has a property indicating it's  priority. H
 ```
 
 Some explanations:
-- The first value with "id":"V-Prio-0" is provided as a string in a single language and the second value with "id":"V-Prio-1" is provided as a list of JSON objects with *text* and *language* attributes (see tutorial [Requirement with Multiple Languages](./07_Requirement-with-Multiple-Languages.html)). 
+- The first value with "id":"V-Prio-0" is provided as a string in a single language and the second value with "id":"V-Prio-1" 
+is provided as a list of JSON objects with *text* and *language* attributes 
+(see tutorial [Requirement with Multiple Languages](./07_Requirement-with-Multiple-Languages.html)). 
 - The last value with "id":"V-Prio-4" is a vocabulary term consisting of a namespace in front of the colon ':' and the term thereafter.
-- Agreed-upon vocabulary terms help both collaborators to communicate more clearly and systems to match data fields automatically. SpecIF adopts terms and their definitions from other initiatives, for example from the [Dublin Core Metadata Initiative (DCMI)](http://dublincore.org/), the [Open Services for Lifecycle Collaboration (OSLC)](http://open-services.net/) and the [International Requirements Engineering Board (IREB)](http://ireb.org/).
+- Agreed-upon vocabulary terms help both collaborators to communicate more clearly and systems to match data fields automatically. 
+SpecIF adopts terms and their definitions from other initiatives, for example from the [Dublin Core Metadata Initiative (DCMI)](http://dublincore.org/), 
+the [Open Services for Lifecycle Collaboration (OSLC)](http://open-services.net/) and the [International Requirements Engineering Board (IREB)](http://ireb.org/).
 - In fact, not only the last enumerated value, but also the *title* is a vocabulary term. Have a look at the currently defined [SpecIF Vocabulary Terms](https://specif.de/apps/view#import=https://specif.de/examples/Vocabulary.specifz). By the way, the vocabulary itself is represented in a SpecIF data-set.
 
 Let us at last have a look at the full example:
