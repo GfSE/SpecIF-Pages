@@ -12,12 +12,14 @@ _Acknowledgement: Parts of the text have been translated with www.DeepL.com/Tran
 
 ## SpecIF Goals
 
-SpecIF stands for "Specification Integration Facility". Process and system descriptions from various sources are brought together in an open format and can be published independently of the authoring tools.
+SpecIF stands for "Specification Integration Facility". Process and system descriptions from various sources are 
+brought together in an open format and can be published independently of the authoring tools.
 
 The initiators assume that
 - there will always be different tools for the disciplines involved;
 - It is not sensible to oblige everyone involved to use a certain tool;
-- and that there is nevertheless a high level of interest in reading, searching through and checking the work results of all those involved in a common context.
+- and that there is nevertheless a high level of interest in reading, searching through and checking 
+the work results of all those involved in a common context.
 
 The following use cases are considered:
 <ol>
@@ -38,23 +40,33 @@ The following use cases are considered:
   </ul>
 </ol>
 
-For this purpose, SpecIF offers a cross-method and cross-manufacturer solution. Existing formats and vocabularies are used as far as possible. The motivation of the GfSE working group PLM4MBSE is summarized in a position paper <a href="http://gfse.de/Dokumente_Mitglieder/ag_ergebnisse/PLM4MBSE/PLM4MBSE_Position_paper_V_1_1.pdf" target="_blank">10 Theses about MBSE and PLM</a>.
+For this purpose, SpecIF offers a cross-method and cross-manufacturer solution. Existing formats and vocabularies are used as far as possible. 
+The motivation of the GfSE working group PLM4MBSE is summarized in a position paper 
+<a href="http://gfse.de/Dokumente_Mitglieder/ag_ergebnisse/PLM4MBSE/PLM4MBSE_Position_paper_V_1_1.pdf" target="_blank">10 Theses about MBSE and PLM</a>.
 
-Further information can be found on the <a href="https://specif.de" target="_blank">SpecIF homepage</a>, including motivation, examples with online demos and conference papers.
+Further information can be found on the <a href="https://specif.de" target="_blank">SpecIF homepage</a>, 
+including motivation, examples with online demos and conference papers.
 
 ## Setup
 
-SpecIF data can be read with a web browser (preferably Firefox, Chrome or Edge) using the SpecIF viewer or SpecIF editor. In contrast to a document, models in SpecIF format can be easily checked because they do not only contain the model elements, but also their semantic relationships.
+SpecIF data can be read with a web browser (preferably Firefox, Chrome or Edge) using the SpecIF viewer or SpecIF editor. 
+In contrast to a document, models in SpecIF format can be easily checked because they do not only contain the model elements, 
+but also their semantic relationships.
 
 ### Install the SpecIF Viewer/Editor
 
 #### Install Viewer/Editor on a Web-Server
 
-Download the last released program version “specIF-apps.vX.Y.zip” from <a href="https://github.com/GfSE/SpecIF-Viewer/releases" target="_blank">GfSE/SpecIF-Viewer/releases</a>, to be found in the collapsible “assets” section, and unzip the file in the file system of the web server of your choice. Enter "http://domain.tld/path/view.html" or "http://domain.tld/path/edit.html" in the address line of your web browser to start the respective app. Of course, "domain.tld/path" has to be replaced according to your installation.
+Download the last released program version “specIF-apps.vX.Y.zip” from <a href="https://github.com/GfSE/SpecIF-Viewer/releases" target="_blank">GfSE/SpecIF-Viewer/releases</a>, 
+to be found in the collapsible “assets” section, and unzip the file in the file system of the web server of your choice. 
+Enter "http://domain.tld/path/view.html" or "http://domain.tld/path/edit.html" in the address line of your web browser to start the respective app. 
+Of course, "domain.tld/path" has to be replaced according to your installation.
 
 #### Use the Installed SpecIF-Viewer/Editor
 
-If the guidelines of your network permit, you can use the <a href="https://apps.specif.de/view.html" target="_blank">SpecIF Viewer</a> or the <a href="https://apps.specif.de/edit.html" target="_blank">SpecIF Model Integrator and Editor</a>, provided for demonstration purposes. You always benefit from the latest release.
+If the guidelines of your network permit, you can use the <a href="https://apps.specif.de/view.html" target="_blank">SpecIF Viewer</a> 
+or the <a href="https://apps.specif.de/edit.html" target="_blank">SpecIF Model Integrator and Editor</a>, provided for demonstration purposes. 
+You always benefit from the latest release.
 
 ### Prepare the Model-data
 
@@ -164,6 +176,24 @@ Now for the contents of each worksheet. The property names (SpecIF property titl
 
 By the way, formatting in text fields using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list.
 
+#### Enumerated Values
+
+<img class="my-align-right size-60" src="../assets/images/Manuals/05_Excel_enumerations_EN.png" alt="Excel Enumerations"/>
+
+To define an attribute with enumerated values, a worksheet with name _(Enumerations)_ including the brackets is created. 
+Here all values of a certain attribute are specified column by column. 
+Again, the first line specifies the attribute name and the values below that are taken over up to the next blank line. 
+In worksheets with user data, these values are provided for attributes with the same name; in the example given to the left, 
+these are the attributes named _IREB:RequirementType_ and _SpecIF:Priority_. 
+While Excel® also allows the specification of deviating values, this is not possible in case of SpecIF, therefore all values 
+that do not correspond to those in the worksheet _(Enumerations)_ are ignored during import.
+
+{: .highlight }
+_Note: Excel® assists the user in entering values through a selection box when the values listed in the "(Enumerations)" 
+worksheet are selected for the column in question using the menu Data > Data Tools > Data Validation._
+
+This <a href="https://specif.de/examples/Example Telephone-Connection-Request (Requirements).xlsx" target="_blank">example</a> shows the described conventions. Here vocabulary terms have also been chosen for the enumerated attribute values. These are replaced in SpecIF Editor/Viewer by terms of the active national language, for example SpecIF:priorityHigh becomes high if German is selected in the browser. Of course, any terms can be used in the Excel worksheet, which will then be used directly in SpecIF Editor/Viewer regardless of the active browser language.
+
 #### Relations
 
 The same goes for the names of relationships (SpecIF statements); for example _oslc_rm:refinedBy_ between two require¬ments or _oslc_rm:satisfies_ between a system component and a requirement. In order to successfully create relationships, the user-defined IDs (_dcterms:identifier_) or titles (_dcterms:title_) of the respective elements must be given between double or single quotation marks. Multiple resources can be specified separated by commas. See columns _IREB: refines_ and _oslc_rm:satisfiedBy_ in the following figure.
@@ -173,17 +203,6 @@ The same goes for the names of relationships (SpecIF statements); for example _o
 By the way, the target of a relation like "DMS" in the figure does not have to be found in the same file. The relation is also established to a resource that originates from a different source, as long as the title resp. ID are identical.
 
 Suitable terms are defined in the <a href="https://apps.specif.de/view.html#import=https://specif.de/v1.1/Ontology.specif" target="_blank">SpecIF Ontology</a>, namely for <a href="https://apps.specif.de/view.html#view=doc;project=P-SpecIF-Ontology;node=N-33z8X0jqbMdrd8PJDKyt2ke4yAB;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property names (propertyClasses)</a>, <a href="https://apps.specif.de/view.html#view=doc;project=P-SpecIF-Ontology;node=N-GXf6xVO7XO5ciMypRwD5WDR6DHR;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property values (propertyValues)</a> and for <a href="https://apps.specif.de/view.html#view=doc;project=P-SpecIF-Ontology;node=N-blM4lfyHM55YlbfBZ3NWj4SYwa3;import=https://specif.de/v1.1/Ontology.specif" target="_blank">statement names (statementClasses)</a>.
-
-#### Enumerated Values
-
-<img class="my-align-right size-60" src="../assets/images/Manuals/05_Excel_enumerations_EN.png" alt="Excel Enumerations"/>
-
-To define an attribute with enumerated values, a worksheet with name _(Enumerations)_ including the brackets is created. Here all values of a certain attribute are specified column by column. Again, the first line specifies the attribute name and the values below that are taken over up to the next blank line. In worksheets with user data, these values are provided for attributes with the same name; in the example given to the left, these are the attributes named _IREB:RequirementType_ and _SpecIF:Priority_. While Excel® also allows the specification of deviating values, this is not possible in case of SpecIF, therefore all values that do not correspond to those in the worksheet _(Enumerations)_ are ignored during import.
-
-{: .highlight }
-_Note: Excel® assists the user in entering values through a selection box when the values listed in the "(Enumerations)" worksheet are selected for the column in question using the menu Data > Data Tools > Data Validation._
-
-This <a href="https://specif.de/examples/Example Telephone-Connection-Request (Requirements).xlsx" target="_blank">example</a> shows the described conventions. Here vocabulary terms have also been chosen for the enumerated attribute values. These are replaced in SpecIF Editor/Viewer by terms of the active national language, for example SpecIF:priorityHigh becomes high if German is selected in the browser. Of course, any terms can be used in the Excel worksheet, which will then be used directly in SpecIF Editor/Viewer regardless of the active browser language.
 
 ### Archi
 
