@@ -2,7 +2,7 @@
 title: "Domain Classes"
 layout: default
 parent: "Documentation"
-nav_order: 41
+nav_order: 34
 ---
 
 # SpecIF Domain Classes

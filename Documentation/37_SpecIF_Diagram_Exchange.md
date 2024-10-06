@@ -2,7 +2,7 @@
 title: "Diagram Exchange"
 layout: default
 parent: "Documentation"
-nav_order: 33
+nav_order: 37
 ---
 
 # SpecIF Diagram Exchange using SVG

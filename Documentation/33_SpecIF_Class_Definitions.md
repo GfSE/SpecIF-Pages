@@ -2,7 +2,7 @@
 title: "Class Definitions"
 layout: default
 parent: "Documentation"
-nav_order: 40
+nav_order: 33
 ---
 
 # SpecIF Class Definitions

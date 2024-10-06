@@ -263,7 +263,7 @@ Both SpecIF as a format with schema and consistency checker as well as the SpecI
 
 ### No Guarantee and No Liability
 
-SpecIF and the SpecIF viewer are provided "as-is" and without guaranteed characteristics. Use is always at your own risk. Any liability and guarantee are excluded. The installation at <a href="http://apps.specif.de" target="_blank">http://apps.specif.de</a> and the code maintained at <a href="https://github.com/GfSE" target="_blank">https://github.com/GfSE</a> is a reference implementation and not designed for high loads and high availability.
+SpecIF and the SpecIF viewer are provided "as-is" and without guaranteed characteristics. Use is always at your own risk. Any liability and guarantee are excluded. The installation at <a href="http://specif.de/apps/" target="_blank">http://specif.de/apps/</a> and the code maintained at <a href="https://github.com/GfSE" target="_blank">https://github.com/GfSE</a> is a reference implementation and not designed for high loads and high availability.
 
 
 <!-- link template <a href="" target="_blank"></a> -->
