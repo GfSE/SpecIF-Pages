@@ -50,8 +50,8 @@ Typically SVG 1.1 builds the standard namespace, so each XML-tag without an expl
 ## Embedding SpecIF-SVG data into resource elements
 
 A diagram is typically embedded in a resource element representing a diagram.
-For this purpose, SpecIF defines the resource class *SpecIF:Diagram*. 
-A resource of the class SpecIF:Diagram has a property with the property class title named *SpecIF:Diagram*.
+For this purpose, SpecIF defines the resource class *SpecIF:View*. 
+A resource of the class SpecIF:View has a property with the property class title named *SpecIF:Diagram*.
 The property value is able to store formatted XHTML-data. 
 
 There are two possibilities to include a diagram in a SpecIF data set:

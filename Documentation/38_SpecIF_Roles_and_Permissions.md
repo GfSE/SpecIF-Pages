@@ -46,24 +46,25 @@ statementClass (also resourceClass) makes use of it. Thus, multiple propertyClas
 are needed depending on the statementClass (or resourceClass).
 - A role's permission pointing to a statementClass defines the access rights for all instances of that class. The same access rights apply
 to all of the instance's properties, unless overridden by a permission pointing at a propertyClass.
-- A role's permission pointing to a project applies to the whole project, unless overridden at a lower level.
-- For all permissions pointing at classes, the default is 'false'. If undefined at all levels, the permission is negative.
+- A role's permission pointing to a project applies to the whole project, unless overridden at a lower level. Per default it is _false_.
+- Permissions pointing at classes are _false_ per default. 
+- If undefined at all levels, the permission is generally _false_. Obviously this doesn't make sense in a practice.
 
 ![SpecIF Project Metamodel](../assets/images/Documentation/StatementPermissions-M1.png)
 
 Next, let us have a look at the resources: 
 - At the top, the assignment of permissions to projectRoles and users is the same as discussed before.
-- The assignment of permissions to resource instances with their properties works similarly to the statements.
-- However, there is another permissionTarget, namely a node in a hierarchy pointing to a resource.
-- In case of resources, permissions must be granted not only by class, but also by node.
-- A node has the same permission as the resource pointed at: If you can delete a resource, you can alse delete the node.
+- The assignment of permissions to resource instances with their properties _by class_ works similarly to the statements.
+- However, there is another permissionTarget, namely a node in a hierarchy pointing to a resource. 
+Thus, in case of resources, permissions can be granted not only _by class_, but also _by node_.
+- A node has the same permission as the resource pointed at: If you can delete a resource, you can also delete the node.
 - By denying a permission to read for one branch in a hierachy and granting it to another, 
 the user may see the recources only in that branch 
 ... provided that the resource is allowed to be read by its classes. So it is possible to limit the access rights to
 a resource depending on the position of its referencing node in the hierarchy.
-- To simplify the permission management, the default permission by hierarchy tree is 'true', so a permission must be
+- To simplify the permission management, the default permission _by node_ is 'true', so a permission must be
 explitly denied.
-- The permissions by hierarchy are also inherited from higher levels: A denial to update applied to a node also apply to all
+- The permissions _by node_ are also inherited from higher levels: A denial to update applied to a node also apply to all
 subordinated child nodes, unless overridden.
 
 ![SpecIF Project Metamodel](../assets/images/Documentation/ResourcePermissions-M1.png)
@@ -115,7 +116,7 @@ The particular property can be created, read and updated, but not be deleted (to
 | a node at hierarchy root | undefined | undefined | undefined | undefined |
 | a node | undefined | undefined | undefined | undefined |
 
-Effect: The resources of that class and referenced in that hierarchy branch can be seen by the user. 
+Effect: The resources of that class and referenced in any hierarchy branch can be seen by the user. 
 
 ---
 
@@ -140,7 +141,7 @@ because there is no permission by class.
 | a node at hierarchy root | undefined | undefined | undefined | undefined |
 | a node | undefined | undefined | undefined | undefined |
 
-Effect: The resources of that class and referenced in that hierarchy branch cannot be accessed by the user,
+Effect: The resources of that class and referenced in any hierarchy branch cannot be accessed by the user,
 because there is again no permission by class.
 
 ---
@@ -153,7 +154,7 @@ because there is again no permission by class.
 | a node at hierarchy root | undefined | undefined | undefined | undefined |
 | a node | undefined | undefined | undefined | undefined |
 
-Effect: The resource of that class and referenced by that node can be seen by the user including their properties. 
+Effect: The resource of that class and referenced by any node can be seen by the user including their properties. 
 The particular property can be created, read, updated and deleted.
 
 ---
@@ -167,13 +168,13 @@ The particular property can be created, read, updated and deleted.
 | a node | undefined | undefined | undefined | undefined |
 
 Effect: By class, all resource instances can be created, read, updated and deleted.
-However all resources referenced by nodes in that hierarchy can only be seen by the particular user. 
+However all resources referenced by nodes in that hierarchy can only be seen by the user. 
 
 ---
 
 Some More Cases:
-- Permissions per resource instance are defined both by class and by hierarchy: Access is allowed, if it is 
-explicitly granted by class *and* not explicitly prohibited by hierarchy.
+- Permissions per resource instance are defined both _by class_ and _by node_: Access is allowed, if it is 
+explicitly granted _by class_ *and* not explicitly prohibited _by node_.
 - If a permission is granted to a resourceClass, it is extended to all of its properties, unless overridden.
 - No read permission is given to the instances of a statementClass, but update permission is given to one of its properties. 
 Then, the latter is useless, because the statements are never visible and consequently none of the properties 
