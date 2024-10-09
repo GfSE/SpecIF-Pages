@@ -55,6 +55,7 @@ Domain classes are generated from the SpecIF Ontology. Here, the classes of rele
 <table><tr><th>title</th><th>id</th><th>revision</th><th>description</th></tr>
 <tr><td>SpecIF:Heading</td><td>RC-Folder</td><td>1.1</td><td><p>Folders with title and text for chapters or descriptive paragraphs.</p><p>Property classes:<br/><ul><li>dcterms:title [PC-Name 1.1]</li><li>dcterms:description [PC-Description 1.1]</li><li>dcterms:type [PC-Type 1.1]</li></ul></p></td></tr>
 <tr><td>SpecIF:Paragraph</td><td>RC-Paragraph</td><td>1.1</td><td><p>Information with text for descriptive paragraphs.</p><p>Property classes:<br/><ul><li>dcterms:title [PC-Name 1.1]</li><li>dcterms:description [PC-Description 1.1]</li></ul></p></td></tr>
+<tr><td>SpecIF:View</td><td>RC-View</td><td>1.1</td><td><p>A model diagram.</p><p>Property classes:<br/><ul><li>dcterms:title [PC-Name 1.1]</li><li>dcterms:description [PC-Description 1.1]</li><li>SpecIF:Diagram</li><li>dcterms:type</li></ul></p></td></tr>
 <tr><td>SpecIF:Hierarchy</td><td>RC-Hierarchy</td><td>1.1</td><td><p>Root node of a hierarchically organized specification (outline).</p><p>Property classes:<br/><ul><li>dcterms:title [PC-Name 1.1]</li><li>dcterms:description [PC-Description 1.1]</li></ul></p></td></tr>
 <tr><td>SpecIF:Comment</td><td>RC-Comment</td><td>1.1</td><td><p>Comment referring to a model element ('resource' or 'statement' in general).</p><p>Property classes:<br/><ul><li>dcterms:title [PC-Name 1.1]</li><li>dcterms:description [PC-Description 1.1]</li></ul></p></td></tr>
 </table>

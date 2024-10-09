@@ -45,9 +45,9 @@ Again, let's start with the new elements of a SpecIF data-set.
       "changedAt": "2018-05-10T11:54:00+01:00"
     }],
     "resourceClasses": [{
-      "id": "RC-Diagram",
-      "title": "SpecIF:Diagram",
-      "description": "A 'Diagram' is a graphical model view with a specific communication purpose, e.g. a business process or system composition.",
+      "id": "RC-View",
+      "title": "SpecIF:View",
+      "description": "A 'View' is a graphical model view with a specific communication purpose, e.g. a business process or system composition.",
       "instantiation": ["user"],
       "icon": "&#9635;",
       "propertyClasses": ["PC-Name","PC-Description","PC-Diagram","PC-Type"],
@@ -94,9 +94,9 @@ Next, we look at the *statementClasses*:
     "statementClasses": [{
       "id": "SC-shows",
       "title": "SpecIF:shows",
-      "description": "'Diagram' shows 'Model-Element'",
+      "description": "'View' shows 'Model-Element'",
       "instantiation": ["auto"],
-      "subjectClasses": ["RC-Diagram"],
+      "subjectClasses": ["RC-View"],
       "objectClasses": ["RC-Actor", "RC-State", "RC-Event"],
       "changedAt": "2018-05-10T11:54:00+01:00"
     }, {
@@ -120,7 +120,7 @@ Next, we look at the *statementClasses*:
 ```
 
 - The first statementClass with \"id\":\"SC-shows\" will be used to relate the diagram to all depicted model-elements. In a more complex model it allows to easily find out on which diagrams a given model-element appears. 
-- In such a statement, only an instance of the class with \"id\":\"RC-Diagram" can serve as a subject (source) and only an instance of any fundamental model-element type can serve as an object (target).
+- In such a statement, only an instance of the class with \"id\":\"RC-View" can serve as a subject (source) and only an instance of any fundamental model-element type can serve as an object (target).
 - The last two statementClasses will be used for the 'writes' and 'reads' predicates (relationships) discussed in the beginning. We see that in both cases only an instance of the class with \"id\":\"RC-Actor" can serve as a subject and only an instance of the class with \"id\":\"RC-State" can serve as an object.
 - The attribute *subjectClasses* can be omitted as discussed in Tutorial 2: [Related-Terms](./02_Related-Terms.html), then any resource can be used as a subject. Similarly for *objectClasses*.
 
@@ -170,9 +170,9 @@ Let us at last have a look at the full example, now:
       "changedAt": "2018-05-10T11:54:00+01:00"
     }],
     "resourceClasses": [{
-      "id": "RC-Diagram",
-      "title": "SpecIF:Diagram",
-      "description": "A 'Diagram' is a graphical model view with a specific communication purpose, e.g. a business process or system composition.",
+      "id": "RC-View",
+      "title": "SpecIF:View",
+      "description": "A 'View' is a graphical model view with a specific communication purpose, e.g. a business process or system composition.",
       "instantiation": ["user"],
       "icon": "&#9635;",
       "propertyClasses": ["PC-Name","PC-Description","PC-Diagram","PC-Type"],
@@ -205,9 +205,9 @@ Let us at last have a look at the full example, now:
     "statementClasses": [{
       "id": "SC-shows",
       "title": "SpecIF:shows",
-      "description": "'Diagram' shows 'Model-Element'",
+      "description": "'View' shows 'Model-Element'",
       "instantiation": ["auto"],
-      "subjectClasses": ["RC-Diagram"],
+      "subjectClasses": ["RC-View"],
       "objectClasses": ["RC-Actor", "RC-State", "RC-Event"],
       "changedAt": "2018-05-10T11:54:00+01:00"
     }, {
@@ -230,7 +230,7 @@ Let us at last have a look at the full example, now:
     "resources": [{
       "id": "Diagram-aec0df7900010000017001eaf53e8876",
       "title": "IT-Integration: FiCo-Application and FiCo-Data",
-      "class": "RC-Diagram",
+      "class": "RC-View",
       "properties": [{
         "class": "PC-Name",
         "value": "IT-Integration: FiCo-Application and FiCo-Data"

@@ -103,9 +103,9 @@ As we have discussed all concepts before, let's right away discuss the full exam
       "propertyClasses": ["PC-Name","PC-Description"],
       "changedAt": "2016-05-26T08:59:00+02:00"
     },{
-      "id": "RC-Diagram",
-      "title": "SpecIF:Diagram",
-      "description": "A 'Diagram' is a graphical model view with a specific communication purpose, e.g. a business process or system composition.",
+      "id": "RC-View",
+      "title": "SpecIF:View",
+      "description": "A 'View' is a graphical model view with a specific communication purpose, e.g. a business process or system composition.",
       "instantiation": ["user"],
       "icon": "&#9635;",
       "propertyClasses": ["PC-Name","PC-Description","PC-Diagram","PC-Type"],
@@ -145,9 +145,9 @@ As we have discussed all concepts before, let's right away discuss the full exam
     "statementClasses": [{
       "id": "SC-shows",
       "title": "SpecIF:shows",
-      "description": "'Diagram' shows 'Model-Element'",
+      "description": "'View' shows 'Model-Element'",
       "instantiation": ["auto"],
-      "subjectClasses": ["RC-Diagram"],
+      "subjectClasses": ["RC-View"],
       "objectClasses": ["RC-Actor", "RC-State", "RC-Event"],
       "changedAt": "2018-05-10T11:54:00+01:00"
     }, {
@@ -197,7 +197,7 @@ As we have discussed all concepts before, let's right away discuss the full exam
     }, {
       "id": "Diagram-aec0df7900010000017001eaf53e8876",
       "title": "IT-Integration: FiCo-Application and FiCo-Data",
-      "class": "RC-Diagram",
+      "class": "RC-View",
       "properties": [{
         "class": "PC-Name",
         "value": "IT-Integration: FiCo-Application and FiCo-Data"

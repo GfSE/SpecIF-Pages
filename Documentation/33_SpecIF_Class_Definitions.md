@@ -33,7 +33,7 @@ For SpecIF 1.1 three domains are selected to be part of the first release:
 - 03 - Model Integration.
 
 The other domains are still under discussion and not yet part of an official SpecIF release. 
-It is planned to release them with a future release.
+It is planned to release them in the future.
 
 ### Domain types
 The following list shows the currently defined domains and their IDs:
