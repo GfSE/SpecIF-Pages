@@ -119,7 +119,7 @@ Next, we look at the *statementClasses*:
 }
 ```
 
-- The first statementClass with \"id\":\"SC-shows\" will be used to relate the diagram to all depicted model-elements. In a more complex model it allows to easily find out on which diagrams a given model-element appears. 
+- The first statementClass with \"id\":\"SC-shows\" will be used to relate the model view to all depicted model-elements. In a more complex model it allows to easily find out on which diagrams a given model-element appears. 
 - In such a statement, only an instance of the class with \"id\":\"RC-View" can serve as a subject (source) and only an instance of any fundamental model-element type can serve as an object (target).
 - The last two statementClasses will be used for the 'writes' and 'reads' predicates (relationships) discussed in the beginning. We see that in both cases only an instance of the class with \"id\":\"RC-Actor" can serve as a subject and only an instance of the class with \"id\":\"RC-State" can serve as an object.
 - The attribute *subjectClasses* can be omitted as discussed in Tutorial 2: [Related-Terms](./02_Related-Terms.html), then any resource can be used as a subject. Similarly for *objectClasses*.
