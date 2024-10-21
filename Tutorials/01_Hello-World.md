@@ -49,3 +49,4 @@ A SpecIF data-set in JSON format has a file extension \'.specif\'. It may be con
 You may view the example using the <a href="https://specif.de/apps/view.html#import=https://specif.de/examples/v1.1/01_Hello-World.specif" target="_blank">SpecIF Viewer</a>, or download the SpecIF data:
 - v1.0: [Hello World](https://specif.de/examples/v1.0/01_Hello-World.specif)
 - v1.1: [Hello World](https://specif.de/examples/v1.1/01_Hello-World.specif)
+- v1.2: [Hello World](https://specif.de/examples/v1.2/01_Hello-World.specif)

@@ -14,16 +14,16 @@ Thus very fundamentally, SpecIF is to represent entities, objects or nodes (call
 ```json
 {
     "statementClasses": [{
-        "id": "SC-isSpecializationOf",
-        "title": "is a specialization of",
-        "description": "Signifies that a term is a specialization of another, such as 'Passenger Car' and 'Vehicle'.",
+        "id": "SC-UmlGeneralization",
+        "title": "generalizes",
+        "description": "Signifies that a term is a generalization of another, such as 'Vehicle' and 'Passenger Car'.",
         "changedAt": "2018-03-21T18:06:20+01:00"
     }],
     "statements": [{
         "id": "S-X0lXi7lJP9DQs",
-        "class": "SC-isSpecializationOf",
-        "subject": "R-1234",
-        "object": "R-9876",
+        "class": "SC-UmlGeneralization",
+        "subject": "R-9876",
+        "object": "R-1234",
         "changedAt": "2020-03-01T07:59:00+01:00"
     }]
 }
@@ -49,9 +49,9 @@ Let us have a look at the full example, now:
         "changedAt": "2020-03-01T07:59:00+01:00"
     }],
     "statementClasses": [{
-        "id": "SC-isSpecializationOf",
-        "title": "is a specialization of",
-        "description": "Signifies that a term is a specialization of another, such as 'Passenger Car' and 'Vehicle'.",
+        "id": "SC-UmlGeneralization",
+        "title": "generalizes",
+        "description": "Signifies that a term is a generalization of another, such as 'Vehicle' and 'Passenger Car'.",
         "subjectClasses": ["RC-ResourceTerm"],
         "objectClasses": ["RC-ResourceTerm"],
         "changedAt": "2018-03-21T18:06:20+01:00"
@@ -71,9 +71,9 @@ Let us have a look at the full example, now:
     }],
     "statements": [{
         "id": "S-X0lXi7lJP9DQs",
-        "class": "SC-isSpecializationOf",
-        "subject": "R-1234",
-        "object": "R-9876",
+        "class": "SC-UmlGeneralization",
+        "subject": "R-9876",
+        "object": "R-1234",
         "changedAt": "2020-03-01T07:59:00+01:00"
     }],
     "hierarchies": [{
@@ -89,7 +89,7 @@ Let us have a look at the full example, now:
 ```
 
 Some more explanations:
-- The statement's *subject* may either be a resource *id* or statement *id*. The same applies to a statement's *object*, so that the example's statement expresses *Lorry is a specialization of Vehicle*.
+- The statement's *subject* may either be a resource *id* or statement *id*. The same applies to a statement's *object*, so that the example's statement expresses *Vehicle is a generalization of Lorry*.
 - A *statementClass* may have an attribute *subjectClasses*. If missing, all resources or statements are eligible as a statement's *subject*. If present, only resources or statements of the specified classes may be used. An empty list is useless und thus isn't allowed by the schema.
 - The same applies to a statement's *object*: It must be an instance of any of the classes listed in the respective statementClass' *objectClasses* ... or may be an instance of any *resourceClass* or *statementClass*, if *objectClasses* is missing.
 - In the example, the statementCLass with \"id\":\"SC-isSpecializationOf\" determines that all it's instance statements may only have subjects and objects with a resourceClass \"id\":\"RC-ResourceTerm\". Have a look at the only instance with \"id\":\"S-X0lXi7lJP9DQs\": As required, it's subject and object are of type \"id\":\"RC-ResourceTerm\".
@@ -98,3 +98,4 @@ Some more explanations:
 You may view the example using the <a href="https://specif.de/apps/view.html#import=https://specif.de/examples/v1.1/02_Related-Terms.specif" target="_blank">SpecIF Viewer</a>, or download the SpecIF data:
 - v1.0: [Related Terms](https://specif.de/examples/v1.0/02_Related-Terms.specif)
 - v1.1: [Related Terms](https://specif.de/examples/v1.1/02_Related-Terms.specif)
+- v1.2: [Related Terms](https://specif.de/examples/v1.2/02_Related-Terms.specif)

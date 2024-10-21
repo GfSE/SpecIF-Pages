@@ -1,0 +1,94 @@
+{
+  "@Context": "http://purl.org/dc/terms/",
+  "id": "P-Hello-World",
+  "$schema": "https://specif.de/v1.2/schema.json",
+  "title": [
+    {
+      "text": "Project 'Hello World'"
+    }
+  ],
+  "generator": "SpecIF Modellintegrator und Editor",
+  "generatorVersion": "1.2.s.16",
+  "createdAt": "2024-10-20T20:39:58.092Z",
+  "rights": {
+    "title": "Creative Commons 4.0 CC BY-SA",
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  "dataTypes": [
+    {
+      "id": "DT-ShortString",
+      "changedAt": "2016-05-26T08:59:00+02:00",
+      "title": "String[256]",
+      "description": [
+        {
+          "text": "String with max. length 256"
+        }
+      ],
+      "type": "xs:string",
+      "maxLength": 256
+    }
+  ],
+  "propertyClasses": [
+    {
+      "id": "PC-Name",
+      "changedAt": "2020-03-26T22:59:00+02:00",
+      "title": "dcterms:title",
+      "description": [
+        {
+          "text": "A name given to the resource."
+        }
+      ],
+      "dataType": {
+        "id": "DT-ShortString"
+      },
+      "format": "plain"
+    }
+  ],
+  "resourceClasses": [
+    {
+      "id": "RC-94e50023b1a8015d57",
+      "changedAt": "2020-03-01T07:59:00+01:00",
+      "title": "SpecIF:Paragraph",
+      "propertyClasses": [
+        {
+          "id": "PC-Name"
+        }
+      ]
+    }
+  ],
+  "statementClasses": [],
+  "resources": [
+    {
+      "id": "R-d5b994e50023",
+      "changedAt": "2020-03-01T07:59:00+01:00",
+      "class": {
+        "id": "RC-94e50023b1a8015d57"
+      },
+      "properties": [
+        {
+          "class": {
+            "id": "PC-Name"
+          },
+          "values": [
+            [
+              {
+                "text": "Hello World!"
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "statements": [],
+  "files": [],
+  "nodes": [
+    {
+      "id": "N-78cf736b254",
+      "resource": {
+        "id": "R-d5b994e50023"
+      },
+      "changedAt": "2020-03-01T07:59:00+01:00"
+    }
+  ]
+}

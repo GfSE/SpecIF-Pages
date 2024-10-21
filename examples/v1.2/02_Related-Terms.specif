@@ -1,0 +1,209 @@
+{
+  "@Context": "http://purl.org/dc/terms/",
+  "id": "P-Related-Terms",
+  "$schema": "https://specif.de/v1.2/schema.json",
+  "title": [
+    {
+      "text": "Project 'Related Terms'"
+    }
+  ],
+  "generator": "SpecIF Modellintegrator und Editor",
+  "generatorVersion": "1.2.s.16",
+  "createdAt": "2024-10-20T21:11:29.519Z",
+  "rights": {
+    "title": "Creative Commons 4.0 CC BY-SA",
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  "dataTypes": [
+    {
+      "id": "DT-ShortString",
+      "changedAt": "2016-05-26T08:59:00+02:00",
+      "title": "String[256]",
+      "description": [
+        {
+          "text": "String with max. length 256"
+        }
+      ],
+      "type": "xs:string",
+      "maxLength": 256
+    },
+    {
+      "id": "DT-Text",
+      "changedAt": "2021-02-14T08:59:00+02:00",
+      "title": "Plain or formatted Text",
+      "description": [
+        {
+          "text": "A text string, plain, or formatted with XHTML or markdown"
+        }
+      ],
+      "type": "xs:string"
+    }
+  ],
+  "propertyClasses": [
+    {
+      "id": "PC-Name",
+      "changedAt": "2020-03-26T22:59:00+02:00",
+      "title": "dcterms:title",
+      "description": [
+        {
+          "text": "A name given to the resource."
+        }
+      ],
+      "dataType": {
+        "id": "DT-ShortString"
+      },
+      "format": "plain"
+    },
+    {
+      "id": "PC-Description",
+      "changedAt": "2021-02-23T08:59:00+02:00",
+      "title": "dcterms:description",
+      "description": [
+        {
+          "text": "An account of the resource (source: http://dublincore.org/documents/dcmi-terms/). Descriptive text represented in plain or rich text using XHTML or Markdown. SHOULD include only content that is valid and suitable inside an XHTML &lt;div&gt; element (source: http://open-services.net/)."
+        }
+      ],
+      "dataType": {
+        "id": "DT-Text"
+      },
+      "format": "xhtml"
+    }
+  ],
+  "resourceClasses": [
+    {
+      "id": "RC-ResourceTerm",
+      "changedAt": "2020-03-01T07:59:00+01:00",
+      "title": "SpecIF:TermResourceClass",
+      "propertyClasses": [
+        {
+          "id": "PC-Name"
+        },
+        {
+          "id": "PC-Description"
+        }
+      ]
+    }
+  ],
+  "statementClasses": [
+    {
+      "id": "SC-UmlGeneralization",
+      "changedAt": "2018-03-21T18:06:20+01:00",
+      "title": "uml:Generalization",
+      "description": [
+        {
+          "text": "Signifies that a term is a generalization of another, such as 'Vehicle' and 'Passenger Car'."
+        }
+      ],
+      "subjectClasses": [
+        {
+          "id": "RC-ResourceTerm"
+        }
+      ],
+      "objectClasses": [
+        {
+          "id": "RC-ResourceTerm"
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "id": "R-1234",
+      "changedAt": "2020-03-01T07:59:00+01:00",
+      "class": {
+        "id": "RC-ResourceTerm"
+      },
+      "properties": [
+        {
+          "class": {
+            "id": "PC-Name"
+          },
+          "values": [
+            [
+              {
+                "text": "Lorry"
+              }
+            ]
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-Description"
+          },
+          "values": [
+            [
+              {
+                "text": "<p>Any of various conveyances running on rails, as for transporting material in a mine or factory. <i>(Source: dictionary.com)</i></p>"
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R-9876",
+      "changedAt": "2020-03-01T07:59:00+01:00",
+      "class": {
+        "id": "RC-ResourceTerm"
+      },
+      "properties": [
+        {
+          "class": {
+            "id": "PC-Name"
+          },
+          "values": [
+            [
+              {
+                "text": "Vehicle"
+              }
+            ]
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-Description"
+          },
+          "values": [
+            [
+              {
+                "text": "<p>Any means in or by which someone travels or something is carried or conveyed; a means of conveyance or transport. <i>(Source: <a href=\"https://dictionary.com\">dictionary.com</a>)</i></p>"
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "statements": [
+    {
+      "id": "S-X0lXi7lJP9DQsg4Jj4qbLuQYaGz",
+      "changedAt": "2020-03-01T07:59:00+01:00",
+      "class": {
+        "id": "SC-UmlGeneralization"
+      },
+      "subject": {
+        "id": "R-9876"
+      },
+      "object": {
+        "id": "R-1234"
+      }
+    }
+  ],
+  "files": [],
+  "nodes": [
+    {
+      "id": "N-78cf736b276",
+      "resource": {
+        "id": "R-1234"
+      },
+      "changedAt": "2020-03-01T07:59:00+01:00"
+    },
+    {
+      "id": "N-78cf736b277",
+      "resource": {
+        "id": "R-9876"
+      },
+      "changedAt": "2020-03-01T07:59:00+01:00"
+    }
+  ]
+}

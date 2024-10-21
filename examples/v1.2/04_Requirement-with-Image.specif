@@ -1,0 +1,147 @@
+{
+  "@Context": "http://purl.org/dc/terms/",
+  "id": "P-Requirement-with-Image",
+  "$schema": "https://specif.de/v1.2/schema.json",
+  "title": [
+    {
+      "text": "Project 'Requirement with Image'"
+    }
+  ],
+  "generator": "SpecIF Modellintegrator und Editor",
+  "generatorVersion": "1.2.s.16",
+  "createdAt": "2024-10-20T20:58:35.797Z",
+  "rights": {
+    "title": "Creative Commons 4.0 CC BY-SA",
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  "dataTypes": [
+    {
+      "id": "DT-ShortString",
+      "changedAt": "2016-05-26T08:59:00+02:00",
+      "title": "String[256]",
+      "description": [
+        {
+          "text": "String with max. length 256"
+        }
+      ],
+      "type": "xs:string",
+      "maxLength": 256
+    },
+    {
+      "id": "DT-Text",
+      "changedAt": "2021-02-14T08:59:00+02:00",
+      "title": "Plain or formatted Text",
+      "description": [
+        {
+          "text": "A text string, plain, or formatted with XHTML or markdown"
+        }
+      ],
+      "type": "xs:string"
+    }
+  ],
+  "propertyClasses": [
+    {
+      "id": "PC-Name",
+      "changedAt": "2020-03-26T22:59:00+02:00",
+      "title": "dcterms:title",
+      "description": [
+        {
+          "text": "A name given to the resource."
+        }
+      ],
+      "dataType": {
+        "id": "DT-ShortString"
+      },
+      "format": "plain"
+    },
+    {
+      "id": "PC-Description",
+      "changedAt": "2021-02-23T08:59:00+02:00",
+      "title": "dcterms:description",
+      "description": [
+        {
+          "text": "An account of the resource (source: http://dublincore.org/documents/dcmi-terms/). Descriptive text represented in plain or rich text using XHTML or Markdown. SHOULD include only content that is valid and suitable inside an XHTML &lt;div&gt; element (source: http://open-services.net/)."
+        }
+      ],
+      "dataType": {
+        "id": "DT-Text"
+      },
+      "format": "xhtml"
+    }
+  ],
+  "resourceClasses": [
+    {
+      "id": "RC-Requirement",
+      "changedAt": "2016-05-26T08:59:00+02:00",
+      "title": "IREB:Requirement",
+      "description": [
+        {
+          "text": "A 'Requirement' is a singular documented physical and functional need that a particular design, product or process must be able to perform."
+        }
+      ],
+      "icon": "&#8623;",
+      "propertyClasses": [
+        {
+          "id": "PC-Name"
+        },
+        {
+          "id": "PC-Description"
+        }
+      ]
+    }
+  ],
+  "statementClasses": [],
+  "resources": [
+    {
+      "id": "Req-5ba3512b0000bca",
+      "changedAt": "2017-06-19T20:13:08+02:00",
+      "class": {
+        "id": "RC-Requirement"
+      },
+      "properties": [
+        {
+          "class": {
+            "id": "PC-Name"
+          },
+          "values": [
+            [
+              {
+                "text": "Minimum button size"
+              }
+            ]
+          ]
+        },
+        {
+          "class": {
+            "id": "PC-Description"
+          },
+          "values": [
+            [
+              {
+                "text": "<p>The <i>button size</i> MUST not be less than 20mm in diameter.</p><p><object data=\"images/button-diameter.png\" type=\"image/png\">Diameter in different Forms</object></p>"
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "statements": [],
+  "files": [
+    {
+      "id": "F-11407635948",
+      "changedAt": "2020-03-03T16:35:20.000Z",
+      "title": "images/button-diameter.png",
+      "type": "image/png"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "N-bca801377e3d1536",
+      "resource": {
+        "id": "Req-5ba3512b0000bca"
+      },
+      "changedAt": "2019-05-29T13:19:28.546Z"
+    }
+  ]
+}

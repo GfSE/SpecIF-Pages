@@ -162,3 +162,4 @@ Finally let us have a look at the tab \"Reports\" of the SpecIF-Viewer. You may 
 You may view the example using the <a href="https://specif.de/apps/view#import=../examples/v1.1/05_Requirement-with-Enumerated-Property.specif" target="_blank">SpecIF Viewer</a>, or download the SpecIF data:
 - v1.0: [Requirement with Enumerated Property](https://specif.de/examples/v1.0/05_Requirement-with-Enumerated-Property.specif)
 - v1.1: [Requirement with Enumerated Property](https://specif.de/examples/v1.1/05_Requirement-with-Enumerated-Property.specif)
+- v1.2: [Requirement with Enumerated Property](https://specif.de/examples/v1.2/05_Requirement-with-Enumerated-Property.specif)

@@ -326,3 +326,4 @@ The instances, the actual model content, have not been discussed, yet:
 You may view the example using the <a href="https://specif.de/apps/view#import=../examples/v1.1/06_Very-Simple-Model-FMC.specifz" target="_blank">SpecIF Viewer</a>, or download the SpecIF data:
 - v1.0: [Very Simple Model (FMC)](https://specif.de/examples/v1.0/06_Very-Simple-Model-FMC.specifz)
 - v1.1: [Very Simple Model (FMC)](https://specif.de/examples/v1.1/06_Very-Simple-Model-FMC.specifz)
+- v1.2: [Very Simple Model (FMC)](https://specif.de/examples/v1.2/06_Very-Simple-Model-FMC.specif.zip)

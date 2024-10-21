@@ -31,7 +31,7 @@ Again, let's start with the new elements of a SpecIF data-set.
 ```
 
 Some explanations may help to understand the principles:
-- Properties have a base *dataType*. The SpecIF schema accepts a number of boolean, numeric, character string and enumerated data types.
+- Properties have a base *dataType*. The SpecIF schema accepts a number of boolean, numeric, character string and enumerated data-types.
 - Above, we see a *dataType* for formatted text of a certain maximum length. Properties using this dataType may use XHTML tags to format the text content.
 - Next, a *propertyClass* is to be defined with it's dataType. 
 - The role of the properties instantiated from a propertyClass is assigned in it's *title*. In this case the properties shall be used for describing the parent resource or statement. Note that a vocabulary term introduced by the [Dublin Core Metadata Initiative](https://dublincore.org/), namely \"dcterms:description\" is used.
@@ -144,3 +144,4 @@ Some more explanations:
 You may view the example using the <a href="https://specif.de/apps/view.html#../examples/v1.0/03_Requirement-with-Properties.specif" target="_blank">SpecIF Viewer</a>, or download the SpecIF data:
 - v1.0: [Requirement with Properties](https://specif.de/examples/v1.0/03_Requirement-with-Properties.specif)
 - v1.1: [Requirement with Properties](https://specif.de/examples/v1.1/03_Requirement-with-Properties.specif)
+- v1.2: [Requirement with Properties](https://specif.de/examples/v1.2/03_Requirement-with-Properties.specif)
