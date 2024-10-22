@@ -2,7 +2,7 @@
 title: "Requirement with Image"
 layout: default
 parent: "Tutorials"
-nav_order: 04
+nav_order: 4
 ---
 
 # Tutorial 4: Requirement with Image
@@ -13,19 +13,19 @@ The definitions including *dataTypes*, *propertyClasses* and *resourceClasses* a
 
 ```json
 {
-    "resources": [{
-        "id": "Req-5ba3512b0000bca",
-        "title": "Minimum button size",
-        "class": "RC-Requirement",
-        "properties": [{
-            "class": "PC-Name",
-            "value": "Minimum button size"
-        },{
-            "class": "PC-Description",
-            "value": "<p>The <i>button size</i> MUST not be less than 20mm in diameter.</p><p><object data=\"images/button-diameter.png\" type=\"image/png\">Diameter in different Forms</object></p>"
-        }],
-        "changedAt": "2017-06-19T20:13:08+02:00"
-    }]
+  "resources": [{
+    "id": "Req-5ba3512b0000bca",
+    "title": "Minimum button size",
+    "class": "RC-Requirement",
+    "properties": [{
+      "class": "PC-Name",
+      "value": "Minimum button size"
+    },{
+      "class": "PC-Description",
+      "value": "<p>The <i>button size</i> MUST not be less than 20mm in diameter.</p><p><object data=\"images/button-diameter.png\" type=\"image/png\">Diameter in different Forms</object></p>"
+    }],
+    "changedAt": "2017-06-19T20:13:08+02:00"
+  }]
 }
 ```
 
@@ -49,64 +49,64 @@ Let us have a look at the full example, now:
 
 ```json
 {
-    "$schema": "https://specif.de/v1.0/schema.json",
-    "id": "P-Requirement-with-Image",
-    "title": "Requirement with Image",
-    "dataTypes": [{
-      "id": "DT-ShortString",
-      "title": "String[96]",
-      "description": "String with max. length 96.",
-      "type": "xs:string",
-      "maxLength": 96,
-      "changedAt": "2016-05-26T08:59:00+02:00"
+  "$schema": "https://specif.de/v1.0/schema.json",
+  "id": "P-Requirement-with-Image",
+  "title": "Requirement with Image",
+  "dataTypes": [{
+    "id": "DT-ShortString",
+    "title": "String[96]",
+    "description": "String with max. length 96.",
+    "type": "xs:string",
+    "maxLength": 96,
+    "changedAt": "2016-05-26T08:59:00+02:00"
+  },{
+    "id": "DT-Text",
+    "title": "Plain or formatted Text",
+    "description": "A text string, plain, or formatted with XHTML or markdown",
+    "type": "xs:string",
+    "changedAt": "2021-02-14T08:59:00+02:00"
+  }],
+  "propertyClasses": [{
+    "id": "PC-Name",
+    "title": "dcterms:title",
+    "description": "A name given to the resource.",
+    "dataType": "DT-ShortString",
+    "changedAt": "2016-05-26T08:59:00+02:00"
+  },{
+    "id": "PC-Description",
+    "title": "dcterms:description",
+    "description": "An account of the resource (source: http://dublincore.org/documents/dcmi-terms/). Descriptive text represented in plain or rich text using XHTML or Markdown. SHOULD include only content that is valid and suitable inside an XHTML &lt;div&gt; element (source: http://open-services.net/).",
+    "dataType": "DT-Text",
+    "changedAt": "2021-02-23T08:59:00+02:00"
+  }],
+  "resourceClasses": [{
+    "id": "RC-Requirement",
+    "title": "IREB:Requirement",
+    "description": "A 'Requirement' is a singular documented physical and functional need that a particular design, product or process must be able to perform.",
+    "icon": "&#8623;",
+    "propertyClasses": [ "PC-Name", "PC-Description" ],
+    "changedAt": "2016-05-26T08:59:00+02:00"
+  }],
+  "statementClasses": [],
+  "resources": [{
+    "id": "Req-5ba3512b0000bca",
+    "title": "Minimum button size",
+    "class": "RC-Requirement",
+    "properties": [{
+      "class": "PC-Name",
+      "value": "Minimum button size"
     },{
-      "id": "DT-Text",
-      "title": "Plain or formatted Text",
-      "description": "A text string, plain, or formatted with XHTML or markdown",
-      "type": "xs:string",
-      "changedAt": "2021-02-14T08:59:00+02:00"
+      "class": "PC-Description",
+      "value": "<p>The <i>button size</i> MUST not be less than 20mm in diameter.</p><p><object data=\"images/button-diameter.png\" type=\"image/png\">Diameter in different Forms</object></p>"
     }],
-    "propertyClasses": [{
-      "id": "PC-Name",
-      "title": "dcterms:title",
-      "description": "A name given to the resource.",
-      "dataType": "DT-ShortString",
-      "changedAt": "2016-05-26T08:59:00+02:00"
-    },{
-      "id": "PC-Description",
-      "title": "dcterms:description",
-      "description": "An account of the resource (source: http://dublincore.org/documents/dcmi-terms/). Descriptive text represented in plain or rich text using XHTML or Markdown. SHOULD include only content that is valid and suitable inside an XHTML &lt;div&gt; element (source: http://open-services.net/).",
-      "dataType": "DT-Text",
-      "changedAt": "2021-02-23T08:59:00+02:00"
-    }],
-    "resourceClasses": [{
-      "id": "RC-Requirement",
-      "title": "IREB:Requirement",
-      "description": "A 'Requirement' is a singular documented physical and functional need that a particular design, product or process must be able to perform.",
-      "icon": "&#8623;",
-      "propertyClasses": [ "PC-Name", "PC-Description" ],
-      "changedAt": "2016-05-26T08:59:00+02:00"
-    }],
-    "statementClasses": [],
-    "resources": [{
-        "id": "Req-5ba3512b0000bca",
-        "title": "Minimum button size",
-        "class": "RC-Requirement",
-        "properties": [{
-            "class": "PC-Name",
-            "value": "Minimum button size"
-        },{
-            "class": "PC-Description",
-            "value": "<p>The <i>button size</i> MUST not be less than 20mm in diameter.</p><p><object data=\"images/button-diameter.png\" type=\"image/png\">Diameter in different Forms</object></p>"
-        }],
-        "changedAt": "2017-06-19T20:13:08+02:00"
-    }],
-    "statements": [],
-    "hierarchies": [{
-        "id": "N-bca801377e3d1525",
-        "resource": "Req-5ba3512b0000bca",
-        "changedAt": "2019-05-29T13:19:28.546Z"
-    }]
+    "changedAt": "2017-06-19T20:13:08+02:00"
+  }],
+  "statements": [],
+  "hierarchies": [{
+     "id": "N-bca801377e3d1525",
+      "resource": "Req-5ba3512b0000bca",
+      "changedAt": "2019-05-29T13:19:28.546Z"
+  }]
 }
 ```
 

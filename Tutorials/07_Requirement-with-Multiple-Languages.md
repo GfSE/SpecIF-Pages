@@ -2,7 +2,7 @@
 title: "Requirement with Multiple Languages"
 layout: default
 parent: "Tutorials"
-nav_order: 07
+nav_order: 7
 ---
 
 # Tutorial 7: Requirement with Multiple Languages

@@ -2,7 +2,7 @@
 title: "Requirement with Vocabulary Term"
 layout: default
 parent: "Tutorials"
-nav_order: 08
+nav_order: 8
 ---
 
 # Tutorial 8: Requirement with Vocabulary Term
