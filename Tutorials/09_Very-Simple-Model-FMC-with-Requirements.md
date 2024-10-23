@@ -367,7 +367,8 @@ Finally, let's inspect the relations of model-element "FiCo-Application" in a gr
 
 ![Very Simple Model with Requirements - Relations](../assets/images/Tutorials/Very-Simple-Model-with-Requirements-Relations.png)
 
-You may view the example using the <a href="https://specif.de/apps/view#import=../examples/v1.1/09_Very-Simple-Model-FMC-with-Requirements.specifz" target="_blank">SpecIF Viewer</a>, or download the SpecIF data:
-- v1.0: <a href="https://specif.de/examples/v1.0/09_Very-Simple-Model-FMC-with-Requirements.specifz">Very Simple Model with Requirements</a>
-- v1.1: <a href="https://specif.de/examples/v1.1/09_Very-Simple-Model-FMC-with-Requirements.specifz">Very Simple Model with Requirements</a>
-- v1.2: <a href="https://specif.de/examples/v1.2/09_Very-Simple-Model-FMC-with-Requirements.specif.zip">Very Simple Model with Requirements</a>
+You may 
+- view the example using the <a href="https://specif.de/apps/view#import=../examples/v1.1/09_Very-Simple-Model-FMC-with-Requirements.specifz" target="_blank">SpecIF Viewer</a> or 
+- download the SpecIF data: <a href="https://specif.de/examples/v1.0/09_Very-Simple-Model-FMC-with-Requirements.specifz">v1.0</a>, 
+<a href="https://specif.de/examples/v1.1/09_Very-Simple-Model-FMC-with-Requirements.specifz">v1.1</a>, 
+- v1.2: <a href="https://specif.de/examples/v1.2/09_Very-Simple-Model-FMC-with-Requirements.specif.zip">v1.2</a>.

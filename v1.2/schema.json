@@ -168,10 +168,19 @@
           "properties": {
             "id": {
               "$ref": "#/definitions/SpecifId"
-			}
+            }
           },
           "additionalProperties": false,
           "required": [ "id" ]
+        },
+        {
+          "description": "A sequence of values according to the complex dataType as specified by the propertyClass.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": false,
+          "items": {
+            "$ref": "#/definitions/SpecifValue"
+          }
         }
       ]
     },
@@ -203,6 +212,7 @@
       "type": "array",
       "title": "Enumerated Values",
       "description": "Enumerated values for the given dataType. If 'multiple' is true 0..n options may be selected, otherwise exactly one must be selected.",
+      "minItems": 1,
       "uniqueItems": true,
       "items": {
         "$ref": "#/definitions/SpecifEnumeratedValue"
@@ -445,6 +455,60 @@
           },
           "additionalProperties": false,
           "required": [ "id", "title", "type", "changedAt" ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "description": "The corresponding definition in https://www.w3.org/TR/xmlschema-2/ applies.",
+              "type": "string",
+              "title": "Complex data-type",
+              "enum": [ "xs:complexType" ]
+            },
+            "id": {
+              "$ref": "#/definitions/SpecifId"
+            },
+            "title": {
+              "$ref": "#/definitions/SpecifText"
+            },
+            "description": {
+              "$ref": "#/definitions/SpecifMultiLanguageText"
+            },
+            "sequence": {
+              "description": "A sequence of simple or complex dataTypes; the resulting data-type may have multiple levels and must be a tree.",
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "$ref": "#/definitions/SpecifText"
+                  },
+                  "dataType": {
+                    "description": "Must be a member of dataTypes.",
+                    "$ref": "#/definitions/SpecifKey"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [ "title", "dataType" ]
+              }
+            },
+            "revision": {
+              "$ref": "#/definitions/SpecifRevision"
+            },
+            "replaces": {
+              "$ref": "#/definitions/SpecifReplaces"
+            },
+            "changedAt": {
+              "$ref": "#/definitions/SpecifDateTime"
+            },
+            "changedBy": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [ "id", "title", "type", "sequence", "changedAt" ]
         }
       ]
     },

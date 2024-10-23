@@ -9,8 +9,16 @@ nav_order: 10
 
 Next, we will introduce complex data-types available since SpecIF v1.2.
 
+A complex data-type consists of a _sequence_ of simple or complex data-types. A sequence is a list where the position of elements matters.
+Thus, complex data-types can be nested, but any cyclic dependency is prohibited: In other words, the resulting data-type may have multiple layers and must be a _tree_.
+In addition, a value assigned to a property with complex data-type must have a list of values corresponding to the sequence of its data-type.
+
+Have a look at the following example:
+- The sequence contains three elements with a title and a pointer to a dataType.
+
 ```
 {
+...
   "dataTypes": [{
     "id": "DT-Coordinate",
     "title": "A coordinate as a real number.",
@@ -29,25 +37,26 @@ Next, we will introduce complex data-types available since SpecIF v1.2.
       "language": "de"
     }],
     "sequence": [{
-      "dataType: { "id": "DT-Coordinate" },
-      "title": "X"
+      "title": "X",
+      "dataType": { "id": "DT-Coordinate" }
     },{
-      "dataType: { "id": "DT-Coordinate" },
-      "title": "Y"
+      "title": "Y",
+      "dataType": { "id": "DT-Coordinate" }
     },{
-      "dataType: { "id": "DT-Coordinate" },
-      "title": "Z"
+      "title": "Z",
+      "dataType": { "id": "DT-Coordinate" }
     }],
-    "multiple": false,
     "revision": "1.2",
     "changedAt": "2024-11-21T10:08:31.960Z"
   }]
+...
 }
 ```
 
-... and the referencing propertyType:
+The referencing propertyClass and resourceClass is similar to others discussed in the previous tutorials:
 ```
 {
+...
   "propertyClasses": [{
     "id": "PC-GeoPoint",
     "title": "geo:Point",
@@ -58,29 +67,52 @@ Next, we will introduce complex data-types available since SpecIF v1.2.
         "text": "Ein Punkt im Raum, spezifiziert durch drei Koordinaten.",
         "language": "de"
     }],
-    "dataType: { "id": "DT-GeoPoint" },
+    "dataType": { "id": "DT-GeoPoint" },
     "multiple": false,
     "revision": "1.2",
     "changedAt": "2024-11-21T10:08:31.960Z"
-  }]
+  }],
+  "resourceClasses": [{
+    "id": "RC-94e50d5023b1a80157",
+    "title": "geo:Point",
+    "propertyClasses": [
+      {
+        "id": "PC-Name"
+      },{
+        "id": "PC-GeoPoint"
+      }
+    ],
+    "changedAt": "2024-11-21T10:08:31.960Z"
+  }],
+...  
 }
 ```
 
 A resource's or statement's property value is given as follows:
+- An element in the values list is a list with values corresponding to the dataType's sequence:
+- The position within the list determines by which element in the dataType's sequence it is defined.
+- Here, the elements of the value list are simple data-types, more concretely real numbers. 
+In other cases, any SpecIF value could be allowed, e.g. multi-language texts, pointers to enumerated values of the data-type or values of a nested complex data-type. 
+
 ```
 {
+...
   "resources": [{
-    "id": "Req-5ba3512b0000bca",
-    "title": "Minimum button size",
-    "class": "RC-Requirement",
+    "id": "R-d5b902394e50",
+    "class": "RC-94e50d5023b1a80157",
     "properties": [{
-      "dataType": "PC-GeoPoint",
+      "class": { "id": "PC-Name" },
+      "values": [
+        [{ "text": "A point in space" }]
+      ]
+    },{
+      "class": "PC-GeoPoint",
       "values": [[ "1.2",  "2.3", "4.0" ]]
     }]
     "changedAt": "2024-11-21T10:08:31.960Z"
   }]
+...
 }
-
 ```
 
 As always, _properties_ is a list of properties, which in turn is a list of one or more values.
@@ -88,9 +120,6 @@ The complex value is a list with SpecIF values corresponding to the dataType.
 The example shows simple real numbers, but it could be pointers to enumerated values or multi-language texts.
 Complex data-types may be nested, but without cyclic dependencies: A complex data-type must be a tree.
 
-<!--
-You may view the example using the <a href="https://specif.de/apps/view.html#import=https://specif.de/examples/v1.1/01_Hello-World.specif" target="_blank">SpecIF Viewer</a>, or download the SpecIF data:
-- v1.0: [Hello World](https://specif.de/examples/v1.0/01_Hello-World.specif)
-- v1.1: [Hello World](https://specif.de/examples/v1.1/01_Hello-World.specif)
-- v1.2: [Hello World](https://specif.de/examples/v1.2/01_Hello-World.specif)
--->
+You may 
+- view the example using the <a href="https://specif.de/apps/view.html#import=https://specif.de/examples/v1.1/01_Hello-World.specif" target="_blank">SpecIF Viewer</a>, or 
+- download the SpecIF data: <a href="https://specif.de/examples/v1.2/10_Complex-DataType.specif">v1.2</a>.

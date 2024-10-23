@@ -1,0 +1,132 @@
+{
+  "@Context": "http://purl.org/dc/terms/",
+  "id": "P-Complex-DataTypes",
+  "$schema": "https://specif.de/v1.2/schema.json",
+  "title": [
+    {
+      "text": "Project 'Complex DataTypes'"
+    }
+  ],
+  "generator": "SpecIF Modellintegrator und Editor",
+  "generatorVersion": "1.2.s.16",
+  "createdAt": "2024-10-20T20:39:58.092Z",
+  "rights": {
+    "title": "Creative Commons 4.0 CC BY-SA",
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  "dataTypes": [
+    {
+      "id": "DT-ShortString",
+      "changedAt": "2016-05-26T08:59:00+02:00",
+      "title": "String[256]",
+      "description": [
+        {
+          "text": "String with max. length 256"
+        }
+      ],
+      "type": "xs:string",
+      "maxLength": 256
+    },{
+      "id": "DT-Coordinate",
+      "title": "A coordinate as a real number.",
+      "type": "xs:double",
+      "revision": "1.2",
+      "changedAt": "2024-11-21T10:08:31.960Z"
+    },{
+      "id": "DT-GeoPoint",
+      "title": "geo:Point",
+      "type": "xs:complexType",
+      "description": [{
+        "text": "A point in space, specified by three coordinates.",
+        "language": "en"
+      },{
+        "text": "Ein Punkt im Raum, spezifiziert durch drei Koordinaten.",
+        "language": "de"
+      }],
+      "sequence": [{
+        "title": "X",
+        "dataType": { "id": "DT-Coordinate" }
+      },{
+        "title": "Y",
+        "dataType": { "id": "DT-Coordinate" }
+      },{
+        "title": "Z",
+        "dataType": { "id": "DT-Coordinate" }
+      }],
+      "revision": "1.2",
+      "changedAt": "2024-11-21T10:08:31.960Z"
+    }
+  ],
+  "propertyClasses": [
+    {
+      "id": "PC-Name",
+      "changedAt": "2020-03-26T22:59:00+02:00",
+      "title": "dcterms:title",
+      "description": [
+        {
+          "text": "A name given to the resource."
+        }
+      ],
+      "dataType": {
+        "id": "DT-ShortString"
+      },
+      "format": "plain"
+    },{
+      "id": "PC-GeoPoint",
+      "title": "geo:Point",
+      "description": [{
+        "text": "A point in space, specified by three coordinates.",
+        "language": "en"
+      },{
+        "text": "Ein Punkt im Raum, spezifiziert durch drei Koordinaten.",
+        "language": "de"
+      }],
+      "dataType": { "id": "DT-GeoPoint" },
+      "multiple": false,
+      "revision": "1.2",
+      "changedAt": "2024-11-21T10:08:31.960Z"
+    }
+  ],
+  "resourceClasses": [
+     {
+      "id": "RC-94e50d5023b1a80157",
+      "title": "geo:Point",
+      "propertyClasses": [
+        {
+          "id": "PC-Name"
+        },{
+          "id": "PC-GeoPoint"
+        }
+      ],
+      "changedAt": "2024-11-21T10:08:31.960Z"
+    }
+  ],
+  "statementClasses": [],
+  "resources": [
+    {
+      "id": "R-d5b902394e50",
+      "class": "RC-94e50d5023b1a80157",
+      "properties": [{
+        "class": { "id": "PC-Name" },
+        "values": [
+          [{ "text": "A point in space" }]
+        ]
+      },{
+        "class": {"id": "PC-GeoPoint"},
+        "values": [
+		  [ "1.2",  "2.3", "4.0" ]
+		]
+      }],
+      "changedAt": "2024-11-21T10:08:31.960Z"
+    }
+  ],
+  "statements": [],
+  "files": [],
+  "nodes": [
+    {
+      "id": "N-d5b902394e50",
+      "resource": { "id": "R-d5b902394e50" },
+      "changedAt": "2020-03-01T07:59:00+01:00"
+    }
+  ]
+}
