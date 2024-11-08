@@ -4,10 +4,6 @@ layout: default
 nav_order: 20
 ---
 
-![SpecIF - Specification Integration Facility](./assets/logos/SpecIF-Logo-120.png)
-
-<!-- templates <a href="" target="_blank"></a> <img class="my-align-right size-60" src="./assets/images/Home/" alt="" /> -->
-
 # Literature
 
 1. Dungern, Oskar v.: <a href="https:specif.de/files/literature/TdSE-2021%20Dungern%20-%20Integrate%20BPMN%20and%20Archimate%20Models%20using%20SpecIF.pdf" target="_blank">Integrate BPMN and Archimate Models using SpecIF</a>. TdSE Tag des Systems Engineering der GfSE, 2021
@@ -36,4 +32,9 @@ nav_order: 20
 [18]  	Dungern, O.v.: Integrate BPMN and Archimate Models using SpecIF. TdSE Tag des Systems Engineering der GfSE, online, November/10-12 2021.
 [19]  	Dungern, O.v.: Kollaboration im Systems Engineering mit ReqIF. REConf, Munich, April/25-27 2022.
 [20]  	Alt, O.: SpecIF-Tutorial (German). TdSE Tag des Systems Engineering der GfSE, Paderborn, November/16-18 2022.
+-->
+
+<!-- templates 
+	<a href="" target="_blank"></a> 
+	<img class="my-align-right size-60" src="./assets/images/Home/" alt="" /> 
 -->
