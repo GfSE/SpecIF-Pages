@@ -107,7 +107,9 @@ In other cases, any SpecIF value could be allowed, e.g. multi-language texts, po
       ]
     },{
       "class": "PC-GeoPoint",
-      "values": [[ "1.2",  "2.3", "4.0" ]]
+      "values": [
+        [ "1.2",  "2.3", "4.0" ]
+      ]
     }]
     "changedAt": "2024-11-21T10:08:31.960Z"
   }]

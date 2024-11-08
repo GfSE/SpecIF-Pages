@@ -2,7 +2,7 @@
 title: "Documentation"
 layout: default
 has_children: true
-nav_order: 5
+nav_order: 50
 ---
 
 ![SpecIF logo](../assets/logos/SpecIF-Logo-120.png)
