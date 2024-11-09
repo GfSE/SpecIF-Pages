@@ -123,7 +123,7 @@ The example shows simple real numbers, but it could be pointers to enumerated va
 Complex data-types may be nested, but without cyclic dependencies: A complex data-type must be a tree.
 
 You may 
-<!-- - view the example using the <a href="https://specif.de/apps/view.html#import=https://specif.de/examples/v1.2/10_Complex-DataType.specif" target="_blank">SpecIF Viewer</a>, or -->
+- view the example using the <a href="https://specif.de/v1.2/apps/view.html#import=https://specif.de/examples/v1.2/10_Complex-DataType.specif" target="_blank">SpecIF Viewer</a>, or
 - download the SpecIF data: <a href="https://specif.de/examples/v1.2/10_Complex-DataType.specif">v1.2</a>.
 
-The SpecIF Editor and Viewer supporting v1.2 with complex data types is still in development.
+<!-- The SpecIF Editor and Viewer supporting v1.2 with complex data types is still in development. -->
