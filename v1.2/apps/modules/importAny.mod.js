@@ -4,8 +4,7 @@
     Copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 */
 moduleManager.construct({
     name: 'importAny'
@@ -13,7 +12,7 @@ moduleManager.construct({
     const importModes = [{
             id: 'create',
             title: 'Create a new project with the given id',
-            desc: 'All types, objects, relations and hierarchies will be created as specified.',
+            desc: 'All types, objects, relations and nodes will be created as specified.',
             label: i18n.BtnCreate
         }, {
             id: 'clone',
@@ -59,6 +58,13 @@ moduleManager.construct({
             label: 'BPMN',
             extensions: [".bpmn"],
             help: i18n.MsgImportBpmn
+        }, {
+            id: 'sysml',
+            name: 'ioSysml',
+            desc: 'System Modeling Language',
+            label: 'UML/SysML',
+            extensions: [".mdzip"],
+            help: "Experimental: Import an XMI file from Cameo v19.0."
         }, {
             id: 'reqif',
             name: 'ioReqif',

@@ -4,8 +4,7 @@
     (C)copyright enso managers gmbh (http://www.enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 */
 class CCache {
     constructor(opts) {
@@ -15,7 +14,7 @@ class CCache {
         this.statementClasses = [];
         this.resources = [];
         this.statements = [];
-        this.hierarchies = [];
+        this.nodes = [];
         this.files = [];
         this.cacheInstances = opts.cacheInstances;
     }
@@ -121,7 +120,7 @@ class CCache {
                     return LIB.uncacheL(this[app.standards.listName.get(ctg)], itemL);
                 return true;
             case 'node':
-                itemL.forEach((el) => { delNodes(this.hierarchies, el); });
+                itemL.forEach((el) => { delNodes(this.nodes, el); });
                 return true;
             default:
                 throw Error("Invalid category '" + ctg + "'.");
@@ -141,16 +140,16 @@ class CCache {
         }
     }
     putNode(e) {
-        if (!e.predecessor && !e['parent'] && LIB.iterateNodes(this.hierarchies, (nd) => { return nd.id != e.id; }, (ndL) => {
+        if (!e.predecessor && !e['parent'] && LIB.iterateNodes(this.nodes, (nd) => { return nd.id != e.id; }, (ndL) => {
             let i = LIB.indexById(ndL, e.id);
             if (i > -1) {
                 ndL.splice(i, 1, e);
             }
             ;
         }))
-            return LIB.indexByKey(this.hierarchies, e) > -1;
+            return LIB.indexByKey(this.nodes, e) > -1;
         this.delete('node', [LIB.keyOf(e)]);
-        if (e.predecessor && LIB.iterateNodes(this.hierarchies, (nd) => { return nd.id != e.predecessor; }, (ndL) => {
+        if (e.predecessor && LIB.iterateNodes(this.nodes, (nd) => { return nd.id != e.predecessor; }, (ndL) => {
             let i = LIB.indexById(ndL, e.predecessor);
             if (i > -1) {
                 delete e.predecessor;
@@ -158,8 +157,8 @@ class CCache {
             }
             ;
         }))
-            return LIB.indexByKey(this.hierarchies, e) > -1;
-        if (e['parent'] && LIB.iterateNodes(this.hierarchies, (nd) => {
+            return LIB.indexByKey(this.nodes, e) > -1;
+        if (e['parent'] && LIB.iterateNodes(this.nodes, (nd) => {
             if (nd.id == e['parent']) {
                 delete e['parent'];
                 if (Array.isArray(nd.nodes))
@@ -172,7 +171,7 @@ class CCache {
             return true;
         }))
             return false;
-        this.hierarchies.unshift(e);
+        this.nodes.unshift(e);
         return true;
     }
     instanceTitleOf(el, opts) {
@@ -292,7 +291,7 @@ class CProject {
         this.propertyClasses = [];
         this.resourceClasses = [];
         this.statementClasses = [];
-        this.hierarchies = [];
+        this.nodes = [];
         this.cache = cData;
         this.exporting = false;
         this.abortFlag = false;
@@ -322,7 +321,7 @@ class CProject {
             projectName: LIB.languageTextOf(this.title, { targetLanguage: this.language }),
             fileName: LIB.languageTextOf(this.title, { targetLanguage: this.language })
         };
-        ["hierarchies", "resourceClasses", "statementClasses", "propertyClasses", "dataTypes"].forEach((list) => {
+        ["nodes", "resourceClasses", "statementClasses", "propertyClasses", "dataTypes"].forEach((list) => {
             for (var p of spD[list])
                 this[list].push({ id: p.id });
         });
@@ -401,9 +400,9 @@ class CProject {
     read(opts) {
         var exD = this.getMeta();
         return new Promise((resolve, reject) => {
-            this.readItems('hierarchy', this.hierarchies.filter((n) => { return !n.id.includes("FolderUnreferencedResources-"); }), opts)
+            this.readItems('hierarchy', this.nodes.filter((n) => { return !n.id.includes("FolderUnreferencedResources-"); }), opts)
                 .then((hL) => {
-                exD.hierarchies = hL;
+                exD.nodes = hL;
                 return this.readItems('resource', LIB.referencedResources(this.cache.resources, hL), opts);
             })
                 .then((rL) => {
@@ -471,24 +470,32 @@ class CProject {
             })
                 .then((dTL) => {
                 exD.dataTypes = dTL;
-                let fL = [], dT;
+                let refL = [], pC, dT;
                 for (var r of exD.resources) {
                     for (var p of r.properties) {
-                        dT = LIB.dataTypeOf(p['class'], this.cache);
-                        if (dT && dT.type == XsDataType.String) {
-                            for (var v of p.values) {
-                                for (var l of v) {
-                                    let re = /data="([^"]+)"/g, mL;
-                                    while ((mL = re.exec(l.text)) !== null) {
-                                        LIB.cacheE(fL, mL[1]);
+                        pC = LIB.itemByKey(this.cache.propertyClasses, p["class"]);
+                        dT = LIB.itemByKey(this.cache.dataTypes, pC.dataType);
+                        if (pC && dT) {
+                            if (!dT.enumeration && dT.type == XsDataType.String) {
+                                for (var v of p.values) {
+                                    if (pC.multiLanguage == undefined && v.length > 1)
+                                        pC.multiLanguage = true;
+                                    for (var l of v) {
+                                        let re = /data="([^"]+)"/g, mL;
+                                        while ((mL = re.exec(l.text)) !== null) {
+                                            LIB.cacheE(refL, mL[1]);
+                                        }
                                     }
                                 }
                             }
                         }
+                        else {
+                            console.error("A property of item '" + r.id + "' references non-existing propertyClass or dataType.");
+                        }
                     }
                 }
                 ;
-                return this.readItems('file', (f) => { return fL.includes(f.title); }, opts);
+                return this.readItems('file', (f) => { return refL.includes(f.title); }, opts);
             })
                 .then((fL) => {
                 exD.files = fL;
@@ -656,7 +663,7 @@ class CProject {
             }
             ;
             pend++;
-            self.createItems('hierarchy', newD.hierarchies)
+            self.createItems('hierarchy', newD.nodes)
                 .then(finalize, aDO.reject);
             if (Array.isArray(newD.files)) {
                 let itmL = [];
@@ -701,7 +708,7 @@ class CProject {
                 break;
             case 'hierarchy':
             case 'node':
-                LIB.cacheE(this.hierarchies, (itm.predecessor ? { id: itm.id, predecessor: LIB.makeKey(itm.predecessor) } : LIB.makeKey(itm.id)));
+                LIB.cacheE(this.nodes, (itm.predecessor ? { id: itm.id, predecessor: LIB.makeKey(itm.predecessor) } : LIB.makeKey(itm.id)));
         }
     }
     createItems(ctg, itmL) {
@@ -780,7 +787,7 @@ class CProject {
             switch (ctg) {
                 case 'hierarchy':
                 case 'node':
-                    self.hierarchies = self.cache.get('hierarchy', 'all').map(h => LIB.makeKey(h.id));
+                    self.nodes = self.cache.get('hierarchy', 'all').map(h => LIB.makeKey(h.id));
             }
             ;
             resolve();
@@ -948,7 +955,7 @@ class CProject {
                 }
                 ;
                 let fldL = [], resL = [];
-                LIB.iterateNodes(dta.get("hierarchy", self.hierarchies), (nd) => {
+                LIB.iterateNodes(dta.get("hierarchy", self.nodes), (nd) => {
                     let res = dta.get("resource", [nd.resource])[0], pVs = LIB.valuesByTitle(res, [CONFIG.propClassType], dta);
                     if (pVs.length > 0) {
                         let pV = LIB.languageTextOf(pVs[0], { targetLanguage: 'default' });
@@ -973,7 +980,7 @@ class CProject {
                         else {
                             let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder] }), {
                                 resources: Folders(r2c.folderNamePrefix + apx, CONFIG.resClassProcesses),
-                                hierarchies: Nodes(r2c, resL)
+                                nodes: Nodes(r2c, resL)
                             });
                             self.adopt(newD, { noCheck: true, deduplicate: true })
                                 .done(resolve)
@@ -1023,7 +1030,7 @@ class CProject {
                 return;
             }
             ;
-            let unRL = [], resL = dta.get('resource', "all"), apx = simpleHash(self.id), tim = new Date().toISOString(), hL = dta.get("hierarchy", self.hierarchies)
+            let unRL = [], resL = dta.get('resource', "all"), apx = simpleHash(self.id), tim = new Date().toISOString(), hL = dta.get("hierarchy", self.nodes)
                 .filter((nd) => {
                 let idx = LIB.indexByKey(resL, nd.resource);
                 if (idx > -1) {
@@ -1056,7 +1063,7 @@ class CProject {
                 else {
                     let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder] }), {
                         resources: Folders(),
-                        hierarchies: Nodes(resL)
+                        nodes: Nodes(resL)
                     });
                     self.adopt(newD, { noCheck: true, deduplicate: true })
                         .done(resolve)
@@ -1108,7 +1115,7 @@ class CProject {
                 return;
             }
             ;
-            let gloL = [], resL = [], diagramL = [], apx = simpleHash(self.id), tim = new Date().toISOString(), lastContentH, hL = dta.get("hierarchy", self.hierarchies)
+            let gloL = [], resL = [], diagramL = [], apx = simpleHash(self.id), tim = new Date().toISOString(), lastContentH, hL = dta.get("hierarchy", self.nodes)
                 .filter((nd) => {
                 let res = dta.get("resource", [nd.resource])[0];
                 if (res && !LIB.hasType(res, [CONFIG.resClassGlossary, CONFIG.resClassUnreferencedResources], dta, opts))
@@ -1136,7 +1143,7 @@ class CProject {
                     .then(() => {
                     let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder] }), {
                         resources: Folders(),
-                        hierarchies: FolderNodes(lastContentH)
+                        nodes: FolderNodes(lastContentH)
                     });
                     self.adopt(newD, { noCheck: true, deduplicate: true })
                         .done(resolve)
@@ -1246,7 +1253,7 @@ class CProject {
     }
     renderExportOptions(fmt) {
         var pnl = '<div class="panel panel-default panel-options" style="margin-bottom:0">'
-            + (['specif', 'specif_v10', 'html'].includes(fmt) ? '' : makeTextField('&#x200b;' + i18n.LblProjectName, (fmt == 'specifClasses' ? 'SpecIF Classes' : this.exportParams.projectName), { typ: 'line' }))
+            + (['specif', 'html'].includes(fmt) ? '' : makeTextField('&#x200b;' + i18n.LblProjectName, (fmt == 'specifClasses' ? 'SpecIF Classes' : this.exportParams.projectName), { typ: 'line' }))
             + makeTextField('&#x200b;' + i18n.LblFileName, (fmt == 'specifClasses' ? 'SpecIF-Classes' : this.exportParams.fileName), { typ: 'line' });
         switch (fmt) {
             case 'epub':
@@ -1292,11 +1299,11 @@ class CProject {
             message: () => {
                 let formats = app.title == i18n.LblEditor ?
                     [
-                        { title: 'SpecIF v1.0', id: 'specif_v10' },
                         { title: 'SpecIF v' + CONFIG.specifVersion, id: 'specif', checked: true },
                         { title: 'HTML with embedded SpecIF v' + CONFIG.specifVersion, id: 'html' },
                         { title: 'ReqIF v1.0', id: 'reqif' },
                         { title: 'MS Excel® <em>(experimental)</em>', id: 'xlsx' },
+                        { title: 'Turtle <em>(experimental)</em>', id: 'turtle' },
                         { title: 'ePub v2', id: 'epub' },
                         { title: 'MS Word® (Open XML)', id: 'oxml' }
                     ]
@@ -1319,7 +1326,7 @@ class CProject {
                     + '</div>';
                 return $(form);
                 function hasOntology() {
-                    let hL = self.cache.get("hierarchy", self.hierarchies);
+                    let hL = self.cache.get("hierarchy", self.nodes);
                     for (var h of hL) {
                         let rL = self.cache.get("resource", [h.resource]);
                         if (rL.length > 0 && LIB.hasType(rL[0], [CONFIG.resClassOntology], self.cache))
@@ -1399,7 +1406,6 @@ class CProject {
             else {
                 self.exporting = true;
                 switch (opts.format) {
-                    case 'specif_v10':
                     case 'turtle':
                     case 'reqif':
                     case 'specif':
@@ -1470,8 +1476,6 @@ class CProject {
             function storeAs(opts) {
                 opts.allDiagramsAsImage = ["html", "turtle", "reqif"].includes(opts.format);
                 switch (opts.format) {
-                    case 'specif_v10':
-                        opts.v10 = true;
                     case 'specif':
                     case 'html':
                         opts.lookupTitles = false;
@@ -1533,8 +1537,6 @@ class CProject {
                         }
                     ;
                     switch (opts.format) {
-                        case 'specif_v10':
-                            fName += ".v10";
                         case 'specif':
                             fName += ".specif";
                             zName = fName + '.zip';
@@ -1796,7 +1798,7 @@ class CProject {
             if (LIB.references(st.object, replacedE))
                 st.object = LIB.makeKey(replacingE.id);
         });
-        this.substituteRef(prj.hierarchies, LIB.makeKey(replacingE.id), LIB.keyOf(replacedE));
+        this.substituteRef(prj.nodes, LIB.makeKey(replacingE.id), LIB.keyOf(replacedE));
         if (replacingE['class'] && replacedE['class'] && !LIB.equalKey(replacingE['class'], replacedE['class']))
             prj.statementClasses.forEach((sC) => {
                 let idx = LIB.referenceIndexBy(sC.subjectClasses, replacedE['class']);

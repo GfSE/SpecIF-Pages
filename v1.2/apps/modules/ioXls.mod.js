@@ -4,8 +4,7 @@
     (C)copyright enso managers gmbh (http://www.enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 
     ToDo:
     - This code assumes that certain dataTypes including DT-Text and DT-ShortString are retrieved from the ontology.
@@ -224,7 +223,7 @@ moduleManager.construct({
                         createRes(sh, l);
                     }
                     ;
-                    specifData.hierarchies[0].nodes.push(hTree);
+                    specifData.nodes[0].nodes.push(hTree);
                     return;
                     function createRes(ws, row) {
                         function getVal(dT, cell) {
@@ -523,7 +522,7 @@ moduleManager.construct({
                 }],
             changedAt: chAt
         });
-        specifData.hierarchies.push({
+        specifData.nodes.push({
             id: CONFIG.prefixH + pN.toSpecifId(),
             resource: LIB.makeKey(CONFIG.prefixR + pN.toSpecifId()),
             nodes: [],
@@ -549,7 +548,7 @@ moduleManager.construct({
                 return pC.title;
             })
         ];
-        LIB.iterateNodes(cData.get("hierarchy", selPrj.hierarchies)
+        LIB.iterateNodes(cData.get("hierarchy", selPrj.nodes)
             .filter((h) => {
             return LIB.typeOf(h.resource, cData) != CONFIG.resClassUnreferencedResources;
         }), (nd) => {

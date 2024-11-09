@@ -3,8 +3,7 @@
     Dependencies: jQuery, bootstrap
     (C)copyright enso managers gmbh (http://www.enso-managers.de)
     Author: se@enso-managers.de, Berlin
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 */
 moduleManager.construct({
     name: CONFIG.reports
@@ -192,7 +191,7 @@ moduleManager.construct({
                 throw Error("Did not find a report panel for resourceClass with id:" + sCk.id);
         }
         let pend = 0, visited = [];
-        LIB.iterateNodes(selPrj.cache.get("hierarchy", selPrj.hierarchies)
+        LIB.iterateNodes(selPrj.cache.get("hierarchy", selPrj.nodes)
             .filter((h) => {
             return LIB.typeOf(h.resource, selPrj.cache) != CONFIG.resClassUnreferencedResources;
         }), (nd) => {

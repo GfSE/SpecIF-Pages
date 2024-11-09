@@ -1,11 +1,11 @@
 "use strict";
 const CONFIG = {};
-CONFIG.appVersion = "1.1.s.15",
-    CONFIG.specifVersion = "1.1";
+CONFIG.appVersion = "1.2.s.16",
+    CONFIG.specifVersion = "1.2";
 CONFIG.imgURL = './assets/images';
-CONFIG.ontologyURL = 'https://specif.de/v1.1/Ontology.specif';
-CONFIG.QuickStartGuideEn = "https://gfse.github.io/SpecIF-Pages/Manuals/01_Quick-Start-Guide_EN.html";
-CONFIG.QuickStartGuideDe = "https://gfse.github.io/SpecIF-Pages/files/SpecIF-Einfuehrung.pdf";
+CONFIG.ontologyURL = 'https://specif.de/v1.2/Ontology.specif';
+CONFIG.QuickStartGuideDe =
+    CONFIG.QuickStartGuideEn = "https://gfse.github.io/SpecIF-Pages/Manuals/01_Quick-Start-Guide_EN.html";
 CONFIG.userNameAnonymous = 'Anonymous';
 CONFIG.passwordAnonymous = '';
 CONFIG.placeholder = 'to-be-replaced';
@@ -108,3 +108,4 @@ RE.vocabularyTerm = /^[\w-]+(?:\:|\.)[\w\.:-]+$/;
 RE.splitVocabularyTerm = /^([\w-]+:|[\w-]+\.)?([\w\.:-]+)$/;
 RE.AmpersandPlus = new RegExp('&(.{0,8})', 'g');
 RE.XMLEntity = new RegExp('&(amp|gt|lt|apos|quot|#x[\\da-fA-F]{1,4}|#\\d{1,5});/', '');
+RE.versionFromPath = /\/(?:v|specif-)(\d+\.\d+)\//;

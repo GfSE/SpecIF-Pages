@@ -19,8 +19,8 @@ class CPropertyToShow {
         this.dT = this.cData.get("dataType", [this.pC.dataType])[0];
         this.title = LIB.titleOf(this.pC, { targetLanguage: 'default' });
         if (this.dT.enumeration) {
-            this.enumIdL = [].concat(prp.values);
-            this.values = this.values.map((v) => LIB.itemById(this.dT.enumeration, v).value);
+            this.enumIdL = prp.values.map(v => v.id);
+            this.values = this.values.map((v) => LIB.itemById(this.dT.enumeration, v.id).value);
         }
         ;
         let iPrm = LIB.itemBy(this.selPrj.myPermissions, 'item', this.pC.id);
@@ -756,6 +756,7 @@ moduleManager.construct({
                 }
             }
         });
+		console.debug('self.tree initialized',self.tree);
         self.showLeft = new State({
             showWhenSet: ['#specLeft'],
             hideWhenSet: []
@@ -778,9 +779,13 @@ moduleManager.construct({
     };
     self.updateTree = (opts, spc) => {
         if (!spc)
-            spc = self.cData.hierarchies;
+            spc = self.cData.nodes;
+		console.debug( 'updateTree', simpleClone(spc), simpleClone(self.cData), opts );
         self.tree.saveState();
-        self.tree.set(LIB.forAll(spc, toJqTreeWithoutRoot));
+		let newTr = LIB.forAll(spc, toJqTreeWithoutRoot);
+		console.debug( 'newTree', simpleClone(newTr));
+        self.tree.set(newTr);
+		console.debug( 'tree', self.tree.get());
         self.tree.numberize();
         self.tree.restoreState();
         return;
@@ -816,7 +821,7 @@ moduleManager.construct({
             || uP && uP[CONFIG.keyProject] && uP[CONFIG.keyProject] != self.selPrj.id)
             self.tree.clear();
         if (self.cData.length("hierarchy") > 0) {
-            self.selPrj.readItems('hierarchy', self.selPrj.hierarchies, { reload: true })
+            self.selPrj.readItems('hierarchy', self.selPrj.nodes, { reload: true })
                 .then((rsp) => {
                 let nd;
                 self.updateTree(opts, rsp);
@@ -1179,7 +1184,7 @@ moduleManager.construct({
         ;
         function aDiagramWithoutShowsStatementsForEdges() {
             let res, isNotADiagram, noDiagramFound = true;
-            return LIB.iterateNodes(cacheData.get('hierarchy', selPrj.hierarchies), (nd) => {
+            return LIB.iterateNodes(cacheData.get('hierarchy', selPrj.nodes), (nd) => {
                 res = cacheData.get('resource', [nd.resource])[0];
                 isNotADiagram = !CONFIG.diagramClasses.includes(LIB.classTitleOf(res['class'], cacheData.resourceClasses));
                 noDiagramFound = noDiagramFound && isNotADiagram;

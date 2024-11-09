@@ -3,8 +3,7 @@
     Dependencies: jQuery, bootstrap
     (C)copyright enso managers gmbh (http://www.enso-managers.de)
     Author: se@enso-managers.de, Berlin
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 */
 var FilterCategory;
 (function (FilterCategory) {
@@ -124,7 +123,7 @@ moduleManager.construct({
         app.busy.set();
         $('#hitlist').empty();
         let pend = 0, hitCnt = 0, visited = [];
-        LIB.iterateNodes(selPrj.cache.get("hierarchy", selPrj.hierarchies)
+        LIB.iterateNodes(selPrj.cache.get("hierarchy", selPrj.nodes)
             .filter((h) => {
             return LIB.typeOf(h.resource, selPrj.cache) != CONFIG.resClassUnreferencedResources;
         }), (nd) => {

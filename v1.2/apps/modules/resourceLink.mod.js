@@ -4,8 +4,7 @@
     (C)copyright enso managers gmbh (http://www.enso-managers.de)
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
     Author: se@enso-managers.de, Berlin
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 */
 moduleManager.construct({
     name: CONFIG.resourceLink
@@ -61,7 +60,7 @@ moduleManager.construct({
                 chooseResourceToLink();
             }, LIB.stdError);
             self.allResources.length = 0;
-            LIB.iterateNodes(cData.get("hierarchy", selPrj.hierarchies)
+            LIB.iterateNodes(cData.get("hierarchy", selPrj.nodes)
                 .filter((h) => {
                 return LIB.typeOf(h.resource, cData) != CONFIG.resClassUnreferencedResources;
             }), (nd) => {
@@ -201,9 +200,8 @@ moduleManager.construct({
             object: LIB.makeKey(dir.secondAs == 'object' ? self.selectedCandidate.resource.id : selRes.id),
             changedAt: new Date().toISOString()
         };
-        if (self.selectedStatementClass.propertyClasses && self.selectedStatementClass.propertyClasses.length > 0) {
-        }
-        ;
+        if (app.me.userName != CONFIG.userNameAnonymous)
+            sta.changedBy = app.me.userName;
         return selPrj.createItems('statement', [sta]);
     };
     return self;

@@ -283,7 +283,7 @@ function LanguageTextsEn() {
     self.MsgLoadingFiles = 'Loading images and files';
     self.MsgLoadingObjects = 'Loading resources';
     self.MsgLoadingRelations = 'Loading statements';
-    self.MsgLoadingHierarchies = 'Loading hierarchies';
+    self.MsgLoadingHierarchies = 'Loading nodes';
     self.MsgProjectCreated = 'Project successfully created';
     self.MsgProjectUpdated = 'Project successfully updated';
     self.MsgNoneSpecified = 'empty';

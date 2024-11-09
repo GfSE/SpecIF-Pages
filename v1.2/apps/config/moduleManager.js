@@ -5,8 +5,7 @@
     (C)copyright enso managers gmbh (http://www.enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 */
 class ViewControl {
     constructor() {
@@ -75,9 +74,6 @@ class Browser {
         this.supportsHtml5History = Boolean(window.history && window.history.pushState);
         if (!this.supportsHtml5History)
             console.info("Browser does not support HTML5 History");
-        this.supportsCORS = $.support.cors;
-        if (!this.supportsCORS)
-            console.info("Browser does not support CORS");
         this.supportsFileAPI = Boolean(window.File && window.FileReader && window.FileList && window.Blob);
     }
     isIE() {
@@ -113,7 +109,7 @@ var app, browser, i18n, message, moduleManager = function () {
                         showWhenSet: ['#spinner'],
                         hideWhenSet: ['.pageActions', '.contentActions']
                     });
-                    bindResizer();
+                    window.onresize = doResize;
                 }
             });
         }
@@ -573,9 +569,4 @@ function doResize() {
     $('.pane-filter').outerHeight(pH);
     $('.contentCtrl').css("top", hH);
     $('#aboutFrame').outerHeight(pH - 8);
-}
-function bindResizer() {
-    $(window).resize(() => {
-        doResize();
-    });
 }

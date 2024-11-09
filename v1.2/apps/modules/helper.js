@@ -25,7 +25,7 @@ function makeTextField(tag, val, opts) {
             throw Error("Invalid display option '" + opts.tagPos + "' when showing a text form");
     }
     ;
-    val = LIB.noCode(val || '').unescapeJSON();
+    val = LIB.noCode(val || '');
     switch (opts.typ) {
         case 'line':
             fG += '<div class="' + aC + '">'
@@ -47,7 +47,7 @@ function makeTextField(tag, val, opts) {
     return fG;
 }
 function setTextValue(tag, val) {
-    val = LIB.noCode(val || '').unescapeJSON();
+    val = LIB.noCode(val || '');
     let el = document.getElementById('field' + simpleHash(tag));
     if (el && el.nodeName && el.nodeName.toLowerCase() == 'div') {
         el.innerHTML = val;
@@ -486,7 +486,7 @@ LIB.equalDT = (refE, newE) => {
             return false;
     }
     ;
-    return LIB.equalBoolean(refE.multiple, newE.multiple);
+    return true;
 };
 LIB.equalPC = (refE, newE) => {
     if (Array.isArray(refE.values) != Array.isArray(newE.values))
@@ -532,6 +532,9 @@ LIB.isEqualStringL = (refL, newL) => {
         if (newL.indexOf(lE) < 0)
             return false;
     return true;
+};
+LIB.versionOf = (spD) => {
+    return spD.specifVersion || RE.versionFromPath.exec(spD['$schema'])[1];
 };
 LIB.hasContent = (pV) => {
     if (typeof (pV) != "string"
@@ -618,7 +621,7 @@ LIB.valuesByTitle = (itm, pNs, dta) => {
                     dT = LIB.itemByKey(dta.dataTypes, pC.dataType);
                     if (dT) {
                         valL = valL.concat(dT.enumeration ?
-                            p.values.map((v) => { return LIB.itemById(dT.enumeration, v).value; })
+                            p.values.map((v) => { return LIB.itemById(dT.enumeration, v.id).value; })
                             : p.values);
                     }
                 }
@@ -1046,11 +1049,6 @@ String.prototype.escapeJSON = function () {
         .replace(/\u0009/g, '\t')
         .replace(/\[\u0000-\u001F]/g, '');
 };
-String.prototype.unescapeJSON = function () {
-    return this.replace(/\\"/g, '"')
-        .replace(/\n/g, '&#x0A;')
-        .replace(/\t/g, '&#x09;');
-};
 String.prototype.escapeXML = function () {
     return this.replace(RE.AmpersandPlus, ($0, $1) => {
         if (RE.XMLEntity.test($0))
@@ -1258,7 +1256,7 @@ LIB.httpGet = (params) => {
 };
 LIB.isReferencedByHierarchy = (itm, H) => {
     if (!H)
-        H = app.projects.selected.cache.hierarchies;
+        H = app.projects.selected.cache.nodes;
     return LIB.iterateNodes(H, (nd) => { return nd.resource.id != itm.id; });
 };
 LIB.referencedResources = (rL, h) => {

@@ -4,8 +4,7 @@
     (C)copyright enso managers gmbh (http://www.enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 
     Limitations:
     - It is assumed that all text values within the provided SpecIF data set have only a single language,
@@ -280,13 +279,13 @@ moduleManager.construct({
             if (LIB.indexById(separatedHC.objects, r.id) < 0)
                 separatedHC.objects.push(r);
         }
-        pr.hierarchies.forEach((h) => {
+        pr.nodes.forEach((h) => {
             if (h.nodes)
                 h.nodes.forEach((n) => {
                     iterate(n, prepObj);
                 });
         });
-        pr.hierarchies.forEach((h) => {
+        pr.nodes.forEach((h) => {
             let hR = LIB.itemByKey(pr.resources, h.resource), hC = LIB.itemByKey(pr.resourceClasses, hR['class']);
             if (LIB.referenceIndexBy(separatedHC.objects, 'class', hC) > -1) {
                 hC = simpleClone(hC);
@@ -340,7 +339,7 @@ moduleManager.construct({
         });
         xml += '</SPEC-RELATIONS>'
             + '<SPECIFICATIONS>';
-        pr.hierarchies.forEach((h) => {
+        pr.nodes.forEach((h) => {
             xml += '<SPECIFICATION ' + commonAttsOf(h) + '>'
                 + '<TYPE><SPECIFICATION-TYPE-REF>' + h['class'].id + '</SPECIFICATION-TYPE-REF></TYPE>'
                 + attsOf(h)

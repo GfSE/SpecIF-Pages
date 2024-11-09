@@ -7,8 +7,7 @@
 	(C)copyright enso managers gmbh (http://www.enso-managers.de)
 	Author: se@enso-managers.de
 	License and terms of use: Apache 2.0 (https://apache.org/licenses/LICENSE-2.0)
-	We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+	We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 
 	Limitations:
 	- Accepts data-sets according to SpecIF v1.1.
@@ -250,7 +249,7 @@ function toOxml( data, options ) {
 			);
 
 			// For each SpecIF hierarchy, create the paragraphs and add them as subsequent section:
-			data.hierarchies.forEach(
+			data.nodes.forEach(
 				(h,i) => {
 					oxml.sections.push(
 						renderHierarchy( h, i, opts )
@@ -483,7 +482,7 @@ function toOxml( data, options ) {
 				// Find the hierarchy node id for a given resource;
 				// the first occurrence is returned:
 				let ndId;
-				for (var h of data.hierarchies) {
+				for (var h of data.nodes) {
 					ndId = ndByRef(h);
 					if (ndId) return ndId;		// return node id
 				};

@@ -4,8 +4,7 @@
     (C)copyright enso managers gmbh (http://www.enso-managers.de)
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
     Author: se@enso-managers.de, Berlin
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 */
 class CPropertyToEdit extends CPropertyToShow {
     constructor(p, rC) {
@@ -28,7 +27,7 @@ class CPropertyToEdit extends CPropertyToShow {
                 let val = this.dT.type == XsDataType.String ? app.ontology.localize(LIB.languageTextOf(eV.value, localOpts), localOpts) : eV.value;
                 return { title: val, id: eV.id, checked: this.enumIdL.includes(eV.id) };
             });
-            if (typeof (this.pC.multiple) == 'boolean' ? this.pC.multiple : this.dT.multiple)
+            if (this.pC.multiple)
                 return makeCheckboxField(ti, entryL, this.dispOpts());
             else
                 return makeRadioField(ti, entryL, this.dispOpts());
@@ -126,7 +125,7 @@ class CPropertyToEdit extends CPropertyToShow {
         }, opts), ti = LIB.titleOf(this, localOpts);
         if (this.dT.enumeration) {
             let valL;
-            if (typeof (this.pC.multiple) == 'boolean' ? this.pC.multiple : this.dT.multiple) {
+            if (this.pC.multiple) {
                 valL = checkboxValues(ti);
             }
             else {
@@ -134,7 +133,7 @@ class CPropertyToEdit extends CPropertyToShow {
                 valL = val ? [val] : [];
             }
             ;
-            return { class: LIB.makeKey(this.pC.id), values: valL };
+            return { class: LIB.makeKey(this.pC.id), values: valL.map(v => { return { id: v }; }) };
         }
         ;
         let val;
