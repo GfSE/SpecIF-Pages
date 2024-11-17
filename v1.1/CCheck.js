@@ -1,7 +1,7 @@
 /*  Schema and constraint checking for native SpecIF data in JSON format. 
 *   Requires: ajv 4.8 or higher.
 *   License: Apache 2.0 (http://www.apache.org/licenses/)
-*   Author: se@enso-managers.de, enso managers gmbh, Berlin (http://www.enso-managers.de)
+*   Author: se@enso-managers.de, enso managers gmbh, Berlin (http://enso-managers.de)
 *   We appreciate any correction, comment or contribution via e-mail to issues@specif.de
 *   .. or even better as Github issue (https://github.com/GfSE/SpecIF-Schema/issues)
 */
