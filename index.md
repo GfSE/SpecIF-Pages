@@ -18,11 +18,19 @@ On it's conference _Tag des Systems Engineering (TdSE) 2021_ the Gesellschaft f�
 
 In the field of Systems Engineering (SE) a multitude of methods is being used with benefit every day; for example requirements mana­gement, modelling of system structure and behavior with UML/SysML or simulation with Modelica and other languages. There is infor­mation from various sources and in different formats, all providing valuable input for system design and development [3].
 
-In practice, it is difficult or even impossible with acceptable effort to join the information and to put it in relation. Information from diffe­rent sources ("silos") is often inconsistent, because it is main­tained by different organi­zations with their own background and purpose. Popular modelling standards such as UML/SysML are notations, but leave semantic inter­pretation to tool-makers or users. For data (model) exchange there are several standards with respect to syntax, but very few which address the semantics as well.
+In practice, it is difficult or even impossible with acceptable effort to join the information and to put it in relation. 
+Information from diffe­rent sources ("silos") is often inconsistent, because it is main­tained by different organizations with their own background and purpose. 
+Popular modelling standards such as UML/SysML are notations, but leave semantic interpretation to tool-makers or users. 
+For data (model) exchange there are several standards with respect to syntax, but very few which address the semantics as well.
 
-The Specification Integration Facility (SpecIF) shall support the change from document-centric to artefact-centric colla­boration, which is a generally accepted goal in the domains of systems engineering and product lifecycle management (PLM). SpecIF defines a language for describing system models with attention to both syntax and semantics. By creating a common context for graphical and textual content, an understanding (beyond mere communi­cation) is achieved on a logical level. Existing technical formats and protocols such as ReqIF or RDF are adopted to take advantage of existing IT infra­structure.
+The Specification Integration Facility (SpecIF) shall support the change from document-centric to artefact-centric colla­boration, 
+which is a generally accepted goal in the domains of systems engineering and product lifecycle management (PLM). 
+SpecIF defines a language for describing system models with attention to both syntax and semantics. 
+By creating a common context for graphical and textual content, an understanding (beyond mere communi­cation) is achieved on a logical level. 
+Existing technical formats and protocols such as ReqIF or RDF are adopted to take advantage of existing IT infra­structure.
 
-The motivation is also discussed in an interview <a href="https://www.se-trends.de/systemmodelle-zusammen-fuehren-mit-specif/" target="_blank">Systemmodelle zusammen führen mit SpecIF</a> on _System Engineering Trends_. The interview was conducted in July 2016, but is just as relevant today as it was then.
+The motivation is also discussed in an interview <a href="https://www.se-trends.de/systemmodelle-zusammen-fuehren-mit-specif/" target="_blank">Systemmodelle zusammen führen mit SpecIF</a> 
+on _System Engineering Trends_. The interview was conducted in July 2016, but is just as relevant today as it was then.
 
 # Goals
 
@@ -31,23 +39,31 @@ The motivation is also discussed in an interview <a href="https://www.se-trends.
 SpecIF contributes to the following objectives:
 - **Lifecycle-Management from the Beginning:** Structures and content from the early phases of system conception are seam­lessly made available for development.
 - **Embracing disciplines:** SpecIF creates a common context for models from disciplines such as Mechanics, Electronics, Software, Safety and others.
-- **Embracing methods:** Texts as well as structural and behavioral models of popular methods, among others BPMN, SysML and FMC can be integrated. This means that individual elements ("resources") exist once and may appear on several model diagrams.
+- **Embracing methods:** Texts as well as structural and behavioral models of popular methods, among others BPMN, SysML and FMC can be integrated. 
+This means that individual elements ("resources") exist once and may appear on several model diagrams.
 - **Technology-neutral:** SpecIF data can be transformed to various technical formats, such as relational datenbase, ReqIF, OSLC, XMI, graph-database or web linked-data (RDF).
 - **Vendor-neutral and independent:** SpecIF is not limited to certain tools or vendors; in contrast, SpecIF lets you exchange model data between different tools and organizations.
-- **Schema-compliant:** SpecIF data can be checked formally using a JSON- or XML-schema; the former has been made available at <a href="https://github.com/GfSE/SpecIF-Schema/tree/main/schema" target="_blank">SpecIF-Schema</a>.
+- **Schema-compliant:** SpecIF data can be checked formally using a JSON- or XML-schema; 
+the former has been made available at <a href="./reference-implementation.html#schema-and-constraint-checker" target="_blank">SpecIF Schema and Constraint Checker</a>.
 - **Standard-compliant:** SpecIF draws on existing standards, most importantly from W3C, OMG and OASIS.
 - **Open and cooperative:** <img class="my-align-right size-20" src="./assets/logos/CC_BY-SA_88x31.png" alt="Creative Commons BY-SA" />
-All results are published with <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons 4.0 CC BY-SA</a> license; allowing commercial use. The results can be further developed, but the origin must be stated and they must be published under similar terms; please consult the referenced license text. We encou­rage everyone interested to join our GfSE working group and to directly contribute to the results.
+All results are published with <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons 4.0 CC BY-SA</a> license
+ allowing commercial use. The results can be further developed, but the origin must be stated and they must be published under similar terms; 
+ please consult the referenced license text. We encou­rage everyone interested to join our GfSE working group and to directly contribute to the results.
 
 # Use Cases
 
-Today, there is close cooperation between product OEMs, engineering service providers and suppliers. The business processes demand easy information exchange between all participating organizations:
+Today, there is close cooperation between product OEMs, engineering service providers and suppliers. 
+The business processes demand easy information exchange between all participating organizations:
 
 - Exchange requirement-specifications and model-based system-specifications along the supply-chain.
-- Publish results (including system models) from different authoring systems, usually requiring a high level of expertise, to a far bigger group of 'occasional' users for inquiry, commenting or auditing. Uniform access regardless of the authoring system is best practice.
 - Show changes made over time and support the change management across organisations.
+- Publish results (including system models) from different authoring systems, usually requiring a high level of expertise, 
+to a far bigger group of 'occasional' users for inquiry, commenting or auditing. Uniform access regardless of the authoring system is best practice.
 
-With respect to the content, information comes from different organisations and address product strategy and resulting requirements, laws and consumer protection, optimized user interaction, functions, system structure and behavior or even the validation of rqatings by means of simulation. The following tasks shall be supported:
+With respect to the content, information comes from different organisations and address product strategy and resulting requirements, 
+laws and consumer protection, optimized user interaction, functions, system structure and behavior or even the validation of rqatings by means of simulation. 
+The following tasks shall be supported:
 
 - Integrate information and models from different sources and in different formats,
 - Search and navigate consistently,
@@ -71,18 +87,6 @@ Four abstraction levels are used:
 - The integrated model holds the semantics, the meaning of the combined information, independently of their respective notation. It lends itself for analysis by machine, overall search as well as navigation.
 - The entities and relations on the lowest level store the information, where many known technologies may apply.
 
-## Fundamental Resource Types
-
-A logical integration of model information prepared using different notations is made possible by abstraction of model elements to very few fundamental element types. Based on scientific research and practical experience, five model element types are proposed [9]:
-
-- An ■ Actor represents an active entity, be it an activity, a process step, a function, a system component or a role.
-- A ● State stands for a passive entity, be it a value, a document, an information storage or even a physical shape.
-- An ♦ Event constitutes a time reference, a change in condition/value or more generally a synchronisation primitive.
-- A ↯ Requirement is a singular documented physical and functional need that a particular design, product or process must be able to perform.
-- A ✶ Feature is an intentional distinguishing characteristic of a system, often a unique selling proposition.
-
-The Fundamental Modelling Concepts (FMC) conceived by Prof. Dr. Siegfried Wendt, founding director of the Hasso-Plattner-Institute Potsdam, and his research team show, that all models of known methods can be constructed using three model element types Actor, State and Event [1,2]. Requirement and Feature have been added for textual information complementing the models.
-
 ## Syntax
 
 Within the SpecIF schema, the information model (meta-model) specifies the resource classes and statement classes that will be available for the system model.
@@ -97,19 +101,42 @@ The resources, relations and hierarchies with their properties are instances of 
 
 ## Semantics
 
+### Fundamental Resource Types
+
+A logical integration of model information prepared using different notations is made possible by abstraction of model elements to very few fundamental element types. 
+Based on scientific research and practical experience, five model element types are proposed [9]:
+
+- An ■ Actor represents an active entity, be it an activity, a process step, a function, a system component or a role.
+- A ● State stands for a passive entity, be it a value, a document, an information storage or even a physical shape.
+- An ♦ Event constitutes a time reference, a change in condition/value or more generally a synchronisation primitive.
+- A ↯ Requirement is a singular documented physical and functional need that a particular design, product or process must be able to perform.
+- A ✶ Feature is an intentional distinguishing characteristic of a system, often a unique selling proposition.
+
+The Fundamental Modelling Concepts (FMC) conceived by Prof. Dr. Siegfried Wendt, founding director of the Hasso-Plattner-Institute Potsdam, 
+and his research team show, that all models of known methods can be constructed using three model element types Actor, State and Event [1,2]. 
+Requirement and Feature have been added for textual information complementing the models.
+
 ### Ontology
 
 Good understanding is based on a clear vocabulary or ontology for the respective domain. This is true both for communication involving people as well as systems.
 
-For example, ReqIF is a format for information exchange standardized by the OMG [5], but is effectively used when applying the naming convention for the information elements which have been introduced by the ReqIF Implementor Forum of the ProSTEP iViP e.V.. Similar conventions have been published by the OSLC initiative. Interestingly, in both cases there are only names for the attributes, but not for the resources themselves: For example, the property carrying a descriptive text is named ReqIF.Text resp. dcterms:description, but there is no name for the requirement as a whole, such as ReqIF.Requirement oder oslc_rm:requirement (or whatever term may have been chosen).
+For example, ReqIF is a format for information exchange standardized by the OMG [5], but is effectively used when applying the naming convention 
+for the information elements which have been introduced by the ReqIF Implementor Forum of the ProSTEP iViP e.V.. 
+Similar conventions have been published by the OSLC initiative. Interestingly, in both cases there are only names for the attributes, 
+but not for the resources themselves: For example, the property carrying a descriptive text is named ReqIF.Text resp. dcterms:description, 
+but there is no name for the requirement as a whole, such as ReqIF.Requirement oder oslc_rm:requirement (or whatever term may have been chosen).
 
-SpecIF proposes an <a href="https://specif.de/apps/view.html#import=%22https://specif.de/v1.1/Ontology.specif%22" target="_blank">ontology</a> comprising names for resources and statements, as well as their properties and values. The conventions or definitions of Dublin Core, OSLC, IREB and other open standards are re-used whenever possible. The ontology itself is available in SpecIF-Format.
+SpecIF proposes an <a href="https://specif.de/apps/view.html#import=%22https://specif.de/v1.1/Ontology.specif%22" target="_blank">ontology</a> 
+comprising names for resources and statements, as well as their properties and values. The conventions or definitions of Dublin Core, OSLC, IREB 
+and other open standards are re-used whenever possible. The ontology itself is available in SpecIF-Format.
 
 ### Logical Statements
 
 <img class="my-align-right size-60" src="./assets/images/Home/logical-statements-en-960.png" alt="Logical Statements" />
 
-Relations between information elements express further meaning; they correspond to statements or assertions like 'Subject Predicate Object', where subject and object are information elements or 'resources'. Some statements have to be made manually by the analyst or system designer/architect, for example 'Component-XY satisfies Requirement-4711'. Most relations, however, can be derived automatically from the model diagrams, usually from the vertices between nodes.
+Relations between information elements express further meaning; they correspond to statements or assertions like 'Subject Predicate Object', 
+where subject and object are information elements or 'resources'. Some statements have to be made manually by the analyst or system designer/architect, 
+for example 'Component-XY satisfies Requirement-4711'. Most relations, however, can be derived automatically from the model diagrams, usually from the vertices between nodes.
 
 By expressing the meaning depicted by model diagrams with explicit statements, navigation as well as automated graph-search and consistency checks are made possible:
 
