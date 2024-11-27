@@ -16,7 +16,7 @@ On it's conference _Tag des Systems Engineering (TdSE) 2021_ the Gesellschaft f�
 
 <img class="my-align-right size-60" src="./assets/images/Home/End-to-end-Product-Lifecycle-Management-en-960.png" alt="End-to-end Product Lifecycle Management" />
 
-In the field of Systems Engineering (SE) a multitude of methods is being used with benefit every day; for example requirements mana­gement, modelling of system structure and behavior with UML/SysML or simulation with Modelica and other languages. There is infor­mation from various sources and in different formats, all providing valuable input for system design and development [3].
+In the field of Systems Engineering (SE) a multitude of methods is being used with benefit every day; for example requirements mana­gement, modelling of system structure and behavior with UML/SysML or simulation with Modelica and other languages. There is infor­mation from various sources and in different formats, all providing valuable input for system design and development.
 
 In practice, it is difficult or even impossible with acceptable effort to join the information and to put it in relation. 
 Information from diffe­rent sources ("silos") is often inconsistent, because it is main­tained by different organizations with their own background and purpose. 
@@ -188,7 +188,7 @@ Are you interested and would like to investigate the SpecIF approach more in det
 - A description of <a href="./Documentation/" target="_blank">basic concepts</a>,
 - A series of <a href="./Tutorials/" target="_blank">tutorials</a> on how to create and interpret SpecIF data,
 - SpecIF <a href="../Manuals/01_Quick-Start-Guide_EN.html" target="_blank">Introduction and Quick Start Guide</a>,
-- The <a href="https://specif.de/apps/view.html#import=%22./v1.1/Ontology.specif%22" target="_blank">SpecIF Ontology</a>,
+- The <a href="https://specif.de/apps/view.html#import=%22../v1.1/Ontology.specif%22" target="_blank">SpecIF Ontology</a>,
 - Some examples using SpecIF are listed in the <a href="#examples" target="_blank">previous chapter</a> and
 <!-- - A presentation <a href="https://specif.de/files/SpecIF/documents/2019-11-24%20Model-Integration%20with%20SpecIF" target="_blank">'Model Integration with SpecIF'</a> covering the status and future steps in development and -->
 - a concrete example <a href="./files/literature/TdSE-2021%20Dungern%20-%20Integrate%20BPMN%20and%20Archimate%20Models%20using%20SpecIF.pdf" target="_blank">'Integrate BPMN and Archimate Models using SpecIF'</a>.
