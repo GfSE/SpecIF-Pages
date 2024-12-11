@@ -114,6 +114,7 @@ function LanguageTextsFr() {
     self.LblSpecType = "Type";
     self.LblResourceClass = "Classe de ressource";
     self.LblStatementClass = "Classe d'affirmation";
+    self.LblResource = 'Resource';
     self.LblSpecificationTypes = "Types d'arborescence";
     self.hierarchyType =
         self.LblSpecificationType = "Type d'arborescence";
@@ -135,7 +136,6 @@ function LanguageTextsFr() {
     self.LblWordBeginnings = 'Seulement mots commen�ant par';
     self.LblWholeWords = 'Seulement mots entiers';
     self.LblCaseSensitive = 'Respecter majuscules et minuscules';
-    self.LblExcludeEnums = 'Ignorer �num�rateurs';
     self.LblNotAssigned = '(sans attribution de valeur)';
     self.LblPrevious = 'Dernier';
     self.LblNext = 'Prochain';
@@ -273,6 +273,7 @@ function LanguageTextsFr() {
     self.MsgImgWidth = "Largeur de l'image [px]";
     self.MsgSelectResClass = "Choisissez une " + self.LblResourceClass;
     self.MsgSelectStaClass = "Choisissez une " + self.LblStatementClass;
+    self.MsgSelectResource = "Choisissez une " + self.LblResource;
     self.MsgNoEligibleRelTypes = "Aucune affirmation d�fini pour ce type de ressource.";
     self.MsgClickToNavigate = "Double-cliquer une ressource pour y naviguer:";
     self.MsgClickToDeleteRel = "Double-cliquer une ressource pour supprimer l'affirmation respective:";

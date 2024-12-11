@@ -1,11 +1,10 @@
 "use strict";
 /*!	DDP-Schema import
     Dependencies: -
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 
     Limitations:
     - The schema is blindly traversed, so that almost every little change in structure will lead to failure
@@ -258,8 +257,8 @@ moduleManager.construct({
         });
         return spD;
         function add2Hierarchy(termId, folderName) {
-            if (spD.hierarchies.length == 1 && spD.hierarchies[0].nodes) {
-                let fld = LIB.itemByKey(spD.hierarchies[0].nodes, LIB.makeKey(folderName));
+            if (spD.nodes.length == 1 && spD.nodes[0].nodes) {
+                let fld = LIB.itemByKey(spD.nodes[0].nodes, LIB.makeKey(folderName));
                 if (fld && fld.nodes)
                     LIB.cacheE(fld.nodes, {
                         id: LIB.replacePrefix(CONFIG.prefixN, termId),

@@ -1,11 +1,10 @@
 "use strict";
 /*!    SpecIF: Generate Specif classes from the Ontology.
     Dependencies: -
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
     Author: se@enso-managers.de, Berlin
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 */
 class COntology {
     constructor(dta) {
@@ -60,11 +59,11 @@ class COntology {
             "SpecIF:LifecycleStatusExperimental"
         ];
         this.data = dta;
-        dta.hierarchies = dta.hierarchies.filter((h) => {
-            let r = LIB.itemByKey(dta.resources, h.resource);
-            return this.valueByTitle(r, CONFIG.propClassType) == "W3C:Ontology";
+        this.data.nodes = (dta.nodes).filter((n) => {
+            let r = LIB.itemByKey(dta.resources, n.resource);
+            return this.valueByTitle(r, CONFIG.propClassType) == CONFIG.resClassOntology;
         });
-        if (dta.hierarchies.length < 1) {
+        if (dta.nodes.length < 1) {
             message.show("No ontology found.", { severity: 'warning' });
             this.data = undefined;
             return;
@@ -83,7 +82,7 @@ class COntology {
         this.options = {};
     }
     isValid() {
-        return this.data && this.data.id && this.data.hierarchies.length > 0 && this.checkConstraintsOntology();
+        return this.data && this.data.id && this.data.nodes.length > 0 && this.checkConstraintsOntology();
     }
     getTermResources(ctg, term, opts) {
         ctg = ctg.toLowerCase();
@@ -293,8 +292,9 @@ class COntology {
         return {
             '@Context': "http://purl.org/dc/terms/",
             "id": "",
-            "$schema": "https://specif.de/v1.1/schema.json",
+            "$schema": "https://specif.de/v" + CONFIG.specifVersion + "/schema.json",
             "title": [],
+            "description": undefined,
             "generator": app.title,
             "generatorVersion": CONFIG.appVersion,
             "createdAt": new Date().toISOString(),
@@ -309,7 +309,7 @@ class COntology {
             "resources": [],
             "statements": [],
             "files": [],
-            "hierarchies": []
+            "nodes": []
         };
     }
     generateSpecifClasses(opts) {
@@ -382,7 +382,7 @@ class COntology {
                 "resourceClasses": this.generated.rCL,
                 "statementClasses": this.generated.sCL,
                 "resources": this.generated.rL,
-                "hierarchies": this.generated.hL
+                "nodes": this.generated.hL
             });
         }
         else {
@@ -392,7 +392,7 @@ class COntology {
     }
     makeClasses(rCIdL, createFn) {
         let self = this;
-        let cL = [], idL = LIB.referencedResourcesByClass(this.data.resources, this.data.hierarchies, rCIdL);
+        let cL = [], idL = LIB.referencedResourcesByClass(this.data.resources, this.data.nodes, rCIdL);
         if (idL.length > 0) {
             let tL = idL
                 .filter(isSelected);
@@ -536,6 +536,7 @@ class COntology {
         return Object.assign(this.makeItem(r, CONFIG.prefixPC), {
             dataType: this.options.referencesWithoutRevision ? LIB.makeKey(dT.id) : LIB.makeKey(dT),
             format: this.valueByTitle(r, "SpecIF:TextFormat"),
+            required: this.valueByTitle(r, "SpecIF:isRequired"),
             multiple: LIB.isTrue(this.valueByTitle(r, "SpecIF:multiple")) ? true : undefined,
             values: (defaultVL.length > 0 && (dT.type != XsDataType.Boolean || defaultVL[0] == "true") ? defaultVL : undefined)
         });

@@ -1,11 +1,11 @@
 "use strict";
 const CONFIG = {};
-CONFIG.appVersion = "1.1.s.15",
-    CONFIG.specifVersion = "1.1";
+CONFIG.appVersion = "1.2.a.3",
+    CONFIG.specifVersion = "1.2";
 CONFIG.imgURL = './assets/images';
-CONFIG.ontologyURL = 'https://specif.de/v1.1/Ontology.specif';
-CONFIG.QuickStartGuideEn = "https://gfse.github.io/SpecIF-Pages/Manuals/01_Quick-Start-Guide_EN.html";
-CONFIG.QuickStartGuideDe = "https://gfse.github.io/SpecIF-Pages/files/SpecIF-Einfuehrung.pdf";
+CONFIG.ontologyURL = 'https://specif.de/v1.2/Ontology.specif';
+CONFIG.QuickStartGuideDe =
+    CONFIG.QuickStartGuideEn = "https://gfse.github.io/SpecIF-Pages/Manuals/01_Quick-Start-Guide_EN.html";
 CONFIG.userNameAnonymous = 'Anonymous';
 CONFIG.passwordAnonymous = '';
 CONFIG.placeholder = 'to-be-replaced';
@@ -74,7 +74,7 @@ CONFIG.showEmptyProperties = false;
 const RE = {};
 RE.Id = /^[_a-zA-Z]{1}[_a-zA-Z\d.-]*$/;
 RE.Email = /^[A-Z\d._%+-]+@[A-Z\d.-]+\.[A-Z]{2,4}$/i;
-RE.URI = /(^|\s|>)((https?:\/\/|www\.)([^\s\/.$?#=]+\.)*([^\s\/.$?#=]+\.[\w]{2,4})(\/[^\s\?#]*?)*(\?[^\s#]+?)?(#\S*?)?)(\s|,|:|<|\.\s|\.?$)/gm;
+RE.URI = /(^|\s|>)((https?:\/\/|www\.)([^\s\/.$?#=]+\.)*([^\s\/.$?#=]+\.[\w]{2,4})((?:\/[^\s#?\/]*?){0,9})(\?[^\s#?]+?)?(#[^\s#]*?)?)(\s|,|:|<|\.\s|\.?$)/gm;
 RE.IsoDateTime = /^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2]\d|30|31)(?:T([0-1]\d|2[0-4]):([0-5]\d):([0-5]\d(?:\.\d{1,3})?)(\+(0\d|11|12):([0-5]\d)|-(0\d|11|12):([0-5]\d)|Z)?)?$/;
 RE.hasTimezone = /(Z|\+\d{2}(:\d{2})?|\-\d{2}(:\d{2})?)$/;
 RE.Integer = /^(-?[1-9]\d*|0)$/;
@@ -108,3 +108,4 @@ RE.vocabularyTerm = /^[\w-]+(?:\:|\.)[\w\.:-]+$/;
 RE.splitVocabularyTerm = /^([\w-]+:|[\w-]+\.)?([\w\.:-]+)$/;
 RE.AmpersandPlus = new RegExp('&(.{0,8})', 'g');
 RE.XMLEntity = new RegExp('&(amp|gt|lt|apos|quot|#x[\\da-fA-F]{1,4}|#\\d{1,5});/', '');
+RE.versionFromPath = /\/(?:v|specif-)(\d+\.\d+)\//;

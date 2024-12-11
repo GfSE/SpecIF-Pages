@@ -4,11 +4,10 @@
 	or
 	  https://www.data2type.de/xml-xslt-xslfo/wordml/praxistipps-word-ooxml/
 
-	(C)copyright enso managers gmbh (http://www.enso-managers.de)
+	(C)copyright enso managers gmbh (http://enso-managers.de)
 	Author: se@enso-managers.de
 	License and terms of use: Apache 2.0 (https://apache.org/licenses/LICENSE-2.0)
-	We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+	We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 
 	Limitations:
 	- Accepts data-sets according to SpecIF v1.1.
@@ -250,7 +249,7 @@ function toOxml( data, options ) {
 			);
 
 			// For each SpecIF hierarchy, create the paragraphs and add them as subsequent section:
-			data.hierarchies.forEach(
+			data.nodes.forEach(
 				(h,i) => {
 					oxml.sections.push(
 						renderHierarchy( h, i, opts )
@@ -483,7 +482,7 @@ function toOxml( data, options ) {
 				// Find the hierarchy node id for a given resource;
 				// the first occurrence is returned:
 				let ndId;
-				for (var h of data.hierarchies) {
+				for (var h of data.nodes) {
 					ndId = ndByRef(h);
 					if (ndId) return ndId;		// return node id
 				};
@@ -1113,31 +1112,6 @@ function toOxml( data, options ) {
 							};
 							return [{ p: { text: minimizeXmlExcapes(ct) } }];
 					}
-				/*	if(prp['class']) {
-						let pC = itemById(data.propertyClasses, prp['class']),
-							dT = itemById(data.dataTypes, pC.dataType);
-						switch( dT.type ) {
-							case dataTypeEnumeration:
-								let ct = '',
-									val = null,
-									st = opts.stereotypeProperties.includes(prp.title),
-									vL = prp.value.split(',');  // in case of xs:enumeration, content carries comma-separated value-IDs
-								for( var v=0,V=vL.length;v<V;v++ ) {
-									val = itemById(dT.values,vL[v]);
-									// If 'val' is an id, replace it by the corresponding value, otherwise don't change:
-									// Add 'double-angle quotation' in case of SubClass values.
-									if (val) ct += (v == 0 ? '' : ', ') + (st ? ('&#x00ab;' + val.value + '&#x00bb;') : val.value)
-									else ct += (v==0?'':', ')+vL[v] // ToDo: Check whether this case can occur
-								};
-								return [{p:{text:minimizeXmlExcapes(ct)}}];
-							case dataTypeString:
-//								console.debug('propertyValueOf - xhtml',prp.value);
-								// The value has been looked-up by the viewer before delivery:
-								return parseXhtml( prp.value, opts );
-						}
-					};
-					// for all other dataTypes or when there is no dataType:
-					return [{p:{text:minimizeXmlExcapes(prp.value)}}] */				
 				}
 				function generateOxml( ct, fmt ) {
 					// In a second step, transform the internal representation to OOXML.

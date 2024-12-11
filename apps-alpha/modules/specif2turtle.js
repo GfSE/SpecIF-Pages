@@ -4,8 +4,7 @@
     (C)copyright adesso SE, enso managers gmbh (http://enso-managers.de)
     Author: ??@adesso.de, se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-RDF-Bridge/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 */
 app.specif2turtle = (specifData, opts) => {
     let resultTtlString = defineNamespaces(specifData.id, opts)
@@ -16,7 +15,7 @@ app.specif2turtle = (specifData, opts) => {
         + transformResources(specifData.resources)
         + transformStatements(specifData.statements)
         + transformFiles(specifData.files)
-        + transformHierarchies(specifData.hierarchies)
+        + transformHierarchies(specifData.nodes)
         + emptyLine();
     return resultTtlString
         .replace(/; \./g, '.');
@@ -67,54 +66,6 @@ app.specif2turtle = (specifData, opts) => {
         return baseProjectTtlString;
     }
     ;
-    function transformDatatypes(dataTypes) {
-        if (!isArrayWithContent(dataTypes)) {
-            return '';
-        }
-        ;
-        let dataTypesTtlString = '';
-        dataTypes.forEach((dataType) => {
-            dataTypesTtlString += emptyLine()
-                + tier1RdfEntry(`rdfs:label '${escapeTtl(dataType.title)}' ;`)
-                + tier1RdfEntry(`SpecIF:type '${escapeTtl(dataType.type)}' ; `)
-                + (dataType.maxLength ? tier1RdfEntry(`SpecIF:maxLength '${dataType.maxLength}' ;`) : '')
-                + (dataType.minInclusive ? tier1RdfEntry(`SpecIF:minInclusive '${dataType.minInclusive}' ;`) : '')
-                + (dataType.maxInclusive ? tier1RdfEntry(`SpecIF:maxInclusive '${dataType.maxInclusive}' ;`) : '')
-                + (dataType.fractionDigits ? tier1RdfEntry(`SpecIF:fractionDigits '${dataType.fractionDigits}' ;`) : '')
-                + tier1RdfEntry(`dcterms:modified '${dataType.changedAt}' ;`)
-                + (dataType.changedBy ? tier1RdfEntry(`SpecIF:changedBy '${escapeTtl(dataType.changedBy)}' ;`) : '');
-            if (isArrayWithContent(dataType.enumeration)) {
-                dataType.enumeration.forEach(enumValue => {
-                    dataTypesTtlString += emptyLine()
-                        + tier0RdfEntry(`:${escapeTtl(enumValue.id)} a :${escapeTtl(dataType.title)} ;`)
-                        + tier1RdfEntry(`SpecIF:id '${escapeTtl(enumValue.id)}' ;`)
-                        + tier1RdfEntry(`rdfs:label '${escapeTtl(enumValue.value)}' ;`)
-                        + ' .';
-                });
-            }
-            ;
-        });
-        return dataTypesTtlString;
-    }
-    ;
-    function transformPropertyClasses(propertyClasses) {
-        if (!isArrayWithContent(propertyClasses)) {
-            return '';
-        }
-        ;
-        let propertyClassesTtlString = '';
-        propertyClasses.forEach(propertyClass => {
-            propertyClassesTtlString += emptyLine()
-                + tier1RdfEntry(`rdfs:label '${escapeTtl(propertyClass.title)}' ; `)
-                + (propertyClass.description ? tier1RdfEntry(`rdfs:comment ${textWithLang(propertyClass.description)} ;`) : '')
-                + tier1RdfEntry(`SpecIF:dataType '${escapeTtl(propertyClass.dataType.id)}' ;`)
-                + tier1RdfEntry(`dcterms:modified '${propertyClass.changedAt}' ;`)
-                + (propertyClass.changedBy ? tier1RdfEntry(`SpecIF:changedBy '${escapeTtl(propertyClass.changedBy)}' ;`) : '')
-                + ' .';
-        });
-        return propertyClassesTtlString;
-    }
-    ;
     function transformResourceClasses(resourceClasses) {
         if (!isArrayWithContent(resourceClasses)) {
             return '';
@@ -160,7 +111,7 @@ app.specif2turtle = (specifData, opts) => {
             prpL.forEach(prp => {
                 let pC = LIB.itemByKey(specifData.propertyClasses, prp['class']), dT = LIB.itemByKey(specifData.dataTypes, pC.dataType), ti = shapeEntity(escapeTtl(pC.title)), ct = '';
                 if (dT.enumeration) {
-                    prp.values = prp.values.map((v) => LIB.itemById(dT.enumeration, v).value);
+                    prp.values = prp.values.map((v) => LIB.itemById(dT.enumeration, v.id).value);
                 }
                 ;
                 for (var v of prp.values) {
@@ -232,10 +183,10 @@ app.specif2turtle = (specifData, opts) => {
             return '';
     }
     ;
-    function transformHierarchies(hierarchies) {
-        if (isArrayWithContent(hierarchies)) {
+    function transformHierarchies(nodes) {
+        if (isArrayWithContent(nodes)) {
             let hierarchyTtlString = '';
-            hierarchies.forEach(node => {
+            nodes.forEach(node => {
                 hierarchyTtlString += transformNode(node, { root: true });
             });
             return hierarchyTtlString;

@@ -4,10 +4,10 @@
     - Extract both model-elements and semantic relations in SpecIF Format
     - Model elements with same type and title are NOT consolidated by this transformation
     
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 
     References:
     [1] S.Friedenthal et al: A Practical Guide to SysML, The MK/OMG Press, Third Edition
@@ -51,7 +51,7 @@ function sysml2specif(xmi, options) {
         }), usedElements = [], specializations = [], associationEnds = [], abstractions = [], portL = [], connectors = [];
         spD.id = modDoc.getAttribute("xmi:id");
         spD.title = [{ text: modDoc.getAttribute("name") }];
-        parseElements(modDoc, { package: '', nodes: spD.hierarchies });
+        parseElements(modDoc, { package: '', nodes: spD.nodes });
         specializations = specializations
             .filter(validateStatement);
         spD.resources

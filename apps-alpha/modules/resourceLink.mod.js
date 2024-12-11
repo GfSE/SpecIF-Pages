@@ -1,17 +1,16 @@
 "use strict";
 /*!	SpecIF: Link Resources.
     Dependencies: jQuery, bootstrap
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
     Author: se@enso-managers.de, Berlin
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 */
 moduleManager.construct({
     name: CONFIG.resourceLink
 }, (self) => {
     "use strict";
-    let myName = self.loadAs, myFullName = 'app.' + myName, selPrj, cData, selRes, opts;
+    let myName = self.loadAs, myFullName = 'app.' + myName, selPrj, cData, selRes, opts, modalAddLink;
     self.eligibleSCL = [];
     self.selResStatements = [];
     self.allResources = [];
@@ -61,7 +60,7 @@ moduleManager.construct({
                 chooseResourceToLink();
             }, LIB.stdError);
             self.allResources.length = 0;
-            LIB.iterateNodes(cData.get("hierarchy", selPrj.hierarchies)
+            LIB.iterateNodes(cData.get("hierarchy", selPrj.nodes)
                 .filter((h) => {
                 return LIB.typeOf(h.resource, cData) != CONFIG.resClassUnreferencedResources;
             }), (nd) => {
@@ -77,60 +76,46 @@ moduleManager.construct({
             return;
             function chooseResourceToLink() {
                 if (--pend < 1) {
-                    let staClasses = LIB.forAll(self.eligibleSCL, (sC) => {
+                    const modalId = "addLink";
+                    $('#' + modalId).remove();
+                    let staClasses = self.eligibleSCL.map((sC) => {
                         return {
                             title: LIB.titleOf(sC, { lookupTitles: true, targetLanguage: selPrj.language }),
                             description: sC.description
                         };
                     });
                     staClasses[0].checked = true;
-                    new BootstrapDialog({
-                        title: i18n.MsgCreateStatement,
-                        type: 'type-primary',
-                        size: BootstrapDialog.SIZE_WIDE,
-                        onshown: () => { app[myName].filterClicked(); },
-                        message: () => {
-                            var form = '<div class="row" style="margin: 0 -4px 0 -4px">'
-                                + '<div class="col-sm-12 col-md-6" style="padding: 0 4px 0 4px"><div class="panel panel-default panel-options" style="margin-bottom:0">'
-                                + makeRadioField(i18n.LblStatementClass, staClasses, { handle: myFullName + '.filterClicked()' })
-                                + makeTextField(i18n.TabFilter, '', { typ: 'line', handle: myFullName + '.filterClicked()' })
-                                + '</div></div>'
-                                + '<div class="col-sm-12 col-md-6" style="padding: 0 4px 0 4px"><div class="panel panel-default panel-options" style="margin-bottom:0">'
-                                + '<div id="resCandidates" style="max-height:' + ($('#app').outerHeight(true) - 220) + 'px; overflow:auto" >'
-                                + '</div></div>'
-                                + '</div>';
-                            return $(form);
-                        },
-                        buttons: [{
-                                label: i18n.BtnCancel,
-                                action: (thisDlg) => {
-                                    thisDlg.close();
-                                }
-                            }, {
-                                id: 'btn-modal-saveResourceAsSubject',
-                                label: i18n.IcoAdd + '&#160;' + i18n.LblSaveRelationAsSource,
-                                cssClass: 'btn-success',
-                                action: (thisDlg) => {
-                                    self.saveStatement({ secondAs: 'subject' })
-                                        .then(() => {
-                                        self.parent.doRefresh({ forced: true });
-                                    }, LIB.stdError);
-                                    thisDlg.close();
-                                }
-                            }, {
-                                id: 'btn-modal-saveResourceAsObject',
-                                label: i18n.IcoAdd + '&#160;' + i18n.LblSaveRelationAsTarget,
-                                cssClass: 'btn-success',
-                                action: (thisDlg) => {
-                                    self.saveStatement({ secondAs: 'object' })
-                                        .then(() => {
-                                        self.parent.doRefresh({ forced: true });
-                                    }, LIB.stdError);
-                                    thisDlg.close();
-                                }
-                            }]
-                    })
-                        .open();
+                    $('body').append('<div id="' + modalId + '" class="modal fade" tabindex="-1" >'
+                        + '<div class="modal-dialog modal-xl" >'
+                        + '<div class="modal-content">'
+                        + '<div class="modal-header bg-success text-white" >'
+                        + '<h5 class="modal-title" >' + i18n.MsgCreateStatement + '</h5>'
+                        + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" > </button>'
+                        + '</div>'
+                        + '<div class="modal-body" >'
+                        + '<div class="row">'
+                        + '<div class="col-xl-6">'
+                        + makeRadioField(i18n.LblStatementClass, staClasses, { handle: myFullName + '.filterClicked()' })
+                        + makeTextField(i18n.TabFilter, '', { typ: 'line', handle: myFullName + '.filterClicked()', classes: 'mt-1' })
+                        + '</div>'
+                        + '<div class="col-xl-6">'
+                        + '<div class="mt-1"><em>' + i18n.MsgSelectResource + ':</em></div>'
+                        + '<div id="resCandidates" style="max-height:' + ($('#app').outerHeight(true) - 250) + 'px; overflow:auto" ></div>'
+                        + '</div>'
+                        + '</div>'
+                        + '</div>'
+                        + '<div class="modal-footer" >'
+                        + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >' + i18n.BtnCancel + '</button>'
+                        + '<button type="button" id="btn-modal-saveResourceAsSubject" class="btn btn-success" onclick="' + myFullName + '.saveClicked(\'subject\')">' + i18n.IcoAdd + '&#160;' + i18n.LblSaveRelationAsSource + '</button>'
+                        + '<button type="button" id="btn-modal-saveResourceAsObject" class="btn btn-success" onclick="' + myFullName + '.saveClicked(\'object\')">' + i18n.IcoAdd + '&#160;' + i18n.LblSaveRelationAsTarget + '</button>'
+                        + '</div>'
+                        + '</div>'
+                        + '</div>'
+                        + '</div>');
+                    const addLink = document.getElementById(modalId);
+                    addLink.addEventListener('shown.bs.modal', app[myName].filterClicked);
+                    modalAddLink = new bootstrap.Modal(addLink);
+                    modalAddLink.show();
                 }
             }
         }
@@ -201,10 +186,16 @@ moduleManager.construct({
             object: LIB.makeKey(dir.secondAs == 'object' ? self.selectedCandidate.resource.id : selRes.id),
             changedAt: new Date().toISOString()
         };
-        if (self.selectedStatementClass.propertyClasses && self.selectedStatementClass.propertyClasses.length > 0) {
-        }
-        ;
+        if (app.me.userName != CONFIG.userNameAnonymous)
+            sta.changedBy = app.me.userName;
         return selPrj.createItems('statement', [sta]);
+    };
+    self.saveClicked = (dir) => {
+        self.saveStatement({ secondAs: dir })
+            .then(() => {
+            self.parent.doRefresh({ forced: true });
+        }, LIB.stdError);
+        modalAddLink.hide();
     };
     return self;
 });

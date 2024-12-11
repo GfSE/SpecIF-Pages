@@ -114,6 +114,7 @@ function LanguageTextsEn() {
     self.LblSpecType = "Type";
     self.LblResourceClass = 'Resource-class';
     self.LblStatementClass = 'Statement-class';
+    self.LblResource = 'Resource';
     self.LblSpecificationTypes = 'Outline-types';
     self.hierarchyType =
         self.LblSpecificationType = 'Outline-type';
@@ -135,7 +136,6 @@ function LanguageTextsEn() {
     self.LblWordBeginnings = 'Word beginnings only';
     self.LblWholeWords = 'Whole words only';
     self.LblCaseSensitive = 'Case sensitive';
-    self.LblExcludeEnums = 'Exclude enumerated values';
     self.LblNotAssigned = '(not assigned)';
     self.LblPrevious = 'Previous';
     self.LblNext = 'Next';
@@ -273,6 +273,7 @@ function LanguageTextsEn() {
     self.MsgImgWidth = "Image width [px]";
     self.MsgSelectResClass = "Choose a " + self.LblResourceClass;
     self.MsgSelectStaClass = "Choose a " + self.LblStatementClass;
+    self.MsgSelectResource = "Select a " + self.LblResource;
     self.MsgNoEligibleRelTypes = "No statement-type defined for this resource-type.";
     self.MsgClickToNavigate = "Double-click a resource to navigate:";
     self.MsgClickToDeleteRel = "Double-click a resource to delete the respective statement:";
@@ -283,7 +284,7 @@ function LanguageTextsEn() {
     self.MsgLoadingFiles = 'Loading images and files';
     self.MsgLoadingObjects = 'Loading resources';
     self.MsgLoadingRelations = 'Loading statements';
-    self.MsgLoadingHierarchies = 'Loading hierarchies';
+    self.MsgLoadingHierarchies = 'Loading nodes';
     self.MsgProjectCreated = 'Project successfully created';
     self.MsgProjectUpdated = 'Project successfully updated';
     self.MsgNoneSpecified = 'empty';

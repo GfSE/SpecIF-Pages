@@ -115,7 +115,7 @@ function SpecifApp() {
     };
     self.export = function () {
         if (self[CONFIG.projects].selected && self[CONFIG.projects].selected.isLoaded())
-            self[CONFIG.projects].selected.chooseFormatAndExport();
+            self[CONFIG.projects].selected.chooseFormatThenExport();
         else
             message.show(i18n.MsgNoProjectLoaded, { severity: 'warning', duration: CONFIG.messageDisplayTimeShort });
     };

@@ -8,6 +8,7 @@ var XsDataType;
     XsDataType[XsDataType["DateTime"] = 'xs:dateTime'] = "DateTime";
     XsDataType[XsDataType["Duration"] = 'xs:duration'] = "Duration";
     XsDataType[XsDataType["String"] = 'xs:string'] = "String";
+    XsDataType[XsDataType["ComplexType"] = 'xs:complexType'] = "ComplexType";
 })(XsDataType || (XsDataType = {}));
 var SpecifInstantiation;
 (function (SpecifInstantiation) {

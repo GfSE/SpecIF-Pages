@@ -4,16 +4,21 @@
     Copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 */
+class CStateImport {
+    constructor() {
+        this.cacheLoaded = false;
+        this.allValid = false;
+    }
+}
 moduleManager.construct({
     name: 'importAny'
 }, function (self) {
     const importModes = [{
             id: 'create',
             title: 'Create a new project with the given id',
-            desc: 'All types, objects, relations and hierarchies will be created as specified.',
+            desc: 'All types, objects, relations and nodes will be created as specified.',
             label: i18n.BtnCreate
         }, {
             id: 'clone',
@@ -87,7 +92,7 @@ moduleManager.construct({
     self.format = undefined;
     var showFileSelect, importMode = { id: 'replace' }, myFullName = 'app.' + self.loadAs, urlP, urlOntology = (window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html') ?
         CONFIG.ontologyURL
-        : '../../SpecIF/vocabulary/Ontology.specif'), importing = false, cacheLoaded = false, allValid = false;
+        : '../../SpecIF/vocabulary/Ontology.specif'), importing = false;
     self.clear = function () {
         $('input[type=file]').val('');
         setTextValue(i18n.LblFileName, '');
@@ -117,18 +122,18 @@ moduleManager.construct({
             + '<div class="attribute-value" >'
             + '<div id="formatSelector" class="btn-group" style="margin: 0 0 0.4em 0" ></div>'
             + '<div id="helpImport" style="margin: 0 0 0.4em 0" ></div>'
-            + '<div id="fileSelectBtn" class="btn btn-default btn-fileinput" style="margin: 0 0 0.8em 0" ></div>'
+            + '<div id="fileSelectBtn" class="btn btn-light btn-fileinput" style="margin: 0 0 0.8em 0" ></div>'
             + '</div>'
             + '</div>'
             + '<form id="formNames" class="form-horizontal" role="form"></form>'
             + '<div class="fileSelect" style="display:none;" >'
             + '<div class="attribute-label" ></div>'
             + '<div class="attribute-value" >'
-            + '<div id="modeSelector" class="btn-group" style="margin: 0 0 0.4em 0" >'
+            + '<div id="modeSelector" class="btn-group mt-1" style="margin: 0 0 0.4em 0" >'
             + function () {
                 let btns = '';
                 importModes.forEach(function (b) {
-                    btns += '<button id="' + b.id + 'Btn" onclick="' + myFullName + '.importLocally(\'' + b.id + '\')" data-toggle="popover" title="' + b.title + '" class="btn btn-primary">' + b.label + '</button>';
+                    btns += '<button id="' + b.id + 'Btn" onclick="' + myFullName + '.importLocally(\'' + b.id + '\')" data-toggle="popover" title="' + b.title + '" type="button" class="btn btn-primary text-nowrap">' + b.label + '</button>';
                 });
                 return btns;
             }()
@@ -138,9 +143,6 @@ moduleManager.construct({
             + '<div>'
             + '<div class="attribute-label" ></div>'
             + '<div class="attribute-value" >'
-            + '<div class="pull-right" >'
-            + '<button id="cancelBtn" onclick="' + myFullName + '.abort()" class="btn btn-danger btn-xs">' + i18n.BtnCancelImport + '</button>'
-            + '</div>'
             + '<div id="progress" class="progress" >'
             + '<div class="progress-bar progress-bar-primary" ></div>'
             + '</div>'
@@ -223,10 +225,10 @@ moduleManager.construct({
         formats.forEach(function (s) {
             if (moduleManager.isReady(s.name)) {
                 if (typeof (app[s.name].toSpecif) == 'function' && typeof (app[s.name].verify) == 'function') {
-                    str += '<button id="formatSelector-' + s.id + '" onclick="' + myFullName + '.setFormat(\'' + s.id + '\')" class="btn btn-default' + (self.format.id == s.id ? ' active' : '') + '" data-toggle="popover" title="' + s.desc + '">' + s.label + '</button>';
+                    str += '<button id="formatSelector-' + s.id + '" onclick="' + myFullName + '.setFormat(\'' + s.id + '\')" type="button" class="btn btn-light' + (self.format.id == s.id ? ' active' : '') + '" data-toggle="popover" title="' + s.desc + '">' + s.label + '</button>';
                 }
                 else {
-                    str += '<button disabled class="btn btn-default" data-toggle="popover" title="' + s.desc + '">' + s.label + '</button>';
+                    str += '<button disabled type="button" class="btn btn-light" data-toggle="popover" title="' + s.desc + '">' + s.label + '</button>';
                 }
                 ;
             }
@@ -260,21 +262,22 @@ moduleManager.construct({
             + '<input id="importFile" type="file" accept="' + self.format.extensions.toString() + '" onchange="' + myFullName + '.pickFiles()" />');
         self.enableActions();
     };
-    function checkState() {
-        let pnl = getTextLength(i18n.LblProjectName) > 0;
-        cacheLoaded = typeof (app.projects) == 'object' && typeof (app.projects.selected) == 'object' && app.projects.selected.isLoaded();
-        allValid = self.file && self.file.name.length > 0 && (self.format.id != 'xls' || pnl);
-        setTextState(i18n.LblProjectName, pnl ? 'has-success' : 'has-error');
+    function getState() {
+        let state = new CStateImport(), pnl = getTextLength(i18n.LblProjectName) > 0;
+        state.cacheLoaded = typeof (app.projects) == 'object' && typeof (app.projects.selected) == 'object' && app.projects.selected.isLoaded();
+        state.allValid = self.file && self.file.name.length > 0 && (self.format.id != 'xls' || pnl);
+        setTextState(i18n.LblProjectName, pnl ? 'is-valid' : 'is-invalid');
+        return state;
     }
     ;
     self.enableActions = function () {
-        checkState();
+        let state = getState();
         try {
-            document.getElementById("createBtn").disabled = !allValid || cacheLoaded;
+            document.getElementById("createBtn").disabled = !state.allValid || state.cacheLoaded;
             document.getElementById("cloneBtn").disabled = true;
             document.getElementById("updateBtn").disabled =
                 document.getElementById("adoptBtn").disabled =
-                    document.getElementById("replaceBtn").disabled = !allValid || !cacheLoaded;
+                    document.getElementById("replaceBtn").disabled = !state.allValid || !state.cacheLoaded;
         }
         catch (e) {
             console.error("importAny: enabling actions has failed (" + e + ").");
@@ -284,15 +287,14 @@ moduleManager.construct({
     function setImporting(st) {
         importing = st;
         app.busy.set(st);
-        checkState();
+        let state = getState();
         try {
             document.getElementById("fileSelectBtn").disabled = st;
-            document.getElementById("createBtn").disabled = st || !allValid || cacheLoaded;
+            document.getElementById("createBtn").disabled = st || !state.allValid || state.cacheLoaded;
             document.getElementById("cloneBtn").disabled = true;
             document.getElementById("updateBtn").disabled =
                 document.getElementById("adoptBtn").disabled =
-                    document.getElementById("replaceBtn").disabled = st || !allValid || !cacheLoaded;
-            document.getElementById("cancelBtn").disabled = !st;
+                    document.getElementById("replaceBtn").disabled = st || !state.allValid || !state.cacheLoaded;
         }
         catch (e) {
             console.error("importAny: setting state 'importing' has failed (" + e + ").");
@@ -435,10 +437,5 @@ moduleManager.construct({
             });
         });
     }
-    self.abort = function () {
-        console.info('abort pressed');
-        app[self.format.name].abort();
-        app.projects.selected.abort();
-    };
     return self;
 });

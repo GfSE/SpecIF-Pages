@@ -8,11 +8,11 @@ function makeTextField(tag, val, opts) {
         opts = {};
     if (typeof (opts.tagPos) != 'string')
         opts.tagPos = 'left';
-    let fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' oninput="' + opts.handle + '"' : '', sH = simpleHash(tag), fG, aC;
+    let fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' oninput="' + opts.handle + '"' : '', sH = simpleHash(tag), fG, cl = (typeof (opts.classes) == 'string' && opts.classes.length > 0) ? ' ' + opts.classes : '', aC;
     if (opts.typ && ['line', 'area'].includes(opts.typ))
-        fG = '<div id="' + sH + '" class="form-group form-active" >';
+        fG = '<div id="' + sH + '" class="form-group form-active mt-1' + cl + '" >';
     else
-        fG = '<div class="attribute" >';
+        fG = '<div class="attribute mt-1' + cl + '" >';
     switch (opts.tagPos) {
         case 'none':
             aC = 'attribute-wide';
@@ -25,7 +25,7 @@ function makeTextField(tag, val, opts) {
             throw Error("Invalid display option '" + opts.tagPos + "' when showing a text form");
     }
     ;
-    val = LIB.noCode(val || '').unescapeJSON();
+    val = LIB.noCode(val || '');
     switch (opts.typ) {
         case 'line':
             fG += '<div class="' + aC + '">'
@@ -47,7 +47,7 @@ function makeTextField(tag, val, opts) {
     return fG;
 }
 function setTextValue(tag, val) {
-    val = LIB.noCode(val || '').unescapeJSON();
+    val = LIB.noCode(val || '');
     let el = document.getElementById('field' + simpleHash(tag));
     if (el && el.nodeName && el.nodeName.toLowerCase() == 'div') {
         el.innerHTML = val;
@@ -63,23 +63,23 @@ function setFocus(tag) {
         el.focus();
 }
 function setTextState(tag, state) {
-    if (['has-success', 'has-error'].indexOf(state) < 0)
+    if (['is-valid', 'is-invalid'].indexOf(state) < 0)
         throw Error("Invalid state '" + state + "'");
-    let el = $('#' + simpleHash(tag));
+    let el = $('#field' + simpleHash(tag));
     if (!el)
         return false;
-    if (el.hasClass('has-error')) {
-        if (state == 'has-success') {
-            el.removeClass('has-error').addClass('has-success');
+    if (el.hasClass('is-invalid')) {
+        if (state == 'is-valid') {
+            el.removeClass('is-invalid').addClass('is-valid');
             return true;
         }
         else
             return false;
     }
     ;
-    if (el.hasClass('has-success')) {
-        if (state == 'has-error') {
-            el.removeClass('has-success').addClass('has-error');
+    if (el.hasClass('is-valid')) {
+        if (state == 'is-invalid') {
+            el.removeClass('is-valid').addClass('is-invalid');
             return true;
         }
         else
@@ -128,7 +128,7 @@ function makeRadioField(tag, entries, opts) {
         opts.tagPos = 'left';
     if (typeof (opts.classes) != 'string')
         opts.classes = 'form-active';
-    let rB = '<div class="form-group ' + (opts.classes || '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
+    let rB = '<div class="form-group mt-1 ' + (opts.classes || '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
     switch (opts.tagPos) {
         case 'none':
             rB += '<div class="radio" >';
@@ -152,7 +152,7 @@ function makeRadioField(tag, entries, opts) {
         rB += '<label>'
             + '<input type="radio" name="radio' + simpleHash(tag) + '" value="' + (e.id || i) + '"' + (e.checked ? ' checked' : '') + fn + ' />'
             + '<span ' + popOver(e.description) + '>'
-            + e.title
+            + '&#160;' + e.title
             + (e.type ? '&#160;(' + e.type + ')' : '')
             + '</span>'
             + '</label><br />';
@@ -187,7 +187,7 @@ function makeCheckboxField(tag, entries, opts) {
         opts.tagPos = 'left';
     if (typeof (opts.classes) != 'string')
         opts.classes = 'form-active';
-    let cB = '<div class="form-group ' + (opts.classes || '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
+    let cB = '<div class="form-group mt-1 ' + (opts.classes || '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
     switch (opts.tagPos) {
         case 'none':
             cB += '<div class="checkbox" >';
@@ -204,7 +204,7 @@ function makeCheckboxField(tag, entries, opts) {
         cB += '<label>'
             + '<input type="checkbox" name="checkbox' + simpleHash(tag) + '" value="' + (e.id || i) + '"' + (e.checked ? ' checked' : '') + fn + ' />'
             + '<span ' + popOver(e.description) + '>'
-            + e.title
+            + '&#160;' + e.title
             + (e.type ? '&#160;(' + e.type + ')' : '')
             + '</span>'
             + '</label><br />';
@@ -229,12 +229,12 @@ function makeBooleanField(tag, val, opts) {
         fn = ' onclick="' + opts.handle + '"';
     switch (opts.typ) {
         case 'display':
-            return '<div class="attribute">'
+            return '<div class="attribute mt-1">'
                 + '<div class="attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
                 + '<div class="attribute-value">' + (val ? 'true' : 'false') + '</div>'
                 + '</div>';
         default:
-            return '<div class="form-group form-active">'
+            return '<div class="form-group form-active mt-1">'
                 + '<div class="attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
                 + '<div class="attribute-value checkbox" >'
                 + '<label>'
@@ -288,7 +288,7 @@ class CCheckDialogInput {
                     ok = val.length < 1 || LIB.isIsoDateTime(val);
             }
             ;
-            setTextState(cPs.label, ok ? 'has-success' : 'has-error');
+            setTextState(cPs.label, ok ? 'is-valid' : 'is-invalid');
             allOk = allOk && ok;
         });
         return allOk;
@@ -385,7 +385,7 @@ class CMessage {
                 return;
         }
         ;
-        if (!opts.severity || ['success', 'info', 'warning', 'error', 'danger'].indexOf(opts.severity) < 0)
+        if (!opts.severity || ['primary', 'secondary', 'success', 'info', 'warning', 'error', 'danger'].indexOf(opts.severity) < 0)
             opts.severity = 'warning';
         if (opts.severity == 'error')
             opts.severity = 'danger';
@@ -486,7 +486,7 @@ LIB.equalDT = (refE, newE) => {
             return false;
     }
     ;
-    return LIB.equalBoolean(refE.multiple, newE.multiple);
+    return true;
 };
 LIB.equalPC = (refE, newE) => {
     if (Array.isArray(refE.values) != Array.isArray(newE.values))
@@ -532,6 +532,9 @@ LIB.isEqualStringL = (refL, newL) => {
         if (newL.indexOf(lE) < 0)
             return false;
     return true;
+};
+LIB.versionOf = (spD) => {
+    return spD.specifVersion || RE.versionFromPath.exec(spD['$schema'])[1];
 };
 LIB.hasContent = (pV) => {
     if (typeof (pV) != "string"
@@ -605,6 +608,13 @@ LIB.displayValueOf = (val, opts) => {
         return opts.stripHTML ? v.stripHTML() : v;
     }
     ;
+    if (Array.isArray(val)) {
+        let oE = '';
+        for (var v of val)
+            oE = oE + (oE.length > 0 ? ', ' : '') + LIB.displayValueOf(v, opts);
+        return oE;
+    }
+    ;
     return val;
 };
 LIB.valuesByTitle = (itm, pNs, dta) => {
@@ -618,7 +628,7 @@ LIB.valuesByTitle = (itm, pNs, dta) => {
                     dT = LIB.itemByKey(dta.dataTypes, pC.dataType);
                     if (dT) {
                         valL = valL.concat(dT.enumeration ?
-                            p.values.map((v) => { return LIB.itemById(dT.enumeration, v).value; })
+                            p.values.map((v) => { return LIB.itemById(dT.enumeration, v.id).value; })
                             : p.values);
                     }
                 }
@@ -1046,11 +1056,6 @@ String.prototype.escapeJSON = function () {
         .replace(/\u0009/g, '\t')
         .replace(/\[\u0000-\u001F]/g, '');
 };
-String.prototype.unescapeJSON = function () {
-    return this.replace(/\\"/g, '"')
-        .replace(/\n/g, '&#x0A;')
-        .replace(/\t/g, '&#x09;');
-};
 String.prototype.escapeXML = function () {
     return this.replace(RE.AmpersandPlus, ($0, $1) => {
         if (RE.XMLEntity.test($0))
@@ -1258,7 +1263,7 @@ LIB.httpGet = (params) => {
 };
 LIB.isReferencedByHierarchy = (itm, H) => {
     if (!H)
-        H = app.projects.selected.cache.hierarchies;
+        H = app.projects.selected.cache.nodes;
     return LIB.iterateNodes(H, (nd) => { return nd.resource.id != itm.id; });
 };
 LIB.referencedResources = (rL, h) => {

@@ -2,11 +2,10 @@
 /*!	A simple module loader and object (singleton) factory.
     When all registered modules are ready, a callback function is executed to start or continue the application.
     Dependencies: jQuery 3.1 and later.
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 */
 class ViewControl {
     constructor() {
@@ -75,9 +74,6 @@ class Browser {
         this.supportsHtml5History = Boolean(window.history && window.history.pushState);
         if (!this.supportsHtml5History)
             console.info("Browser does not support HTML5 History");
-        this.supportsCORS = $.support.cors;
-        if (!this.supportsCORS)
-            console.info("Browser does not support CORS");
         this.supportsFileAPI = Boolean(window.File && window.FileReader && window.FileList && window.Blob);
     }
     isIE() {
@@ -103,7 +99,7 @@ var app, browser, i18n, message, moduleManager = function () {
         loadL(['bootstrap', 'font', 'types', 'i18n', 'tree'], { done: init2 });
         return;
         function init2() {
-            let modL = ['helper', 'helperTree', 'bootstrapDialog', 'mainCSS', 'ioOntology', 'standards', "xSpecif"];
+            let modL = ['helper', 'helperTree', 'mainCSS', 'ioOntology', 'standards', "xSpecif"];
             if (CONFIG.convertMarkdown)
                 modL.push('markdown');
             loadL(modL, {
@@ -113,7 +109,7 @@ var app, browser, i18n, message, moduleManager = function () {
                         showWhenSet: ['#spinner'],
                         hideWhenSet: ['.pageActions', '.contentActions']
                     });
-                    bindResizer();
+                    window.onresize = doResize;
                 }
             });
         }
@@ -142,7 +138,7 @@ var app, browser, i18n, message, moduleManager = function () {
         return;
         function ld(e) {
             if (e.view && e.parent) {
-                let c = e.viewClass ? 'class="' + e.viewClass + '" ' : '', d = '<div id="' + e.view.substring(1) + '" ' + c + ' style="display:none;"></div>';
+                let c = e.viewClass ? 'class="' + e.viewClass + '" ' : '', d = '<div id="' + e.view.substring(1) + '" ' + c + 'style="display:none;"></div>';
                 $(e.parent.view).append(d);
             }
             ;
@@ -183,10 +179,10 @@ var app, browser, i18n, message, moduleManager = function () {
                             lbl = ch.label || id;
                             switch (e.selectorType) {
                                 case 'btns':
-                                    $(e.selector).append('<button id="' + id + '" type="button" class="btn btn-default" onclick="moduleManager.show({view:\'' + ch.view + '\'})" >' + lbl + '</button>');
+                                    $(e.selector).append('<button id="' + id + '" type="button" class="btn btn-light" onclick="moduleManager.show({view:\'' + ch.view + '\'})" >' + lbl + '</button>');
                                     break;
                                 default:
-                                    $(e.selector).append('<li id="' + id + '" onclick="moduleManager.show({view:\'' + ch.view + '\'})"><a>' + lbl + '</a></li>');
+                                    $(e.selector).append('<li class="nav-item"><button class="nav-link" id="' + id + '"type = "button" role="tab" onclick="moduleManager.show({view:\'' + ch.view + '\'})">' + lbl + '</button></li>');
                             }
                             ;
                         }
@@ -200,7 +196,7 @@ var app, browser, i18n, message, moduleManager = function () {
                             lbl = ch.label || id;
                             switch (e.selectorType) {
                                 case 'btns':
-                                    $(e.selector).append('<button id="' + id + '" type="button" class="btn btn-default" onclick="' + ch.action + '" >' + lbl + '</button>');
+                                    $(e.selector).append('<button id="' + id + '" type="button" class="btn btn-light" onclick="' + ch.action + '" >' + lbl + '</button>');
                                     break;
                                 default:
                                     throw Error("Action'" + lbl + "' needs a parent selector of type 'btns'.");
@@ -310,21 +306,16 @@ var app, browser, i18n, message, moduleManager = function () {
         function ldM(mod) {
             switch (mod) {
                 case "font":
-                    getCss("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css");
+                    getStyle("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css");
                     setReady(mod);
                     return true;
                 case "bootstrap":
-                    getCss("https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css");
-                    getCss("https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap-theme.min.css");
-                    getScript('https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js');
-                    return true;
-                case "bootstrapDialog":
-                    getCss("https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.35.4/css/bootstrap-dialog.min.css");
-                    getScript('https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.35.4/js/bootstrap-dialog.min.js');
+                    getStyle("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css");
+                    getScript("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js");
                     return true;
                 case "tree":
-                    getCss("https://cdn.jsdelivr.net/npm/jqtree@1.8.4/jqtree.css");
-                    getScript('https://cdn.jsdelivr.net/npm/jqtree@1.8.4/tree.jquery.js');
+                    getStyle("https://cdn.jsdelivr.net/npm/jqtree@1.8.7/jqtree.css");
+                    getScript('https://cdn.jsdelivr.net/npm/jqtree@1.8.7/tree.jquery.js');
                     return true;
                 case "fileSaver":
                     getScript('https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js');
@@ -349,7 +340,7 @@ var app, browser, i18n, message, moduleManager = function () {
                         .done(() => { window.markdown = window.markdownit({ html: true, xhtmlOut: true, breaks: true, linkify: false }); });
                     return true;
                 case "mainCSS":
-                    getCss(loadPath + 'assets/stylesheets/SpecIF.default.css');
+                    getStyle(loadPath + 'assets/stylesheets/SpecIF.default.css');
                     setReady(mod);
                     return true;
                 case "types":
@@ -483,7 +474,7 @@ var app, browser, i18n, message, moduleManager = function () {
         function bust(url) {
             return url + (url.startsWith(loadPath) ? "?" + CONFIG.appVersion : "");
         }
-        function getCss(url) {
+        function getStyle(url) {
             $('head').append('<link rel="stylesheet" type="text/css" href="' + bust(url) + '" />');
         }
         function getScript(url, options) {
@@ -508,7 +499,7 @@ var app, browser, i18n, message, moduleManager = function () {
     function setReady(mod) {
         if (self.ready.indexOf(mod) < 0) {
             self.ready.push(mod);
-            console.info(mod + " loaded (" + self.ready.length + "/" + self.registered.length + ")");
+            console.info(mod + " loaded module " + self.ready.length + " of " + self.registered.length);
         }
         else {
             throw Error("Module '" + mod + "' cannot be set 'ready' more than once");
@@ -570,12 +561,5 @@ function doResize() {
     $('.contentWide').outerHeight(pH);
     $('.pane-tree').outerHeight(pH);
     $('.pane-details').outerHeight(pH);
-    $('.pane-filter').outerHeight(pH);
-    $('.contentCtrl').css("top", hH);
     $('#aboutFrame').outerHeight(pH - 8);
-}
-function bindResizer() {
-    $(window).resize(() => {
-        doResize();
-    });
 }
