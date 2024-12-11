@@ -18,7 +18,6 @@ Have a look at the following example:
 
 ```json
 {
-...
   "dataTypes": [{
     "id": "DT-Coordinate",
     "title": "A coordinate as a real number.",
@@ -49,14 +48,12 @@ Have a look at the following example:
     "revision": "1.2",
     "changedAt": "2024-11-21T10:08:31.960Z"
   }]
-...
 }
 ```
 
 The referencing propertyClass and resourceClass is similar to others discussed in the previous tutorials:
 ```json
 {
-...
   "propertyClasses": [{
     "id": "PC-GeoPoint",
     "title": "geo:Point",
@@ -84,20 +81,18 @@ The referencing propertyClass and resourceClass is similar to others discussed i
     ],
     "changedAt": "2024-11-21T10:08:31.960Z"
   }],
-...  
 }
 ```
 
 A resource's or statement's property value is given as follows:
 - An element in the values list is a list with values corresponding to the dataType's sequence; 
-thus a property can have multiple values (provided that the propertyClass allows it), where each value is a list with values according to its complexType.
+thus a property can have multiple values (provided that 'multiple' is set to 'true' in the propertyClass), where each value is a list with values according to its complexType.
 - The position within the list determines by which element in the dataType's sequence it is defined.
 - Here, the elements of the value list are simple data-types, more concretely real numbers. 
 In general, values of any SpecIF dataType are allowed, e.g. multi-language texts, pointers to enumerated values of the dataType or the values of a nested complex data-type. 
 
 ```json
 {
-...
   "resources": [{
     "id": "R-d5b902394e50",
     "class": "RC-94e50d5023b1a80157",
@@ -114,14 +109,13 @@ In general, values of any SpecIF dataType are allowed, e.g. multi-language texts
     }]
     "changedAt": "2024-11-21T10:08:31.960Z"
   }]
-...
 }
 ```
 
-Recap: As always, _properties_ is a list of properties, which in turn is a list of one or more values.
-The complex value is a list with SpecIF values corresponding to the dataType. 
+Recap: As always, _properties_ is a list of one or more values, if the corresponding propertyClass allows it.
+The complex value is a list with SpecIF values corresponding to its dataType. 
 The example shows simple real numbers, but it could be pointers to enumerated values or multi-language texts.
-Complex data-types may be nested, but without cyclic dependencies: A complex data-type must be a tree.
+Complex dataTypes may be nested, but without cyclic dependencies: A complex dataType must be a tree.
 
 You may 
 - view the example using the <a href="https://specif.de/v1.2/apps/view.html#import=https://specif.de/examples/v1.2/10_Complex-DataType.specif" target="_blank">SpecIF Viewer</a>, or
