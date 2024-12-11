@@ -16,7 +16,7 @@ In addition, a value assigned to a property with complex data-type must have a l
 Have a look at the following example:
 - The sequence contains three elements with a title and a pointer to a dataType.
 
-```
+```json
 {
 ...
   "dataTypes": [{
@@ -54,7 +54,7 @@ Have a look at the following example:
 ```
 
 The referencing propertyClass and resourceClass is similar to others discussed in the previous tutorials:
-```
+```json
 {
 ...
   "propertyClasses": [{
@@ -89,12 +89,13 @@ The referencing propertyClass and resourceClass is similar to others discussed i
 ```
 
 A resource's or statement's property value is given as follows:
-- An element in the values list is a list with values corresponding to the dataType's sequence:
+- An element in the values list is a list with values corresponding to the dataType's sequence; 
+thus a property can have multiple values (provided that the propertyClass allows it), where each value is a list with values according to its complexType.
 - The position within the list determines by which element in the dataType's sequence it is defined.
 - Here, the elements of the value list are simple data-types, more concretely real numbers. 
-In other cases, any SpecIF value could be allowed, e.g. multi-language texts, pointers to enumerated values of the data-type or values of a nested complex data-type. 
+In general, values of any SpecIF dataType are allowed, e.g. multi-language texts, pointers to enumerated values of the dataType or the values of a nested complex data-type. 
 
-```
+```json
 {
 ...
   "resources": [{
@@ -117,7 +118,7 @@ In other cases, any SpecIF value could be allowed, e.g. multi-language texts, po
 }
 ```
 
-As always, _properties_ is a list of properties, which in turn is a list of one or more values.
+Recap: As always, _properties_ is a list of properties, which in turn is a list of one or more values.
 The complex value is a list with SpecIF values corresponding to the dataType. 
 The example shows simple real numbers, but it could be pointers to enumerated values or multi-language texts.
 Complex data-types may be nested, but without cyclic dependencies: A complex data-type must be a tree.

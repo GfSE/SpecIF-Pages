@@ -16,7 +16,7 @@ Schema and Constraint Checker are made available here:
 | Schema | [https://specif.de/v1.0/schema.json](https://specif.de/v1.0/schema.json) | [https://specif.de/v1.1/schema.json](https://specif.de/v1.1/schema.json) | [https://specif.de/v1.2/schema.json](https://specif.de/v1.2/schema.json) |
 | Constraint Checker | [https://specif.de/v1.0/CCheck.js](https://specif.de/v1.0/CCheck.js) | [https://specif.de/v1.1/CCheck.js](https://specif.de/v1.1/CCheck.js) | [https://specif.de/v1.2/CCheck.js](https://specif.de/v1.2/CCheck.js)  
 | Constraint Checker (minimized) | [https://specif.de/v1.0/CCheck.min.js](https://specif.de/v1.0/CCheck.min.js) | [https://specif.de/v1.1/CCheck.min.js](https://specif.de/v1.1/CCheck.min.js) | [https://specif.de/v1.2/CCheck.min.js](https://specif.de/v1.2/CCheck.min.js)
-| Constraint Checker (module) | [https://specif.de/v1.0/CCheck.mjs](https://specif.de/v1.0/CCheck.mjs) | [https://specif.de/v1.1/CCheck.mjs](https://specif.de/v1.1/CCheck.mjs) | [https://specif.de/v1.2/CCheck.mjs](https://specif.de/v1.2/CCheck.mjs)
+| Constraint Checker (ES6-module) | [https://specif.de/v1.0/CCheck.mjs](https://specif.de/v1.0/CCheck.mjs) | [https://specif.de/v1.1/CCheck.mjs](https://specif.de/v1.1/CCheck.mjs) | [https://specif.de/v1.2/CCheck.mjs](https://specif.de/v1.2/CCheck.mjs)
 
 ## SpecIF Viewer / SpecIF Model Integrator and Editor
 
