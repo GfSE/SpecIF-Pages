@@ -1,7 +1,7 @@
 "use strict";
 /*!	SpecIF Class-based Reports.
     Dependencies: jQuery, bootstrap
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 */
@@ -170,7 +170,7 @@ moduleManager.construct({
                         rp = LIB.itemBy(res.properties, 'class', pCk);
                         if (rp && rp.values.length > 0) {
                             rp.values.forEach((val) => {
-                                j = LIB.indexById(self.list[i].datasets, val);
+                                j = LIB.indexById(self.list[i].datasets, val.id);
                                 if (j > -1) {
                                     incVal(self.list[i], j);
                                 }
@@ -207,7 +207,7 @@ moduleManager.construct({
                 }
             }, handleError);
             pend++;
-            selPrj.readStatementsOf(nd.resource, { asSubject: true })
+            selPrj.readStatementsOf(nd.resource, { dontCheckStatementVisibility: selPrj.aDiagramWithoutShowsStatementsForEdges(), asSubject: true })
                 .then((staL) => {
                 for (var sta of staL)
                     evalStatement(sta);
@@ -237,36 +237,28 @@ moduleManager.construct({
             });
         }
         function renderReports(list) {
-            var rs = '<div class="row" >';
-            let lb;
+            var rs = '<div class="container-fluid background-select"><div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 pt-1 px-3">', lb;
             list.forEach((li, i) => {
-                rs += '<div class="col-sm-6 col-md-4 col-lg-3" style="background-color:#f4f4f4; border-right: 4px solid #ffffff; border-top: 4px solid #ffffff; padding-right:0.4em; padding-left:0.4em; height: ' + panelHeight(list) + '">'
-                    + '<h4>' + li.title + '</h4>'
+                rs += '<div class="col my-1 px-1"><div class="card h-100"><div class="card-body">'
+                    + '<h4 class="card-title">' + li.title + '</h4>'
                     + '<table style="width:100%; font-size:90%">'
                     + '<tbody>';
                 li.datasets.forEach((ds, s) => {
-                    lb = (li.category != FilterCategory.statementClass && ds.count > 0) ? '<a onclick="app.' + self.loadAs + '.facetClicked(' + i + ',' + s + ')">' + ds.label + '</a>' : ds.label;
+                    lb = (li.category != FilterCategory.statementClass && ds.count > 0) ? '<a class="link-primary" onclick="app.' + self.loadAs + '.facetClicked(' + i + ',' + s + ')">' + ds.label + '</a>' : ds.label;
                     rs += '<tr>'
-                        + '<td style="width:35%; padding:0.2em; white-space: nowrap">' + lb + '</td>'
-                        + '<td style="width:15%; padding:0.2em" class="text-right">' + ds.count + '</td>'
-                        + '<td style="padding:0.2em">'
+                        + '<td style="width:35%; white-space: nowrap">' + lb + '</td>'
+                        + '<td class="px-2" style="width:10%; text-align:right">' + ds.count + '</td>'
+                        + '<td>'
                         + '<div style="background-color:#1a48aa; height: 0.5em; border-radius: 0.2em; width: ' + barLength(li, ds) + '" />'
                         + '</td>'
                         + '</tr>';
                 });
                 rs += '</tbody>'
                     + '</table>'
-                    + '</div>';
+                    + '</div></div></div>';
             });
-            rs += '</div>';
+            rs += '</div></div>';
             return rs;
-            function panelHeight(L) {
-                let maxSets = 0;
-                L.forEach((p) => {
-                    maxSets = Math.max(maxSets, p.datasets.length);
-                });
-                return ((1.1 + maxSets) * 1.67 + 'em');
-            }
             function barLength(rp, ds) {
                 if (rp && ds) {
                     if (ds.count <= rp.scaleMin)

@@ -1,7 +1,7 @@
 "use strict";
 /*!	Show SpecIF data
     Dependencies: jQuery, jqTree, bootstrap
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
     We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
@@ -105,7 +105,7 @@ class CPropertyToShow {
                 replaced = true;
                 if ($1.length < CONFIG.titleLinkMinLength)
                     return $1 + $2;
-                let m = $1.toLowerCase(), cR, ti, rC, target;
+                let m = $1.toLowerCase(), cR, ti, target;
                 app.specs.tree.iterate((nd) => {
                     cR = LIB.itemByKey(this.cData.resources, nd.ref);
                     ti = this.cData.instanceTitleOf(cR, opts);
@@ -114,15 +114,14 @@ class CPropertyToShow {
                     target = cR;
                     return false;
                 });
-                if (target)
-                    return lnk(target, $1) + $2;
+                if (target) {
+                    return '<a class="link-primary" onclick="app[CONFIG.objectList].relatedItemClicked(\'' + target.id + '\')">' + $1 + '</a>' + $2;
+                }
+                ;
                 return '<span style="color:#D82020">' + $1 + '</span>' + $2;
             });
         } while (replaced);
         return str;
-        function lnk(r, t) {
-            return '<a onclick="app[CONFIG.objectList].relatedItemClicked(\'' + r.id + '\')">' + t + '</a>';
-        }
     }
     renderFile(txt, opts) {
         if (typeof (opts) != 'object')
@@ -356,8 +355,8 @@ class CResourceToShow {
         }, optsDesc = Object.assign({
             titleLinking: clickable
         }, opts);
-        var rO = '<div class="listEntry">'
-            + '<div class="content-main">';
+        var rO = '<div class="row listEntry">'
+            + '<div class="col-xl-8">';
         switch (app.specs.selectedView()) {
             case '#' + CONFIG.objectFilter:
             case '#' + CONFIG.objectList:
@@ -375,7 +374,7 @@ class CResourceToShow {
             }
         });
         rO += '</div>'
-            + '<div class="content-other">';
+            + '<div class="col-xl">';
         rO += this.renderAttr(app.ontology.localize('SpecIF:Resource', opts), LIB.titleOf(this.rC, opts), 'attribute-condensed');
         this.other.forEach((prp) => {
             if (prp.isVisible(opts)) {
@@ -686,9 +685,9 @@ moduleManager.construct({
     };
     self.init = () => {
         let h = '<div id="specLeft" class="paneLeft" style="position:relative">'
-            + '<div id="navBtns" class="btn-group-vertical btn-group-sm" style="position:absolute;top:4px;right:12px;z-index:900">'
-            + '<button class="btn btn-default" onclick="' + myFullName + '.tree.moveUp()" data-toggle="popover" title="' + i18n.LblPrevious + '" >' + i18n.IcoPrevious + '</button>'
-            + '<button class="btn btn-default" onclick="' + myFullName + '.tree.moveDown()" data-toggle="popover" title="' + i18n.LblNext + '" >' + i18n.IcoNext + '</button>'
+            + '<div id="navBtns" class="btn-group-vertical btn-group-sm" role="group" style="position:absolute;top:4px;right:12px;z-index:900">'
+            + '<button class="btn btn-light" onclick="' + myFullName + '.tree.moveUp()" data-toggle="popover" title="' + i18n.LblPrevious + '" >' + i18n.IcoPrevious + '</button>'
+            + '<button class="btn btn-light" onclick="' + myFullName + '.tree.moveDown()" data-toggle="popover" title="' + i18n.LblNext + '" >' + i18n.IcoNext + '</button>'
             + '</div>'
             + '<div id="hierarchy" class="pane-tree" ></div>'
             + '<div id="details" class="pane-details" ></div>'
@@ -756,7 +755,6 @@ moduleManager.construct({
                 }
             }
         });
-		console.debug('self.tree initialized',self.tree);
         self.showLeft = new State({
             showWhenSet: ['#specLeft'],
             hideWhenSet: []
@@ -780,12 +778,8 @@ moduleManager.construct({
     self.updateTree = (opts, spc) => {
         if (!spc)
             spc = self.cData.nodes;
-		console.debug( 'updateTree', simpleClone(spc), simpleClone(self.cData), opts );
         self.tree.saveState();
-		let newTr = LIB.forAll(spc, toJqTreeWithoutRoot);
-		console.debug( 'newTree', simpleClone(newTr));
-        self.tree.set(newTr);
-		console.debug( 'tree', self.tree.get());
+        self.tree.set(LIB.forAll(spc, toJqTreeWithoutRoot));
         self.tree.numberize();
         self.tree.restoreState();
         return;
@@ -884,7 +878,7 @@ moduleManager.construct({
 moduleManager.construct({
     view: '#' + CONFIG.objectList
 }, (self) => {
-    var myName = self.loadAs, myFullName = 'app.' + myName, selPrj, selRes;
+    var myName = self.loadAs, myFullName = 'app.' + myName, selPrj, selRes, modalDelNode;
     self.resCreClasses = [];
     self.resCre = false;
     self.resources = new CResourcesToShow();
@@ -955,30 +949,30 @@ moduleManager.construct({
             app.busy.reset();
         }
         function actionBtns() {
-            var rB = '<div class="btn-group" style="position:absolute;top:4px;right:4px;z-index:900">';
+            var rB = '<div class="btn-group" role="group" style="position:absolute;top:4px;right:4px;z-index:900">';
             if (self.resCre && (!selRes || selRes.isUserInstantiated()))
                 rB += '<button class="btn btn-success" onclick="' + myFullName + '.editResource(\'create\')" '
                     + 'data-toggle="popover" title="' + i18n.LblAddObject + '" >' + i18n.IcoAdd + '</button>';
             else
-                rB += '<button disabled class="btn btn-default" >' + i18n.IcoAdd + '</button>';
+                rB += '<button disabled class="btn btn-light" >' + i18n.IcoAdd + '</button>';
             if (!selRes)
                 return rB + '</div>';
             if (self.resCre && selRes.isUserInstantiated())
                 rB += '<button class="btn btn-success" onclick="' + myFullName + '.editResource(\'clone\')" '
                     + 'data-toggle="popover" title="' + i18n.LblCloneObject + '" >' + i18n.IcoClone + '</button>';
             else
-                rB += '<button disabled class="btn btn-default" >' + i18n.IcoClone + '</button>';
+                rB += '<button disabled class="btn btn-light" >' + i18n.IcoClone + '</button>';
             if (selRes.hasPropertyWithUpdatePermission)
-                rB += '<button class="btn btn-default" onclick="' + myFullName + '.editResource(\'update\')" '
+                rB += '<button class="btn btn-primary" onclick="' + myFullName + '.editResource(\'update\')" '
                     + 'data-toggle="popover" title="' + i18n.LblUpdateObject + '" >' + i18n.IcoEdit + '</button>';
             else
-                rB += '<button disabled class="btn btn-default" >' + i18n.IcoEdit + '</button>';
-            rB += '<button disabled class="btn btn-default" >' + i18n.IcoComment + '</button>';
+                rB += '<button disabled class="btn btn-primary" >' + i18n.IcoEdit + '</button>';
+            rB += '<button disabled class="btn btn-primary" >' + i18n.IcoComment + '</button>';
             if (selRes.rC.permissionVector.D && selRes.isUserInstantiated())
-                rB += '<button class="btn btn-danger" onclick="' + myFullName + '.deleteNode()" '
+                rB += '<button class="btn btn-danger" onclick="' + myFullName + '.confirmDeletion()" '
                     + 'data-toggle="popover" title="' + i18n.LblDeleteObject + '" >' + i18n.IcoDelete + '</button>';
             else
-                rB += '<button disabled class="btn btn-default" >' + i18n.IcoDelete + '</button>';
+                rB += '<button disabled class="btn btn-light" >' + i18n.IcoDelete + '</button>';
             return rB + '</div>';
         }
         ;
@@ -1014,32 +1008,37 @@ moduleManager.construct({
             throw Error("\'editResource\' clicked, but module '" + CONFIG.resourceEdit + "' is not ready.");
         }
     };
-    self.deleteNode = () => {
-        new BootstrapDialog({
-            title: i18n.MsgConfirm,
-            type: BootstrapDialog.TYPE_DANGER,
-            message: i18n.lookup('MsgConfirmObjectDeletion', self.parent.tree.selectedNode.name),
-            buttons: [{
-                    label: i18n.BtnCancel,
-                    action: (thisDlg) => {
-                        thisDlg.close();
-                    }
-                }, {
-                    label: i18n.BtnDeleteObjectRef,
-                    action: (thisDlg) => {
-                        delNd(self.parent.tree.selectedNode);
-                        thisDlg.close();
-                    }
-                }]
-        })
-            .open();
-        return;
-        function delNd(nd) {
-            console.info("Deleting tree object '" + nd.name + "'.");
-            self.parent.tree.selectNode(nd.getNextSibling());
-            app.projects.selected.deleteItems('node', [LIB.makeKey(nd)])
-                .then(self.parent.reworkTree, LIB.stdError);
-        }
+    self.confirmDeletion = () => {
+        const modalId = "delNode";
+        $('#' + modalId).remove();
+        $('body').append('<div class="modal fade" id="' + modalId + '" tabindex="-1" >'
+            + '<div class="modal-dialog" >'
+            + '<div class="modal-content">'
+            + '<div class="modal-header bg-danger text-white" >'
+            + '<h5 class="modal-title" >' + i18n.MsgConfirm + '</h5>'
+            + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" > </button>'
+            + '</div>'
+            + '<div class="modal-body" >'
+            + i18n.lookup('MsgConfirmObjectDeletion', self.parent.tree.selectedNode.name)
+            + '</div>'
+            + '<div class="modal-footer" >'
+            + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >' + i18n.BtnCancel + '</button>'
+            + '<button type="button" class="btn btn-danger" onclick="' + myFullName + '.deleteSelectedNode()">' + i18n.BtnDeleteObjectRef + '</button>'
+            + '</div>'
+            + '</div>'
+            + '</div>'
+            + '</div>');
+        const delNode = document.getElementById(modalId);
+        modalDelNode = new bootstrap.Modal(delNode);
+        modalDelNode.show();
+    };
+    self.deleteSelectedNode = () => {
+        const nd = self.parent.tree.selectedNode;
+        console.info("Deleting tree object '" + nd.name + "'.");
+        self.parent.tree.selectNode(nd.getNextSibling());
+        app.projects.selected.deleteItems('node', [LIB.makeKey(nd)])
+            .then(self.parent.reworkTree, LIB.stdError);
+        modalDelNode.hide();
     };
     self.relatedItemClicked = (rId) => {
         self.parent.tree.selectNodeByRef(LIB.makeKey(rId));
@@ -1085,7 +1084,7 @@ moduleManager.construct({
                 view: self.view,
                 node: nd.id
             });
-        selPrj.readStatementsOf(nd.ref, { dontCheckStatementVisibility: aDiagramWithoutShowsStatementsForEdges(), asSubject: true, asObject: true })
+        selPrj.readStatementsOf(nd.ref, { dontCheckStatementVisibility: selPrj.aDiagramWithoutShowsStatementsForEdges(), asSubject: true, asObject: true })
             .then((sL) => {
             net = new CGraph({ resources: [nd.ref] });
             sL.forEach(cacheNet);
@@ -1182,33 +1181,23 @@ moduleManager.construct({
             }
         }
         ;
-        function aDiagramWithoutShowsStatementsForEdges() {
-            let res, isNotADiagram, noDiagramFound = true;
-            return LIB.iterateNodes(cacheData.get('hierarchy', selPrj.nodes), (nd) => {
-                res = cacheData.get('resource', [nd.resource])[0];
-                isNotADiagram = !CONFIG.diagramClasses.includes(LIB.classTitleOf(res['class'], cacheData.resourceClasses));
-                noDiagramFound = noDiagramFound && isNotADiagram;
-                return (isNotADiagram
-                    || LIB.hasType(res, CONFIG.diagramTypesHavingShowsStatementsForEdges, cacheData));
-            }) || noDiagramFound;
-        }
     };
     function linkBtns() {
         if (!selRes)
             return '';
-        var rB = '<div id="linkBtns" class="btn-group" style="position:absolute;top:4px;right:4px;z-index:900">';
+        var rB = '<div id="linkBtns" class="btn-group" role="group" style="position:absolute;top:4px;right:4px;z-index:900">';
         if (modeStaDel)
-            return rB + '<button class="btn btn-default" onclick="' + myFullName + '.toggleModeStaDel()" >' + i18n.BtnCancel + '</button></div>';
+            return rB + '<button class="btn btn-light" onclick="' + myFullName + '.toggleModeStaDel()" >' + i18n.BtnCancel + '</button></div>';
         if (app.title != i18n.LblReader && self.staCre)
             rB += '<button class="btn btn-success" onclick="' + myFullName + '.linkResource()" '
                 + 'data-toggle="popover" title="' + i18n.LblAddRelation + '" >' + i18n.IcoAdd + '</button>';
         else
-            rB += '<button disabled class="btn btn-default" >' + i18n.IcoAdd + '</button>';
+            rB += '<button disabled class="btn btn-success" >' + i18n.IcoAdd + '</button>';
         if (app.title != i18n.LblReader && net.statements.length > 0)
             rB += '<button class="btn btn-danger ' + (modeStaDel ? 'active' : '') + '" onclick="' + myFullName + '.toggleModeStaDel()" '
                 + 'data-toggle="popover" title="' + i18n.LblDeleteRelation + '" >' + i18n.IcoDelete + '</button>';
         else
-            rB += '<button disabled class="btn btn-default" >' + i18n.IcoDelete + '</button>';
+            rB += '<button disabled class="btn btn-danger" >' + i18n.IcoDelete + '</button>';
         return rB + '</div>';
     }
     function getPermissions(res) {

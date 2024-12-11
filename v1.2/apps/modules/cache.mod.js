@@ -1,7 +1,7 @@
 "use strict";
 /*!	Cache Library for SpecIF data.
     Dependencies: jQuery
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
     We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
@@ -838,6 +838,16 @@ class CProject {
                 .catch(reject);
         });
     }
+    aDiagramWithoutShowsStatementsForEdges() {
+        let res, isNotADiagram, noDiagramFound = true;
+        return LIB.iterateNodes(this.cache.get('hierarchy', this.nodes), (nd) => {
+            res = this.cache.get('resource', [nd.resource])[0];
+            isNotADiagram = !CONFIG.diagramClasses.includes(LIB.classTitleOf(res['class'], this.cache.resourceClasses));
+            noDiagramFound = noDiagramFound && isNotADiagram;
+            return (isNotADiagram
+                || LIB.hasType(res, CONFIG.diagramTypesHavingShowsStatementsForEdges, this.cache));
+        }) || noDiagramFound;
+    }
     hookStatements() {
         var self = this, dta = this.cache, opts = {
             targetLanguage: 'any',
@@ -1252,7 +1262,7 @@ class CProject {
         });
     }
     renderExportOptions(fmt) {
-        var pnl = '<div class="panel panel-default panel-options" style="margin-bottom:0">'
+        var pnl = '<div>'
             + (['specif', 'html'].includes(fmt) ? '' : makeTextField('&#x200b;' + i18n.LblProjectName, (fmt == 'specifClasses' ? 'SpecIF Classes' : this.exportParams.projectName), { typ: 'line' }))
             + makeTextField('&#x200b;' + i18n.LblFileName, (fmt == 'specifClasses' ? 'SpecIF-Classes' : this.exportParams.fileName), { typ: 'line' });
         switch (fmt) {
@@ -1285,113 +1295,102 @@ class CProject {
         pnl += '</div>';
         return pnl;
     }
+    hasOntology() {
+        let hL = this.cache.get("hierarchy", self.nodes);
+        for (var h of hL) {
+            let rL = this.cache.get("resource", [h.resource]);
+            if (rL.length > 0 && LIB.hasType(rL[0], [CONFIG.resClassOntology], this.cache))
+                return true;
+        }
+        ;
+        return false;
+    }
+    chooseFormatThenExport() {
+        if (this.exporting)
+            return;
+        $('#exportFormat').remove();
+        const formats = app.title == i18n.LblEditor ?
+            [
+                { title: 'SpecIF v' + CONFIG.specifVersion, id: 'specif', checked: true },
+                { title: 'HTML with embedded SpecIF v' + CONFIG.specifVersion, id: 'html' },
+                { title: 'ReqIF v1.0', id: 'reqif' },
+                { title: 'MS Excel® <em>(experimental)</em>', id: 'xlsx' },
+                { title: 'Turtle <em>(experimental)</em>', id: 'turtle' },
+                { title: 'ePub v2', id: 'epub' },
+                { title: 'MS Word® (Open XML)', id: 'oxml' }
+            ]
+            :
+                [
+                    { title: 'HTML with embedded SpecIF v' + CONFIG.specifVersion, id: 'html', checked: true },
+                ];
+        if (moduleManager.isReady('ioOntology') && this.hasOntology())
+            formats.splice(3, 0, { title: 'SpecIF Class Definitions', id: 'specifClasses' });
+        let form = $('<div class="modal fade" id="exportFormat" tabindex="-1" >'
+            + '<div class="modal-dialog modal-lg" >'
+            + '<div class="modal-content" >'
+            + '<div class="modal-header bg-success text-white" >'
+            + '<h5 class="modal-title" >' + i18n.LblExport + '</h5>'
+            + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" > </button>'
+            + '</div>'
+            + '<div class="modal-body" >'
+            + makeRadioField(i18n.LblFormat, formats, { handle: 'app.projects.selected.exportFormatClicked()' })
+            + '<div id="expOptions" class="mt-1">'
+            + this.renderExportOptions(app.title == i18n.LblEditor ? 'specif' : 'html')
+            + '</div>'
+            + '</div>'
+            + '<div class="modal-footer" >'
+            + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >' + i18n.BtnCancel + '</button>'
+            + '<button type="button" class="btn btn-success" onclick="app.projects.selected.getFormatAndOptionsThenExport()">' + i18n.BtnExport + '</button>'
+            + '</div>'
+            + '</div>'
+            + '</div>'
+            + '</div>');
+        this.modalExport = new bootstrap.Modal(form);
+        this.modalExport.show();
+    }
     exportFormatClicked() {
         document.getElementById("expOptions").innerHTML = this.renderExportOptions(radioValue(i18n.LblFormat));
     }
-    chooseFormatAndExport() {
-        if (this.exporting)
-            return;
-        var self = this;
-        const exportFormatClicked = 'app.projects.selected.exportFormatClicked()';
-        new BootstrapDialog({
-            title: i18n.LblExport,
-            type: 'type-primary',
-            message: () => {
-                let formats = app.title == i18n.LblEditor ?
-                    [
-                        { title: 'SpecIF v' + CONFIG.specifVersion, id: 'specif', checked: true },
-                        { title: 'HTML with embedded SpecIF v' + CONFIG.specifVersion, id: 'html' },
-                        { title: 'ReqIF v1.0', id: 'reqif' },
-                        { title: 'MS Excel® <em>(experimental)</em>', id: 'xlsx' },
-                        { title: 'Turtle <em>(experimental)</em>', id: 'turtle' },
-                        { title: 'ePub v2', id: 'epub' },
-                        { title: 'MS Word® (Open XML)', id: 'oxml' }
-                    ]
-                    :
-                        [
-                            { title: 'HTML with embedded SpecIF v' + CONFIG.specifVersion, id: 'html', checked: true },
-                        ];
-                if (moduleManager.isReady('ioOntology') && hasOntology())
-                    formats.splice(3, 0, { title: 'SpecIF Class Definitions', id: 'specifClasses' });
-                var form = '<div class="row" style="margin: 0 -4px 0 -4px">'
-                    + '<div class="col-sm-12" style="padding: 0 4px 0 4px">'
-                    + '<div class="panel panel-default panel-options" style="margin-bottom:4px">'
-                    + "<p>" + i18n.MsgExport + "</p>"
-                    + makeRadioField(i18n.LblFormat, formats, { handle: exportFormatClicked })
-                    + '</div>'
-                    + '</div>'
-                    + '<div id="expOptions" class="col-sm-12" style="padding: 0 4px 0 4px">'
-                    + this.renderExportOptions(app.title == i18n.LblEditor ? 'specif' : 'html')
-                    + '</div>'
-                    + '</div>';
-                return $(form);
-                function hasOntology() {
-                    let hL = self.cache.get("hierarchy", self.nodes);
-                    for (var h of hL) {
-                        let rL = self.cache.get("resource", [h.resource]);
-                        if (rL.length > 0 && LIB.hasType(rL[0], [CONFIG.resClassOntology], self.cache))
-                            return true;
-                    }
-                    ;
-                    return false;
+    getFormatAndOptionsThenExport() {
+        let self = this;
+        app.busy.set();
+        message.show(i18n.MsgBrowserSaving, { severity: 'success', duration: CONFIG.messageDisplayTimeShort });
+        let prjN = textValue('&#x200b;' + i18n.LblProjectName);
+        this.exportParams.fileName = textValue('&#x200b;' + i18n.LblFileName) || prjN || this.id;
+        if (prjN)
+            this.exportParams.projectName = prjN;
+        let options = {
+            projectName: this.exportParams.projectName,
+            fileName: this.exportParams.fileName,
+            format: radioValue(i18n.LblFormat),
+            role: '',
+            domains: []
+        };
+        switch (options.format) {
+            case 'html':
+                if (app.title == i18n.LblEditor) {
+                    options.role = radioValue(app.ontology.localize("SpecIF:Permissions", { targetLanguage: browser.language }));
                 }
-            },
-            buttons: [
-                {
-                    label: i18n.BtnCancel,
-                    action: (thisDlg) => {
-                        thisDlg.close();
-                    }
-                },
-                {
-                    label: i18n.BtnExport,
-                    cssClass: 'btn-success',
-                    action: (thisDlg) => {
-                        app.busy.set();
-                        message.show(i18n.MsgBrowserSaving, { severity: 'success', duration: CONFIG.messageDisplayTimeShort });
-                        let prjN = textValue('&#x200b;' + i18n.LblProjectName);
-                        this.exportParams.fileName = textValue('&#x200b;' + i18n.LblFileName) || prjN || this.id;
-                        if (prjN)
-                            this.exportParams.projectName = prjN;
-                        let options = {
-                            projectName: this.exportParams.projectName,
-                            fileName: this.exportParams.fileName,
-                            format: radioValue(i18n.LblFormat),
-                            role: '',
-                            domains: []
-                        };
-                        switch (options.format) {
-                            case 'html':
-                                if (app.title == i18n.LblEditor) {
-                                    options.role = radioValue(app.ontology.localize("SpecIF:Permissions", { targetLanguage: browser.language }));
-                                }
-                                else
-                                    options.role = window.role || "SpecIF:Supplier";
-                                break;
-                            case 'specifClasses':
-                                let chkDomains = checkboxValues(i18n.LblOptions);
-                                options.domains = LIB.enumeratedValuesOf(LIB.makeKey('DT-Domain')).filter((d) => chkDomains.includes(d.toJsId()));
-                                break;
-                            default:
-                                checkboxValues(i18n.LblOptions).forEach((op) => {
-                                    options[op] = true;
-                                });
-                        }
-                        ;
-                        this.exportAs(options)
-                            .then(() => { app.busy.reset(); }, handleError);
-                        thisDlg.close();
-                    }
-                }
-            ]
-        })
-            .open();
-        return;
-        function handleError(xhr) {
+                else
+                    options.role = window.role || "SpecIF:Supplier";
+                break;
+            case 'specifClasses':
+                let chkDomains = checkboxValues(i18n.LblOptions);
+                options.domains = LIB.enumeratedValuesOf(LIB.makeKey('DT-Domain')).filter((d) => chkDomains.includes(d.toJsId()));
+                break;
+            default:
+                checkboxValues(i18n.LblOptions).forEach((op) => {
+                    options[op] = true;
+                });
+        }
+        ;
+        this.exportAs(options)
+            .then(() => { app.busy.reset(); }, (xhr) => {
             self.exporting = false;
             app.busy.reset();
             message.show(xhr);
-        }
+        });
+        this.modalExport.hide();
     }
     exportAs(opts) {
         var self = this;

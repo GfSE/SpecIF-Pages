@@ -1,7 +1,7 @@
 "use strict";
 /*!	iLAH: Resource Filters.
     Dependencies: jQuery, bootstrap
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 */
@@ -41,16 +41,18 @@ moduleManager.construct({
     self.init = () => {
         self.filters = [];
         self.secondaryFilters = undefined;
-        let h = '<div id="filterLeft" class="paneLeft">'
-            + '<div id="primaryFilters" class="pane-filter" ></div>'
-            + '</div>'
-            + '<div id="filterCtrl" class="contentCtrl" >'
+        let h = '<div class="container-fluid"><div class="row">'
+            + '<div id="primaryFilters" class="col-lg-3 background-select font-size-90"></div>'
+            + '<div class="col-lg">'
+            + '<div id="filterCtrl" class="mt-1">'
             + '<div class="btn-group" >'
-            + '<button class="btn btn-default" onclick="app.' + self.loadAs + '.resetClicked()" >' + i18n.BtnFilterReset + '</button>'
+            + '<button class="btn btn-light" onclick="' + myFullName + '.resetClicked()" >' + i18n.BtnFilterReset + '</button>'
             + '</div>'
             + '<div id="filterNotice" class="notice-default contentNotice" ></div>'
             + '</div>'
-            + '<div id="hitlist" class="content" style="padding-top:44px"></div>';
+            + '<div id="hitlist"></div>'
+            + '</div>'
+            + '</div></div>';
         $(self.view).html(h);
         return true;
     };
@@ -92,11 +94,11 @@ moduleManager.construct({
                 project: selPrj.id,
                 view: self.view
             });
-        self.parent.showLeft.set(false);
+        self.parent.showLeft.reset();
         let fps = '';
         for (var f of self.filters) {
-            fps += '<div class="panel panel-default panel-filter" >'
-                + '<h4>' + f.title + '</h4>';
+            fps += '<div class="card" style="margin:0.2rem 0 0 0" ><div class="card-body" >'
+                + '<h4 class="card-title">' + f.title + '</h4>';
             switch (f.category) {
                 case FilterCategory.textSearch:
                     fps += renderTextFilterSettings(f);
@@ -106,7 +108,7 @@ moduleManager.construct({
                     fps += renderEnumFilterSettings(f);
             }
             ;
-            fps += '</div>';
+            fps += '</div></div>';
         }
         ;
         $('#primaryFilters').html(fps);

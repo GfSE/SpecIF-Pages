@@ -111,7 +111,7 @@ app.specif2turtle = (specifData, opts) => {
             prpL.forEach(prp => {
                 let pC = LIB.itemByKey(specifData.propertyClasses, prp['class']), dT = LIB.itemByKey(specifData.dataTypes, pC.dataType), ti = shapeEntity(escapeTtl(pC.title)), ct = '';
                 if (dT.enumeration) {
-                    prp.values = prp.values.map((v) => LIB.itemById(dT.enumeration, v).value);
+                    prp.values = prp.values.map((v) => LIB.itemById(dT.enumeration, v.id).value);
                 }
                 ;
                 for (var v of prp.values) {

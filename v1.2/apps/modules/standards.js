@@ -1,7 +1,7 @@
 "use strict";
 /*!	Standard type definitions with methods.
     Dependencies: -
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
     Author: se@enso-managers.com, Berlin
     We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
@@ -100,12 +100,6 @@ CONFIG.hiddenStatements = [
 CONFIG.excludedFromTypeFiltering = [
     CONFIG.resClassComment
 ];
-CONFIG.excludedFromFormatting = [
-    CONFIG.propClassType,
-    "SpecIF:Notation"
-]
-    .concat(CONFIG.titleProperties)
-    .concat(CONFIG.idProperties);
 CONFIG.excludedFromDeduplication = [
     CONFIG.resClassFolder,
     CONFIG.resClassParagraph,

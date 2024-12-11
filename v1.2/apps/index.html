@@ -4,22 +4,24 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="expires" content="0" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="./assets/stylesheets/SpecIF.default.css" />
 	<title>SpecIF View</title>
 </head>
 <body style="overflow:auto;">
-	<div class="row" style="display: flex; flex-wrap: wrap; justify-content: center;">
-		<div class="col-md-6" style="padding-right: 16px; padding-left: 16px; max-width:768px;">
+	<div class="container">
+	<div class="row">
+		<div class="col-lg">
 			<h1 id="aboutTitle">About SpecIF Apps</h1>
 			<p>A family of apps for your web-browser to integrate, edit, transform and review system specifications:</p>
 			<ul>
-				<li><a href="https://specif.de/apps/edit.html" target="_blank">SpecIF Model Integrator and Editor</a></li>
-				<li><a href="https://specif.de/apps/view.html" target="_blank">SpecIF Viewer</a></li>
+				<li><a href="./edit.html" target="_blank">SpecIF Model Integrator and Editor</a></li>
+				<li><a href="./view.html" target="_blank">SpecIF Viewer</a></li>
 				<li>An HTML file with embedded SpecIF data and viewer script can be generated with the apps listed above.</li>
 			</ul>
 			<p>You may consult the <a href="https://gfse.github.io/SpecIF-Pages/Manuals/01_Quick-Start-Guide_EN.html" target="_blank">Quick Start Guide.</a></p>
 			<p>If you experience unexpected or faulty behavior of the software, please open a <a href="https://github.com/GfSE/SpecIF-Viewer/issues" target="_blank">new issue</a>.</p>
+			<p>Version: App v<span id="appVersion"></span> supporting Specif v0.9.4 to v<span id="specifVersion"></span>.</p>
 			<p>License: <a href="https://github.com/GfSE/SpecIF-Viewer/blob/master/LICENSE" target="_blank">Apache 2.0</a></p>
 			<h2>Introduction</h2>
 			<p>SpecIF is the 'Specification Integration Facility'. It combines partial specifications from different tools in a semantic net for</p>
@@ -36,13 +38,13 @@
 				Any contribution to this collaborative effort is highly welcome!
 			</p>
 			<h2>Features</h2>
-			<table class="stdInlineWithBorder">
+			<table class="table table-sm" style="font-size: 90%;">
 				<thead>
 					<tr>
-						<th width="75%" style="text-align: left;">Feature</th>
-						<th>Editor</th>
-						<th>Viewer</th>
-						<th>HTML</th>
+						<th scope="col" width="75%" style="text-align: left;">Feature</th>
+						<th scope="col">Editor</th>
+						<th scope="col">Viewer</th>
+						<th scope="col">HTML</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -149,13 +151,13 @@
 						<td></td>
 					</tr>
 					<tr>
-						<td>Filter using text fragments ('full text search'), resource classes or enumerated property values</td>
+						<td>Filter using text fragments ('full text search'), applied to text and enumerated values per resource property</td>
 						<td style="text-align: center;">&check;</td>
 						<td style="text-align: center;">&check;</td>
 						<td style="text-align: center;">&check;</td>
 					</tr>
 					<tr>
-						<td>Report model-based statistics, such as used resource classes or used property enumerated values</td>
+						<td>Report model-based statistics, such as used resource classes or assigned enumerated values per property class</td>
 						<td style="text-align: center;">&check;</td>
 						<td style="text-align: center;">&check;</td>
 						<td style="text-align: center;">&check;</td>
@@ -205,22 +207,21 @@
 				</tbody>
 			</table>
 		</div>
-		<div class="col-md-6" style="padding-right: 16px; padding-left: 16px; max-width:768px;">
+		<div class="col-lg" >
 			<h2>Compatibility</h2>
 			<ul>
 				<li>Mozilla Firefox</li>
 				<li>Google Chromium and Chrome</li>
-				<li>Microsoft Edge</li>
+				<li>Apple Safari</li>
+				<li>Microsoft Edge <em>(current generation)</em></li>
 				<li>Opera</li>
-				<li>Apple Safari <em>(beware of performance issues in case of bigger models)</em></li>
-				<li>Microsoft Internet Explorer and first generation Edge are not any more supported</li>
 			</ul>
 			<h2>Support</h2>
 			<p>
 				In case you discover a conceptual inconsistency, a software bug or a flaw in documentation,
-				we appreciate if you open an <a href="https://github.com/GfSE/SpecIF-Viewer/issues" target="_blank">issue</a>
-				... or simply send an e-mail with a concise description and test-data to
-				<a href="mailto:maintenance@specif.de">maintenance(at)specif.de</a>.
+				please open an 
+				<a href="https://github.com/GfSE/SpecIF-Viewer/issues" target="_blank">issue</a>
+				with a concise description and ideally test-data.
 				We are highly interested to supply high-quality concepts and useful software.
 			</p>
 
@@ -247,13 +248,13 @@
 			<!--	<p>	Our policy is to donate 12% of our revenues made with
 				the SpecIF Apps to these projects ... and we hope that our software will be useful to many people, as well.
 			</p>	-->
-			<table class="stdInlineWithBorder">
+			<table class="table table-sm" style="font-size: 90%;">
 				<thead>
 					<tr>
-						<th width="15%">Library</th>
-						<th>Author</th>
-						<th>Description</th>
-						<th>License</th>
+						<th scope="col" width="15%">Library</th>
+						<th scope="col">Author</th>
+						<th scope="col">Description</th>
+						<th scope="col">License</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -366,5 +367,19 @@
 			</table>
 		</div>
 	</div>
+	</div>
+	<script type="text/javascript">
+        // see https://www.sitepoint.com/community/t/window-load-function-getscript-not-jquery/195657/3
+        function getScript(url) {
+            var el = document.createElement('script');
+			el.onload = function () {
+                document.getElementById('appVersion').innerHTML = CONFIG.appVersion;
+                document.getElementById('specifVersion').innerHTML = CONFIG.specifVersion;
+            };
+            el.src = url;
+            document.body.appendChild(el)
+        }
+        getScript('./config/definitions.js?' + Date.now().toString()); // with cache-busting
+	</script>
 </body>
 </html>

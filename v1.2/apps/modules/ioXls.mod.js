@@ -568,19 +568,32 @@ moduleManager.construct({
         });
         return;
         function prpValues(res) {
-            let prpL = [];
+            let prpL = [], pVal;
             for (var pC of data.propertyClasses) {
                 let p = findPrp(res.properties, pC);
-                let pVal = p ? p.values[0][0].text || p.values[0] : undefined;
-                if (p && p.values.length > 1)
-                    console.info("Only first property value exported to xlsx.");
-                let dT = LIB.itemByKey(data.dataTypes, pC.dataType);
-                if (pVal && dT && dT.enumeration) {
-                    let v = LIB.itemById(dT.enumeration, pVal);
-                    pVal = LIB.isMultiLanguageValue(v.value) ? v.value[0]['text'] : v.value;
+                if (p) {
+                    if (p.values.length > 1)
+                        console.info("Limitation of XLS export: Only first property value is included.");
+                    let dT = LIB.itemByKey(data.dataTypes, pC.dataType);
+                    if (dT) {
+                        if (dT.enumeration) {
+                            let v = LIB.itemById(dT.enumeration, p.values[0].id);
+                            pVal = LIB.isMultiLanguageValue(v.value) ? v.value[0]['text'] : v.value;
+                        }
+                        else if (dT.type == XsDataType.String) {
+                            if (p.values[0].length > 1)
+                                console.info("Limitation of XLS export: Only first language value is included.");
+                            pVal = p.values[0][0]['text'];
+                        }
+                        else {
+                            pVal = p.values[0];
+                        }
+                        ;
+                        prpL.push(pVal);
+                    }
+                    ;
                 }
                 ;
-                prpL.push(pVal);
             }
             ;
             return prpL;
