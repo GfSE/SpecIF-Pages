@@ -113,7 +113,7 @@ In general, values of any SpecIF dataType are allowed, e.g. multi-language texts
 ```
 
 Recap: As always, _properties_ is a list of one or more values, if the corresponding propertyClass allows it.
-The complex value is a list with SpecIF values corresponding to its dataType. 
+The complex value is a list with SpecIF values corresponding to their respective dataType. 
 The example shows simple real numbers, but it could be pointers to enumerated values or multi-language texts.
 Complex dataTypes may be nested, but without cyclic dependencies: A complex dataType must be a tree.
 
