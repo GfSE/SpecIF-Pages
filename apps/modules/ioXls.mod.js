@@ -4,9 +4,589 @@
     (C)copyright enso managers gmbh (http://www.enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
-
-    ToDo:
-    - This code assumes that certain dataTypes including DT-Text and DT-ShortString are retrieved from the ontology.
-    - Need to make that more robust ... and deal with the dataTypes actually returned.
-*/moduleManager.construct({name:"ioXls"},(function(e){var t,s;return e.init=function(){return!0},e.verify=function(e){return t=e.name,(r=t).endsWith(".xlsx")||r.endsWith(".xlsm")||r.endsWith(".xls")||r.endsWith(".csv")?(s=e.lastModified?new Date(e.lastModified).toISOString():(new Date).toISOString(),!0):(message.show(i18n.lookup("ErrInvalidFileXls",e.name)),!1);var r},e.toSpecif=function(r){e.abortFlag=!1;var a=$.Deferred();let i=function(e,s,r){let a=app.ontology.getTerms("statementClass");class i{constructor(e){let t=e.match(/([A-Z]+)(\d+)/);if(!Array.isArray(t)||!t[1]||!t[2])throw Error("Incomplete input data: Cell without address!");this.col=I(t[1]),this.row=parseInt(t[2])}}class n{constructor(e){if(this.isValid=!1,this.name=e,this.data=v.Sheets[e],this.resClass=p(s+"-"+e),this.hid=CONFIG.prefixH+simpleHash(s+e),this.range=this.data["!ref"],this.range){let e=this.range.split(":");e.length>1&&(this.firstCell=new i(e[0]),this.lastCell=new i(e[1]),this.isValid=!0)}this.col2dT=new Map}}function l(e){return CONFIG.prefixDT+simpleHash(e)}class o{constructor(e,t,s){this.id=u(e),this.title=t,this.dataType=LIB.makeKey(s),this.changedAt=r}}function u(e){return CONFIG.prefixPC+simpleHash(e)}class c{constructor(e,t){this.id=e,this.title=t,this.description=LIB.makeMultiLanguageValue("For resources specified per line of an excel sheet"),this.instantiation=[SpecifInstantiation.User],this.propertyClasses=[],this.changedAt=r}}function p(e){return CONFIG.prefixRC+simpleHash(e)}class f{constructor(e){this.title=e,this.id=h(e),this.description=LIB.makeMultiLanguageValue("For statements created by columns whose title is declared as a statement"),this.instantiation=[SpecifInstantiation.User],this.changedAt=r}}function h(e){return CONFIG.prefixSC+simpleHash(e)}function d(e){function t(e,s){if(e<1)return s;let r=e%26;return t((e-r)/26,s=String.fromCharCode(r+64)+s)}return t(e,"")}function m(e,t){return d(e)+t}function I(e){let t=0,s=1;for(var r=e.length-1;r>-1;r--)t+=s*(e.charCodeAt(r)-64),s*=26;return t}function g(e){if(e&&e.isValid&&"{Enumerations}"===e.name){let t,s,a,i,n;for(t=e.firstCell.col;t<e.lastCell.col+1;t++)if(a=e.data[m(t,e.firstCell.row)],a&&a.v){for(i={id:l(e.name+t),title:"",type:XsDataType.String,enumeration:[],changedAt:r},n={id:u(e.name+t),title:"",dataType:LIB.keyOf(i),changedAt:r},s=e.firstCell.row;s<e.lastCell.row+1;s++)a=e.data[m(t,s)],s==e.firstCell.row?n.title=i.title=a&&"s"==a.t?a.v:"":a&&"s"==a.t&&a.v&&i.enumeration.push({id:i.id+"-"+s,value:LIB.makeMultiLanguageValue(a.v)});i.title&&i.enumeration.length>0&&(w.dataTypes.push(i),w.propertyClasses.push(n))}}}function C(e){if(e&&e.isValid){if(e.name.startsWith("{")&&e.name.endsWith("}"))return;function t(e){return e&&("d"==e.t||"s"==e.t&&LIB.isIsoDateTime(e.v))}function i(e){return e&&("n"==e.t&&Number.isInteger(e.v)||"s"==e.t&&RE.Integer.test(e.v))}function n(e){return e&&("n"==e.t&&!Number.isInteger(e.v)||"s"==e.t&&RE.Real().test(e.v))}function l(e){return e&&("b"==e.t||"s"==e.t&&(LIB.isTrue(e.v)||LIB.isFalse(e.v)))}function u(e){return e&&"s"==e.t&&e.v.length>0}function p(e){if(e.lastCell.row-e.firstCell.row<1);else{var t={id:CONFIG.prefixR+simpleHash(s+e.name+CONFIG.resClassFolder),class:LIB.makeKey("RC-Folder"),properties:[{class:LIB.makeKey("PC-Name"),values:[LIB.makeMultiLanguageValue(O(e.name))]}],changedAt:r};w.resources.push(t);for(var a={id:e.hid,resource:LIB.keyOf(t),nodes:[],changedAt:r},i=[],n=e.firstCell.row+1,l=e.lastCell.row+1;n<l;n++)o(e,n);w.nodes[0].nodes.push(a)}function o(t,s){function n(e,t){if(t&&t.v&&e&&e.enumeration){for(var s of e.enumeration)if((s.value[0].text||s.value[0])==t.v)return s.id;return""}switch(e.type){case XsDataType.String:let e;switch(t.t){case"d":e=t.v.toISOString();break;case"n":case"b":e=t.v.toString();break;default:e=t.v}return LIB.makeMultiLanguageValue(e);case XsDataType.DateTime:switch(t.t){case"d":return t.v.toISOString();case"s":return LIB.isIsoDateTime(t.v)?t.v:""}case XsDataType.Integer:case XsDataType.Double:switch(t.t){case"n":return t.v.toString();case"s":return t.v}case XsDataType.Boolean:switch(t.t){case"b":return t.v.toString();case"s":return LIB.isTrue(t.v).toString()}}return""}var l={class:LIB.makeKey(t.resClass),properties:[],changedAt:r};let o,u,c,p,f,d,I,g,C=[];for(o=t.firstCell.col,u=t.lastCell.col+1;o<u;o++)if(c=t.data[m(o,t.firstCell.row)],g=c&&c.v?c.v.trim():"",g&&(c=t.data[m(o,s)],c&&c.v)){if(CONFIG.nativeProperties.has(g)){f=CONFIG.nativeProperties.get(g),p=n({type:f.type},c),f.check(p)?(l[f.name]=p,console.info(t.name+", row "+s+": '"+g+"' with value '"+p+"' has been mapped to the native property '"+f.name+"'")):console.warn(t.name+", row "+s+": Cell value '"+c.v+"' is invalid for the given native property '"+g+"'");continue}let a=t.col2dT.get(o);if(a)f=LIB.itemByKey(w.propertyClasses,a),d=LIB.itemByKey(w.dataTypes,f.dataType),d?(!I&&CONFIG.idProperties.includes(f.title)&&(I=c.v),p=n(d,c),d.maxLength&&d.maxLength<p.length&&(p=p.slice(0,d.maxLength),console.warn("Text of cell "+m(o,s)+" on sheet "+e.name+" has been truncated because it is too long")),p&&l.properties.push({class:LIB.keyOf(f),values:[p]})):console.error("No dataType with id "+f.dataType.id+" found for value "+c.v+" in cell "+m(o,s)+" of worksheet "+t.name);else{let e=c.w.split(",");e.length<2&&(e=c.w.split(";")),e.forEach((e=>{let t,s=RE.inQuotes.exec(e);t=s&&s.length>2?s[1]||s[2]:e.trim(),t.length>CONFIG.titleLinkMinLength-1&&C.push({class:LIB.makeKey(h(g)),object:LIB.makeKey(CONFIG.placeholder),resourceToLink:t,changedAt:r})}))}}if(l.properties.length>0){if(I){if(l.id=CONFIG.prefixR+simpleHash(t.name+I),LIB.indexById(w.resources,l.id)>-1){i.push(I);let e={};i.forEach((t=>{e[t]=(e[t]||0)+1})),console.warn("The user-defined identifier",I,"is occurring",e[I]+1,"times."),l.id=CONFIG.prefixR+simpleHash(t.name+I+e[I])}}else l.id=LIB.genID(CONFIG.prefixR);a.nodes.push({id:CONFIG.prefixN+simpleHash(l.id+a.nodes.length),resource:LIB.keyOf(l),changedAt:r}),w.resources.push(l),C.length>0&&(C.forEach((e=>{e.id=CONFIG.prefixS+simpleHash(l.id+e.class.id+e.resourceToLink),e.subject=LIB.keyOf(l)})),w.statements=w.statements.concat(C))}}}function d(e){var s,r,c,p,f,h,d=[];for(c=e.firstCell.col,p=e.lastCell.col+1;c<p;c++)if(h=(f=e.data[m(c,e.firstCell.row)])&&f.v?f.v.trim():""){if(CONFIG.nativeProperties.has(h))continue;if((s=LIB.itemByTitle(w.propertyClasses,h))&&s.id&&(r=LIB.itemByKey(w.dataTypes,s.dataType))&&r.enumeration){let t=LIB.keyOf(s);d.push(t),e.col2dT.set(c,t);continue}if(s=I(c)){LIB.cacheE(w.propertyClasses,s);let t=LIB.keyOf(s);d.push(t),e.col2dT.set(c,t)}}return d;function I(s){const r="ShortString";let c,p,f=[];for(c=e.firstCell.row,p=e.lastCell.row+1;c<p;c++)f.push(e.data[m(s,c)]);let h=f[0]?f[0].w||f[0].v:"",d="",I="";if(!h||a.includes(h))return;let g=LIB.itemByTitle(w.propertyClasses,h);if(g)return g;for(var C=f.length-1;C>0;C--)I=y(f[C]),I.length<1||(d?d!=I&&("Real"==d&&"Integer"==I||(d="Integer"!=d||"Real"!=I?r:"Real")):d=I);if(d||(d=r),d==r&&app.ontology.propertyClassIsText(h)&&(d="Text"),d==r){let e=0,t=!1;for(C=f.length-1;C>0;C--)e=Math.max(e,f[C]&&f[C].v?f[C].v.length:0),t=t||f[C]&&"string"==typeof f[C].v&&f[C].v.indexOf("\n")>-1;(e>CONFIG.textThreshold||t)&&(d="Text")}return new o(e.name+s,h,CONFIG.prefixDT+d);function y(e){return l(e)?"Boolean":i(e)?"Integer":n(e)?"Real":t(e)?"DateTime":u(e)?r:""}}}function I(e){for(var t,s,r=[],i=e.firstCell.col,n=e.lastCell.col+1;i<n;i++)(t=e.data[m(i,e.firstCell.row)])&&(t=t.w||t.v)&&a.includes(t)&&(s=new f(t),r.push(s));return r}if(e.range){LIB.cacheL(w.statementClasses,I(e));let g=new c(e.resClass,N(e.name)||N(s)||CONFIG.resClassXlsRow);g.propertyClasses=d(e),w.resourceClasses.push(g),p(e)}}}let y=new Uint8Array(e),v=XLSX.read(y,{type:"array",cellDates:!0,cellStyles:!0}),L=v.SheetNames.length;console.info("SheetNames: "+v.SheetNames+" ("+L+")");var B=["xs:string","xs:boolean","xs:integer","xs:double","xs:dateTime","xs:anyURI",CONFIG.propClassId,CONFIG.propClassTitle,CONFIG.propClassDesc,CONFIG.propClassType,CONFIG.resClassFolder],w=app.ontology.generateSpecifClasses({terms:B,adoptOntologyDataTypes:!0});let x;for(w.title=LIB.makeMultiLanguageValue(O(t.fileName())),w.resources.push({id:CONFIG.prefixR+s.toSpecifId(),class:LIB.makeKey("RC-Folder"),properties:[{class:LIB.makeKey("PC-Name"),values:[w.title]},{class:LIB.makeKey("PC-Type"),values:[LIB.makeMultiLanguageValue(CONFIG.resClassOutline)]}],changedAt:r}),w.nodes.push({id:CONFIG.prefixH+s.toSpecifId(),resource:LIB.makeKey(CONFIG.prefixR+s.toSpecifId()),nodes:[],changedAt:r}),x=0;x<L;x++)g(new n(v.SheetNames[x]));for(x=0;x<L;x++)C(new n(v.SheetNames[x]));return w;function O(e){let t=RE.withoutBracketsAtEnd.exec(e);if(Array.isArray(t)&&t.length>1)return t[1]}function N(e){let t=RE.inBracketsAtEnd.exec(e);if(Array.isArray(t)&&t.length>1)return t[1]}}(r,e.parent.projectName,s);return a.resolve(i),a},e.fromSpecif=function(e,t){!function(e,t){console.debug("toXlsx",e,t);const s=XLSX.utils.book_new();let r=app.projects.selected,a=r.cache,i=0,n=[e.propertyClasses.map((e=>e.title))];return void LIB.iterateNodes(a.get("hierarchy",r.nodes).filter((e=>LIB.typeOf(e.resource,a)!=CONFIG.resClassUnreferencedResources)),(e=>(i++,r.readItems("resource",[e.resource]).then((e=>{if(n.push(l(e[0])),--i<1){const e=XLSX.utils.aoa_to_sheet(n);XLSX.utils.book_append_sheet(s,e,"Sheet1"),XLSX.writeFile(s,t.fileName+".xlsx",{compression:!0}),"function"==typeof t.done&&t.done()}}),LIB.stdError),!0)));function l(t){let s,r=[];for(var a of e.propertyClasses){let n=i(t.properties,a);if(n){n.values.length>1&&console.info("Limitation of XLS export: Only first property value is included.");let t=LIB.itemByKey(e.dataTypes,a.dataType);if(t){if(t.enumeration){let e=LIB.itemById(t.enumeration,n.values[0].id);s=LIB.isMultiLanguageValue(e.value)?e.value[0].text:e.value}else t.type==XsDataType.String?(n.values[0].length>1&&console.info("Limitation of XLS export: Only first language value is included."),s=n.values[0][0].text):s=n.values[0];r.push(s)}}}return r;function i(e,t){for(var s of e)if(LIB.references(s.class,t))return s}}}(e,t)},e.abort=function(){app.projects.abort(),e.abortFlag=!0},e}));
+    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
+    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+*/
+moduleManager.construct({
+    name: 'ioXls'
+}, function (self) {
+    "use strict";
+    var fDate, ontologyStatementClasses = [];
+    self.init = function () {
+        ontologyStatementClasses = app.ontology.getTerms('statementClass');
+        return true;
+    };
+    self.verify = function (f) {
+        function isXls(fname) {
+            return fname.endsWith('.xlsx') || fname.endsWith('.xlsm') || fname.endsWith('.xls') || fname.endsWith('.csv');
+        }
+        if (!isXls(f.name)) {
+            message.show(i18n.lookup('ErrInvalidFileXls', f.name));
+            return false;
+        }
+        ;
+        if (f.lastModified) {
+            fDate = new Date(f.lastModified).toISOString();
+        }
+        else {
+            fDate = new Date().toISOString();
+        }
+        ;
+        return true;
+    };
+    self.toSpecif = function (buf) {
+        self.abortFlag = false;
+        var xDO = $.Deferred();
+        let data = xlsx2specif(buf, self.parent.projectName, fDate);
+        xDO.resolve(data);
+        return xDO;
+    };
+    self.fromSpecif = function (pr, opts) {
+        specif2xlsx(pr, opts);
+    };
+    self.abort = function () {
+        app.projects.abort();
+        self.abortFlag = true;
+    };
+    return self;
+    function xlsx2specif(buf, pN, chAt) {
+        "use strict";
+        class Coord {
+            constructor(addr) {
+                let res = addr.match(/([A-Z]+)(\d+)/);
+                if (!Array.isArray(res) || !res[1] || !res[2])
+                    throw Error("Incomplete input data: Cell without address!");
+                this.col = colIdx(res[1]);
+                this.row = parseInt(res[2]);
+            }
+        }
+        class Worksheet {
+            constructor(wsN) {
+                this.isValid = false;
+                this.name = wsN;
+                this.data = wb.Sheets[wsN],
+                    this.resClass = resClassId(pN + '-' + wsN);
+                this.hid = CONFIG.prefixH + simpleHash(pN + wsN);
+                this.range = this.data["!ref"];
+                if (this.range) {
+                    let splittedRange = this.range.split(":");
+                    if (splittedRange.length > 1) {
+                        this.firstCell = new Coord(splittedRange[0]);
+                        this.lastCell = new Coord(splittedRange[1]);
+                        this.isValid = true;
+                    }
+                    ;
+                }
+                ;
+                this.col2dT = new Map();
+            }
+        }
+        var xlsTerms = ["xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI", CONFIG.propClassId, CONFIG.propClassType, CONFIG.resClassFolder];
+        function dataTypeId(str) {
+            return CONFIG.prefixDT + simpleHash(str);
+        }
+        class PropClass {
+            constructor(nm, ti, dT) {
+                this.id = propClassId(nm);
+                this.title = ti;
+                this.dataType = LIB.makeKey(CONFIG.prefixDT + dT);
+                this.changedAt = chAt;
+            }
+        }
+        function propClassId(str) {
+            return CONFIG.prefixPC + simpleHash(str);
+        }
+        class ResClass {
+            constructor(nm, ti) {
+                this.id = nm;
+                this.title = ti;
+                this.description = LIB.makeMultiLanguageValue('For resources specified per line of an excel sheet');
+                this.instantiation = [SpecifInstantiation.User];
+                this.propertyClasses = [];
+                this.changedAt = chAt;
+            }
+        }
+        function resClassId(str) {
+            return CONFIG.prefixRC + simpleHash(str);
+        }
+        class StaClass {
+            constructor(ti) {
+                this.title = ti;
+                this.id = staClassId(this.title);
+                this.description = LIB.makeMultiLanguageValue('For statements created by columns whose title is declared as a statement');
+                this.instantiation = [SpecifInstantiation.User];
+                this.changedAt = chAt;
+            }
+        }
+        function staClassId(str) {
+            return CONFIG.prefixSC + simpleHash(str);
+        }
+        function colName(colI) {
+            function cName(idx, res) {
+                if (idx < 1)
+                    return res;
+                let r = idx % 26, f = (idx - r) / 26;
+                res = String.fromCharCode(r + 64) + res;
+                return cName(f, res);
+            }
+            return cName(colI, '');
+        }
+        function cellName(col, row) {
+            return colName(col) + row;
+        }
+        function colIdx(colN) {
+            let idx = 0, f = 1;
+            for (var i = colN.length - 1; i > -1; i--) {
+                idx += f * (colN.charCodeAt(i) - 64);
+                f *= 26;
+            }
+            ;
+            return idx;
+        }
+        function collectMetaData(ws) {
+            if (ws && ws.isValid) {
+                switch (ws.name) {
+                    case "(Enumerations)":
+                        let c, r, cell, dT, pC;
+                        for (c = ws.firstCell.col; c < ws.lastCell.col + 1; c++) {
+                            cell = ws.data[cellName(c, ws.firstCell.row)];
+                            if (!cell || !cell.v)
+                                continue;
+                            dT = { id: dataTypeId(ws.name + c), title: '', type: XsDataType.String, enumeration: [], changedAt: chAt };
+                            pC = { id: propClassId(ws.name + c), title: '', dataType: LIB.keyOf(dT), changedAt: chAt };
+                            for (r = ws.firstCell.row; r < ws.lastCell.row + 1; r++) {
+                                cell = ws.data[cellName(c, r)];
+                                if (r == ws.firstCell.row) {
+                                    pC.title = dT.title = (cell && cell.t == 's' ? cell.v : '');
+                                }
+                                else {
+                                    if (cell && cell.t == 's' && cell.v)
+                                        dT.enumeration.push({
+                                            id: dT.id + '-' + r,
+                                            value: LIB.makeMultiLanguageValue(cell.v)
+                                        });
+                                }
+                                ;
+                            }
+                            ;
+                            if (dT.title && dT.enumeration.length > 0) {
+                                specifData.dataTypes.push(dT);
+                                specifData.propertyClasses.push(pC);
+                            }
+                            ;
+                        }
+                        ;
+                }
+            }
+        }
+        function transformData(ws) {
+            if (ws && ws.isValid) {
+                if (ws.name.indexOf("(") == 0 && ws.name.indexOf(")") == ws.name.length - 1)
+                    return;
+                function isDateTime(cell) {
+                    return cell && (cell.t == 'd' || cell.t == 's' && LIB.isIsoDateTime(cell.v));
+                }
+                function isInt(cell) {
+                    return cell && (cell.t == 'n' && Number.isInteger(cell.v) || (cell.t == 's' && RE.Integer.test(cell.v)));
+                }
+                function isReal(cell) {
+                    return cell && (cell.t == 'n' && !Number.isInteger(cell.v) || (cell.t == 's' && RE.Real().test(cell.v)));
+                }
+                function isBool(cell) {
+                    return cell && (cell.t == 'b' || cell.t == 's' && (LIB.isTrue(cell.v) || LIB.isFalse(cell.v)));
+                }
+                function isStr(cell) {
+                    return cell && cell.t == 's' && cell.v.length > 0;
+                }
+                function createFld(sh) {
+                    if (sh.lastCell.row - sh.firstCell.row < 1)
+                        return;
+                    var fld = {
+                        id: CONFIG.prefixR + simpleHash(pN + sh.name + CONFIG.resClassFolder),
+                        class: LIB.makeKey("RC-Folder"),
+                        properties: [{
+                                class: LIB.makeKey("PC-Name"),
+                                values: [LIB.makeMultiLanguageValue(sh.name)]
+                            }],
+                        changedAt: chAt
+                    };
+                    specifData.resources.push(fld);
+                    var hTree = {
+                        id: sh.hid,
+                        resource: LIB.keyOf(fld),
+                        nodes: [],
+                        changedAt: chAt
+                    }, dupIdL = [];
+                    for (var l = sh.firstCell.row + 1, L = sh.lastCell.row + 1; l < L; l++) {
+                        createRes(sh, l);
+                    }
+                    ;
+                    specifData.hierarchies[0].nodes.push(hTree);
+                    return;
+                    function createRes(ws, row) {
+                        function getVal(dT, cell) {
+                            if (cell && cell.v && dT)
+                                if (dT.enumeration) {
+                                    for (var eV of dT.enumeration)
+                                        if ((eV.value[0].text || eV.value[0]) == cell.v)
+                                            return eV.id;
+                                    return '';
+                                }
+                            ;
+                            switch (dT.type) {
+                                case XsDataType.String:
+                                    let v;
+                                    switch (cell.t) {
+                                        case "d":
+                                            v = cell.v.toISOString();
+                                            break;
+                                        case "n":
+                                            v = cell.v.toString();
+                                            break;
+                                        case "b":
+                                            v = cell.v.toString();
+                                            break;
+                                        default: v = cell.v;
+                                    }
+                                    ;
+                                    return LIB.makeMultiLanguageValue(v);
+                                case XsDataType.DateTime:
+                                    switch (cell.t) {
+                                        case "d": return cell.v.toISOString();
+                                        case "s":
+                                            if (LIB.isIsoDateTime(cell.v))
+                                                return cell.v;
+                                            return '';
+                                    }
+                                    ;
+                                case XsDataType.Integer:
+                                case XsDataType.Double:
+                                    switch (cell.t) {
+                                        case "n": return cell.v.toString();
+                                        case "s": return cell.v;
+                                    }
+                                    ;
+                                case XsDataType.Boolean:
+                                    switch (cell.t) {
+                                        case "b": return cell.v.toString();
+                                        case "s": return LIB.isTrue(cell.v).toString();
+                                    }
+                                    ;
+                            }
+                            ;
+                            return '';
+                        }
+                        var res = {
+                            class: LIB.makeKey(ws.resClass),
+                            properties: [],
+                            changedAt: chAt
+                        };
+                        let c, C, cell, val, pC, dT, id, stL = [], pTi;
+                        for (c = ws.firstCell.col, C = ws.lastCell.col + 1; c < C; c++) {
+                            cell = ws.data[cellName(c, ws.firstCell.row)];
+                            pTi = cell && cell.v ? cell.v.trim() : '';
+                            if (!pTi)
+                                continue;
+                            cell = ws.data[cellName(c, row)];
+                            if (cell && cell.v) {
+                                if (CONFIG.nativeProperties.has(pTi)) {
+                                    pC = CONFIG.nativeProperties.get(pTi);
+                                    val = getVal({ type: pC.type }, cell);
+                                    if (pC.check(val)) {
+                                        res[pC.name] = val;
+                                        console.info(ws.name + ", row " + row + ": '" + pTi + "' with value '" + val + "' has been mapped to the native property '" + pC.name + "'");
+                                    }
+                                    else
+                                        console.warn(ws.name + ", row " + row + ": Cell value '" + cell.v + "' is invalid for the given native property '" + pTi + "'");
+                                    continue;
+                                }
+                                ;
+                                let cl = ws.col2dT.get(c);
+                                if (cl) {
+                                    pC = LIB.itemByKey(specifData.propertyClasses, cl);
+                                    dT = LIB.itemByKey(specifData.dataTypes, pC.dataType);
+                                    if (dT) {
+                                        if (!id && CONFIG.idProperties.includes(pC.title))
+                                            id = cell.v;
+                                        val = getVal(dT, cell);
+                                        if (dT.maxLength && (dT.maxLength < val.length)) {
+                                            val = val.slice(0, dT.maxLength);
+                                            console.warn('Text of cell ' + cellName(c, row) + ' on sheet ' + sh.name + ' has been truncated because it is too long');
+                                        }
+                                        ;
+                                        if (val)
+                                            res.properties.push({
+                                                class: LIB.keyOf(pC),
+                                                values: [val]
+                                            });
+                                    }
+                                    else {
+                                        console.error('No dataType with id ' + pC.dataType.id + ' found for value ' + cell.v + ' in cell ' + cellName(c, row) + ' of worksheet ' + ws.name);
+                                    }
+                                }
+                                else {
+                                    let obL = cell.w.split(",");
+                                    if (obL.length < 2)
+                                        obL = cell.w.split(";");
+                                    obL.forEach((ob) => {
+                                        let oInner = RE.inQuotes.exec(ob), res2l;
+                                        if (oInner && oInner.length > 2) {
+                                            res2l = oInner[1] || oInner[2];
+                                        }
+                                        else {
+                                            res2l = ob.trim();
+                                        }
+                                        ;
+                                        if (res2l.length > CONFIG.titleLinkMinLength - 1)
+                                            stL.push({
+                                                class: LIB.makeKey(staClassId(pTi)),
+                                                object: LIB.makeKey(CONFIG.placeholder),
+                                                resourceToLink: res2l,
+                                                changedAt: chAt
+                                            });
+                                    });
+                                }
+                            }
+                        }
+                        ;
+                        if (res.properties.length > 0) {
+                            if (id) {
+                                res.id = CONFIG.prefixR + simpleHash(ws.name + id);
+                                if (LIB.indexById(specifData.resources, res.id) > -1) {
+                                    dupIdL.push(id);
+                                    let counts = {};
+                                    dupIdL.forEach((x) => { counts[x] = (counts[x] || 0) + 1; });
+                                    console.warn('The user-defined identifier', id, 'is occurring', counts[id] + 1, 'times.');
+                                    res.id = CONFIG.prefixR + simpleHash(ws.name + id + counts[id]);
+                                }
+                                ;
+                            }
+                            else {
+                                res.id = LIB.genID(CONFIG.prefixR);
+                            }
+                            ;
+                            hTree.nodes.push({
+                                id: CONFIG.prefixN + simpleHash(res.id + hTree.nodes.length),
+                                resource: LIB.keyOf(res),
+                                changedAt: chAt
+                            });
+                            specifData.resources.push(res);
+                            if (stL.length > 0) {
+                                stL.forEach((st) => {
+                                    st.id = CONFIG.prefixS + simpleHash(res.id + st['class'].id + st.resourceToLink);
+                                    st.subject = LIB.keyOf(res);
+                                });
+                                specifData.statements = specifData.statements.concat(stL);
+                            }
+                        }
+                    }
+                }
+                function getPropClasses(ws) {
+                    var pCs = [], pC, dT, c, C, cell, pTi;
+                    for (c = ws.firstCell.col, C = ws.lastCell.col + 1; c < C; c++) {
+                        cell = ws.data[cellName(c, ws.firstCell.row)];
+                        pTi = cell && cell.v ? cell.v.trim() : '';
+                        if (pTi) {
+                            if (CONFIG.nativeProperties.has(pTi))
+                                continue;
+                            pC = LIB.itemByTitle(specifData.propertyClasses, pTi);
+                            if (pC && pC.id) {
+                                dT = LIB.itemByKey(specifData.dataTypes, pC.dataType);
+                                if (dT && dT.enumeration) {
+                                    let pCk = LIB.keyOf(pC);
+                                    pCs.push(pCk);
+                                    ws.col2dT.set(c, pCk);
+                                    continue;
+                                }
+                                ;
+                            }
+                            ;
+                            pC = getPropClass(c);
+                            if (pC) {
+                                LIB.cacheE(specifData.propertyClasses, pC);
+                                let pCk = LIB.keyOf(pC);
+                                pCs.push(pCk);
+                                ws.col2dT.set(c, pCk);
+                            }
+                            ;
+                        }
+                        ;
+                    }
+                    ;
+                    return pCs;
+                    function getPropClass(cX) {
+                        const defaultC = 'ShortString';
+                        let valL = [], r, R;
+                        for (r = ws.firstCell.row, R = ws.lastCell.row + 1; r < R; r++) {
+                            valL.push(ws.data[cellName(cX, r)]);
+                        }
+                        ;
+                        let pTi = valL[0] ? (valL[0].w || valL[0].v) : '', pC = '', nC = '';
+                        if (!pTi || ontologyStatementClasses.includes(pTi))
+                            return;
+                        let pc = LIB.itemByTitle(specifData.propertyClasses, pTi);
+                        if (pc)
+                            return pc;
+                        for (var i = valL.length - 1; i > 0; i--) {
+                            nC = classOf(valL[i]);
+                            if (nC.length < 1)
+                                continue;
+                            if (!pC) {
+                                pC = nC;
+                                continue;
+                            }
+                            ;
+                            if (pC == nC)
+                                continue;
+                            if (pC == 'Real' && nC == 'Integer')
+                                continue;
+                            if (pC == 'Integer' && nC == 'Real') {
+                                pC = 'Real';
+                                continue;
+                            }
+                            ;
+                            pC = defaultC;
+                        }
+                        ;
+                        if (!pC)
+                            pC = defaultC;
+                        if (pC == defaultC && app.ontology.propertyClassIsText(pTi))
+                            pC = 'Text';
+                        if (pC == defaultC) {
+                            let maxL = 0, multLines = false;
+                            for (var i = valL.length - 1; i > 0; i--) {
+                                maxL = Math.max(maxL, valL[i] && valL[i].v ? valL[i].v.length : 0);
+                                multLines = multLines || valL[i] && typeof (valL[i].v) == 'string' && valL[i].v.indexOf('\n') > -1;
+                            }
+                            ;
+                            if (maxL > CONFIG.textThreshold || multLines)
+                                pC = 'Text';
+                        }
+                        ;
+                        return new PropClass(ws.name + cX, pTi, pC);
+                        function classOf(cell) {
+                            if (isBool(cell))
+                                return 'Boolean';
+                            if (isInt(cell))
+                                return 'Integer';
+                            if (isReal(cell))
+                                return 'Real';
+                            if (isDateTime(cell))
+                                return 'DateTime';
+                            if (isStr(cell))
+                                return defaultC;
+                            return '';
+                        }
+                    }
+                }
+                function getStaClasses(ws, sCL) {
+                    var sTi, sC;
+                    for (var c = ws.firstCell.col, C = ws.lastCell.col + 1; c < C; c++) {
+                        sTi = ws.data[cellName(c, ws.firstCell.row)];
+                        if (sTi) {
+                            sTi = sTi.w || sTi.v;
+                            if (sTi && LIB.indexById(sCL, staClassId(sTi)) < 0 && ontologyStatementClasses.includes(sTi)) {
+                                sC = new StaClass(sTi);
+                                sCL.push(sC);
+                            }
+                            ;
+                        }
+                        ;
+                    }
+                    ;
+                }
+                if (ws.range) {
+                    var rC = new ResClass(ws.resClass, inBracketsAtEnd(ws.name) || inBracketsAtEnd(pN) || CONFIG.resClassXlsRow);
+                    rC.propertyClasses = getPropClasses(ws);
+                    specifData.resourceClasses.push(rC);
+                    getStaClasses(ws, specifData.statementClasses);
+                    createFld(ws);
+                }
+            }
+        }
+        let xDta = new Uint8Array(buf), wb = XLSX.read(xDta, { type: 'array', cellDates: true, cellStyles: true }), wsCnt = wb.SheetNames.length;
+        console.info('SheetNames: ' + wb.SheetNames + ' (' + wsCnt + ')');
+        var specifData = app.ontology.generateSpecifClasses({ terms: xlsTerms, adoptOntologyDataTypes: true });
+        specifData.resources.push({
+            id: CONFIG.prefixR + pN.toSpecifId(),
+            class: LIB.makeKey("RC-Folder"),
+            properties: [{
+                    class: LIB.makeKey("PC-Name"),
+                    values: [LIB.makeMultiLanguageValue(pN)]
+                }, {
+                    class: LIB.makeKey("PC-Type"),
+                    values: [LIB.makeMultiLanguageValue(CONFIG.resClassOutline)]
+                }],
+            changedAt: chAt
+        });
+        specifData.hierarchies.push({
+            id: CONFIG.prefixH + pN.toSpecifId(),
+            resource: LIB.makeKey(CONFIG.prefixR + pN.toSpecifId()),
+            nodes: [],
+            changedAt: chAt
+        });
+        let idx;
+        for (idx = 0; idx < wsCnt; idx++)
+            collectMetaData(new Worksheet(wb.SheetNames[idx]));
+        for (idx = 0; idx < wsCnt; idx++)
+            transformData(new Worksheet(wb.SheetNames[idx]));
+        return specifData;
+        function inBracketsAtEnd(str) {
+            let resL = RE.inBracketsAtEnd.exec(str);
+            if (Array.isArray(resL) && resL.length > 1)
+                return resL[1] || resL[2];
+        }
+    }
+    function specif2xlsx(data, opts) {
+        console.debug('toXlsx', data, opts);
+        const wb = XLSX.utils.book_new();
+        let selPrj = app.projects.selected, cData = selPrj.cache, pend = 0, sheet = [
+            data.propertyClasses.map((pC) => {
+                return pC.title;
+            })
+        ];
+        LIB.iterateNodes(cData.get("hierarchy", selPrj.hierarchies)
+            .filter((h) => {
+            return LIB.typeOf(h.resource, cData) != CONFIG.resClassUnreferencedResources;
+        }), (nd) => {
+            pend++;
+            selPrj.readItems('resource', [nd.resource])
+                .then((rL) => {
+                sheet.push(prpValues(rL[0]));
+                if (--pend < 1) {
+                    const ws = XLSX.utils.aoa_to_sheet(sheet);
+                    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+                    XLSX.writeFile(wb, opts.fileName + ".xlsx", { compression: true });
+                    if (typeof (opts.done) == "function")
+                        opts.done();
+                }
+            }, LIB.stdError);
+            return true;
+        });
+        return;
+        function prpValues(res) {
+            let prpL = [];
+            for (var pC of data.propertyClasses) {
+                let p = findPrp(res.properties, pC);
+                let pVal = p ? p.values[0][0].text || p.values[0] : undefined;
+                if (p && p.values.length > 1)
+                    console.info("Only first property value exported to xlsx.");
+                let dT = LIB.itemByKey(data.dataTypes, pC.dataType);
+                if (pVal && dT && dT.enumeration) {
+                    let v = LIB.itemById(dT.enumeration, pVal);
+                    pVal = LIB.isMultiLanguageValue(v.value) ? v.value[0]['text'] : v.value;
+                }
+                ;
+                prpL.push(pVal);
+            }
+            ;
+            return prpL;
+            function findPrp(prpL, pC) {
+                for (var p of prpL) {
+                    if (LIB.references(p['class'], pC))
+                        return p;
+                }
+            }
+        }
+    }
+});
