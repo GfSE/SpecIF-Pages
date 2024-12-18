@@ -10,4 +10,445 @@
     - transform RELATION-GROUP-TYPES and RELATION-GROUPS
     - extract default values
 */
-function reqif2Specif(e,t){const r=/\sxmlns:(.*?)=\".*?\"/;"object"!=typeof t&&(t={}),t.propType||(t.propType="ReqIF.Category"),t.prefixN||(t.prefixN="N-");const n=(i=e,(new DOMParser).parseFromString(i,"text/xml"));var i,s,a;if(0==(s=(a=n).getElementsByTagName("REQ-IF-HEADER").length>0&&a.getElementsByTagName("REQ-IF-CONTENT").length>0?{status:0,statusText:"ReqIF data is valid"}:t.errInvalidReqif||{status:899,statusText:"ReqIF data is invalid"}).status&&(s.response=function(e){let t=e[0].getAttribute("IDENTIFIER");return{id:t,title:e[0].getElementsByTagName("TITLE")[0]&&e[0].getElementsByTagName("TITLE")[0].innerHTML||t,description:e[0].getElementsByTagName("COMMENT")[0]&&e[0].getElementsByTagName("COMMENT")[0].innerHTML||"",generator:"reqif2specif",$schema:"https://specif.de/v1.0/schema.json",createdAt:e[0].getElementsByTagName("CREATION-TIME")[0].innerHTML}}(n.getElementsByTagName("REQ-IF-HEADER")),s.response.dataTypes=function(e){return e.length<1?[]:Array.from(e[0].children,t);function t(e){let t={id:e.getAttribute("IDENTIFIER"),type:n(e),title:e.getAttribute("LONG-NAME")||"",description:e.getAttribute("DESC")||"",changedAt:e.getAttribute("LAST-CHANGE")||""};return r("MIN","minInclusive"),r("MAX","maxInclusive"),r("MAX-LENGTH","maxLength"),r("ACCURACY","fractionDigits"),e.childElementCount>0&&(t.values=i(e.children)),t;function r(r,n){let i=e.getAttribute(r);i&&(t[n]=Number(i))}function n(e){return{"DATATYPE-DEFINITION-BOOLEAN":"xs:boolean","DATATYPE-DEFINITION-DATE":"xs:dateTime","DATATYPE-DEFINITION-INTEGER":"xs:integer","DATATYPE-DEFINITION-REAL":"xs:double","DATATYPE-DEFINITION-STRING":"xs:string","DATATYPE-DEFINITION-XHTML":"xhtml","DATATYPE-DEFINITION-ENUMERATION":"xs:enumeration"}[e.nodeName]}function i(e){return Array.from(e[0].children,t);function t(e){return{id:e.getAttribute("IDENTIFIER"),value:e.getAttribute("LONG-NAME")||"&#x00ab;undefined&#x00bb;"}}}}}(n.getElementsByTagName("DATATYPES")),s.response.propertyClasses=function(e){let r=n(i(e[0]));T(r).length<1&&(s.response.dataTypes.push({id:"DT-ShortString-"+s.response.id,type:"xs:string",title:"String[256]",description:"String with length <=256",maxLength:256,changedAt:(new Date).toISOString()}),r.push({id:"PC-Type-"+s.response.id,dataType:"DT-ShortString-"+s.response.id,title:t.propType,description:"The nature or genre of the resource.",changedAt:(new Date).toISOString()}));return r;function n(e){return Object.entries(e).map((e=>{let t={id:e[0],title:e[1].title,dataType:e[1].dataType,changedAt:e[1].changedAt};return e[1].multiple&&(t.multiple=!0),t}))}function i(e){return Object.assign({},t(e,"ATTRIBUTE-DEFINITION-STRING"),t(e,"ATTRIBUTE-DEFINITION-XHTML"),t(e,"ATTRIBUTE-DEFINITION-ENUMERATION"),t(e,"ATTRIBUTE-DEFINITION-DATE"),t(e,"ATTRIBUTE-DEFINITION-BOOLEAN"),t(e,"ATTRIBUTE-DEFINITION-INTEGER"),t(e,"ATTRIBUTE-DEFINITION-REAL"));function t(e,t){let r=e.getElementsByTagName(t),n={};return Array.from(r).forEach((e=>{if(n[e.getAttribute("IDENTIFIER")]={title:e.getAttribute("LONG-NAME"),dataType:e.children[0].children[0].innerHTML,changedAt:e.getAttribute("LAST-CHANGE")},"ATTRIBUTE-DEFINITION-ENUMERATION"==t){let t=e.getAttribute("MULTI-VALUED");t&&"true"==t.toLowerCase()&&(n[e.getAttribute("IDENTIFIER")].multiple=!0)}})),n}}}(n.getElementsByTagName("SPEC-TYPES")),s.response.resourceClasses=E(n.getElementsByTagName("SPEC-TYPES"),["SPECIFICATION-TYPE","SPEC-OBJECT-TYPE"]),s.response.statementClasses=E(n.getElementsByTagName("SPEC-TYPES"),["SPEC-RELATION-TYPE"]),s.response.resources=l("SPEC-OBJECTS").concat(l("SPECIFICATIONS")),s.response.statements=function(e){return e.length<1?[]:Array.from(e[0].children,t);function t(e){let t={id:e.getAttribute("IDENTIFIER"),subject:e.getElementsByTagName("SOURCE")[0].children[0].innerHTML,object:e.getElementsByTagName("TARGET")[0].children[0].innerHTML,changedAt:e.getAttribute("LAST-CHANGE")};t.class=e.getElementsByTagName("TYPE")[0].children[0].innerHTML;let r=e.getElementsByTagName("VALUES");return t.properties=o(r),t}}(n.getElementsByTagName("SPEC-RELATIONS")),s.response.hierarchies=function(e){return e.length<1?[]:Array.from(e[0].getElementsByTagName("SPECIFICATION"),r);function r(e){let r=e.getAttribute("IDENTIFIER");return{id:t.prefixN+r,resource:r,changedAt:e.getAttribute("LAST-CHANGE"),nodes:n(e)};function n(e){let t=[];const r=i(e,"CHILDREN")[0];return null!=r&&(t=Array.from(r.children,s)),t;function i(e,t){return Array.from(e.children).filter((e=>e.nodeName==t))}function s(e){let t={id:e.getAttribute("IDENTIFIER"),resource:e.getElementsByTagName("OBJECT")[0].firstElementChild.innerHTML,changedAt:e.getAttribute("LAST-CHANGE")},r=n(e);return r.length>0&&(t.nodes=r),t}}}}(n.getElementsByTagName("SPECIFICATIONS"))),!s.response.title){let e,t="";s.response.hierarchies.forEach((r=>{e=u(s.response.resources,r.resource),t+=(t.length>0?", ":"")+e.title})),s.response.title=t,console.info("Project title assembled from ReqIF SPECIFICATION roots")}return s;function T(e){return e.filter((e=>e.title==t.propType)).map((e=>e.id))}function E(e,t){if(e.length<1)return[];const r=[];return Array.from(e[0].children,(e=>{if(t.includes(e.nodeName)){let t=function(e){const t={id:e.getAttribute("IDENTIFIER"),title:e.getAttribute("LONG-NAME")||e.getAttribute("IDENTIFIER"),changedAt:e.getAttribute("LAST-CHANGE")};e.getAttribute("DESC")&&(t.description=e.getAttribute("DESC"));e.getElementsByTagName("SPEC-ATTRIBUTES")[0]&&(t.propertyClasses=r(e.getElementsByTagName("SPEC-ATTRIBUTES")));return t;function r(e){return Array.from(e[0].children,(e=>e.getAttribute("IDENTIFIER")))}}(e);if("SPECIFICATION-TYPE"==e.nodeName){let e=T(s.response.propertyClasses);e.length>0?Array.isArray(t.propertyClasses)?function(e,t){for(pC of e)if(t.includes(pC.id))return;e.push(t[0])}(t.propertyClasses,e):t.propertyClasses=[e[0]]:console.error("There is no propertyClass ")}r.push(t)}})),r}function l(e){let t=n.getElementsByTagName(e);return t.length<1?[]:Array.from(t[0].children,(function(t){let r={id:t.getAttribute("IDENTIFIER"),title:t.getAttribute("LONG-NAME")||"",changedAt:t.getAttribute("LAST-CHANGE")};r.class=t.getElementsByTagName("TYPE")[0].children[0].innerHTML;let n=t.getElementsByTagName("VALUES");r.properties=o(n),!r.title&&r.properties.length<1&&(r.title=r.id);if("SPECIFICATIONS"==e){let e=T(s.response.propertyClasses),t={class:e[0],value:"ReqIF:HierarchyRoot"},n=function(e){for(var t of r.properties)if(e.includes(t.class))return t}(e);n?n.value=t.value:r.properties.push(t)}return r}))}function o(e){if(e.length<1)return[];let t=[];return Array.from(e[0].children,(e=>{let n=function(e){let t,n,i={};i.class=e.getElementsByTagName("DEFINITION")[0].children[0].innerHTML,e.getAttribute("THE-VALUE")?(i.value=e.getAttribute("THE-VALUE"),t=u(s.response.propertyClasses,i.class),n=u(s.response.dataTypes,t.dataType),"number"==typeof n.maxLength&&n.maxLength<i.value.length&&(console.warn("Truncated ReqIF Attribute with value '"+i.value+"' to the specified maxLength of "+n.maxLength+" characters"),i.value=i.value.substring(0,n.maxLength))):e.getElementsByTagName("THE-VALUE")[0]?i.value=function(e){let t=s(r,e),n=e.replace(r,"");const i=new RegExp(t,"g");return n=n.replace(i,""),n;function s(e,t){let r="";return t=t.replace(e,(function(e,t){return r=t+":",""})),r}}(e.getElementsByTagName("THE-VALUE")[0].innerHTML):e.getElementsByTagName("VALUES")[0]&&(i.value="",Array.from(e.getElementsByTagName("VALUES")[0].children,(e=>{i.value+=(i.value.length>0?",":"")+e.innerHTML})));return i}(e);n.value&&t.push(n)})),t}function u(e,t){if(e&&t){t=t.trim();for(var r=e.length-1;r>-1;r--)if(e[r].id==t)return e[r]}}}
+
+/*
+########################## Main #########################################
+*/
+function reqif2Specif(reqifDoc,options) {
+	const RE_NS_LINK = /\sxmlns:(.*?)=\".*?\"/;
+	
+    if (typeof (options) != 'object') options = {};
+    if (!options.propType) options.propType = "ReqIF.Category";  // the type/category of a resource, e.g. folder or diagram.
+    if (!options.prefixN) options.prefixN = "N-";
+
+    const xmlDoc = parse(reqifDoc);
+
+    var xhr;
+    if (validateReqif(xmlDoc))
+        xhr = { status: 0, statusText: "ReqIF data is valid" }
+    else
+        xhr = options.errInvalidReqif || { status: 899, statusText: "ReqIF data is invalid" };
+
+    if (xhr.status == 0) {
+        // Transform ReqIF data provided as an XML string to SpecIF data.
+        xhr.response = extractMetaData(xmlDoc.getElementsByTagName("REQ-IF-HEADER"));
+        xhr.response.dataTypes = extractDatatypes(xmlDoc.getElementsByTagName("DATATYPES"));
+        xhr.response.propertyClasses = extractPropertyClasses(xmlDoc.getElementsByTagName("SPEC-TYPES"));
+        xhr.response.resourceClasses = extractElementClasses(xmlDoc.getElementsByTagName("SPEC-TYPES"), ['SPECIFICATION-TYPE','SPEC-OBJECT-TYPE']);
+        xhr.response.statementClasses = extractElementClasses(xmlDoc.getElementsByTagName("SPEC-TYPES"), [/*'RELATION-GROUP-TYPE',*/'SPEC-RELATION-TYPE']);
+        xhr.response.resources = extractResources("SPEC-OBJECTS")
+            // ReqIF hierarchy roots are SpecIF resouces:
+            .concat(extractResources("SPECIFICATIONS"));
+        xhr.response.statements = extractStatements(xmlDoc.getElementsByTagName("SPEC-RELATIONS"));
+        xhr.response.hierarchies = extractHierarchies(xmlDoc.getElementsByTagName("SPECIFICATIONS"));
+    };
+
+    // get project title from hierarchy roots in case of default;
+    // for example the ReqIF exports from Cameo do not have a TITLE:
+    if (!xhr.response.title) {
+        let ti = '', r;
+        xhr.response.hierarchies.forEach((h) => {
+            r = itemById(xhr.response.resources, h.resource);
+            ti += (ti.length > 0 ? ', ' : '') + r.title;
+        });
+        xhr.response.title = ti;
+        console.info('Project title assembled from ReqIF SPECIFICATION roots');
+    };
+
+//  console.info(xhr);
+    return xhr;
+
+/*
+########################## Subroutines #########################################
+*/
+    function validateReqif(xml) {
+        return xml.getElementsByTagName("REQ-IF-HEADER").length > 0
+            && xml.getElementsByTagName("REQ-IF-CONTENT").length > 0;
+    }
+    function extractMetaData(header) {
+        // header.length>0 has been checked before: 
+        let id = header[0].getAttribute("IDENTIFIER");
+        return ({
+            id: id,
+            title: (header[0].getElementsByTagName("TITLE")[0] && header[0].getElementsByTagName("TITLE")[0].innerHTML) || id,
+            description: header[0].getElementsByTagName("COMMENT")[0] && header[0].getElementsByTagName("COMMENT")[0].innerHTML || '',
+            generator: 'reqif2specif',
+            $schema: "https://specif.de/v1.0/schema.json",
+            createdAt: header[0].getElementsByTagName("CREATION-TIME")[0].innerHTML
+        })
+    };
+    function extractDatatypes(xmlDatatypes) {
+        let specifDataTypes = xmlDatatypes.length < 1 ? [] : Array.from(xmlDatatypes[0].children, extractDatatype);
+        return specifDataTypes;
+
+        function extractDatatype(datatype) {
+            let specifDatatype = {
+                id: datatype.getAttribute("IDENTIFIER"),
+                type: getTypeOfDatatype(datatype),
+                title: datatype.getAttribute("LONG-NAME") || '',
+                description: datatype.getAttribute("DESC") || '',
+                changedAt: datatype.getAttribute("LAST-CHANGE") || ''
+            };
+
+            extr("MIN", "minInclusive");
+            extr("MAX", "maxInclusive");
+            extr("MAX-LENGTH", "maxLength");
+            extr("ACCURACY", "fractionDigits");
+            if (datatype.childElementCount > 0) specifDatatype.values = extractDataTypeValues(datatype.children);
+
+            return specifDatatype;
+
+            function extr(rqA,spP) {
+                let val = datatype.getAttribute(rqA);
+                if (val)
+                    specifDatatype[spP] = Number(val)
+            }
+            function getTypeOfDatatype(datatype) {
+                return {
+                    "DATATYPE-DEFINITION-BOOLEAN": 'xs:boolean',
+                    "DATATYPE-DEFINITION-DATE": 'xs:dateTime',
+                    "DATATYPE-DEFINITION-INTEGER": 'xs:integer',
+                    "DATATYPE-DEFINITION-REAL": 'xs:double',
+                    "DATATYPE-DEFINITION-STRING": 'xs:string',
+                    "DATATYPE-DEFINITION-XHTML": 'xhtml',
+                    "DATATYPE-DEFINITION-ENUMERATION": 'xs:enumeration',
+                }[datatype.nodeName];
+            }
+            function extractDataTypeValues(DataTypeValuesHtmlCollection) {
+                return Array.from(DataTypeValuesHtmlCollection[0].children, extractEnumValue);
+
+                function extractEnumValue(ch) {
+                    return {
+                        id: ch.getAttribute("IDENTIFIER"),
+                        value: ch.getAttribute("LONG-NAME") || '&#x00ab;undefined&#x00bb;'
+                    }
+                }
+            }
+        }
+    };
+
+    function pcTypeIdL(pCL) {
+        // Return a list with all ids of propertyClasses defining the type/category;
+        // there may be serveral, as the list of propertyClasses is not yet deduplicated:
+        return pCL.filter(
+                pC => pC.title == options.propType
+            )
+            .map(
+                pC => pC.id
+            )
+    }
+    function extractPropertyClasses(xmlSpecTypes) {
+        const specAttributesMap = extractSpecAttributesMap(xmlSpecTypes[0]);
+        let specifPropertyClasses = extractPropertyClassesFromSpecAttributeMap(specAttributesMap);
+
+        // Look for a propertyClass defining the type/category:
+        if (pcTypeIdL(specifPropertyClasses).length<1) {
+            // 1. Add a dataType for the hierarchy type:
+            xhr.response.dataTypes.push({
+                id: "DT-ShortString-" + xhr.response.id,
+                type: "xs:string",
+                title: "String[256]",
+                description: "String with length <=256",
+                maxLength: 256,
+                changedAt: new Date().toISOString()
+            });
+            // 2. Add a propertyClass for the hierarchy type, unless already present:
+            specifPropertyClasses.push({
+                id: "PC-Type-" + xhr.response.id,
+                dataType: "DT-ShortString-" + xhr.response.id,
+                title: options.propType,
+                description: "The nature or genre of the resource.",
+                changedAt: new Date().toISOString()
+            });
+        };
+        return specifPropertyClasses;
+
+        function extractPropertyClassesFromSpecAttributeMap(specAttributeMap) {
+            let propertyClasses = Object.entries(specAttributeMap).map( entry => { 
+                let propertyClass = {
+                    id: entry[0],
+                    title: entry[1].title,
+                    dataType: entry[1].dataType,
+                    changedAt: entry[1].changedAt
+                };
+                if( entry[1].multiple ) propertyClass.multiple = true;
+
+                return propertyClass;
+            });
+            return propertyClasses;
+        }
+        function extractSpecAttributesMap(specTypesDocument) {
+            return Object.assign({},
+                extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-STRING"),
+                extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-XHTML"),
+                extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-ENUMERATION"),
+                extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-DATE"),
+                extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-BOOLEAN"),
+                extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-INTEGER"),
+                extractSpecAttributeTypeMap(specTypesDocument, "ATTRIBUTE-DEFINITION-REAL"),
+            );
+
+            function extractSpecAttributeTypeMap(specTypesDocument, nodeName) {
+                let attributeDefinitions = specTypesDocument.getElementsByTagName(nodeName),
+                    attributeDefinitionMap = {};
+
+                Array.from(attributeDefinitions).forEach(definition => {
+                    attributeDefinitionMap[definition.getAttribute("IDENTIFIER")] =
+                        {
+                            title: definition.getAttribute("LONG-NAME"),
+                            dataType: definition.children[0].children[0].innerHTML,
+                            changedAt: definition.getAttribute("LAST-CHANGE"),
+                        };
+
+                    // Enumerations have an optional attribute MULTI-VALUED:  
+                    if (nodeName == "ATTRIBUTE-DEFINITION-ENUMERATION") {
+                        let multiple = definition.getAttribute("MULTI-VALUED");
+                        if (multiple && multiple.toLowerCase() == 'true')
+                            attributeDefinitionMap[definition.getAttribute("IDENTIFIER")].multiple = true;
+                    }
+                });
+                return attributeDefinitionMap;
+            }
+        }
+    }
+
+    function extractElementClasses(xmlSpecTypes,subset) {
+        if (xmlSpecTypes.length<1) return [];
+        const specifElementClasses = [];
+        // consider to use .querySelectorAll("nodeName")
+        Array.from(xmlSpecTypes[0].children,
+            xmlSpecType => {
+                if (subset.includes(xmlSpecType.nodeName)) {
+                    let elC = extractElementClass(xmlSpecType);
+
+                    // Add a propertyClass for hierarchy type, unless already present:
+                    if (xmlSpecType.nodeName == 'SPECIFICATION-TYPE') {
+                        // Look for a propertyClass defining the type/category with value 'ReqIF:HierarchyRoot';
+                        // there should be at least one:
+                        let idL = pcTypeIdL(xhr.response.propertyClasses);
+                        if (idL.length > 0) {
+                            // Add the propertyClass as reference to the resourceClass, if missing:
+                            Array.isArray(elC.propertyClasses) ?
+                                addPcTypeIfMissing(elC.propertyClasses, idL)
+                                : elC.propertyClasses = [idL[0]];
+                        }
+                        else
+                            console.error("There is no propertyClass ");
+                    };
+                    specifElementClasses.push(elC)
+                }
+            }
+        );
+        return specifElementClasses;
+
+        function addPcTypeIfMissing(pCL,idL) {
+            for (pC of pCL) {
+                if (idL.includes(pC.id)) return;
+            };
+            pCL.push(idL[0]);
+        }
+        function extractElementClass(xmlSpecType) {
+            // for both resourceClasses and statementClasses:
+            const specifElementClass = {
+                id: xmlSpecType.getAttribute("IDENTIFIER"),
+                title: xmlSpecType.getAttribute("LONG-NAME") || xmlSpecType.getAttribute("IDENTIFIER"),
+                changedAt: xmlSpecType.getAttribute("LAST-CHANGE")
+            };
+            if (xmlSpecType.getAttribute("DESC"))
+                specifElementClass.description = xmlSpecType.getAttribute("DESC");
+            if (xmlSpecType.getElementsByTagName("SPEC-ATTRIBUTES")[0])
+                specifElementClass.propertyClasses = extractPropertyClassReferences(xmlSpecType.getElementsByTagName("SPEC-ATTRIBUTES"));
+
+            return specifElementClass;
+
+            function extractPropertyClassReferences(propertyClassesDocument) {
+                return Array.from(propertyClassesDocument[0].children, property => { return property.getAttribute("IDENTIFIER") })
+            }
+        }
+    }
+
+    function extractResources(tagName) {
+        let xmlSpecObjects = xmlDoc.getElementsByTagName(tagName);
+        return xmlSpecObjects.length<1? [] : Array.from(xmlSpecObjects[0].children,extractResource);
+
+        function extractResource(xmlSpecObject) {
+            let specifResource = {
+                id: xmlSpecObject.getAttribute("IDENTIFIER"),
+                title: xmlSpecObject.getAttribute("LONG-NAME") || "",
+                changedAt: xmlSpecObject.getAttribute("LAST-CHANGE")
+            };
+            specifResource['class'] = xmlSpecObject.getElementsByTagName("TYPE")[0].children[0].innerHTML;
+            let values = xmlSpecObject.getElementsByTagName("VALUES");
+            // Get a list of properties with none, one or more items:
+            specifResource.properties = extractProperties(values);  
+
+            // a resource must have at least one property:
+            if (!specifResource.title && specifResource.properties.length < 1)
+                specifResource.title = specifResource.id;
+
+            if (tagName == 'SPECIFICATIONS') {
+                // The property defining the type of the hierarchy root to decide whether a hierarchy has a root or not;
+                // as SpecIF data from other sources usually do not have an explicit root:
+                let idL = pcTypeIdL(xhr.response.propertyClasses),
+                    prp = {
+                        class: idL[0],
+                        value: "ReqIF:HierarchyRoot" // ReqIF root node with meta-data
+                    };
+                // Add type to properties, unless already present:
+                let p = pType(idL);
+                if (p)
+                    p.value = prp.value
+                else
+                    specifResource.properties.push(prp)
+            };
+
+            return specifResource;
+
+            function pType(L) {
+                // Return the propertyClass defining the type/category:
+                for (var p of specifResource.properties) {
+                    if (L.includes(p['class'])) return p;
+                };
+                // return undefined;
+            }
+        }
+    }
+    function extractStatements(xmlSpecRelations) {
+        return xmlSpecRelations.length<1? [] : Array.from(xmlSpecRelations[0].children,extractStatement);
+
+        function extractStatement(xmlSpecRelation) {
+            let specifStatement = {
+                id: xmlSpecRelation.getAttribute("IDENTIFIER"),
+                subject: xmlSpecRelation.getElementsByTagName("SOURCE")[0].children[0].innerHTML,
+                object: xmlSpecRelation.getElementsByTagName("TARGET")[0].children[0].innerHTML,
+                changedAt: xmlSpecRelation.getAttribute("LAST-CHANGE")
+            };
+            specifStatement['class'] = xmlSpecRelation.getElementsByTagName("TYPE")[0].children[0].innerHTML;
+            let values = xmlSpecRelation.getElementsByTagName("VALUES");
+            specifStatement.properties = extractProperties(values);
+        
+            return specifStatement;
+        }
+    }
+    function extractProperties(specAttributes) {
+        // used for OBJECTS as well as RELATIONS:
+        if ( specAttributes.length<1 ) return [];
+	    let list = [];
+	    // Only add a SpecIF property, if it has a value:
+        Array.from( specAttributes[0].children, (prp)=>{ let p=extractSpecIfProperty(prp); if(p.value) list.push(p)} );
+	    return list;
+
+        function extractSpecIfProperty(property) {
+            let specifProperty = {}, pC, dT;
+            /*  // Provide the id, even though it is not required by SpecIF:
+                // The attribute-value id is not required by ReqIF, 
+                // ToDo: check wether it *may* be specified, at all ...  
+                specifProperty.id = property.getAttribute("IDENTIFIER"); */
+            specifProperty['class'] = property.getElementsByTagName("DEFINITION")[0].children[0].innerHTML;
+
+            //  ToDo: Check whether ReqIF ATTRIBUTES can have an individual LONG-NAME ..
+
+            if (property.getAttribute("THE-VALUE")) {
+                specifProperty.value = property.getAttribute("THE-VALUE");
+
+                pC = itemById(xhr.response.propertyClasses, specifProperty['class']);
+                dT = itemById(xhr.response.dataTypes, pC.dataType);
+    //          console.debug('maxL', dT, pC, specifProperty.value, specifProperty.value.length);
+                if( typeof(dT.maxLength)=='number' && dT.maxLength < specifProperty.value.length ) {
+                    console.warn("Truncated ReqIF Attribute with value '" + specifProperty.value + "' to the specified maxLength of " + dT.maxLength + " characters");
+                    specifProperty.value = specifProperty.value.substring(0, dT.maxLength);
+                };
+            }
+            // XHTML:
+            else if( property.getElementsByTagName("THE-VALUE")[0] ) 
+                specifProperty.value = removeNamespace(property.getElementsByTagName("THE-VALUE")[0].innerHTML);
+            // ENUMERATION:
+            else if (property.getElementsByTagName("VALUES")[0]) {
+                specifProperty.value = '';
+                Array.from(property.getElementsByTagName("VALUES")[0].children, (ch) => { specifProperty.value += (specifProperty.value.length > 0 ? ',' : '') + ch.innerHTML });
+            };
+            return specifProperty;
+        }
+    }
+
+    function extractHierarchies(xmlSpecifications) {
+        // There is none or one element with tagname SPECIFICATIONS:
+        return xmlSpecifications.length < 1 ? [] : Array.from(xmlSpecifications[0].getElementsByTagName("SPECIFICATION"),extractHierarchy);
+
+        function extractHierarchy(xmlSpecification) {
+            let hId = xmlSpecification.getAttribute("IDENTIFIER");
+            return {
+                id: options.prefixN + hId,
+                resource: hId,
+                changedAt: xmlSpecification.getAttribute("LAST-CHANGE"),
+                nodes: extractNodes(xmlSpecification)
+            };
+
+            function extractNodes(rootElement) {
+                let specifNodesArray = [];
+                const childrenDocElement = getChildNodeswithTag(rootElement, "CHILDREN")[0];
+                if(childrenDocElement != undefined){
+                    specifNodesArray = Array.from(childrenDocElement.children,extractSpecifNode)
+                };
+                return specifNodesArray;
+
+                function getChildNodeswithTag(parentDocument, nodeName) {
+                    return Array.from(parentDocument.children).filter(element => {return element.nodeName == nodeName});
+                }
+                function extractSpecifNode(hierarchyDocument) {
+                    let specifHierarchy = {
+                        id: hierarchyDocument.getAttribute("IDENTIFIER"),
+                        resource: hierarchyDocument.getElementsByTagName("OBJECT")[0].firstElementChild.innerHTML,
+                        changedAt: hierarchyDocument.getAttribute("LAST-CHANGE")
+                    };
+                
+                    let specifSubnodesArray = extractNodes(hierarchyDocument);
+                    if( specifSubnodesArray.length>0 ) 
+                        specifHierarchy.nodes = specifSubnodesArray;
+                
+                    return specifHierarchy;
+                }
+            }
+        }
+    }
+    function parse(string) {
+        const parser = new DOMParser();
+        return parser.parseFromString(string,"text/xml");
+    }
+
+
+/* 
+########################## Tools #########################################  
+*/
+    function itemById(L, id) {
+        if (L && id) {
+            // given an ID of an item in a list, return it's index:
+            id = id.trim();
+            for (var i = L.length - 1; i > -1; i--)
+                if (L[i].id == id) return L[i]   // return list item
+        };
+    }
+    /*
+    //      (xmlns:.*?=)\\".*?\\" Regular Expression to match namespace links (at beginning)
+    String.prototype.removeNamespace = function(){
+        if( this ) return this.replace( /(xmlns:.*?=)\\".*?\\"/g, '' ); 
+        return;
+    };*/
+    function removeNamespace(input) {
+        let namespace = getNameSpace(RE_NS_LINK, input);
+        let string = input.replace(RE_NS_LINK, '' ); 
+        //string = string.replaceAll(namespace, '')
+        const RE_namespace = new RegExp(namespace, 'g' )
+        string = string.replace(RE_namespace, '');
+        return string;
+
+	    function getNameSpace(regEX, string) {
+		    let namespace = '';
+		    string = string.replace(regEX, function($0, $1){
+			    namespace = $1 + ":";
+			    return ''
+		    });
+		    return namespace;
+	    }
+    }
+}

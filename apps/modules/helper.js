@@ -25,7 +25,7 @@ function makeTextField(tag, val, opts) {
             throw Error("Invalid display option '" + opts.tagPos + "' when showing a text form");
     }
     ;
-    val = LIB.noCode(val || '');
+    val = LIB.noCode(val || '').unescapeJSON();
     switch (opts.typ) {
         case 'line':
             fG += '<div class="' + aC + '">'
@@ -47,7 +47,7 @@ function makeTextField(tag, val, opts) {
     return fG;
 }
 function setTextValue(tag, val) {
-    val = LIB.noCode(val || '');
+    val = LIB.noCode(val || '').unescapeJSON();
     let el = document.getElementById('field' + simpleHash(tag));
     if (el && el.nodeName && el.nodeName.toLowerCase() == 'div') {
         el.innerHTML = val;

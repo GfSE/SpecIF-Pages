@@ -90,6 +90,7 @@ RE.attrData = /data="([^"]+)"/;
 const tagSO = '<object ([^>]+?)(/>|>(.*?)</object>)', tagNO = '<object ([^>]+?)>[\\s]*' + tagSO + '([\\s\\S]*?)</object>';
 RE.tagSingleObject = new RegExp(tagSO, 'g');
 RE.tagNestedObjects = new RegExp(tagNO, 'g');
+const inBr = "\\((\\S[^\\)]*?\\S)\\)|\\[(\\S[^\\]]*?\\S)\\]";
 RE.inBracketsAtEnd = /{(\S[^}]*?\S)}$/;
 RE.withoutBracketsAtEnd = /^\s*([^{]+[^{\s])\s*(?:\s{1}{\S.*?\S})?$/;
 RE.inQuotes = /"(\S[^"]*?\S)"|'(\S[^']*?\S)'/i;
