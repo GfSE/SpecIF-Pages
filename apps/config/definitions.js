@@ -1,6 +1,6 @@
 "use strict";
 const CONFIG = {};
-CONFIG.appVersion = "1.1.r.27",
+CONFIG.appVersion = "1.1.r.28",
     CONFIG.specifVersion = "1.1";
 CONFIG.imgURL = './assets/images';
 CONFIG.ontologyURL = 'https://specif.de/v1.1/Ontology.specif';

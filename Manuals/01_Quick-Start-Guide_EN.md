@@ -103,21 +103,30 @@ In the ↗ `Document` tab, the model is presented in a structure or outline chos
 
 ![Document Tab](../assets/images/Manuals/02_document-tab_EN.png)
 
-You can open and close the structural levels on the left; the respective contents are shown on the right. In the main column, the properties designated as title, description and diagram are shown, plus any other properties in a narrow column on the right.
+You can open and close the structural levels on the left; the respective contents are shown on the right. 
+In the main column, the properties designated as title, description and diagram are shown, plus any other properties in a narrow column on the right.
 
-With certain SVG model diagrams, e.g. with FMC- or BPMN-notation created by <a href="http://arcway.com" target="_blank">ARCWAY Cockpit</a>, the diagram elements are linked to the corresponding data elements such that their title and description are displayed when the mouse is hovered over them. The element is jumped to with a double click. Here is a small <a href="https://specif.de/apps/edit#view=doc;node=N-Diagram-aec0df7900010000017001eaf53e8876;import=https://specif.de/examples/v1.1/09_Very-Simple-Model-FMC-with-Requirements.specifz" target="_blank">example</a>.
+With certain SVG model diagrams, e.g. with FMC- or BPMN-notation created by <a href="http://arcway.com" target="_blank">ARCWAY Cockpit</a>, 
+the diagram elements are linked to the corresponding data elements such that their title and description are displayed when the mouse is hovered over them. 
+The element is jumped to with a double click. 
+Here is a small <a href="https://specif.de/apps/edit#view=doc;node=N-Diagram-aec0df7900010000017001eaf53e8876;import=https://specif.de/examples/v1.1/09_Very-Simple-Model-FMC-with-Requirements.specifz" target="_blank">example</a>.
 
 ### Edit a Model Element
 
-If permissions allow, a pen icon ↗ `🖉` is active at the selected model element in the upper right corner. Clicking opens an editing window whose fields are determined by the current element type. Entries are checked key by key for correctness: For example, a red frame immediately indicates when a letter is entered in a number field.
+If permissions allow, a pen icon ↗ `🖉` is active at the selected model element in the upper right corner. Clicking opens an editing window whose fields are determined by the current element type. 
+Entries are checked key by key for correctness: For example, a red frame immediately indicates when a letter is entered in a number field.
 
-Fields of type text (data type xs:string) allow formatting by means of XHTML or <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a>, which is interpreted accordingly during display or document generation.
+Fields of type text (data type xs:string) allow formatting by means of XHTML or <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a>, 
+which is interpreted accordingly during display or document generation.
 
 By the way, texts can also be formatted using XHTML and markdown in many authoring tools, including Excel®, Archi, Camunda Modeler and Cameo. The formatting is preserved during import.
 
 ### Investigate Semantic Relationships
 
-In the ↗ `Relations` tab, the semantic relationships of the element selected in the outline to the left are shown. Most relationships are automatically created by graphically analyzing the model diagrams, such as “component XY contains function FR” when the block representing function FR is spatially contained in the block representing component XY. Some relationships have to be created manually as part of the analysis and system design, for example "Component XZ satisfies requirement 134".
+In the ↗ `Relations` tab, the semantic relationships of the element selected in the outline to the left are shown. 
+Most relationships are automatically created by graphically analyzing the model diagrams, 
+such as “component XY contains function FR” when the block representing function FR is spatially contained in the block representing component XY. 
+Some relationships have to be created manually as part of the analysis and system design, for example "Component XZ satisfies requirement 134".
 
 ![Relations Tab](../assets/images/Manuals/03_relations-tab_EN.png)
 
@@ -130,7 +139,11 @@ The selected element is a little darker and shown in the center of the spider. T
 - writes a document „Invoice Document“ and finally
 - sends messages to an organization „Invoice Management“.
 
-The relationships shown are the entirety of all statements relating to the selected element in the present model. For example, if one diagram shows that component A is contained in component B and another diagram shows the opposite situation, then it is clearly a contradiction. While it is hardly possible to look through the entire model with all its diagrams and check for consistency, such contradictions are quite easily uncovered when inspecting the statements of individual elements. Current work deals with automatic model testing using hard and empirical rules in order to improve model quality in the long term.
+The relationships shown are the entirety of all statements relating to the selected element in the present model. 
+For example, if one diagram shows that component A is contained in component B and another diagram shows the opposite situation, then it is clearly a contradiction. 
+While it is hardly possible to look through the entire model with all its diagrams and check for consistency, 
+such contradictions are quite easily uncovered when inspecting the statements of individual elements. 
+Current work deals with automatic model testing using hard and empirical rules in order to improve model quality in the long term.
 
 In this view, you can also double-click any element and navigate through the semantic network using the relationships.
 
@@ -138,7 +151,8 @@ In this view, you can also double-click any element and navigate through the sem
 
 Likewise on tab ↗ `Relations`, two buttons for creating and deleting relations become active, if permissions are granted. 
 
-To create a relation ↗ `＋`, a dialog box is displayed, in which a valid relation type for the given model element and a suitable target element as subject or object can be selected. Only those options are offered that correspond to the ontology, so that only meaningful semantic relations are created.
+To create a relation ↗ `＋`, a dialog box is displayed, in which a valid relation type for the given model element and a suitable target element as subject or object can be selected. 
+Only those options are offered that correspond to the ontology, so that only meaningful semantic relations are created.
 
 To delete a relation ↗ `❌`, all relation targets of the selected model element are colored red. Double-clicking on a target element deletes the respective relation.
 
@@ -146,11 +160,13 @@ To delete a relation ↗ `❌`, all relation targets of the selected model eleme
 
 Once the document has the desired structure and content, it can be saved in various formats by pressing ↗ `Export` at the top right:
 - ↗ `SpecIF` creates a ZIP file with the semantic network in SpecIF format and all referenced images and files. It can be easily read back into the SpecIF editor at a later time.
-- ↗ `HTML` with embedded SpecIF generates a file to be displayed in the web browser. All views and semantic relationships can be easily tracked and reviewed. The file contains Javascript and therefore some environments prohibit execution.
+- ↗ `HTML` with embedded SpecIF generates a file to be displayed in the web browser. All views and semantic relationships can be easily tracked and reviewed. 
+The file contains Javascript and therefore some environments prohibit execution.
 - ↗ `ReqIF` generates an XML file according to the OMG Requirement Interchange Format, which can be read by several Requirement Management (RM) and Application Lifecycle Management (ALM) tools.
 - ↗ `Turtle` creates a file for reading into graph databases; it is a compact representation of the Resource Description Framework (RDF).
 - ↗ `Epub` generates a file for electronic document readers.
-- ↗ `MS Word®` creates an OOXML file that can be read and further edited using MS Word. Edited files are best saved in the compressed format DOCX. As is well known, Word files in change mode are a popular means of collaboration and adding content within a team.
+- ↗ `MS Word®` creates an OOXML file that can be read and further edited using MS Word. Edited files are best saved in the compressed format DOCX. 
+As is well known, Word files in change mode are a popular means of collaboration and adding content within a team.
 
 ## Special Authoring Tools
 
@@ -164,17 +180,28 @@ When importing Excel® files, a folder with the file name as title is created in
 
 #### Resources
 
-If there is a term in brackets in the name of a worksheet, it is used as the title of the resource class (SpecIF resourceClass, type of all resources/objects found on this worksheet). If the worksheet name does not contain a term in brackets, a term in brackets in the file name is used as a substitute. If no type designation is found there either, a generic title without a particular meaning is used for the resource class of the worksheet.
+If there is a term in brackets in the name of a worksheet, it is used as the title of the resource class (SpecIF resourceClass, type of all resources/objects found on this worksheet). 
+If the worksheet name does not contain a term in brackets, a term in brackets in the file name is used as a substitute. 
+If no type designation is found there either, a generic title without a particular meaning is used for the resource class of the worksheet.
 
-Unfortunately, no vocabulary term ready to be interpreted by the system can be used in the filename, as certain characters (e.g. the colon) may not appear in filenames. However, the terms “requirement”, “feature”, “annotation”, “user-story” and “pain-point“ are interpreted correctly by the viewer or editor and replaced by a vocabulary term.
+Unfortunately, no vocabulary term ready to be interpreted by the system can be used in the filename, as certain characters (e.g. the colon) may not appear in filenames. 
+However, the terms “requirement”, “feature”, “annotation”, “user-story” and “pain-point“ are interpreted correctly by the viewer or editor and replaced by a vocabulary term.
 
-For example, if an Excel file has the file name "Project-name (Requirement).xslx" and it contains two worksheets with the names "Functions (User Story)" and "Constraints", a resource-class with the title "User-Story" replaced by "SpecIF:UserStory" forthe first worksheet and a resource-class with the title "Requirement" repla¬ced by "IREB:Requirement" for the second worksheet are created.
+For example, if an Excel file has the file name "Project-name (Requirement).xslx" and it contains two worksheets with the names "Functions (User Story)" and "Constraints", 
+a resource-class with the title "User-Story" replaced by "SpecIF:UserStory" for the first worksheet and a resource-class with the title "Requirement" replaced by "IREB:Requirement" 
+for the second worksheet are created.
 
 #### Properties
 
-Now for the contents of each worksheet. The property names (SpecIF property titles) are expected in the first table line of each worksheet and the resources ("instances") follow from the second line. Defined vocabulary terms are best used as attribute names, e.g. dcterms:title and dcterms:description from the <a href="https://www.dublincore.org/" target="_blank">Dublin Core Metadata Initiative</a>. The use of agreed terms conveys the meaning of the respective attributes so that, just one of the potential benefits, the user interface knows how to display the properties. For example, the title (denoted by dcterms:title) comes first in larger letters, underneath the description (denoted by dcterms:description) in the main column plus the remaining attributes in a narrower column on the right. However, there are many more benefits in the entire product development.
+Now for the contents of each worksheet. The property names (SpecIF property titles) are expected in the first table line of each worksheet and the resources ("instances") 
+follow from the second line. Defined vocabulary terms are best used as attribute names, e.g. dcterms:title and dcterms:description from 
+the <a href="https://www.dublincore.org/" target="_blank">Dublin Core Metadata Initiative</a>. 
+The use of agreed terms conveys the meaning of the respective attributes so that, just one of the potential benefits, the user interface knows how to display the properties. 
+For example, the title (denoted by dcterms:title) comes first in larger letters, underneath the description (denoted by dcterms:description) in the main column plus the 
+remaining attributes in a narrower column on the right. However, there are many more benefits in the entire product development.
 
-By the way, formatting in text fields using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list.
+By the way, formatting in text fields using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, 
+for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list.
 
 #### Enumerated Values
 
@@ -201,7 +228,7 @@ SpecIF Editor/Viewer regardless of the active browser language (without a define
 
 #### Relations
 
-The same goes for the names of relationships (SpecIF statements); for example _oslc_rm:refinedBy_ between two require¬ments 
+The same goes for the names of relationships (SpecIF statements); for example _oslc_rm:refinedBy_ between two requirements 
 or _oslc_rm:satisfies_ between a system component and a requirement. In order to successfully create relationships, 
 the user-defined IDs (_dcterms:identifier_) or titles (_dcterms:title_) of the respective elements must be given 
 between double or single quotation marks. Multiple resources can be specified separated by commas. 
@@ -243,27 +270,37 @@ Also for ADOIT, formatting in diagram or element descriptions using <a href="htt
 
 ### Cameo
 
-Cameo Systems Modeler is a commercial modeling tool licensed by <a href="https://www.3ds.com/" target="_blank">Dassault Systèmes</a> supporting the UML and SysML notation of the OMG. It can be obtained from <a href="https://www.3ds.com/products/catia/no-magic/cameo-systems-modeler" target="_blank">https://www.3ds.com/products/catia/no-magic/cameo-systems-modeler</a>.
+Cameo Systems Modeler is a commercial modeling tool licensed by <a href="https://www.3ds.com/" target="_blank">Dassault Systèmes</a> supporting the UML and SysML notation of the OMG. 
+It can be obtained from <a href="https://www.3ds.com/products/catia/no-magic/cameo-systems-modeler" target="_blank">https://www.3ds.com/products/catia/no-magic/cameo-systems-modeler</a>.
 
 {: .highlight }
-_Note: The transformation of UML/SysML models authored with Cameo to SpecIF is in development. Currently the UML Class Diagram, SysML Block Diagram (bdd) and Internal Block Diagram (ibd) are transformed._
+_Note: The transformation of UML/SysML models authored with Cameo to SpecIF is in development. 
+Currently the UML Class Diagram, SysML Block Diagram (bdd) and Internal Block Diagram (ibd) are transformed._
 
 A model created with Cameo can be transformed into SpecIF format or integrated with models from other sources as follows:
-1. In the Cameo tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, open a diagram by double-clicking in the model structure on the left and then save it via main menu ↗ `File` > `Save as Image`; select the desired file path and format. 
+1. In the Cameo tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, 
+open a diagram by double-clicking in the model structure on the left and then save it via main menu ↗ `File` > `Save as Image`; select the desired file path and format. 
 2. Save the model via main menu ↗ `File` > `Save Project` to obtain a *.mdzip file, which is accepted for import by the SpecIF Viewer and Editor.
 3. From the third step on, the procedure is the same as described above for Archi; however choose the format `UML/SysML`.
 
-Also for Cameo, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list. It is recommended to use markdown instead of the HTML feature offered by the input field _documentation_ available for most model elements.
+Also for Cameo, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, 
+for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list. 
+It is recommended to use markdown instead of the HTML feature offered by the input field _documentation_ available for most model elements.
 
 ## Terms of Use
 
 ### License
 
-Both SpecIF as a format with schema and consistency checker as well as the SpecIF viewer/editor are open source and are subject to the <a href="https://github.com/GfSE/SpecIF/blob/master/LICENSE" target="_blank">Apache 2.0 license</a>, which also allows free use for commercial applications. If used in your own product, the source must be given.
+Both SpecIF as a format with schema and consistency checker as well as the SpecIF viewer/editor are open source and are subject to 
+the <a href="https://github.com/GfSE/SpecIF/blob/master/LICENSE" target="_blank">Apache 2.0 license</a>, 
+which also allows free use for commercial applications. If used in your own product, the source must be given.
 
 ### No Guarantee and No Liability
 
-SpecIF and the SpecIF viewer are provided "as-is" and without guaranteed characteristics. Use is always at your own risk. Any liability and guarantee are excluded. The installation at <a href="http://specif.de/apps/" target="_blank">http://specif.de/apps/</a> and the code maintained at <a href="https://github.com/GfSE" target="_blank">https://github.com/GfSE</a> is a reference implementation and not designed for high loads and high availability.
+SpecIF and the SpecIF viewer are provided "as-is" and without guaranteed characteristics. 
+Use is always at your own risk. Any liability and guarantee are excluded. 
+The installation at <a href="http://specif.de/apps/" target="_blank">http://specif.de/apps/</a> and the code maintained 
+at <a href="https://github.com/GfSE" target="_blank">https://github.com/GfSE</a> is a reference implementation and not designed for high loads and high availability.
 
 
 <!-- link template <a href="" target="_blank"></a> -->
