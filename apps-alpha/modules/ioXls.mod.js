@@ -4,29 +4,21 @@
     (C)copyright enso managers gmbh (http://www.enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 
-    ToDo:
-    - This code assumes that certain dataTypes including DT-Text and DT-ShortString are retrieved from the ontology.
-    - Need to make that more robust ... and deal with the dataTypes actually returned.
+    Limitation:
+    - This code assumes that dataTypes with cetrtain names including DT-Text and DT-ShortString are retrieved from the ontology.
 */
 moduleManager.construct({
     name: 'ioXls'
 }, function (self) {
     "use strict";
-    var fDate;
+    var fName, fDate;
     self.init = function () {
         return true;
     };
     self.verify = function (f) {
-        function isXls(fname) {
-            return fname.endsWith('.xlsx') || fname.endsWith('.xlsm') || fname.endsWith('.xls') || fname.endsWith('.csv');
-        }
-        if (!isXls(f.name)) {
-            message.show(i18n.lookup('ErrInvalidFileXls', f.name));
-            return false;
-        }
-        ;
+        fName = f.name;
         if (f.lastModified) {
             fDate = new Date(f.lastModified).toISOString();
         }
@@ -51,7 +43,7 @@ moduleManager.construct({
         self.abortFlag = true;
     };
     return self;
-    function xlsx2specif(buf, pN, chAt) {
+    function xlsx2specif(buf, prjN, chAt) {
         "use strict";
         let ontologyStatementClasses = app.ontology.getTerms('statementClass');
         class Coord {
@@ -68,8 +60,8 @@ moduleManager.construct({
                 this.isValid = false;
                 this.name = wsN;
                 this.data = wb.Sheets[wsN],
-                    this.resClass = resClassId(pN + '-' + wsN);
-                this.hid = CONFIG.prefixH + simpleHash(pN + wsN);
+                    this.resClass = resClassId(prjN + '-' + wsN);
+                this.hid = CONFIG.prefixH + simpleHash(prjN + wsN);
                 this.range = this.data["!ref"];
                 if (this.range) {
                     let splittedRange = this.range.split(":");
@@ -148,7 +140,7 @@ moduleManager.construct({
         function collectMetaData(ws) {
             if (ws && ws.isValid) {
                 switch (ws.name) {
-                    case "(Enumerations)":
+                    case "{Enumerations}":
                         let c, r, cell, dT, pC;
                         for (c = ws.firstCell.col; c < ws.lastCell.col + 1; c++) {
                             cell = ws.data[cellName(c, ws.firstCell.row)];
@@ -178,12 +170,16 @@ moduleManager.construct({
                             ;
                         }
                         ;
+                        break;
+                    default:
+                        if (ws.name.startsWith('{') && ws.name.endsWith('}'))
+                            console.warn("Sheet with name " + ws.name + " skipped, because it has an unknown keyword in curly brackets");
                 }
             }
         }
         function transformData(ws) {
             if (ws && ws.isValid) {
-                if (ws.name.indexOf("(") == 0 && ws.name.indexOf(")") == ws.name.length - 1)
+                if (ws.name.startsWith("{") && ws.name.endsWith("}"))
                     return;
                 function isDateTime(cell) {
                     return cell && (cell.t == 'd' || cell.t == 's' && LIB.isIsoDateTime(cell.v));
@@ -204,11 +200,11 @@ moduleManager.construct({
                     if (sh.lastCell.row - sh.firstCell.row < 1)
                         return;
                     var fld = {
-                        id: CONFIG.prefixR + simpleHash(pN + sh.name + CONFIG.resClassFolder),
+                        id: CONFIG.prefixR + simpleHash(prjN + sh.name + CONFIG.resClassFolder),
                         class: LIB.makeKey("RC-Folder"),
                         properties: [{
                                 class: LIB.makeKey("PC-Name"),
-                                values: [LIB.makeMultiLanguageValue(sh.name)]
+                                values: [LIB.makeMultiLanguageValue(withoutBracketsAtEnd(sh.name))]
                             }],
                         changedAt: chAt
                     };
@@ -500,7 +496,7 @@ moduleManager.construct({
                 }
                 if (ws.range) {
                     LIB.cacheL(specifData.statementClasses, getStaClasses(ws));
-                    let rC = new ResClass(ws.resClass, inBracketsAtEnd(ws.name) || inBracketsAtEnd(pN) || CONFIG.resClassXlsRow);
+                    let rC = new ResClass(ws.resClass, inBracketsAtEnd(ws.name) || inBracketsAtEnd(prjN) || CONFIG.resClassXlsRow);
                     rC.propertyClasses = getPropClasses(ws);
                     specifData.resourceClasses.push(rC);
                     createFld(ws);
@@ -509,13 +505,14 @@ moduleManager.construct({
         }
         let xDta = new Uint8Array(buf), wb = XLSX.read(xDta, { type: 'array', cellDates: true, cellStyles: true }), wsCnt = wb.SheetNames.length;
         console.info('SheetNames: ' + wb.SheetNames + ' (' + wsCnt + ')');
-        var xlsTerms = ["xs:string", "xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI", CONFIG.propClassId, CONFIG.propClassTitle, CONFIG.propClassDesc, CONFIG.propClassType, CONFIG.resClassFolder], specifData = app.ontology.generateSpecifClasses({ terms: xlsTerms, adoptOntologyDataTypes: true });
+        var xlsTerms = ["xs:string", "xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI", CONFIG.propClassId, CONFIG.propClassTitle, CONFIG.propClassDesc, CONFIG.propClassType, CONFIG.resClassFolder], specifData = app.ontology.generateSpecifClasses({ terms: xlsTerms });
+        specifData.title = LIB.makeMultiLanguageValue(withoutBracketsAtEnd(fName.fileName()));
         specifData.resources.push({
-            id: CONFIG.prefixR + pN.toSpecifId(),
+            id: CONFIG.prefixR + prjN.toSpecifId(),
             class: LIB.makeKey("RC-Folder"),
             properties: [{
                     class: LIB.makeKey("PC-Name"),
-                    values: [LIB.makeMultiLanguageValue(pN)]
+                    values: [specifData.title]
                 }, {
                     class: LIB.makeKey("PC-Type"),
                     values: [LIB.makeMultiLanguageValue(CONFIG.resClassOutline)]
@@ -523,8 +520,8 @@ moduleManager.construct({
             changedAt: chAt
         });
         specifData.nodes.push({
-            id: CONFIG.prefixH + pN.toSpecifId(),
-            resource: LIB.makeKey(CONFIG.prefixR + pN.toSpecifId()),
+            id: CONFIG.prefixH + prjN.toSpecifId(),
+            resource: LIB.makeKey(CONFIG.prefixR + prjN.toSpecifId()),
             nodes: [],
             changedAt: chAt
         });
@@ -534,10 +531,15 @@ moduleManager.construct({
         for (idx = 0; idx < wsCnt; idx++)
             transformData(new Worksheet(wb.SheetNames[idx]));
         return specifData;
+        function withoutBracketsAtEnd(str) {
+            let resL = RE.withoutBracketsAtEnd.exec(str);
+            if (Array.isArray(resL) && resL.length > 1)
+                return resL[1];
+        }
         function inBracketsAtEnd(str) {
             let resL = RE.inBracketsAtEnd.exec(str);
             if (Array.isArray(resL) && resL.length > 1)
-                return resL[1] || resL[2];
+                return resL[1];
         }
     }
     function specif2xlsx(data, opts) {

@@ -4,7 +4,7 @@
     (C)copyright enso managers gmbh (http://enso-managers.de)
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
     Author: se@enso-managers.de, Berlin
-    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 */
 class COntology {
     constructor(dta) {
@@ -437,7 +437,7 @@ class COntology {
     }
     makeDT(r) {
         let self = this;
-        let ty = this.primitiveDataTypes.get(r["class"].id), prep = this.makeIdAndTitle(r, CONFIG.prefixPC), dtId = LIB.replacePrefix(CONFIG.prefixDT, prep.id), vId = LIB.replacePrefix(CONFIG.prefixV, prep.id), stL = this.statementsByTitle(r, ["SpecIF:hasEnumValue"], { asSubject: true }), oL = stL.map((st) => {
+        let ty = this.primitiveDataTypes.get(r["class"].id), prep = this.makeIdAndTitle(r, CONFIG.prefixPC), enumId = LIB.replacePrefix(CONFIG.prefixDT, prep.id), vId = LIB.replacePrefix(CONFIG.prefixV, prep.id), stL = this.statementsByTitle(r, ["SpecIF:hasEnumValue"], { asSubject: true }), oL = stL.map((st) => {
             return LIB.itemById(this.data.resources, st.object.id);
         }), enumL = LIB.forAll(oL, (o, idx) => {
             let evL = LIB.valuesByTitle(o, [CONFIG.propClassTerm], this.data);
@@ -448,28 +448,42 @@ class COntology {
                 };
             else
                 console.warn("Ontology: Property value term '" + o.id + "' is undefined");
-        }), dT = {};
+        }), dT = {}, dTid;
         switch (ty) {
             case XsDataType.String:
                 let maxLen = this.valueByTitle(r, "SpecIF:StringMaxLength");
+                switch (maxLen) {
+                    case '256':
+                        dTid = CONFIG.prefixDT + "ShortString";
+                        break;
+                    default:
+                        if (maxLen)
+                            dTid = CONFIG.prefixDT + "String" + (maxLen ? "-LE" + maxLen : "");
+                        else
+                            dTid = CONFIG.prefixDT + "Text";
+                }
+                ;
                 dT = {
-                    id: "DT-String" + (maxLen ? "-LE" + maxLen : ""),
-                    title: "String" + (maxLen ? " <=" + maxLen : ""),
+                    id: dTid,
+                    title: maxLen ? "String <=" + maxLen : "Plain or formatted Text",
                     description: [{ text: "Text string" + (enumL.length > 0 ? " with enumerated values for " + prep.title : (maxLen ? " with maximum length " + maxLen : "")) }],
                     maxLength: maxLen ? parseInt(maxLen) : undefined
                 };
                 break;
             case XsDataType.Boolean:
                 dT = {
-                    id: "DT-Boolean",
+                    id: CONFIG.prefixDT + "Boolean",
                     title: "Boolean Value",
                     description: [{ text: "A Boolean value." }]
                 };
                 break;
             case XsDataType.Integer:
                 let maxI = this.valueByTitle(r, "SpecIF:IntegerMaxInclusive"), minI = this.valueByTitle(r, "SpecIF:IntegerMinInclusive");
+                dTid = CONFIG.prefixDT + "Integer";
+                if (minI != CONFIG.minInteger || maxI != CONFIG.maxInteger)
+                    dTid += (minI ? "-GE" + minI : "") + (maxI ? "-LE" + maxI : "");
                 dT = {
-                    id: "DT-Integer" + (minI ? "-GE" + minI : "") + (maxI ? "-LE" + maxI : ""),
+                    id: dTid,
                     title: "Integer Value" + (minI ? " >=" + minI : "") + (maxI ? " <=" + maxI : ""),
                     description: [{ text: "A numerical integer value" + (minI && maxI ? " with minimum value " + minI + " and maximum value " + maxI : (minI ? " with minimum value " + minI : (maxI ? " with maximum value " + maxI : ""))) + "." }],
                     minInclusive: minI ? parseInt(minI) : undefined,
@@ -479,7 +493,7 @@ class COntology {
             case XsDataType.Double:
                 let frD = this.valueByTitle(r, "SpecIF:RealFractionDigits"), maxR = this.valueByTitle(r, "SpecIF:RealMaxInclusive"), minR = this.valueByTitle(r, "SpecIF:RealMinInclusive");
                 dT = {
-                    id: "DT-Real" + (minR ? "-GE" + minR : "") + (maxR ? "-LE" + maxR : "") + (frD ? "-FD" + frD : ""),
+                    id: CONFIG.prefixDT + "Real" + (minR ? "-GE" + minR : "") + (maxR ? "-LE" + maxR : "") + (frD ? "-FD" + frD : ""),
                     title: "Real Value" + (minR ? " >=" + minR : "") + (maxR ? " <=" + maxR : "") + (frD ? " " + frD + "digits" : ""),
                     description: [{ text: "A numerical floating point number (double precision)" + (minR && maxR ? " with minimum value " + minR + " and maximum value " + maxR : (minR ? " with minimum value " + minR : (maxR ? " with maximum value " + maxR : ""))) + (frD ? " having no more than " + frD + " digits" : "") + "." }],
                     minInclusive: minR ? parseFloat(minR) : undefined,
@@ -489,21 +503,21 @@ class COntology {
                 break;
             case XsDataType.DateTime:
                 dT = {
-                    id: "DT-DateTime",
+                    id: CONFIG.prefixDT + "DateTime",
                     title: "Date/Time",
                     description: [{ text: "Date or timestamp in ISO-8601 format." }]
                 };
                 break;
             case XsDataType.Duration:
                 dT = {
-                    id: "DT-Duration",
+                    id: CONFIG.prefixDT + "Duration",
                     title: "Duration",
                     description: [{ text: "A duration as defined by the ISO 8601 ABNF for 'duration'." }]
                 };
                 break;
             case XsDataType.AnyURI:
                 dT = {
-                    id: "DT-AnyURI",
+                    id: CONFIG.prefixDT + "AnyURI",
                     title: "Universal Resource Identifier (URI)",
                     description: [{ text: "A universal resource identifier (URI), according to RFC3986." }]
                 };
@@ -511,7 +525,7 @@ class COntology {
         ;
         dT.type = ty;
         if (enumL.length > 0) {
-            dT.id = dtId;
+            dT.id = enumId;
             dT.title = prep.title;
             dT.enumeration = enumL;
         }
@@ -625,10 +639,10 @@ class COntology {
     eligibleClassesOf(el, clL) {
         let iCL = [], sL = this.statementsByTitle(el, clL, { asObject: true });
         for (let s of sL) {
-            let term = LIB.itemByKey(this.data.resources, s.subject), prep = this.makeIdAndTitle(term, term['class'].id == "RC-SpecifTermresourceclass" ? CONFIG.prefixRC : CONFIG.prefixSC);
+            let term = LIB.itemByKey(this.data.resources, s.subject), prep = this.makeIdAndTitle(term, term['class'].id == CONFIG.prefixRC + "SpecifTermresourceclass" ? CONFIG.prefixRC : CONFIG.prefixSC);
             LIB.cacheE(iCL, { id: prep.id });
             if (!this.options.excludeEligibleSubjectClassesAndObjectClasses) {
-                if (term['class'].id == "RC-SpecifTermresourceclass") {
+                if (term['class'].id == CONFIG.prefixRC + "SpecifTermresourceclass") {
                     if (LIB.indexById(this.generated.rCL, prep.id) < 0)
                         LIB.cacheE(this.generated.rCL, this.makeRC(term));
                 }
@@ -676,7 +690,7 @@ class COntology {
         return ti.toCamelCase();
     }
     makeIdAndTitle(r, pfx) {
-        const termId = "PC-SpecifTerm";
+        const termId = CONFIG.prefixPC + "SpecifTerm";
         let visIdL = LIB.valuesByTitle(r, ["dcterms:identifier"], this.data), prp = LIB.itemBy(r.properties, 'class', { id: termId });
         if (prp && prp.values.length > 0) {
             let ti = LIB.languageTextOf(prp.values[0], { targetLanguage: 'default' });

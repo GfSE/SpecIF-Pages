@@ -4,7 +4,7 @@
     (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 */
 class CSpecifItemNames {
     constructor(ver) {
@@ -124,12 +124,12 @@ class CSpecIF {
                 if (spD['$schema'] && !spD['$schema'].includes('v1.0')) {
                     import((window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html')) ?
                         'https://specif.de/v' + LIB.versionOf(spD) + '/CCheck.mjs'
-                        : '../../SpecIF-Schema/check/CCheck.mjs')
+                        : '../../../SpecIF-Schema/check/CCheck.mjs')
                         .then(modChk => {
                         getSchema();
                         checker = new modChk.CCheck();
                     })
-                        .catch(handleError);
+                        .catch((err) => { console.error(err); reject(new resultMsg(903, 'Schema- and constraint-check nof found.')); });
                 }
                 else {
                     throw "Programming Error: Inexpected check of SpecIF data set < v1.1";
@@ -159,25 +159,15 @@ class CSpecIF {
                 else
                     throw Error('Standard routines checkSchema and/or checkConstraints are not available.');
             }
-            function handleError(xhr) {
-                switch (xhr.status) {
-                    case 404:
-                        let v = spD.specifVersion ? 'version ' + spD.specifVersion : 'with Schema ' + spD['$schema'];
-                        xhr = new resultMsg(903, 'SpecIF ' + v + ' is not supported by this program!');
-                    default:
-                        reject(xhr);
-                }
-                ;
-            }
             function getSchema() {
                 LIB.httpGet({
                     url: (window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html') ?
                         (spD['$schema'] || 'https://specif.de/v' + spD.specifVersion + '/schema')
-                        : '../../SpecIF-Schema/schema/schema.json'),
+                        : '../../../SpecIF-Schema/schema/schema.json'),
                     responseType: 'arraybuffer',
                     withCredentials: false,
                     done: handleResult,
-                    fail: handleError
+                    fail: () => { reject(new resultMsg(903, 'Schema not found')); }
                 });
             }
         });
@@ -308,10 +298,8 @@ class CSpecIF {
                 else if (dT.multiple)
                     oE.multiple = true;
             }
-            else {
+            else
                 throw "The dataType " + oE.dataType.id + " for propertyClass " + oE.id + " has not been found.";
-            }
-            ;
             if (iE.required)
                 oE.required = true;
             dT = LIB.itemByKey(self.dataTypes, oE.dataType);
@@ -983,20 +971,6 @@ class CSpecIF {
                     }
                     else {
                         switch (iE.type) {
-                            case 'application/bpmn+xml':
-                                LIB.blob2text(iE, (txt) => {
-                                    bpmn2svg(txt).then((result) => {
-                                        let nFileName = iE.title.fileName() + '.svg';
-                                        resolve({
-                                            blob: new Blob([result.svg], { type: "image/svg+xml" }),
-                                            id: 'F-' + simpleHash(nFileName),
-                                            title: nFileName,
-                                            type: 'image/svg+xml',
-                                            changedAt: iE.changedAt
-                                        });
-                                    }, reject);
-                                });
-                                break;
                             default:
                                 console.warn("Cannot transform file '" + iE.title + "' of type '" + iE.type + "' to an image.");
                                 resolve({

@@ -4,7 +4,7 @@
     (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 */
 class CCache {
     constructor(opts) {
@@ -281,6 +281,12 @@ class CRoleAssignment {
         this.role = '';
         this.project = prj;
         this.role = roleName;
+    }
+}
+class CStateImport {
+    constructor() {
+        this.cacheLoaded = false;
+        this.allValid = false;
     }
 }
 class CProject {
@@ -1296,7 +1302,7 @@ class CProject {
         return pnl;
     }
     hasOntology() {
-        let hL = this.cache.get("hierarchy", self.nodes);
+        let hL = this.cache.get("hierarchy", this.nodes);
         for (var h of hL) {
             let rL = this.cache.get("resource", [h.resource]);
             if (rL.length > 0 && LIB.hasType(rL[0], [CONFIG.resClassOntology], this.cache))

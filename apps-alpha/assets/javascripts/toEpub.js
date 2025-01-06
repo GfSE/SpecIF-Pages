@@ -4,13 +4,13 @@ function toEpub( data, opts ) {
 	// (C)copyright enso managers gmbh(http://enso-managers.de)
 	// Author: se@enso-managers.de, Berlin
 	// License: Apache 2.0 (http://www.apache.org/licenses/)
-	// Dependencies: 
-	// - jszip ( https://github.com/Stuk/jszip ), 
-	// - fileSaver ( https://github.com/eligrey/FileSaver.js ), 
-	// ePub Tutorials: 
+	// Dependencies:
+	// - jszip ( https://github.com/Stuk/jszip ),
+	// - fileSaver ( https://github.com/eligrey/FileSaver.js ),
+	// ePub Tutorials:
 	// - https://www.ibm.com/developerworks/xml/tutorials/x-epubtut/index.html
 	// - http://www.jedisaber.com/eBooks/formatsource.shtml
-    // We appreciate any correction, comment or contribution as Github issue(https://github.com/GfSE/SpecIF-Viewer/issues)
+    // We appreciate any correction, comment or contribution as Github issue(https://github.com/enso-managers/SpecIF-Tools/issues)
 
 	// ToDo: 
 	// - Embed font with sufficient UTF - 8 coverage: http://www.dpc-consulting.org/epub-praxis-fonts-einbinden-und-verwenden/

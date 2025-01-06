@@ -4,7 +4,7 @@
     (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 
     Limitations:
     - It is assumed that all text values within the provided SpecIF data set have only a single language,
@@ -167,10 +167,11 @@ moduleManager.construct({
             if (eC.propertyClasses) {
                 let eL = ctg == 'statementClass' ?
                     pr.statements.filter((sta) => { return LIB.references(sta['class'], eC); })
-                    : pr.resources.filter((res) => { return LIB.references(res['class'], eC); }), pC;
+                    : pr.resources.filter((res) => { return LIB.references(res['class'], eC); }), pC, dT;
                 eC.propertyClasses.forEach((pCk) => {
                     pC = LIB.itemByKey(pr.propertyClasses, pCk);
-                    if ((LIB.itemByKey(pr.dataTypes, pC.dataType).type == XsDataType.String) && withHtml(eL, pCk)) {
+                    dT = LIB.itemByKey(pr.dataTypes, pC.dataType);
+                    if ((!dT.enumeration && dT.type == XsDataType.String) && withHtml(eL, pCk)) {
                         console.info("Specializing data type to formatted text for propertyClass with id '" + pC.id + " and title '" + pC.title + "'");
                         pC.dataType = LIB.makeKey(dTFormattedText.id);
                         pC.format = "xhtml";
@@ -190,7 +191,7 @@ moduleManager.construct({
             + '<REQ-IF-TOOL-ID></REQ-IF-TOOL-ID>'
             + '<REQ-IF-VERSION>1.0</REQ-IF-VERSION>'
             + '<SOURCE-TOOL-ID>' + (pr.generator || '') + '</SOURCE-TOOL-ID>'
-            + '<TITLE>' + pr.title + '</TITLE>'
+            + '<TITLE>' + pr.title[0].text + '</TITLE>'
             + '</REQ-IF-HEADER>'
             + '</THE-HEADER>'
             + '<CORE-CONTENT>'
@@ -418,7 +419,7 @@ moduleManager.construct({
                         + '<DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>PC-' + adId + '</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>'
                         + '<VALUES>';
                     prp.values.forEach((v) => {
-                        xml += '<ENUM-VALUE-REF>' + v + '</ENUM-VALUE-REF>';
+                        xml += '<ENUM-VALUE-REF>' + v.id + '</ENUM-VALUE-REF>';
                     });
                     xml += '</VALUES>'
                         + '</ATTRIBUTE-VALUE-ENUMERATION>';

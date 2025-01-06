@@ -22,11 +22,11 @@
 
     // This is a template for SpecIF apps.
     // To create a new SpecIF app:
-// - copy this file and rename it with the desired app title
-// - in the moduleTree below, include the modules to load for the particular app.
+    // - copy this file and rename it with the desired app title
+    // - in the moduleTree below, include the modules to load for the particular app.
 
-    // App-specific code called by the moduleManager after initializing;
-    // the moduleTree defines the modules to load:
+    // The App-specific code called by the moduleManager after initializing;
+    // self.moduleTree defines the modules to load:
     function SpecifApp() {
         "use strict";
 
@@ -38,6 +38,8 @@
             // Define
             // - name: the modules to load as specified in 'moduleManager.js'
             // - loadAs: name for execution (addressable javascript object)
+            // - requires: wait with loading until all listed modules are loaded
+            // - view: id of the DOM element associated with the module
             // - the hierarchy of views using implicit actions hide/show or refresh
             // - the explicit actions independent of any view
 
@@ -77,7 +79,10 @@
                 }, {
                     name: 'ioSysml'
                 }, {
-                    name: 'ioReqif'
+                    name: 'ioReqif',
+                    children: [{
+                        name: 'reqif2specif'
+                    }]
                 }, {
                     name: 'ioXls'
                     /*	}, {
@@ -165,7 +170,6 @@
             }]
         };
 
-        // IE does not support ()=>{..} --> "syntax error" at load time.
         self.init = function () {
             // must set it here, because the language files must be read first:
             document.title = self.title = i18n.LblEditor;

@@ -234,7 +234,7 @@ function LanguageTextsDe() {
     self.MsgImportReqif = 'Zulässige Dateitypen sind *.reqif oder *.reqifz. Inhalte müssen den Schemata für ReqIF 1.0+ entsprechen. Der Import dauert meist einige Sekunden und bei sehr großen Dateien mehrere Minuten.';
     self.MsgImportSpecif = 'Zulässige Dateitypen sind *.specif, *.specif.zip und *.specifz. Inhalte müssen den Schemata für SpecIF 0.10.4+ entsprechen. Bei großen Dateien kann der Import einige Minuten dauern.';
     self.MsgImportBpmn = 'Zulässiger Dateityp *.bpmn. Inhalte müssen den Schemata für BPMN 2.0 XML entsprechen. Der Import kann bis zu einigen Minuten dauern.';
-    self.MsgImportXls = 'Zulässige Dateitypen sind *.xls, *.xlsx und *.csv. Der Import kann bei sehr großen Dateien mehrere Minuten dauern.';
+    self.MsgImportXls = 'Zulässige Dateitypen sind *.xls, *.xlsx, *.csv, *.ods and *.fods. Der Import kann bei sehr großen Dateien mehrere Minuten dauern.';
     self.MsgExport = 'Es wird eine Datei im gewählten Format erzeugt. Der Export dauert meist einige Sekunden und im Falle sehr großer Dateien mehrere Minuten; Ihr Web-Browser speichert die Datei gemäß Voreinstellungen.';
     self.MsgLoading = 'Lade soeben ...';
     self.MsgSearching = 'Suche weiter ...';
@@ -253,6 +253,7 @@ function LanguageTextsDe() {
     self.MsgCredentialsUnknown = 'Anmeldeinformation ist unbekannt.';
     self.MsgUserMgmtNeedsAdminRole = 'Bitten Sie einen Administrator die Nutzer und Rollen zu verwalten.';
     self.MsgProjectMgmtNeedsAdminRole = 'Bitten Sie einen Administrator die Projekteigenschaften, Rollen und Rechte zu verwalten.';
+    self.MsgExportSuccessful = "'~A' wurde erfolgreich exportiert.";
     self.MsgImportSuccessful = "'~A' wurde erfolgreich importiert.";
     self.MsgImportDenied = "'~A' wurde nicht importiert: Das Projekt wird von einer anderen Organisation bearbeitet oder das Schema wird nicht eingehalten.";
     self.MsgImportFailed = "Der Import von '~A' wurde wegen eines Fehlers abgebrochen.";
@@ -321,6 +322,7 @@ function LanguageTextsDe() {
     self.LblReader = 'SpecIF Leser';
     self.LblReviewer = 'SpecIF Lieferanten-Abstimmung';
     self.LblEditor = 'SpecIF Modellintegrator und Editor';
+    self.LblSheet2reqif = 'Sheet → ReqIF';
     return self;
 }
 ;

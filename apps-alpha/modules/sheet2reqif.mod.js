@@ -4,95 +4,38 @@
     Copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 */
-class CStateImport {
-    constructor() {
-        this.cacheLoaded = false;
-        this.allValid = false;
-    }
-}
 moduleManager.construct({
-    name: 'importAny'
+    name: 'sheet2reqif'
 }, function (self) {
     const importModes = [{
-            id: 'create',
-            title: 'Create a new project with the given id',
-            desc: 'All types, objects, relations and nodes will be created as specified.',
-            label: i18n.BtnCreate
-        }, {
-            id: 'clone',
-            title: 'Create a new instance of the project with a new id',
-            desc: 'There will be two projects with the existing and the new content.',
-            label: i18n.BtnClone
-        }, {
-            id: 'replace',
-            title: 'Replace the project having the same id',
-            desc: 'Existing content will be lost.',
-            label: i18n.BtnReplace
-        }, {
-            id: 'adopt',
-            title: 'Add the new project without effect on the existing one',
-            desc: 'Add diagrams and adopt any existing resource having an identical name.',
-            label: i18n.BtnAdopt
-        }, {
-            id: 'update',
-            title: 'Update the project with new or changed content',
-            desc: 'New objects will be created, modified ones will be superseded.',
-            label: i18n.BtnUpdate
+            id: 'transform',
+            title: "Download ReqIF",
+            desc: 'Transform and download a ReqIF ZIP-container'
         }];
     const formats = [{
+            id: 'xls',
+            name: 'ioXls',
+            desc: 'MS Excel® or LibreOffice Spreadsheet',
+            label: 'Excel®',
+            extensions: [".xlsx", ".xls", ".csv", "ods", "fods"],
+            opts: { dontCheck: ["statement.object"] },
+            help: '<p>' + i18n.MsgImportXls + '</p>'
+        }, {
             id: 'specif',
             name: 'ioSpecif',
             desc: 'Specification Integration Facility',
             label: 'SpecIF',
             extensions: [".specif", ".specifz", ".specif.zip"],
-            help: i18n.MsgImportSpecif,
-            opts: { mediaTypeOf: LIB.attachment2mediaType, doCheck: ['statementClass.subjectClasses', 'statementClass.objectClasses'] }
-        }, {
-            id: 'archimate',
-            name: 'ioArchimate',
-            desc: 'ArchiMate Open Exchange',
-            label: 'ArchiMate®',
-            extensions: [".xml"],
-            help: "Experimental: Import an ArchiMate Open Exchange file (*.xml) and add the diagrams (*.png or *.svg) to their respective resources using the 'edit' function.",
-            opts: { mediaTypeOf: LIB.attachment2mediaType }
-        }, {
-            id: 'bpmn',
-            name: 'ioBpmn',
-            desc: 'Business Process',
-            label: 'BPMN',
-            extensions: [".bpmn"],
-            help: i18n.MsgImportBpmn
-        }, {
-            id: 'sysml',
-            name: 'ioSysml',
-            desc: 'System Modeling Language',
-            label: 'UML/SysML',
-            extensions: [".mdzip"],
-            help: "Experimental: Import an XMI file from Cameo v19.0."
-        }, {
-            id: 'reqif',
-            name: 'ioReqif',
-            desc: 'Requirement Interchange Format',
-            label: 'ReqIF',
-            extensions: [".reqif", ".reqifz"],
-            help: i18n.MsgImportReqif,
-            opts: { multipleMode: "adopt", mediaTypeOf: LIB.attachment2mediaType, dontCheck: ["statement.subject", "statement.object"] }
-        }, {
-            id: 'xls',
-            name: 'ioXls',
-            desc: 'MS Excel® Spreadsheet',
-            label: 'Excel®',
-            extensions: [".xlsx", ".xls", ".csv"],
-            help: i18n.MsgImportXls,
-            opts: { dontCheck: ["statement.object"] }
+            opts: { mediaTypeOf: LIB.attachment2mediaType, doCheck: ['statementClass.subjectClasses', 'statementClass.objectClasses'] },
+            help: '<p>' + i18n.MsgImportSpecif + '</p>'
         }];
     self.projectName = '';
     self.format = undefined;
-    var showFileSelect, importMode = { id: 'replace' }, myFullName = 'app.' + self.loadAs, urlP, urlOntology = (window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html') ?
+    var showFileSelect, importMode = { id: 'replace' }, myFullName = 'app.' + self.loadAs, urlP, urlOntology = (window.location.href.startsWith('http') ?
         CONFIG.ontologyURL
-        : '../../SpecIF/vocabulary/Ontology.specif'), importing = false;
+        : '../../../SpecIF/vocabulary/Ontology.specif'), importing = false;
     self.clear = function () {
         $('input[type=file]').val('');
         setTextValue(i18n.LblFileName, '');
@@ -110,7 +53,11 @@ moduleManager.construct({
             return false;
         }
         ;
-        let h = '<div style="max-width:768px; margin-top:1em">'
+        let h = '<div class="container"><div class="row justify-content-lg-center">'
+            + '<div class="col-md-4 col-lg-3 mt-4">'
+            + '<div id="intro">' + intro() + '</div>'
+            + '</div>'
+            + '<div class="col-md-8 col-lg-6 mt-4">'
             + '<div class="fileSelect" style="display:none;" >'
             + '<div class="attribute-label" style="vertical-align:top; padding-top:0.2em" >' + i18n.LblOntology + '</div>'
             + '<div class="attribute-value" >'
@@ -122,7 +69,7 @@ moduleManager.construct({
             + '<div class="attribute-value" >'
             + '<div id="formatSelector" class="btn-group" style="margin: 0 0 0.4em 0" ></div>'
             + '<div id="helpImport" style="margin: 0 0 0.4em 0" ></div>'
-            + '<div id="fileSelectBtn" class="btn btn-light btn-fileinput" style="margin: 0 0 0.8em 0" ></div>'
+            + '<div id="fileSelectBtn" class="btn btn-primary btn-fileinput" style="margin: 0 0 0.8em 0" ></div>'
             + '</div>'
             + '</div>'
             + '<form id="formNames" class="form-horizontal" role="form"></form>'
@@ -132,8 +79,8 @@ moduleManager.construct({
             + '<div id="modeSelector" class="btn-group mt-1" style="margin: 0 0 0.4em 0" >'
             + function () {
                 let btns = '';
-                importModes.forEach(function (b) {
-                    btns += '<button id="' + b.id + 'Btn" onclick="' + myFullName + '.importLocally(\'' + b.id + '\')" data-toggle="popover" title="' + b.title + '" type="button" class="btn btn-primary text-nowrap">' + b.label + '</button>';
+                importModes.forEach((b) => {
+                    btns += '<button id="' + b.id + 'Btn" onclick="' + myFullName + '.importLocally(\'' + b.id + '\')"' + (b.desc ? ' data-toggle="popover" title="' + b.desc + '"' : '') + ' type="button" class="btn btn-primary text-nowrap">' + b.title + '</button>';
                 });
                 return btns;
             }()
@@ -148,11 +95,14 @@ moduleManager.construct({
             + '</div>'
             + '</div>'
             + '</div>'
-            + '<div style="padding-top:2em">'
+            + '<div class="mt-4">'
             + '<div class="attribute-label" ></div>'
-            + '<div class="attribute-value" >' + i18n.MsgIntro + '</div>'
+            + '<div class="attribute-value" >'
+            + donate()
+            + '</div>'
             + '</div>'
             + '</div>';
+        +'</div></div>';
         $(self.view).prepend(h);
         self.clear();
         self.setFormat('specif');
@@ -167,60 +117,15 @@ moduleManager.construct({
         if (!opts)
             opts = {};
         $('#pageTitle').html(app.title);
-        function getFormat(uParms) {
-            for (var f of formats) {
-                for (var ext of f.extensions) {
-                    if (uParms[CONFIG.keyImport].endsWith(ext) && moduleManager.isReady(f.name))
-                        return f;
-                }
-                ;
-            }
-            ;
-        }
+        if (!opts.urlParams)
+            setUrlParams({
+                view: self.view
+            });
         function getOntologyURL(uP) {
             return uP ? uP[CONFIG.keyOntology] : undefined;
         }
-        urlP = opts.urlParams;
         urlOntology = getOntologyURL(urlP) || urlOntology;
-        if (urlP && urlP[CONFIG.keyImport]) {
-            importMode = { id: urlP[CONFIG.keyMode] || 'replace' };
-            self.file.name = urlP[CONFIG.keyImport];
-            self.format = getFormat(urlP);
-            if (self.format && app[self.format.name]) {
-                app[self.format.name].init(self.format.opts);
-                if (app[self.format.name].verify({ name: urlP[CONFIG.keyImport] })) {
-                    let rF = makeTextField(i18n.LblFileName, self.file.name);
-                    $("#formNames").html(rF);
-                    self.projectName = self.file.name.fileName();
-                    setImporting(true);
-                    getOntology(urlOntology)
-                        .then((ont) => {
-                        app.ontology = ont;
-                        LIB.httpGet({
-                            url: urlP[CONFIG.keyImport] + '?' + Date.now().toString(),
-                            responseType: 'arraybuffer',
-                            withCredentials: false,
-                            done: function (result) {
-                                app[self.format.name].toSpecif(result.response)
-                                    .progress(setProgress)
-                                    .done(handleResult)
-                                    .fail(handleError);
-                            },
-                            fail: handleError
-                        });
-                    })
-                        .catch(noOntologyFound);
-                    return;
-                }
-            }
-            ;
-            message.show(i18n.lookup('ErrInvalidFileType', self.file.name), { severity: 'error' });
-            self.clear();
-            self.show();
-            return;
-        }
-        ;
-        self.setFormat('specif');
+        self.setFormat(formats[0].id);
         let str = '';
         formats.forEach(function (s) {
             if (moduleManager.isReady(s.name)) {
@@ -273,14 +178,10 @@ moduleManager.construct({
     self.enableActions = function () {
         let state = getState();
         try {
-            document.getElementById("createBtn").disabled = !state.allValid || state.cacheLoaded;
-            document.getElementById("cloneBtn").disabled = true;
-            document.getElementById("updateBtn").disabled =
-                document.getElementById("adoptBtn").disabled =
-                    document.getElementById("replaceBtn").disabled = !state.allValid || !state.cacheLoaded;
+            document.getElementById("transformBtn").disabled = !state.allValid;
         }
         catch (e) {
-            console.error("importAny: enabling actions has failed (" + e + ").");
+            console.error(app.title + ": enabling actions has failed (" + e + ").");
         }
         ;
     };
@@ -290,14 +191,10 @@ moduleManager.construct({
         let state = getState();
         try {
             document.getElementById("fileSelectBtn").disabled = st;
-            document.getElementById("createBtn").disabled = st || !state.allValid || state.cacheLoaded;
-            document.getElementById("cloneBtn").disabled = true;
-            document.getElementById("updateBtn").disabled =
-                document.getElementById("adoptBtn").disabled =
-                    document.getElementById("replaceBtn").disabled = st || !state.allValid || !state.cacheLoaded;
+            document.getElementById("transformBtn").disabled = st || !state.allValid || state.cacheLoaded;
         }
         catch (e) {
-            console.error("importAny: setting state 'importing' has failed (" + e + ").");
+            console.error(app.title + ": setting state 'importing' has failed (" + e + ").");
         }
         ;
     }
@@ -345,12 +242,21 @@ moduleManager.construct({
         }
     };
     function terminateWithSuccess() {
-        message.show(i18n.lookup('MsgImportSuccessful', self.file.name), { severity: "success", duration: CONFIG.messageDisplayTimeShort });
-        setTimeout(function () {
-            self.clear();
-            if (urlP)
-                delete urlP[CONFIG.keyImport];
-            moduleManager.show({ view: '#' + (app.title == "check" ? CONFIG.importAny : (urlP && urlP[CONFIG.keyView] ? urlP[CONFIG.keyView] : CONFIG.specifications)), urlParams: urlP });
+        setTimeout(() => {
+            let options = {
+                projectName: self.projectName,
+                fileName: self.file.name.fileName(),
+                format: 'reqif',
+                role: "SpecIF:Reader"
+            };
+            app.projects.selected.exportAs(options)
+                .then(() => {
+                message.show(i18n.lookup('MsgExportSuccessful', options.fileName), { severity: "success" });
+            }, (xhr) => {
+                message.show(xhr);
+            })
+                .finally(self.clear);
+            self.show();
         }, CONFIG.showTimelag);
     }
     function handleError(xhr) {
@@ -388,24 +294,9 @@ moduleManager.construct({
                 opts.addGlossary =
                     opts.addUnreferencedResources = resQ.length < 1;
             switch (opts.mode) {
-                case 'create':
-                case 'replace':
+                case 'transform':
                     opts.collectProcesses = false;
                     app.projects.create(dta, opts)
-                        .progress(setProgress)
-                        .done(handleNext)
-                        .fail(handleError);
-                    break;
-                case 'update':
-                    opts.collectProcesses = false;
-                    app.projects.selected.update(dta, opts)
-                        .progress(setProgress)
-                        .done(handleNext)
-                        .fail(handleError);
-                    break;
-                case 'adopt':
-                    opts.collectProcesses = true;
-                    app.projects.selected.adopt(dta, opts)
                         .progress(setProgress)
                         .done(handleNext)
                         .fail(handleError);
@@ -436,6 +327,16 @@ moduleManager.construct({
                 fail: reject
             });
         });
+    }
+    let lang = browser.language.slice(0, 2);
+    function intro() {
+        let en = '<p>Transform a spreadsheet to the Requirements Interchange Format (ReqIF). The property names are expected in the first line (column head) and an entity (<span class="text-bg-light"><em>SPEC-OBJECT</em></span> in ReqIF terms) with its property values per following line.</p><p>The property names are semantically interpreted and translated using the SpecIF Ontology. For example, a property name <span class="text-bg-light"><em>Title</em></span> is first normalized to <span class="text-bg-light"><em>dcterms:title</em></span> and then mapped to <span class="text-bg-light"><em>ReqIF.Name</em></span>.</p><p>For instructions, please refer to the <a href="https://enso-managers.de/tools/manual-sheet2reqif.html" target="_blank">Manual Sheet → ReqIF</a>.</p>', de = '<p>Umwandeln einer Kalkulationstabelle in das Requirements Interchange Format (ReqIF). Die Attributnamen werden in der ersten Zeile (Spaltenkopf) erwartet und eine Entität (<span class="text-bg-light"><em>SPEC-OBJECT</em></span> gemäß ReqIF) mit ihren Attributwerten pro folgender Zeile.</p><p>Die Attributnamen werden semantisch interpretiert und mit Hilfe der SpecIF-Ontologie übersetzt. Zum Beispiel wird ein Attributname <span class="text-bg-light"><em>Titel</em></span> zunächst zu <span class="text-bg-light"><em>dcterms:title</em></span> normalisiert und dann auf <span class="text-bg-light"><em>ReqIF.Name</em></span> abgebildet.</p><p>Eine Anleitung (in englischer Sprache) ist im <a href="https://enso-managers.de/tools/manual-sheet2reqif.html" target="_blank">Manual Sheet → ReqIF</a> zu finden.</p>', fr = '<p>Transformer une feuille de calcul en format d\'échange d\'exigences (ReqIF). Les noms des propriétés sont attendus sur la première ligne (tête de colonne) et une entité (<span class="text-bg-light"><em>SPEC-OBJECT</em></span> en termes de ReqIF) avec ses valeurs de propriétés par ligne suivante.</p><p>Les noms de propriétés sont interprétés sémantiquement et traduits à l\'aide de l\'ontologie SpecIF. Par exemple, un nom de propriété <span class="text-bg-light"><em>Titre</em></span> est d\'abord normalisé en <span class="text-bg-light"><em>dcterms:title</em></span>, puis remplacé par <span class="text-bg-light"><em>ReqIF.Name</em></span>.</p><p>Pour les instructions, veuillez consulter le <a href="https://enso-managers.de/tools/manual-sheet2reqif.html" target="_blank">Guide Sheet → ReqIF</a> (en anglais).</p>';
+        return (lang == 'de' ? de : (lang == 'fr' ? fr : en));
+    }
+    function donate() {
+        let en = '<p>Is this service of value to you, would you like to make a donation?</p><p>You support further development of transformations and model integration to improve collaboration over the whole product lifecycle, see <a href="https://cascade.gfse.org" target="_blank">Project CASCaDE</a>.</p>', de = '<p>Ist dieser Dienst für Sie von Nutzen, wollen Sie etwas spenden?</p><p>Sie unterstützen die weitere Entwicklung von Transformationen und Modellintegration zur Verbesserung der Zusammenarbeit im gesamten Produktlebenszyklus, siehe <a href="https://cascade.gfse.org" target="_blank">Projekt CASCaDE</a>.</p>', fr = '<p>Ce service vous est-il utile, souhaitez-vous faire un don?</p><p>Vous soutenez la poursuite du développement des transformations et de l\'intégration des modèles pour améliorer la collaboration tout au long du cycle de vie du produit, voir <a href="https://cascade.gfse.org" target="_blank">Projekt CASCaDE</a>.</p>';
+        return '<div style="float: left; margin: 6px 9px 0 0;" > <iframe src="https://github.com/sponsors/enso-managers/button" title = "Sponsor enso-managers" height = "32" width = "114" style = "border: 0; border-radius: 6px;" > </iframe></div >'
+            + (lang == 'de' ? de : (lang == 'fr' ? fr : en));
     }
     return self;
 });

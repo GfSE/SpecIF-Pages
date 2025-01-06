@@ -4,42 +4,31 @@
     Copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 */
-class CStateImport {
-    constructor() {
-        this.cacheLoaded = false;
-        this.allValid = false;
-    }
-}
 moduleManager.construct({
     name: 'importAny'
 }, function (self) {
     const importModes = [{
             id: 'create',
-            title: 'Create a new project with the given id',
-            desc: 'All types, objects, relations and nodes will be created as specified.',
-            label: i18n.BtnCreate
+            title: i18n.BtnCreate,
+            desc: 'Create a new project with the given id.'
         }, {
             id: 'clone',
-            title: 'Create a new instance of the project with a new id',
-            desc: 'There will be two projects with the existing and the new content.',
-            label: i18n.BtnClone
+            title: i18n.BtnClone,
+            desc: 'Create a new instance of the project with a new id.'
         }, {
             id: 'replace',
-            title: 'Replace the project having the same id',
-            desc: 'Existing content will be lost.',
-            label: i18n.BtnReplace
+            title: i18n.BtnReplace,
+            desc: 'Replace the project having the same id; existing content will be lost.'
         }, {
             id: 'adopt',
-            title: 'Add the new project without effect on the existing one',
-            desc: 'Add diagrams and adopt any existing resource having an identical name.',
-            label: i18n.BtnAdopt
+            title: i18n.BtnAdopt,
+            desc: 'Add the new project without effect on the existing one; existing resources having an identical name will be adopted.'
         }, {
             id: 'update',
-            title: 'Update the project with new or changed content',
-            desc: 'New objects will be created, modified ones will be superseded.',
-            label: i18n.BtnUpdate
+            title: i18n.BtnUpdate,
+            desc: 'Update the project with new or changed content.'
         }];
     const formats = [{
             id: 'specif',
@@ -47,22 +36,23 @@ moduleManager.construct({
             desc: 'Specification Integration Facility',
             label: 'SpecIF',
             extensions: [".specif", ".specifz", ".specif.zip"],
-            help: i18n.MsgImportSpecif,
-            opts: { mediaTypeOf: LIB.attachment2mediaType, doCheck: ['statementClass.subjectClasses', 'statementClass.objectClasses'] }
+            opts: { mediaTypeOf: LIB.attachment2mediaType, doCheck: ['statementClass.subjectClasses', 'statementClass.objectClasses'] },
+            help: i18n.MsgImportSpecif
         }, {
             id: 'archimate',
             name: 'ioArchimate',
             desc: 'ArchiMate Open Exchange',
             label: 'ArchiMate®',
             extensions: [".xml"],
-            help: "Experimental: Import an ArchiMate Open Exchange file (*.xml) and add the diagrams (*.png or *.svg) to their respective resources using the 'edit' function.",
-            opts: { mediaTypeOf: LIB.attachment2mediaType }
+            opts: { mediaTypeOf: LIB.attachment2mediaType },
+            help: "Experimental: Import an ArchiMate Open Exchange file (*.xml) and add the diagrams (*.png or *.svg) to their respective resources using the 'edit' function."
         }, {
             id: 'bpmn',
             name: 'ioBpmn',
             desc: 'Business Process',
             label: 'BPMN',
             extensions: [".bpmn"],
+            opts: { ingest: ["source"] },
             help: i18n.MsgImportBpmn
         }, {
             id: 'sysml',
@@ -77,22 +67,22 @@ moduleManager.construct({
             desc: 'Requirement Interchange Format',
             label: 'ReqIF',
             extensions: [".reqif", ".reqifz"],
-            help: i18n.MsgImportReqif,
-            opts: { multipleMode: "adopt", mediaTypeOf: LIB.attachment2mediaType, dontCheck: ["statement.subject", "statement.object"] }
+            opts: { multipleMode: "adopt", mediaTypeOf: LIB.attachment2mediaType, dontCheck: ["statement.subject", "statement.object"] },
+            help: i18n.MsgImportReqif
         }, {
             id: 'xls',
             name: 'ioXls',
-            desc: 'MS Excel® Spreadsheet',
+            desc: 'MS Excel® or LibreOffice Spreadsheet',
             label: 'Excel®',
-            extensions: [".xlsx", ".xls", ".csv"],
-            help: i18n.MsgImportXls,
-            opts: { dontCheck: ["statement.object"] }
+            extensions: [".xlsx", ".xls", ".csv", ".ods", ".fods"],
+            opts: { dontCheck: ["statement.object"] },
+            help: i18n.MsgImportXls
         }];
     self.projectName = '';
     self.format = undefined;
     var showFileSelect, importMode = { id: 'replace' }, myFullName = 'app.' + self.loadAs, urlP, urlOntology = (window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html') ?
         CONFIG.ontologyURL
-        : '../../SpecIF/vocabulary/Ontology.specif'), importing = false;
+        : '../../../SpecIF/vocabulary/Ontology.specif'), importing = false;
     self.clear = function () {
         $('input[type=file]').val('');
         setTextValue(i18n.LblFileName, '');
@@ -132,8 +122,8 @@ moduleManager.construct({
             + '<div id="modeSelector" class="btn-group mt-1" style="margin: 0 0 0.4em 0" >'
             + function () {
                 let btns = '';
-                importModes.forEach(function (b) {
-                    btns += '<button id="' + b.id + 'Btn" onclick="' + myFullName + '.importLocally(\'' + b.id + '\')" data-toggle="popover" title="' + b.title + '" type="button" class="btn btn-primary text-nowrap">' + b.label + '</button>';
+                importModes.forEach((b) => {
+                    btns += '<button id="' + b.id + 'Btn" onclick="' + myFullName + '.importLocally(\'' + b.id + '\')"' + (b.desc ? ' data-toggle="popover" title="' + b.desc + '"' : '') + ' type="button" class="btn btn-primary text-nowrap">' + b.title + '</button>';
                 });
                 return btns;
             }()
@@ -167,6 +157,10 @@ moduleManager.construct({
         if (!opts)
             opts = {};
         $('#pageTitle').html(app.title);
+        if (!opts.urlParams)
+            setUrlParams({
+                view: self.view
+            });
         function getFormat(uParms) {
             for (var f of formats) {
                 for (var ext of f.extensions) {
@@ -346,7 +340,7 @@ moduleManager.construct({
     };
     function terminateWithSuccess() {
         message.show(i18n.lookup('MsgImportSuccessful', self.file.name), { severity: "success", duration: CONFIG.messageDisplayTimeShort });
-        setTimeout(function () {
+        setTimeout(() => {
             self.clear();
             if (urlP)
                 delete urlP[CONFIG.keyImport];

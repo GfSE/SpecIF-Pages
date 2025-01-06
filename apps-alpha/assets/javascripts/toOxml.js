@@ -7,7 +7,7 @@
 	(C)copyright enso managers gmbh (http://enso-managers.de)
 	Author: se@enso-managers.de
 	License and terms of use: Apache 2.0 (https://apache.org/licenses/LICENSE-2.0)
-	We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+	We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 
 	Limitations:
 	- Accepts data-sets according to SpecIF v1.1.
@@ -739,7 +739,7 @@ function toOxml( data, options ) {
 														},
 														border: { style: 'single' }
 													});
-													return ''
+													return '';
 												}
 									);
 									// the row with it's content:
@@ -748,11 +748,11 @@ function toOxml( data, options ) {
 
 									function al(sty) {
 										// identify values of XHTML text-align attributes:
-										return sty.includes('center') ? 'center' : (sty.includes('right') ? 'right' : undefined)
-
+										if (sty)
+											return sty.includes('center') ? 'center' : (sty.includes('right') ? 'right' : undefined);
 									}
 								})
-							}
+							};
 						});
 
 						// Add the remainder:

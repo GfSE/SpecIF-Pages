@@ -4,7 +4,7 @@
     (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 
     ToDo: This module is lousy coding with lots of historical burden --> redo!
 */
@@ -319,9 +319,9 @@ class CResourceToShow {
         return (!Array.isArray(this.rC.instantiation)
             || this.rC.instantiation.includes(SpecifInstantiation.User));
     }
-    renderAttr(lbl, val, cssCl) {
-        cssCl = cssCl ? ' ' + cssCl : '';
-        return '<div class="attribute' + cssCl + '">'
+    renderAttr(lbl, val, opts) {
+        let cl = opts && opts.condensed ? "attribute-condensed" : "attribute";
+        return '<div class="' + cl + '">'
             + (lbl ? '<div class="attribute-label" >' + lbl + '</div><div class="attribute-value" >'
                 : '<div class="attribute-wide" >')
             + val
@@ -341,7 +341,7 @@ class CResourceToShow {
     listEntry() {
         if (!this.id)
             return '<div class="notice-default">' + i18n.MsgNoObject + '</div>';
-        const clickable = ['#' + CONFIG.objectList, '#' + CONFIG.objectDetails].includes(app.specs.selectedView()), opts = {
+        const clickable = [CONFIG.objectList, CONFIG.objectDetails].includes(app.specs.selectedView()), opts = {
             clickableElements: clickable,
             linkifyURLs: clickable,
             unescapeHTMLTags: true,
@@ -357,17 +357,12 @@ class CResourceToShow {
         }, opts);
         var rO = '<div class="row listEntry">'
             + '<div class="col-xl-8">';
-        switch (app.specs.selectedView()) {
-            case '#' + CONFIG.objectFilter:
-            case '#' + CONFIG.objectList:
-                rO += '<div onclick="app.specs.itemClicked(\'' + this.id + '\')">'
-                    + this.renderTitle(opts)
-                    + '</div>';
-                break;
-            default:
-                rO += this.renderTitle(opts);
-        }
-        ;
+        if ([CONFIG.objectList, CONFIG.objectFilter].includes(app.specs.selectedView()))
+            rO += '<div onclick="app.specs.itemClicked(\'' + this.id + '\')">'
+                + this.renderTitle(opts)
+                + '</div>';
+        else
+            rO += this.renderTitle(opts);
         this.descriptions.forEach((prp) => {
             if (prp.isVisible(opts)) {
                 rO += this.renderAttr('', prp.get(optsDesc));
@@ -375,10 +370,10 @@ class CResourceToShow {
         });
         rO += '</div>'
             + '<div class="col-xl">';
-        rO += this.renderAttr(app.ontology.localize('SpecIF:Resource', opts), LIB.titleOf(this.rC, opts), 'attribute-condensed');
+        rO += this.renderAttr(app.ontology.localize('SpecIF:Resource', opts), LIB.titleOf(this.rC, opts), { condensed: true });
         this.other.forEach((prp) => {
             if (prp.isVisible(opts)) {
-                rO += this.renderAttr(LIB.titleOf(prp, opts), prp.get(opts), 'attribute-condensed');
+                rO += this.renderAttr(LIB.titleOf(prp, opts), prp.get(opts), { condensed: true });
             }
         });
         rO += '</div>'
@@ -516,9 +511,6 @@ class CFileWithContent {
                 break;
             case 'image/svg+xml':
                 this.showSvg(opts);
-                break;
-            case 'application/bpmn+xml':
-                this.showBpmn(opts);
                 break;
             default:
                 console.warn('Cannot show diagram ' + this.title + ' of unknown type: ', this.type);
@@ -661,23 +653,13 @@ class CFileWithContent {
             }
         }
     }
-    showBpmn(opts) {
-        LIB.blob2text(this, (t, fTi) => {
-            bpmn2svg(t)
-                .then((result) => {
-                Array.from(document.getElementsByClassName(tagId(fTi)), (el) => { el.innerHTML = result.svg; });
-            }, (err) => {
-                console.error('BPMN-Viewer could not deliver SVG', err);
-            });
-        }, opts.timelag);
-    }
 }
 moduleManager.construct({
     name: CONFIG.specifications
 }, (self) => {
     let myName = self.loadAs, myFullName = 'app.' + myName;
     self.selectedView = () => {
-        return self.ViewControl.selected.view;
+        return self.ViewControl.selected.view.substring(1);
     };
     self.emptyTab = (tab) => {
         app.busy.reset();
@@ -706,11 +688,11 @@ moduleManager.construct({
                     self.refresh();
                 },
                 'open': () => {
-                    if (self.selectedView() == '#' + CONFIG.objectList)
+                    if (self.selectedView() == CONFIG.objectList)
                         self.refresh();
                 },
                 'close': () => {
-                    if (self.selectedView() == '#' + CONFIG.objectList)
+                    if (self.selectedView() == CONFIG.objectList)
                         self.refresh();
                 },
                 'move': (event) => {
@@ -862,7 +844,7 @@ moduleManager.construct({
             .catch(LIB.stdError);
     };
     self.itemClicked = (rId) => {
-        if (['#' + CONFIG.objectRevisions, '#' + CONFIG.comments].includes(self.selectedView()))
+        if ([CONFIG.objectRevisions, CONFIG.comments].includes(self.selectedView()))
             return;
         if (self.tree.selectedNode.ref != rId) {
             self.tree.selectNodeByRef(LIB.makeKey(rId));
@@ -870,7 +852,7 @@ moduleManager.construct({
             self.tree.openNode();
         }
         ;
-        if (self.selectedView() != '#' + CONFIG.objectList)
+        if (self.selectedView() != CONFIG.objectList)
             moduleManager.show({ view: '#' + CONFIG.objectList });
     };
     return self;

@@ -609,10 +609,10 @@ LIB.displayValueOf = (val, opts) => {
     }
     ;
     if (Array.isArray(val)) {
-        let oE = '';
+        let str = '';
         for (var v of val)
-            oE = oE + (oE.length > 0 ? ', ' : '') + LIB.displayValueOf(v, opts);
-        return oE;
+            str += (str.length > 0 ? ', ' : '') + LIB.displayValueOf(v, opts);
+        return str;
     }
     ;
     return val;
@@ -1427,10 +1427,6 @@ function simpleClone(o) {
     }
     ;
 }
-function hasUrlParams() {
-    let p = document.URL.split('#');
-    return (!!p[1] && p[1].length > 0);
-}
 function getUrlParams(opts) {
     if (typeof (opts) != 'object')
         opts = {};
@@ -1476,10 +1472,4 @@ function setUrlParams(actSt) {
         + (actSt.project ? sep + CONFIG.keyProject + is + actSt.project : "")
         + (actSt.node ? sep + CONFIG.keyNode + is + actSt.node : (actSt.item ? sep + CONFIG.keyItem + is + actSt.item : ''));
     history.pushState('', '', newParams);
-}
-function clearUrlParams() {
-    if (!browser.supportsHtml5History || !hasUrlParams())
-        return;
-    let path = window.location.pathname.split('/');
-    history.pushState('', '', path[path.length - 1]);
 }

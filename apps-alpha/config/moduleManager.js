@@ -5,7 +5,7 @@
     (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 */
 class ViewControl {
     constructor() {
@@ -96,10 +96,10 @@ var app, browser, i18n, message, moduleManager = function () {
             loadPath = opts.path;
         self.registered = [];
         self.ready = [];
-        loadL(['bootstrap', 'font', 'types', 'i18n', 'tree'], { done: init2 });
+        loadL(['bootstrap', 'font', 'types', 'i18n'], { done: init2 });
         return;
         function init2() {
-            let modL = ['helper', 'helperTree', 'mainCSS', 'ioOntology', 'standards', "xSpecif"];
+            let modL = ['helper', 'ioOntology', 'standards', "xSpecif"];
             if (CONFIG.convertMarkdown)
                 modL.push('markdown');
             loadL(modL, {
@@ -314,6 +314,7 @@ var app, browser, i18n, message, moduleManager = function () {
                     getScript("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js");
                     return true;
                 case "tree":
+                    loadModule('helperTree');
                     getStyle("https://cdn.jsdelivr.net/npm/jqtree@1.8.7/jqtree.css");
                     getScript('https://cdn.jsdelivr.net/npm/jqtree@1.8.7/tree.jquery.js');
                     return true;
@@ -330,7 +331,7 @@ var app, browser, i18n, message, moduleManager = function () {
                     getScript('https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js');
                     return true;
                 case "bpmnViewer":
-                    getScript('https://unpkg.com/bpmn-js@17.9.1/dist/bpmn-viewer.production.min.js');
+                    getScript('https://unpkg.com/bpmn-js@17.9.2/dist/bpmn-viewer.production.min.js');
                     return true;
                 case "graphViz":
                     getScript('https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/standalone/umd/vis-network.min.js');
@@ -338,10 +339,6 @@ var app, browser, i18n, message, moduleManager = function () {
                 case "markdown":
                     getScript('https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js')
                         .done(() => { window.markdown = window.markdownit({ html: true, xhtmlOut: true, breaks: true, linkify: false }); });
-                    return true;
-                case "mainCSS":
-                    getStyle(loadPath + 'assets/stylesheets/SpecIF.default.css');
-                    setReady(mod);
                     return true;
                 case "types":
                     getScript(loadPath + 'types/specif.types.js');
@@ -378,13 +375,13 @@ var app, browser, i18n, message, moduleManager = function () {
                     getScript(loadPath + 'modules/xSpecif.js');
                     return true;
                 case "cache":
+                    loadModule('fileSaver');
                     getScript(loadPath + 'modules/cache.mod.js');
                     return true;
                 case "profileAnonymous":
                     getScript(loadPath + 'modules/profileAnonymous.mod.js');
                     return true;
                 case 'toHtml':
-                    loadModule('fileSaver');
                     getScript(loadPath + 'modules/specif2html.js');
                     return true;
                 case "toXhtml":
@@ -419,10 +416,11 @@ var app, browser, i18n, message, moduleManager = function () {
                 case "about":
                     getScript(loadPath + 'modules/about.mod.js');
                     return true;
+                case 'sheet2reqif':
                 case 'importAny':
                     loadModule('zip');
                     loadModule('jsonSchema');
-                    getScript(loadPath + 'modules/importAny.mod.js');
+                    getScript(loadPath + 'modules/' + mod + '.mod.js');
                     return true;
                 case 'ioSpecif':
                     getScript(loadPath + 'modules/ioSpecif.mod.js');
@@ -431,7 +429,6 @@ var app, browser, i18n, message, moduleManager = function () {
                     getScript(loadPath + 'modules/ioDdpSchema.mod.js');
                     return true;
                 case 'ioReqif':
-                    loadModule('reqif2specif');
                     getScript(loadPath + 'modules/ioReqif.mod.js');
                     return true;
                 case 'ioXls':
@@ -452,6 +449,7 @@ var app, browser, i18n, message, moduleManager = function () {
                     getScript(loadPath + 'modules/ioSysml.mod.js');
                     return true;
                 case CONFIG.specifications:
+                    loadModule('tree');
                     getScript(loadPath + 'modules/specifications.mod.js');
                     return true;
                 case CONFIG.reports:
@@ -470,12 +468,6 @@ var app, browser, i18n, message, moduleManager = function () {
                     console.warn("Module loader: Module '" + mod + "' is unknown.");
                     return false;
             }
-        }
-        function bust(url) {
-            return url + (url.startsWith(loadPath) ? "?" + CONFIG.appVersion : "");
-        }
-        function getStyle(url) {
-            $('head').append('<link rel="stylesheet" type="text/css" href="' + bust(url) + '" />');
         }
         function getScript(url, options) {
             let settings = $.extend(options || {}, {
@@ -496,16 +488,21 @@ var app, browser, i18n, message, moduleManager = function () {
                 setTimeout(function () { loadAfterRequiredModules(mod, fn); }, 33);
         }
     }
+    function bust(url) {
+        return url + (url.startsWith(loadPath) ? "?" + CONFIG.appVersion : "");
+    }
+    function getStyle(url) {
+        $('head').append('<link rel="stylesheet" type="text/css" href="' + bust(url) + '" />');
+    }
     function setReady(mod) {
         if (self.ready.indexOf(mod) < 0) {
             self.ready.push(mod);
-            console.info(mod + " loaded module " + self.ready.length + " of " + self.registered.length);
+            console.info("Loaded module '" + mod + "' (" + self.ready.length + " of " + self.registered.length + ").");
         }
-        else {
+        else
             throw Error("Module '" + mod + "' cannot be set 'ready' more than once");
-        }
-        ;
         if (self.registered.length === self.ready.length) {
+            getStyle(loadPath + 'assets/stylesheets/SpecIF.default.css');
             initModuleTree(self.tree);
             console.info("All " + self.ready.length + " modules loaded --> ready!");
             if (typeof (callWhenReady) == 'function')
@@ -556,7 +553,7 @@ function doResize() {
     let wH = window.innerHeight
         || document.documentElement.clientHeight
         || document.body.clientHeight, hH = $('#pageHeader').outerHeight(true)
-        + $('.nav-tabs').outerHeight(true), pH = wH - hH;
+        + ($('.nav-tabs').outerHeight(true) | 0), pH = wH - hH;
     $('.content').outerHeight(pH);
     $('.contentWide').outerHeight(pH);
     $('.pane-tree').outerHeight(pH);

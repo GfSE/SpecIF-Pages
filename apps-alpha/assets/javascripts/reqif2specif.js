@@ -3,7 +3,7 @@
     (C)copyright adesso SE, enso managers gmbh (http://enso-managers.de)
     Author: jasmin.droescher@adesso.de, se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 
     ToDo:
     - transform RELATION-GROUP-TYPES and RELATION-GROUPS

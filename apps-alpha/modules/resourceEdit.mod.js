@@ -4,7 +4,7 @@
     (C)copyright enso managers gmbh (http://enso-managers.de)
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
     Author: se@enso-managers.de, Berlin
-    We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 */
 class CPropertyToEdit extends CPropertyToShow {
     constructor(p, rC) {
@@ -23,7 +23,7 @@ class CPropertyToEdit extends CPropertyToShow {
             targetLanguage: this.selPrj.language
         }, opts), ti = LIB.titleOf(this, localOpts);
         if (this.dT.enumeration) {
-            let entryL = LIB.forAll(this.dT.enumeration, (eV) => {
+            let entryL = this.dT.enumeration.map((eV) => {
                 let val = this.dT.type == XsDataType.String ? app.ontology.localize(LIB.languageTextOf(eV.value, localOpts), localOpts) : eV.value;
                 return { title: val, id: eV.id, checked: this.enumIdL.includes(eV.id) };
             });
@@ -33,48 +33,30 @@ class CPropertyToEdit extends CPropertyToShow {
                 return makeRadioField(ti, entryL, this.dispOpts());
         }
         ;
-        switch (this.dT.type) {
-            case XsDataType.Boolean:
-                return makeBooleanField(ti, this.values.length > 0 ? LIB.isTrue(this.values[0]) : false, this.dispOpts());
-            case XsDataType.String:
-                if (this.pC.title == CONFIG.propClassDiagram) {
-                    return this.makeDiagramField(localOpts);
-                }
-                else {
-                    if (this.pC.permissionVector.U) {
-                        if (opts && opts.dialogForm)
-                            opts.dialogForm.addField(ti, this.dT);
-                        return makeTextField(ti, this.get(localOpts).escapeHTML(), {
-                            typ: app.ontology.propertyClassIsText(this.pC.title) ? 'area' : 'line',
-                            handle: opts.myFullName + '.check()',
-                            hint: this.pC.description
-                        });
-                    }
-                    else {
-                        return makeTextField(ti, this.get(localOpts), {
-                            typ: 'display',
-                            hint: this.pC.description
-                        });
-                    }
-                }
-                ;
-            default:
-                if (this.pC.permissionVector.U) {
-                    if (opts && opts.dialogForm)
-                        opts.dialogForm.addField(ti, this.dT);
-                    return makeTextField(ti, this.get(localOpts), {
-                        typ: 'line',
-                        handle: opts.myFullName + '.check()',
-                        hint: this.pC.description
-                    });
-                }
-                else {
-                    return makeTextField(ti, this.get(localOpts), {
-                        typ: 'display',
-                        hint: this.pC.description
-                    });
-                }
+        if (this.dT.type == XsDataType.Boolean) {
+            return makeBooleanField(ti, this.values.length > 0 ? LIB.isTrue(this.values[0]) : false, this.dispOpts());
         }
+        ;
+        if (this.dT.type == XsDataType.String && this.pC.title == CONFIG.propClassDiagram) {
+            return this.makeDiagramField(localOpts);
+        }
+        ;
+        if (this.pC.permissionVector.U) {
+            if (opts && opts.dialogForm)
+                opts.dialogForm.addField(ti, this.dT);
+            return makeTextField(ti, this.dT.type == XsDataType.String ? this.get(localOpts).escapeHTML() : this.get(localOpts), {
+                typ: this.dT.type == XsDataType.String && app.ontology.propertyClassIsText(this.pC.title) ? 'area' : 'line',
+                handle: opts.myFullName + '.check()',
+                hint: this.pC.description
+            });
+        }
+        else {
+            return makeTextField(ti, this.get(localOpts), {
+                typ: 'display',
+                hint: this.pC.description
+            });
+        }
+        ;
     }
     renderImg(opts) {
         return '<div id="' + tagId(this['class'].id) + '">'
@@ -186,7 +168,7 @@ class CResourceToEdit {
         this.rC = LIB.getExtendedClasses(this.selPrj.cache.get("resourceClass", "all"), [el['class']])[0];
         this.language = el.language || this.selPrj.language;
         this.dialogForm = new CCheckDialogInput();
-        this.properties = LIB.forAll(el.properties, (pr) => { return new CPropertyToEdit(pr, this.rC); });
+        this.properties = el.properties.map((pr) => { return new CPropertyToEdit(pr, this.rC); });
         this.newFiles = [];
     }
     editForm(opts) {
@@ -400,7 +382,7 @@ moduleManager.construct({
         }
         function selectResClass(opts) {
             return new Promise((resolve, reject) => {
-                app.projects.selected.readItems('resourceClass', LIB.forAll(opts.eligibleResourceClasses, (rCId) => { return LIB.makeKey(rCId); }))
+                app.projects.selected.readItems('resourceClass', opts.eligibleResourceClasses.map((rCId) => { return LIB.makeKey(rCId); }))
                     .then((rCL) => {
                     function res() {
                         resolve(LIB.itemById(rCL, radioValue(i18n.LblResourceClass)));
@@ -476,9 +458,8 @@ moduleManager.construct({
             else
                 throw Error('Programming error: Edited property does not replace an existing');
         });
-        self.newRes.properties = LIB.forAll(self.newRes.properties, (p) => {
-            if (p.values.length > 0)
-                return p;
+        self.newRes.properties = self.newRes.properties.filter((p) => {
+            return (p.values.length > 0);
         });
         self.newRes.changedAt = chD;
         if (app.me.userName != CONFIG.userNameAnonymous)

@@ -33,7 +33,6 @@ The terms listed in the vocabulary may be used as predicates to distinguish clas
 Each statement class may define an individual set of properties for carrying the information 'payload'.
 
 ## Mapping
-The visual mapping can currently be found (and modified) in the [config.ts](https://github.com/GfSE/SpecIF-Viewer/blob/master/src/config/config.ts) file of the SpecIF-Viewer.
 
 ### Keywords (for visibilty and arrangement)
 ####  idProperties

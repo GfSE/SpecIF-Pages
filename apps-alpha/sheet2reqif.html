@@ -20,13 +20,13 @@
 
 <script type="text/javascript">
 
-// This is a template for SpecIF apps.
-// To create a new SpecIF app:
-// - copy this file and rename it with the desired app title
-// - in the moduleTree below, include the modules to load for the particular app.
+    // This is a template for SpecIF apps.
+    // To create a new SpecIF app:
+    // - copy this file and rename it with the desired app title
+    // - in the moduleTree below, include the modules to load for the particular app.
 
-    // App-specific code called by the moduleManager after initializing;
-    // the moduleTree defines the modules to load:
+    // The App-specific code called by the moduleManager after initializing;
+    // self.moduleTree defines the modules to load:
     function SpecifApp() {
         "use strict";
 
@@ -34,66 +34,61 @@
         var self = {};
 
         // Define the module hierarchy; it will be used to load the modules and to control the views later on:
-		self.moduleTree = {
-			// Define
-			// - name: the modules to load as specified in 'moduleManager.js'
-			// - loadAs: name for execution (addressable javascript object)
-			// - the hierarchy of views using implicit actions hide/show or refresh
-			// - the explicit actions independent of any view
+        self.moduleTree = {
+            // Define
+            // - name: the modules to load as specified in 'moduleManager.js'
+            // - loadAs: name for execution (addressable javascript object)
+            // - requires: wait with loading until all listed modules are loaded
+            // - the hierarchy of views using implicit actions hide/show or refresh
+            // - the explicit actions independent of any view
 
-			// Let's start at the top level:
-			// no name, thus no additional script file will be loaded at top level
-			view: '#app',
-			selector: '#pageSelector',			// DOM element to choose the view of a child (top level)
-			selectorType: 'btns',
-			children: [{
-				name: 'profileAnonymous',
-				loadAs: 'me'					// the name of the controller object to construct
-				// no view
-			}, {
-				name: 'cache',
-				loadAs: 'projects'
-				// no view
-			}, {
-				name: 'importAny',
-				// no loadAs, so name will be used for the controller object
-				// This is a view of the parent:
-				view: '#' + CONFIG.importAny,	// uses implicit actions show/hide
-				viewClass: 'contentWide',		// whole width under control of the view
-				label: i18n.BtnImport,
-				selectedBy: '#selectImport',	// DOM element in parent's selector to choose this view
-				// no selector: the children don't have views
-				children: [{
-					name: 'ioSpecif'
-				}, {
-					name: 'ioArchimate'
-				}, {
-					name: 'ioReqif'
-				}, {
-					name: 'ioBpmn'
-				}, {
-					name: 'ioXls'
-				}]
-			}, {
-				name: 'about',
-				view: '#about',
-				viewClass: 'contentWide',			// whole width under control of the view
-				label: i18n.IcoAbout,
-				selectedBy: '#selectAbout'			// DOM element in parent's selector to choose this view
-			}]
-		};
+            // Let's start at the top level:
+            // no name, thus no additional script file will be loaded at top level
+            view: '#app',
+            selector: '#pageSelector',			// DOM element to choose the view of a child (top level)
+            selectorType: 'btns',
+            children: [{
+                name: 'profileAnonymous',
+                loadAs: 'me'					// the name of the controller object to construct
+                // no view
+            }, {
+                name: 'cache',
+                loadAs: 'projects'
+            }, {
+                name: 'sheet2reqif',
+                // no loadAs, so name will be used for the controller object
+                // This is a view of the parent:
+                view: '#sheet2reqif',	// uses implicit actions show/hide
+                viewClass: 'contentWide',		// whole width under control of the view
+                label: '&rarr; ReqIF',
+                selectedBy: '#selectImport',	// DOM element in parent's selector to choose this view
+                // no selector: the children don't have views
+                children: [{
+                    name: 'ioSpecif'
+                }, {
+                    name: 'ioReqif'
+                }, {
+                    name: 'ioXls'
+                }]
+            }, {
+                name: 'about',
+                view: '#about',
+                viewClass: 'contentWide',			// whole width under control of the view
+                label: i18n.IcoAbout,
+                selectedBy: '#selectAbout'			// DOM element in parent's selector to choose this view
+            }]
+        };
 
-        // IE does not support ()=>{..} --> "syntax error" at load time.
         self.init = function () {
             // must set it here, because the language files must be read first:
-            document.title = self.title = i18n.LblEditor;
+            document.title = self.title = i18n.LblSheet2reqif;
 
             // React on Browser Back/Forward buttons:
             window.addEventListener("hashchange", self.show);
-            // Warn before leaving the page (browser back button or tab deletion ... or outgoing link):
+        /*    // Warn before leaving the page (browser back button or tab deletion ... or outgoing link):
             window.onbeforeunload = function () {
                 return "You are about to leave this application - did you save any changes you made?";
-            };
+            }; */
 
             moduleManager.load(self.moduleTree, { done: self.login });
         };
@@ -106,19 +101,7 @@
                 )
         };
         self.show = function () {
-            var uP = getUrlParams(), v;
-            if (!self[CONFIG.projects].selected
-                || !self[CONFIG.projects].selected.isLoaded()
-                || uP[CONFIG.keyProject] && uP[CONFIG.keyProject] != self[CONFIG.projects].selected.id
-                || uP[CONFIG.keyImport] && uP[CONFIG.keyImport].length > 0)
-                // - no project is loaded
-                // - a project id is found in the URL parameters and it differs from the one of the loaded project
-                // - an URL parameter 'import' has been found:
-                v = '#' + CONFIG.importAny
-            else
-                v = '#' + (uP[CONFIG.keyView] || CONFIG.specifications);
-            //		console.debug( 'app.show', uP, v );
-            moduleManager.show({ view: v, urlParams: uP });
+            moduleManager.show({ view: '#sheet2reqif' });
         };
         self.export = function () {
             if (self[CONFIG.projects].selected && self[CONFIG.projects].selected.isLoaded())
