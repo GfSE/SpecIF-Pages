@@ -173,7 +173,7 @@ class CSpecIF {
         });
     }
     toInt(spD, opts) {
-        if (this.isOntology(spD) || spD.id == "P-DDP-Schema-V20")
+        if (this.isOntology(spD) || spD.id.startsWith("P-DDP-"))
             opts.normalizeTerms = false;
         let self = this, names = new CSpecifItemNames(LIB.versionOf(spD));
         console.info("References are imported *without* revision to ascertain that updates of the referenced element do not break the link. "

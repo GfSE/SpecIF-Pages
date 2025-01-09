@@ -19,7 +19,11 @@ moduleManager.construct({
         self.userName = CONFIG.userNameAnonymous;
         self.userPassword = CONFIG.passwordAnonymous;
         self.administrator = false;
-        self.roleAssignments = [new CRoleAssignment("any", app.title == i18n.LblEditor ? "SpecIF:Editor" : "SpecIF:Reader")];
+        self.roleAssignments = [
+            new CRoleAssignment("any", app.title == i18n.LblEditor ? "SpecIF:Editor" : "SpecIF:Reader"),
+            new CRoleAssignment("P-DDP-Classes-V20", "SpecIF:Editor"),
+            new CRoleAssignment("P-DDP-Ontology-V20", "SpecIF:Editor")
+        ];
     };
     self.login = function () {
         return new Promise((resolve) => {

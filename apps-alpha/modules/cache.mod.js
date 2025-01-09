@@ -198,7 +198,7 @@ class CCache {
                 }
                 else {
                     ti = (LIB.valueByTitle(el, CONFIG.propClassDesc, self) || '')
-                        .substring(0, CONFIG.treeMaxTitleLength);
+                        .substring(0, CONFIG.maxTitleLengthTree);
                 }
             }
             ;
@@ -1830,11 +1830,14 @@ moduleManager.construct({
     name: 'cache'
 }, (self) => {
     self.init = () => {
+        app.standards = new CStandards();
         self.cache = new CCache({ cacheInstances: true });
+        self.clear();
+        return true;
+    };
+    self.clear = () => {
         self.list = [];
         self.selected = undefined;
-        app.standards = new CStandards();
-        return true;
     };
     self.create = (dta, opts) => {
         self.list.length = 0;

@@ -374,15 +374,6 @@ mark{
 }
 
 /* override jqtree.css */
-/* .jqtree-tree .jqtree-title {
-	display: block;
-}
-.jqtree-tree .jqtree-title.jqtree-title-folder {
-	display: inline;
-}  
-ul.jqtree-tree .jqtree-element {
-	display: unset;    for selection buttonLeft:false 
-} */
 ul.jqtree-tree li.jqtree-selected>.jqtree-element .jqtree-toggler,
 ul.jqtree-tree li.jqtree-selected>.jqtree-element .jqtree-title {
 	color: #ffffff;

@@ -383,6 +383,9 @@ class CResourceToShow {
 }
 class CResourcesToShow {
     constructor() {
+        this.clear();
+    }
+    clear() {
         this.list = [];
     }
     push(r) {
@@ -456,7 +459,7 @@ class CFileWithContent {
         return this.title && this.title.length > 0 && (this.hasBlob() || this.hasDataURL());
     }
     canBeRenderedAsImage() {
-        return ['png', 'svg', 'bpmn', 'jpg', 'jpeg', 'gif'].includes(this.title.fileExt().toLowerCase());
+        return CONFIG.imgExtensions.includes(this.title.fileExt().toLowerCase());
     }
     canBeDownloaded() {
         return CONFIG.officeExtensions.concat(CONFIG.applExtensions).includes(this.title.fileExt().toLowerCase());
@@ -666,6 +669,7 @@ moduleManager.construct({
         $(tab).empty();
     };
     self.init = () => {
+        self.clear();
         let h = '<div id="specLeft" class="paneLeft" style="position:relative">'
             + '<div id="navBtns" class="btn-group-vertical btn-group-sm" role="group" style="position:absolute;top:4px;right:12px;z-index:900">'
             + '<button class="btn btn-light" onclick="' + myFullName + '.tree.moveUp()" data-toggle="popover" title="' + i18n.LblPrevious + '" >' + i18n.IcoPrevious + '</button>'
@@ -749,9 +753,11 @@ moduleManager.construct({
         return true;
     };
     self.clear = () => {
-        self.tree.clear();
+        if (self.tree) {
+            self.tree.clear();
+        }
+        ;
         refreshReqCnt = 0;
-        app.projects.clear();
         app.busy.reset();
     };
     self.hide = () => {
@@ -861,14 +867,14 @@ moduleManager.construct({
     view: '#' + CONFIG.objectList
 }, (self) => {
     var myName = self.loadAs, myFullName = 'app.' + myName, selPrj, selRes, modalDelNode;
-    self.resCreClasses = [];
-    self.resCre = false;
-    self.resources = new CResourcesToShow();
     self.init = () => {
+        self.resCreClasses = [];
+        self.resCre = false;
+        self.resources = new CResourcesToShow();
         return true;
     };
     self.clear = () => {
-        self.resources.init();
+        self.resources.clear();
     };
     self.hide = () => {
         $(self.view).empty();
@@ -949,7 +955,7 @@ moduleManager.construct({
                     + 'data-toggle="popover" title="' + i18n.LblUpdateObject + '" >' + i18n.IcoEdit + '</button>';
             else
                 rB += '<button disabled class="btn btn-primary" >' + i18n.IcoEdit + '</button>';
-            rB += '<button disabled class="btn btn-primary" >' + i18n.IcoComment + '</button>';
+            rB += '<button disabled class="btn btn-light" >' + i18n.IcoComment + '</button>';
             if (selRes.rC.permissionVector.D && selRes.isUserInstantiated())
                 rB += '<button class="btn btn-danger" onclick="' + myFullName + '.confirmDeletion()" '
                     + 'data-toggle="popover" title="' + i18n.LblDeleteObject + '" >' + i18n.IcoDelete + '</button>';
@@ -1037,6 +1043,8 @@ moduleManager.construct({
     self.staDel = false;
     self.init = () => {
         return true;
+    };
+    self.clear = () => {
     };
     self.hide = () => {
         $(self.view).empty();

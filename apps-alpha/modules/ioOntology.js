@@ -59,7 +59,7 @@ class COntology {
             "SpecIF:LifecycleStatusExperimental"
         ];
         this.data = dta;
-        this.data.nodes = (dta.nodes).filter((n) => {
+        this.data.nodes = (dta.nodes || dta.hierarchies).filter((n) => {
             let r = LIB.itemByKey(dta.resources, n.resource);
             return this.valueByTitle(r, CONFIG.propClassType) == CONFIG.resClassOntology;
         });
@@ -85,6 +85,7 @@ class COntology {
         return this.data && this.data.id && this.data.nodes.length > 0 && this.checkConstraintsOntology();
     }
     getTermResources(ctg, term, opts) {
+        let nTerm = term.replace(/^dc:/, 'dcterms:');
         ctg = ctg.toLowerCase();
         return this.data.resources
             .filter((r) => {
@@ -92,7 +93,7 @@ class COntology {
             if (valL.length > 1)
                 console.warn("Ontology: Term " + r.id + " has multiple values (" + valL.toString() + ")");
             return (valL.length > 0
-                && LIB.languageTextOf(valL[0], { targetLanguage: "default" }) == term
+                && LIB.languageTextOf(valL[0], { targetLanguage: "default" }) == nTerm
                 && (!opts || !opts.eligibleOnly || this.eligibleLifecycleStatus.includes(stat))
                 && (ctg == 'all' || LIB.classTitleOf(r['class'], this.data.resourceClasses).toLowerCase().includes(ctg)));
         });

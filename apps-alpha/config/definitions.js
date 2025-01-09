@@ -1,6 +1,6 @@
 "use strict";
 const CONFIG = {};
-CONFIG.appVersion = "1.2.a.7",
+CONFIG.appVersion = "1.2.a.9",
     CONFIG.specifVersion = "1.2";
 CONFIG.imgURL = './assets/images';
 CONFIG.ontologyURL = 'https://specif.de/v1.2/Ontology.specif';
@@ -24,7 +24,7 @@ CONFIG.maxAccuracy = 9;
 CONFIG.maxStringLength = 16384;
 CONFIG.maxTitleLength =
     CONFIG.textThreshold = 256;
-CONFIG.treeMaxTitleLength = 48;
+CONFIG.maxTitleLengthTree = 48;
 CONFIG.objToGetCount = 16;
 CONFIG.genIdLength = 27;
 CONFIG.convertMarkdown = true;

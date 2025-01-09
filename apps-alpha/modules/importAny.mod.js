@@ -9,14 +9,14 @@
 moduleManager.construct({
     name: 'importAny'
 }, function (self) {
-    const importModes = [{
+    const actions = [{
             id: 'create',
             title: i18n.BtnCreate,
             desc: 'Create a new project with the given id.'
         }, {
             id: 'clone',
             title: i18n.BtnClone,
-            desc: 'Create a new instance of the project with a new id.'
+            desc: 'Copy the project with a new id.'
         }, {
             id: 'replace',
             title: i18n.BtnReplace,
@@ -28,58 +28,11 @@ moduleManager.construct({
         }, {
             id: 'update',
             title: i18n.BtnUpdate,
-            desc: 'Update the project with new or changed content.'
+            desc: 'Update the project: New objects will be created, modified ones will be superseded.',
         }];
-    const formats = [{
-            id: 'specif',
-            name: 'ioSpecif',
-            desc: 'Specification Integration Facility',
-            label: 'SpecIF',
-            extensions: [".specif", ".specifz", ".specif.zip"],
-            opts: { mediaTypeOf: LIB.attachment2mediaType, doCheck: ['statementClass.subjectClasses', 'statementClass.objectClasses'] },
-            help: i18n.MsgImportSpecif
-        }, {
-            id: 'archimate',
-            name: 'ioArchimate',
-            desc: 'ArchiMate Open Exchange',
-            label: 'ArchiMate®',
-            extensions: [".xml"],
-            opts: { mediaTypeOf: LIB.attachment2mediaType },
-            help: "Experimental: Import an ArchiMate Open Exchange file (*.xml) and add the diagrams (*.png or *.svg) to their respective resources using the 'edit' function."
-        }, {
-            id: 'bpmn',
-            name: 'ioBpmn',
-            desc: 'Business Process',
-            label: 'BPMN',
-            extensions: [".bpmn"],
-            opts: { ingest: ["source"] },
-            help: i18n.MsgImportBpmn
-        }, {
-            id: 'sysml',
-            name: 'ioSysml',
-            desc: 'System Modeling Language',
-            label: 'UML/SysML',
-            extensions: [".mdzip"],
-            help: "Experimental: Import an XMI file from Cameo v19.0."
-        }, {
-            id: 'reqif',
-            name: 'ioReqif',
-            desc: 'Requirement Interchange Format',
-            label: 'ReqIF',
-            extensions: [".reqif", ".reqifz"],
-            opts: { multipleMode: "adopt", mediaTypeOf: LIB.attachment2mediaType, dontCheck: ["statement.subject", "statement.object"] },
-            help: i18n.MsgImportReqif
-        }, {
-            id: 'xls',
-            name: 'ioXls',
-            desc: 'MS Excel® or LibreOffice Spreadsheet',
-            label: 'Excel®',
-            extensions: [".xlsx", ".xls", ".csv", ".ods", ".fods"],
-            opts: { dontCheck: ["statement.object"] },
-            help: i18n.MsgImportXls
-        }];
+    var iFormats = [];
     self.projectName = '';
-    self.format = undefined;
+    self.importFormat = undefined;
     var showFileSelect, importMode = { id: 'replace' }, myFullName = 'app.' + self.loadAs, urlP, urlOntology = (window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html') ?
         CONFIG.ontologyURL
         : '../../../SpecIF/vocabulary/Ontology.specif'), importing = false;
@@ -100,6 +53,62 @@ moduleManager.construct({
             return false;
         }
         ;
+        iFormats = [{
+                id: 'ddp',
+                name: 'ioDdpSchema',
+                desc: 'Schema (.xsd) of the Prostep iViP Digital Data Package (DDP)',
+                label: 'DDP',
+                extensions: [".xsd"],
+                opts: { mediaTypeOf: LIB.attachment2mediaType },
+                help: "Experimental: Import a DDP-Schema file (Dictionary.xsd)."
+            }, {
+                id: 'specif',
+                name: 'ioSpecif',
+                desc: 'Specification Integration Facility',
+                label: 'SpecIF',
+                extensions: [".specif", ".specifz", ".specif.zip"],
+                opts: { mediaTypeOf: LIB.attachment2mediaType, doCheck: ['statementClass.subjectClasses', 'statementClass.objectClasses'] },
+                help: i18n.MsgImportSpecif
+            }, {
+                id: 'archimate',
+                name: 'ioArchimate',
+                desc: 'ArchiMate Open Exchange',
+                label: 'ArchiMate®',
+                extensions: [".xml"],
+                opts: { mediaTypeOf: LIB.attachment2mediaType },
+                help: "Experimental: Import an ArchiMate Open Exchange file (*.xml) and add the diagrams (*.png or *.svg) to their respective resources using the 'edit' function."
+            }, {
+                id: 'bpmn',
+                name: 'ioBpmn',
+                desc: 'Business Process',
+                label: 'BPMN',
+                extensions: [".bpmn"],
+                opts: { ingest: ["source"] },
+                help: i18n.MsgImportBpmn
+            }, {
+                id: 'sysml',
+                name: 'ioSysml',
+                desc: 'System Modeling Language',
+                label: 'UML/SysML',
+                extensions: [".mdzip"],
+                help: "Experimental: Import an XMI file from Cameo v19.0."
+            }, {
+                id: 'reqif',
+                name: 'ioReqif',
+                desc: 'Requirement Interchange Format',
+                label: 'ReqIF',
+                extensions: [".reqif", ".reqifz"],
+                opts: { multipleMode: "adopt", mediaTypeOf: LIB.attachment2mediaType, dontCheck: ["statement.subject", "statement.object"] },
+                help: i18n.MsgImportReqif
+            }, {
+                id: 'xls',
+                name: 'ioXls',
+                desc: 'MS Excel® or LibreOffice Spreadsheet',
+                label: 'Excel®',
+                extensions: [".xlsx", ".xls", ".csv", ".ods", ".fods"],
+                opts: { dontCheck: ["statement.object"] },
+                help: i18n.MsgImportXls
+            }];
         let h = '<div style="max-width:768px; margin-top:1em">'
             + '<div class="fileSelect" style="display:none;" >'
             + '<div class="attribute-label" style="vertical-align:top; padding-top:0.2em" >' + i18n.LblOntology + '</div>'
@@ -122,8 +131,8 @@ moduleManager.construct({
             + '<div id="modeSelector" class="btn-group mt-1" style="margin: 0 0 0.4em 0" >'
             + function () {
                 let btns = '';
-                importModes.forEach((b) => {
-                    btns += '<button id="' + b.id + 'Btn" onclick="' + myFullName + '.importLocally(\'' + b.id + '\')"' + (b.desc ? ' data-toggle="popover" title="' + b.desc + '"' : '') + ' type="button" class="btn btn-primary text-nowrap">' + b.title + '</button>';
+                actions.forEach((a) => {
+                    btns += '<button id="' + a.id + 'Btn" onclick="' + myFullName + '.importLocally(\'' + a.id + '\')"' + (a.desc ? ' data-toggle="popover" title="' + a.desc + '"' : '') + ' type="button" class="btn btn-primary text-nowrap">' + a.title + '</button>';
                 });
                 return btns;
             }()
@@ -145,7 +154,6 @@ moduleManager.construct({
             + '</div>';
         $(self.view).prepend(h);
         self.clear();
-        self.setFormat('specif');
         importMode = { id: 'replace' };
         showFileSelect = new State({
             showWhenSet: ['.fileSelect'],
@@ -162,7 +170,7 @@ moduleManager.construct({
                 view: self.view
             });
         function getFormat(uParms) {
-            for (var f of formats) {
+            for (var f of iFormats) {
                 for (var ext of f.extensions) {
                     if (uParms[CONFIG.keyImport].endsWith(ext) && moduleManager.isReady(f.name))
                         return f;
@@ -179,10 +187,10 @@ moduleManager.construct({
         if (urlP && urlP[CONFIG.keyImport]) {
             importMode = { id: urlP[CONFIG.keyMode] || 'replace' };
             self.file.name = urlP[CONFIG.keyImport];
-            self.format = getFormat(urlP);
-            if (self.format && app[self.format.name]) {
-                app[self.format.name].init(self.format.opts);
-                if (app[self.format.name].verify({ name: urlP[CONFIG.keyImport] })) {
+            self.importFormat = getFormat(urlP);
+            if (self.importFormat && app[self.importFormat.name]) {
+                app[self.importFormat.name].init(self.importFormat.opts);
+                if (app[self.importFormat.name].verify({ name: urlP[CONFIG.keyImport] })) {
                     let rF = makeTextField(i18n.LblFileName, self.file.name);
                     $("#formNames").html(rF);
                     self.projectName = self.file.name.fileName();
@@ -195,7 +203,7 @@ moduleManager.construct({
                             responseType: 'arraybuffer',
                             withCredentials: false,
                             done: function (result) {
-                                app[self.format.name].toSpecif(result.response)
+                                app[self.importFormat.name].toSpecif(result.response)
                                     .progress(setProgress)
                                     .done(handleResult)
                                     .fail(handleError);
@@ -214,15 +222,13 @@ moduleManager.construct({
             return;
         }
         ;
-        self.setFormat('specif');
         let str = '';
-        formats.forEach(function (s) {
+        iFormats.forEach((s) => {
             if (moduleManager.isReady(s.name)) {
+                if (!self.importFormat)
+                    self.setFormat(s.id);
                 if (typeof (app[s.name].toSpecif) == 'function' && typeof (app[s.name].verify) == 'function') {
-                    str += '<button id="formatSelector-' + s.id + '" onclick="' + myFullName + '.setFormat(\'' + s.id + '\')" type="button" class="btn btn-light' + (self.format.id == s.id ? ' active' : '') + '" data-toggle="popover" title="' + s.desc + '">' + s.label + '</button>';
-                }
-                else {
-                    str += '<button disabled type="button" class="btn btn-light" data-toggle="popover" title="' + s.desc + '">' + s.label + '</button>';
+                    str += '<button id="formatSelector-' + s.id + '" onclick="' + myFullName + '.setFormat(\'' + s.id + '\')" type="button" class="btn btn-light' + (self.importFormat.id == s.id ? ' active' : '') + '" data-toggle="popover" title="' + s.desc + '">' + s.label + '</button>';
                 }
                 ;
             }
@@ -239,27 +245,27 @@ moduleManager.construct({
     self.setFormat = function (fId) {
         if (importing || !fId)
             return;
-        if (typeof (self.format) == 'object' && fId != self.format.id)
-            $('#formatSelector-' + self.format.id).removeClass('active');
-        if (typeof (self.format) != 'object' || fId != self.format.id) {
+        if (typeof (self.importFormat) == 'object' && fId != self.importFormat.id)
+            $('#formatSelector-' + self.importFormat.id).removeClass('active');
+        if (typeof (self.importFormat) != 'object' || fId != self.importFormat.id) {
             $('#formatSelector-' + fId).addClass('active');
-            self.format = LIB.itemById(formats, fId);
+            self.importFormat = LIB.itemById(iFormats, fId);
         }
         ;
-        app[self.format.name].init(self.format.opts);
+        app[self.importFormat.name].init(self.importFormat.opts);
         let rF = makeTextField(i18n.LblFileName, '');
         if (fId == 'xls')
             rF += makeTextField(i18n.LblProjectName, self.projectName, { typ: 'line', handle: myFullName + '.enableActions()' });
-        $('#helpImport').html(self.format.help);
+        $('#helpImport').html(self.importFormat.help);
         $("#formNames").html(rF);
         $("#fileSelectBtn").html('<span>' + i18n.BtnFileSelect + '</span>'
-            + '<input id="importFile" type="file" accept="' + self.format.extensions.toString() + '" onchange="' + myFullName + '.pickFiles()" />');
+            + '<input id="importFile" type="file" accept="' + self.importFormat.extensions.toString() + '" onchange="' + myFullName + '.pickFiles()" />');
         self.enableActions();
     };
     function getState() {
         let state = new CStateImport(), pnl = getTextLength(i18n.LblProjectName) > 0;
         state.cacheLoaded = typeof (app.projects) == 'object' && typeof (app.projects.selected) == 'object' && app.projects.selected.isLoaded();
-        state.allValid = self.file && self.file.name.length > 0 && (self.format.id != 'xls' || pnl);
+        state.allValid = self.file && self.file.name.length > 0 && (self.importFormat.id != 'xls' || pnl);
         setTextState(i18n.LblProjectName, pnl ? 'is-valid' : 'is-invalid');
         return state;
     }
@@ -297,10 +303,10 @@ moduleManager.construct({
     }
     self.pickFiles = function () {
         let f = document.getElementById("importFile").files[0];
-        if (app[self.format.name].verify(f)) {
+        if (app[self.importFormat.name].verify(f)) {
             self.file = f;
             setTextValue(i18n.LblFileName, f.name);
-            if (self.format.id == 'xls' && getTextLength(i18n.LblProjectName) < 1) {
+            if (self.importFormat.id == 'xls' && getTextLength(i18n.LblProjectName) < 1) {
                 self.projectName = self.file.name.fileName();
                 setTextValue(i18n.LblProjectName, self.projectName);
                 setFocus(i18n.LblProjectName);
@@ -322,7 +328,7 @@ moduleManager.construct({
             .then((ont) => {
             app.ontology = ont;
             self.projectName = textValue(i18n.LblProjectName);
-            readFile(self.file, app[self.format.name].toSpecif);
+            readFile(self.file, app[self.importFormat.name].toSpecif);
         })
             .catch(noOntologyFound);
         return;
@@ -375,7 +381,7 @@ moduleManager.construct({
         }
         function handle(dta, idx) {
             setProgress(importMode.id + ' project', 20);
-            let opts = self.format.opts || {};
+            let opts = self.importFormat.opts || {};
             opts.mode = idx < 1 ? importMode.id : opts.multipleMode || 'update';
             opts.normalizeTerms = true;
             opts.deduplicate =

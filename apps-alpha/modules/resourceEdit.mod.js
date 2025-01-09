@@ -384,11 +384,11 @@ moduleManager.construct({
             return new Promise((resolve, reject) => {
                 app.projects.selected.readItems('resourceClass', opts.eligibleResourceClasses.map((rCId) => { return LIB.makeKey(rCId); }))
                     .then((rCL) => {
-                    function res() {
+                    function resv() {
                         resolve(LIB.itemById(rCL, radioValue(i18n.LblResourceClass)));
                         modalSelectRC.hide();
                     }
-                    function rej() {
+                    function rejc() {
                         reject({ status: 0, statusText: 'Create Resource cancelled by the user' });
                         modalSelectRC.hide();
                     }
@@ -422,17 +422,17 @@ moduleManager.construct({
                                 + '</div>'
                                 + '</div>'
                                 + '</div>');
-                            const selectRC = document.getElementById(modalId);
-                            selectRC.addEventListener('hidePrevented.bs.modal', rej);
+                            const domEl = document.getElementById(modalId);
+                            domEl.addEventListener('hidePrevented.bs.modal', rejc);
                             [
-                                { id: 'selRCclose', action: rej },
-                                { id: 'selRCcancel', action: rej },
-                                { id: 'selRCnext', action: res }
+                                { id: 'selRCclose', action: rejc },
+                                { id: 'selRCcancel', action: rejc },
+                                { id: 'selRCnext', action: resv }
                             ].forEach((b) => {
                                 document.getElementById(b.id)
                                     .addEventListener('click', b.action);
                             });
-                            modalSelectRC = new bootstrap.Modal(selectRC);
+                            modalSelectRC = new bootstrap.Modal(domEl);
                             modalSelectRC.show();
                         }
                         else {

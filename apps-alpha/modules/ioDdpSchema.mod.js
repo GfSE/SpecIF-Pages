@@ -31,50 +31,53 @@ moduleManager.construct({
     };
     self.toSpecif = (buf) => {
         let dDO = $.Deferred(), xsd = LIB.ab2str(buf);
+        const modalId = "ddpOpts";
+        self.cancel = () => {
+            dDO.reject(errTransformationCancelled);
+            self.modalOpts.hide();
+        };
+        self.nextStep = () => {
+            let data;
+            switch (radioValue(i18n.LblFormat)) {
+                case 'ontology':
+                    data = ddpSchema2specifOntology(xsd);
+                    break;
+                case 'specifClasses':
+                    data = ddpSchema2specifClasses(xsd);
+            }
+            ;
+            if (typeof (data) == 'object' && data.id)
+                dDO.resolve(data);
+            else
+                dDO.reject(errTransformationFailed);
+            self.modalOpts.hide();
+        };
         if (LIB.validXML(xsd)) {
-            new BootstrapDialog({
-                title: "Choose result type",
-                type: 'type-primary',
-                message: () => {
-                    return $('<div>'
-                        + "<p>" + i18n.MsgExport + "</p>"
-                        + makeRadioField(i18n.LblFormat, [
-                            { title: 'SpecIF Ontology for DDP', id: 'ontology', checked: true },
-                            { title: 'SpecIF Classes for DDP', id: 'specifClasses' }
-                        ])
-                        + '</div>');
-                },
-                buttons: [
-                    {
-                        label: i18n.BtnCancel,
-                        action: (thisDlg) => {
-                            dDO.reject(errTransformationCancelled);
-                            thisDlg.close();
-                        }
-                    },
-                    {
-                        label: i18n.LblNextStep,
-                        cssClass: 'btn-success',
-                        action: (thisDlg) => {
-                            let data;
-                            switch (radioValue(i18n.LblFormat)) {
-                                case 'ontology':
-                                    data = ddpSchema2specifOntology(xsd);
-                                    break;
-                                case 'specifClasses':
-                                    data = ddpSchema2specifClasses(xsd);
-                            }
-                            ;
-                            if (typeof (data) == 'object' && data.id)
-                                dDO.resolve(data);
-                            else
-                                dDO.reject(errTransformationFailed);
-                            thisDlg.close();
-                        }
-                    }
-                ]
-            })
-                .open();
+            $('body').append('<div id="' + modalId + '" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" >'
+                + '<div class="modal-dialog modal-lg" >'
+                + '<div class="modal-content" >'
+                + '<div class="modal-header bg-primary text-white" >'
+                + '<h5 class="modal-title" >Choose result type</h5>'
+                + '<button type="button" class="btn-close" onclick="app.' + self.name + '.cancel()" aria-label="Close" > </button>'
+                + '</div>'
+                + '<div class="modal-body" >'
+                + "<p>" + i18n.MsgExport + "</p>"
+                + makeRadioField(i18n.LblFormat, [
+                    { title: 'SpecIF Ontology for DDP', id: 'ontology', checked: true },
+                    { title: 'SpecIF Classes for DDP', id: 'specifClasses' }
+                ])
+                + '</div>'
+                + '<div class="modal-footer" >'
+                + '<button type="button" class="btn btn-secondary" onclick="app.' + self.name + '.cancel()">' + i18n.BtnCancel + '</button>'
+                + '<button type="button" class="btn btn-success" onclick="app.' + self.name + '.nextStep()">' + i18n.BtnImport + '</button>'
+                + '</div>'
+                + '</div>'
+                + '</div>'
+                + '</div>');
+            const domEl = document.getElementById(modalId);
+            domEl.addEventListener('hidePrevented.bs.modal', self.cancel);
+            self.modalOpts = new bootstrap.Modal(domEl);
+            self.modalOpts.show();
         }
         else
             dDO.reject(errInvalidXML);
@@ -89,7 +92,7 @@ moduleManager.construct({
         var xlsTerms = ["xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI", CONFIG.propClassId, CONFIG.propClassType, CONFIG.resClassFolder], spD = app.ontology.generateSpecifClasses({ terms: xlsTerms });
         spD.title = [{ text: "SpecIF Classes for prostep iViP DDP (Data Model)" }];
         spD.description = [{ text: "SpecIF Classes derived from DDP Schema Version 2.0 created 10.03.2023 08:09:28 by Michael Kirsch, :em engineering methods AG on behalf of prostep iViP Association" }];
-        spD.id = "P-DDP-Schema-V20";
+        spD.id = "P-DDP-Classes-V20";
         spD.createdAt = new Date().toISOString();
         let parser = new DOMParser(), xsdDoc = parser.parseFromString(xsd, "text/xml");
         let dictionaryEntities = Array.from(xsdDoc.getElementsByTagName('xs:schema')[0].children)

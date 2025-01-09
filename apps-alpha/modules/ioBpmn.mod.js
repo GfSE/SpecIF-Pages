@@ -12,7 +12,6 @@ moduleManager.construct({
     var options, fDate, fName, data, bDO;
     self.init = function (opts) {
         options = opts;
-        $('#app').after('<div id="bpmnView"></div>');
         return true;
     };
     self.verify = function (f) {
@@ -58,6 +57,8 @@ moduleManager.construct({
                 type: mMime,
                 changedAt: fDate
             });
+        if (!document.querySelector("#bpmnView"))
+            $('#app').after('<div id="bpmnView"></div>');
         bpmn2svg(xml).then((result) => {
             data.files.push({
                 id: 'F-' + simpleHash(iName),
@@ -74,6 +75,7 @@ moduleManager.construct({
                 bDO.resolve(data);
             else
                 bDO.reject(new resultMsg(999, 'Input file could not be transformed to SpecIF'));
+            $("#bpmnView").remove();
         }
     };
     self.abort = function () {

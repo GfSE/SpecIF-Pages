@@ -64,7 +64,8 @@ CONFIG.prefixH = "H-";
 CONFIG.prefixN = "N-";
 CONFIG.prefixV = "V-";
 CONFIG.idProperties = [
-    'dcterms:identifier'
+    'dcterms:identifier',
+    'dc.identifier'
 ];
 CONFIG.titleProperties = [
     CONFIG.propClassTitle,

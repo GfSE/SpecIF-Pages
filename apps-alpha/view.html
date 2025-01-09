@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<meta http-equiv="expires" content="0" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<link rel="shortcut icon" href="./assets/icons/favicon.ico" type="image/x-icon">
-	<link rel="icon" href="./assets/icons/favicon.ico" type="image/x-icon">
+    <title>SpecIF Viewer</title>
+    <meta name="description" content="An app for your web-browser to view system specifications">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta http-equiv="expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="./assets/icons/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="./assets/icons/favicon.ico" type="image/x-icon">
 </head>
 <body>
 
@@ -23,9 +25,10 @@
     // This is a template for SpecIF apps.
     // To create a new SpecIF app:
     // - copy this file and rename it with the desired app title
+    // - set a meaningful <title> metatag
     // - in the moduleTree below, include the modules to load for the particular app.
 
-    // The App-specific code called by the moduleManager after initializing;
+    // The App-specific code follows and is called by the moduleManager after initializing;
     // self.moduleTree defines the modules to load:
     function SpecifApp() {
         "use strict";

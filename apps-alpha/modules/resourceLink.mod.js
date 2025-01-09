@@ -99,7 +99,7 @@ moduleManager.construct({
                         + makeTextField(i18n.TabFilter, '', { typ: 'line', handle: myFullName + '.filterClicked()', classes: 'mt-1' })
                         + '</div>'
                         + '<div class="col-xl-6">'
-                        + '<div class="mt-1"><em>' + i18n.MsgSelectResource + ':</em></div>'
+                        + '<div class="mt-1 text-primary"><em>' + i18n.MsgSelectResource + ':</em></div>'
                         + '<div id="resCandidates" style="max-height:' + ($('#app').outerHeight(true) - 250) + 'px; overflow:auto" ></div>'
                         + '</div>'
                         + '</div>'
@@ -136,7 +136,7 @@ moduleManager.construct({
                     || candidateMayBeSubject(self.selectedStatementClass, res))) {
                 let ti = cData.instanceTitleOf(res, $.extend({}, opts, { neverEmpty: true }));
                 if (reTi.test(ti))
-                    eligibleRs += '<div id="cand-' + i + '" class="candidates" onclick="' + myFullName + '.itemClicked(\'' + i + '\')">' + ti + '</div>';
+                    eligibleRs += '<div id="cand-' + i + '" class="candidates text-black bg-white" onclick="' + myFullName + '.itemClicked(\'' + i + '\')">' + ti + '</div>';
             }
         });
         document.getElementById("resCandidates").innerHTML = eligibleRs || "<em>" + i18n.MsgNoMatchingObjects + "</em>";
@@ -145,14 +145,18 @@ moduleManager.construct({
     };
     self.itemClicked = (idx) => {
         if (self.selectedCandidate && !LIB.equalKey(self.selectedCandidate.resource, self.allResources[idx])) {
-            self.selectedCandidate.div.style.background = 'white';
-            self.selectedCandidate.div.style.color = 'black';
+            self.selectedCandidate.domEl.classList.remove("text-white");
+            self.selectedCandidate.domEl.classList.add("text-black");
+            self.selectedCandidate.domEl.classList.remove("bg-secondary");
+            self.selectedCandidate.domEl.classList.add("bg-white");
         }
         ;
         let el = document.getElementById("cand-" + idx);
-        el.style.background = CONFIG.focusColor;
-        el.style.color = 'white';
-        self.selectedCandidate = { resource: self.allResources[idx], div: el };
+        el.classList.remove("text-black");
+        el.classList.add("text-white");
+        el.classList.remove("bg-white");
+        el.classList.add("bg-secondary");
+        self.selectedCandidate = { resource: self.allResources[idx], domEl: el };
         let btn = document.getElementById("btn-modal-saveResourceAsObject");
         if (candidateMayBeObject(self.selectedStatementClass, self.selectedCandidate.resource)) {
             btn.disabled = false;

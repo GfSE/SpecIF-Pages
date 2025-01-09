@@ -82,7 +82,7 @@ class Browser {
 }
 var app, browser, i18n, message, moduleManager = function () {
     var self = {};
-    let callWhenReady, loadPath = './';
+    let callWhenReady, loadPath = './', pend = 0;
     self.init = (opts) => {
         browser = new Browser();
         if (browser.isIE()) {
@@ -96,28 +96,24 @@ var app, browser, i18n, message, moduleManager = function () {
             loadPath = opts.path;
         self.registered = [];
         self.ready = [];
-        loadL(['bootstrap', 'font', 'types', 'i18n'], { done: init2 });
+        let initL = ['bootstrap', 'font', 'types', 'standards', 'i18n', 'helper', "xSpecif", 'ioOntology'];
+        if (CONFIG.convertMarkdown)
+            initL.push('markdown');
+        loadL(initL, { done: createApp });
         return;
-        function init2() {
-            let modL = ['helper', 'ioOntology', 'standards', "xSpecif"];
-            if (CONFIG.convertMarkdown)
-                modL.push('markdown');
-            loadL(modL, {
-                done: () => {
-                    app = window['SpecifApp']();
-                    app.busy = new State({
-                        showWhenSet: ['#spinner'],
-                        hideWhenSet: ['.pageActions', '.contentActions']
-                    });
-                    window.onresize = doResize;
-                }
+        function createApp() {
+            app = window['SpecifApp']();
+            app.busy = new State({
+                showWhenSet: ['#spinner'],
+                hideWhenSet: ['.pageActions', '.contentActions']
             });
+            window.onresize = doResize;
         }
         function loadL(L, opts) {
             if (opts && typeof (opts.done) == "function")
                 callWhenReady = opts.done;
             else
-                callWhenReady = undefined;
+                throw Error("No callback provided to continue after initializing.");
             L.forEach((e) => { loadModule(e); });
         }
     };
@@ -304,6 +300,7 @@ var app, browser, i18n, message, moduleManager = function () {
         ;
         return;
         function ldM(mod) {
+            pend++;
             switch (mod) {
                 case "font":
                     getStyle("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css");
@@ -482,7 +479,8 @@ var app, browser, i18n, message, moduleManager = function () {
                     .done(() => { setReady(module.name); });
         }
         function loadAfterRequiredModules(mod, fn) {
-            if (!Array.isArray(mod.requires) || LIB.containsAllStrings(self.ready, mod.requires))
+            if ((!Array.isArray(mod.requires) || LIB.containsAllStrings(self.ready, mod.requires))
+                && pend < 9)
                 fn(mod.name);
             else
                 setTimeout(function () { loadAfterRequiredModules(mod, fn); }, 33);
@@ -496,15 +494,20 @@ var app, browser, i18n, message, moduleManager = function () {
     }
     function setReady(mod) {
         if (self.ready.indexOf(mod) < 0) {
+            pend--;
             self.ready.push(mod);
             console.info("Loaded module '" + mod + "' (" + self.ready.length + " of " + self.registered.length + ").");
         }
         else
             throw Error("Module '" + mod + "' cannot be set 'ready' more than once");
         if (self.registered.length === self.ready.length) {
-            getStyle(loadPath + 'assets/stylesheets/SpecIF.default.css');
-            initModuleTree(self.tree);
-            console.info("All " + self.ready.length + " modules loaded --> ready!");
+            if (self.tree) {
+                getStyle(loadPath + 'assets/stylesheets/SpecIF.default.css');
+                initModuleTree(self.tree);
+                console.info("All " + self.ready.length + " modules loaded --> ready!");
+            }
+            else
+                console.info("Initialization completed!");
             if (typeof (callWhenReady) == 'function')
                 callWhenReady();
             else
