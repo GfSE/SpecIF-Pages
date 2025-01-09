@@ -1,5 +1,5 @@
 "use strict";
-function LanguageTextsEn() {
+var i18n = function () {
     var self = {};
     self.lookup = function (lb, pA) {
         if (lb) {
@@ -324,5 +324,4 @@ function LanguageTextsEn() {
     self.LblEditor = 'SpecIF Model-Integrator and Editor';
     self.LblSheet2reqif = 'Sheet → ReqIF';
     return self;
-}
-;
+}();

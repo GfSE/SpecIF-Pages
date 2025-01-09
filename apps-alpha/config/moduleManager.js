@@ -80,7 +80,7 @@ class Browser {
         return /MSIE |rv:11.0/i.test(navigator.userAgent);
     }
 }
-var app, browser, i18n, message, moduleManager = function () {
+var app, browser, message, moduleManager = function () {
     var self = {};
     let callWhenReady, loadPath = './', pend = 0;
     self.init = (opts) => {
@@ -343,15 +343,12 @@ var app, browser, i18n, message, moduleManager = function () {
                 case "i18n":
                     switch (browser.language.slice(0, 2)) {
                         case 'de':
-                            getScript(loadPath + 'config/locales/iLaH-de.i18n.js')
-                                .done(() => { i18n = LanguageTextsDe(); });
+                            getScript(loadPath + 'config/locales/iLaH-de.i18n.js');
                             break;
                         case 'fr':
-                            getScript(loadPath + 'config/locales/iLaH-fr.i18n.js')
-                                .done(() => { i18n = LanguageTextsFr(); });
+                            getScript(loadPath + 'config/locales/iLaH-fr.i18n.js');
                             break;
-                        default: getScript(loadPath + 'config/locales/iLaH-en.i18n.js')
-                            .done(() => { i18n = LanguageTextsEn(); });
+                        default: getScript(loadPath + 'config/locales/iLaH-en.i18n.js');
                     }
                     ;
                     return true;

@@ -1,5 +1,5 @@
 "use strict";
-function LanguageTextsFr() {
+var i18n = function () {
     var self = {};
     self.lookup = function (lb, pA) {
         if (lb) {
@@ -324,5 +324,4 @@ function LanguageTextsFr() {
     self.LblEditor = 'Intégrateur de Modèles et Editeur SpecIF';
     self.LblSheet2reqif = 'Sheet → ReqIF';
     return self;
-}
-;
+}();
