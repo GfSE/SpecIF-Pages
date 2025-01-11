@@ -303,7 +303,7 @@ var app, browser, message, moduleManager = function () {
             pend++;
             switch (mod) {
                 case "font":
-                    getStyle("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css");
+                    getStyle("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css");
                     setReady(mod);
                     return true;
                 case "bootstrap":
@@ -312,8 +312,8 @@ var app, browser, message, moduleManager = function () {
                     return true;
                 case "tree":
                     loadModule('helperTree');
-                    getStyle("https://cdn.jsdelivr.net/npm/jqtree@1.8.7/jqtree.css");
-                    getScript('https://cdn.jsdelivr.net/npm/jqtree@1.8.7/tree.jquery.js');
+                    getStyle("https://cdn.jsdelivr.net/npm/jqtree@1.8.10/jqtree.css");
+                    getScript('https://cdn.jsdelivr.net/npm/jqtree@1.8.10/tree.jquery.js');
                     return true;
                 case "fileSaver":
                     getScript('https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js');
@@ -552,8 +552,7 @@ class State {
 function doResize() {
     let wH = window.innerHeight
         || document.documentElement.clientHeight
-        || document.body.clientHeight, hH = $('#pageHeader').outerHeight(true)
-        + ($('.nav-tabs').outerHeight(true) | 0), pH = wH - hH;
+        || document.body.clientHeight, hH = LIB.getHeight('#pageHeader') + LIB.getHeight('.nav-tabs'), pH = wH - hH;
     $('.content').outerHeight(pH);
     $('.contentWide').outerHeight(pH);
     $('.pane-tree').outerHeight(pH);

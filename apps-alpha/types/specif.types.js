@@ -12,6 +12,7 @@ var XsDataType;
 })(XsDataType || (XsDataType = {}));
 var SpecifInstantiation;
 (function (SpecifInstantiation) {
+    SpecifInstantiation[SpecifInstantiation["Never"] = 'never'] = "Never";
     SpecifInstantiation[SpecifInstantiation["Auto"] = 'auto'] = "Auto";
     SpecifInstantiation[SpecifInstantiation["User"] = 'user'] = "User";
 })(SpecifInstantiation || (SpecifInstantiation = {}));

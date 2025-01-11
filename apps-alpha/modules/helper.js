@@ -25,7 +25,7 @@ function makeTextField(tag, val, opts) {
             throw Error("Invalid display option '" + opts.tagPos + "' when showing a text form");
     }
     ;
-    val = LIB.noCode(val || '');
+    val = LIB.noCode(val ?? '');
     switch (opts.typ) {
         case 'line':
             fG += '<div class="' + aC + '">'
@@ -47,7 +47,7 @@ function makeTextField(tag, val, opts) {
     return fG;
 }
 function setTextValue(tag, val) {
-    val = LIB.noCode(val || '');
+    val = LIB.noCode(val ?? '');
     let el = document.getElementById('field' + simpleHash(tag));
     if (el && el.nodeName && el.nodeName.toLowerCase() == 'div') {
         el.innerHTML = val;
@@ -91,7 +91,7 @@ function setTextState(tag, state) {
 }
 function textValue(tag) {
     try {
-        return LIB.noCode(document.getElementById('field' + simpleHash(tag)).value).escapeJSON() || '';
+        return LIB.noCode(document.getElementById('field' + simpleHash(tag)).value).escapeJSON() ?? '';
     }
     catch (e) {
         return '';
@@ -105,12 +105,15 @@ function getTextLength(tag) {
         return -1;
     }
 }
+LIB.getHeight = (elm) => {
+    return $(elm).outerHeight(true) ?? 0;
+};
 function makeRadioField(tag, entries, opts) {
     if (!opts)
         opts = {};
     switch (opts.typ) {
         case 'display':
-            return '<div class="attribute ' + (opts.classes || '') + '">'
+            return '<div class="attribute ' + (opts.classes ?? '') + '">'
                 + '<div class="attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
                 + '<div class="attribute-value" >'
                 + function () {
@@ -128,7 +131,7 @@ function makeRadioField(tag, entries, opts) {
         opts.tagPos = 'left';
     if (typeof (opts.classes) != 'string')
         opts.classes = 'form-active';
-    let rB = '<div class="form-group mt-1 ' + (opts.classes || '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
+    let rB = '<div class="form-group mt-1 ' + (opts.classes ?? '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
     switch (opts.tagPos) {
         case 'none':
             rB += '<div class="radio" >';
@@ -150,7 +153,7 @@ function makeRadioField(tag, entries, opts) {
     });
     entries.forEach((e, i) => {
         rB += '<label>'
-            + '<input type="radio" name="radio' + simpleHash(tag) + '" value="' + (e.id || i) + '"' + (e.checked ? ' checked' : '') + fn + ' />'
+            + '<input type="radio" name="radio' + simpleHash(tag) + '" value="' + (e.id ?? i) + '"' + (e.checked ? ' checked' : '') + fn + ' />'
             + '<span ' + popOver(e.description) + '>'
             + '&#160;' + e.title
             + (e.type ? '&#160;(' + e.type + ')' : '')
@@ -162,14 +165,14 @@ function makeRadioField(tag, entries, opts) {
     return rB;
 }
 function radioValue(tag) {
-    return $('input[name="radio' + simpleHash(tag) + '"]:checked').attr('value') || '';
+    return $('input[name="radio' + simpleHash(tag) + '"]:checked').attr('value') ?? '';
 }
 function makeCheckboxField(tag, entries, opts) {
     if (!opts)
         opts = {};
     switch (opts.typ) {
         case 'display':
-            return '<div class="attribute ' + (opts.classes || '') + '">'
+            return '<div class="attribute ' + (opts.classes ?? '') + '">'
                 + '<div class="attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
                 + '<div class="attribute-value" >'
                 + function () {
@@ -187,7 +190,7 @@ function makeCheckboxField(tag, entries, opts) {
         opts.tagPos = 'left';
     if (typeof (opts.classes) != 'string')
         opts.classes = 'form-active';
-    let cB = '<div class="form-group mt-1 ' + (opts.classes || '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
+    let cB = '<div class="form-group mt-1 ' + (opts.classes ?? '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
     switch (opts.tagPos) {
         case 'none':
             cB += '<div class="checkbox" >';
@@ -202,7 +205,7 @@ function makeCheckboxField(tag, entries, opts) {
     ;
     entries.forEach((e, i) => {
         cB += '<label>'
-            + '<input type="checkbox" name="checkbox' + simpleHash(tag) + '" value="' + (e.id || i) + '"' + (e.checked ? ' checked' : '') + fn + ' />'
+            + '<input type="checkbox" name="checkbox' + simpleHash(tag) + '" value="' + (e.id ?? i) + '"' + (e.checked ? ' checked' : '') + fn + ' />'
             + '<span ' + popOver(e.description) + '>'
             + '&#160;' + e.title
             + (e.type ? '&#160;(' + e.type + ')' : '')
@@ -249,12 +252,7 @@ function booleanValue(tag) {
     return chd.length > 0;
 }
 function tagId(str) {
-    return 'X-' + simpleHash(str || '');
-}
-function setStyle(sty) {
-    let css = document.createElement('style');
-    css.innerHTML = sty;
-    document.head.appendChild(css);
+    return 'X-' + simpleHash(str ?? '');
 }
 class CCheckDialogInput {
     constructor() {
@@ -302,7 +300,7 @@ class resultMsg {
         this.response = resp;
     }
     asString() {
-        return this.statusText + " (" + this.status + (this.responseType == 'text' ? "): " + (this.response || this.responseText) : ")");
+        return this.statusText + " (" + this.status + (this.responseType == 'text' ? "): " + (this.response ?? this.responseText) : ")");
     }
     log() {
         console.log(this.asString());
@@ -314,7 +312,7 @@ class resultMsg {
     }
 }
 LIB.stdError = (xhr, cb) => {
-    let xhrCl = new resultMsg(xhr.status, xhr.statusText, xhr.responseType, xhr.responseType == 'text' ? (xhr.response || xhr.responseText) : '');
+    let xhrCl = new resultMsg(xhr.status, xhr.statusText, xhr.responseType, xhr.responseType == 'text' ? (xhr.response ?? xhr.responseText) : '');
     switch (xhr.status) {
         case 0:
         case 200:
@@ -374,9 +372,9 @@ class CMessage {
                 if (msg.status) {
                     if (!opts.severity)
                         opts.severity = msg.status < 202 ? 'success' : 'danger';
-                    msg = (msg.statusText || i18n.Error)
+                    msg = (msg.statusText ?? i18n.Error)
                         + " (" + msg.status
-                        + (msg.responseType == 'text' ? "): " + (msg.response || msg.responseText) : ")");
+                        + (msg.responseType == 'text' ? "): " + (msg.response ?? msg.responseText) : ")");
                     break;
                 }
                 ;
@@ -534,7 +532,7 @@ LIB.isEqualStringL = (refL, newL) => {
     return true;
 };
 LIB.versionOf = (spD) => {
-    return spD.specifVersion || RE.versionFromPath.exec(spD['$schema'])[1];
+    return spD.specifVersion ?? RE.versionFromPath.exec(spD['$schema'])[1];
 };
 LIB.hasContent = (pV) => {
     if (typeof (pV) != "string"
@@ -992,7 +990,7 @@ String.prototype.toSpecifId = function () {
     return (/[^_a-zA-Z]/.test(this[0]) ? '_' : '') + this.replace(/[^_a-zA-Z\d.-]/g, '_');
 };
 String.prototype.stripHTML = function () {
-    return $("<dummy/>").html(this).text().trim() || '';
+    return $("<dummy/>").html(this).text().trim() ?? '';
 };
 String.prototype.stripCtrl = function () {
     return this.replace(/\n|\r|\t|\b|\f|\v/g, '');
@@ -1318,7 +1316,7 @@ LIB.createProp = (pC, key) => {
     let _pC = Array.isArray(pC) ? LIB.itemByKey(pC, key) : pC;
     return {
         class: LIB.keyOf(_pC),
-        values: _pC.values || []
+        values: _pC.values ?? []
     };
 };
 LIB.propByTitle = (itm, pN, dta) => {

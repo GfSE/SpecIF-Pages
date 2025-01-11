@@ -189,7 +189,7 @@ class CResourceToEdit {
                 + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" > </button>'
                 + '</div>'
                 + '<div class="modal-body" >'
-                + '<div style="max-height:' + ($('#app').outerHeight(true) - 220) + 'px; overflow:auto" >'
+                + '<div style="max-height:' + (LIB.getHeight('#app') - 220) + 'px; overflow:auto" >'
                 + function () {
                     let form = '';
                     self.properties.forEach((p) => { form += p.editField(editOpts); });
@@ -413,7 +413,9 @@ moduleManager.construct({
                                 + '<button id="selRCclose" type="button" class="btn-close" aria-label="Close" > </button>'
                                 + '</div>'
                                 + '<div class="modal-body" >'
+                                + '<div style="max-height:' + (LIB.getHeight('#app') - 220) + 'px; overflow:auto" >'
                                 + makeRadioField(i18n.LblResourceClass, resClasses)
+                                + '</div>'
                                 + '</div>'
                                 + '<div class="modal-footer" >'
                                 + '<button id="selRCcancel" type="button" class="btn btn-secondary">' + i18n.BtnCancel + '</button>'
