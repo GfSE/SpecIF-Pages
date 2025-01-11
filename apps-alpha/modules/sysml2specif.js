@@ -311,7 +311,7 @@ function sysml2specif(xmi, options) {
                             case "uml:Realization":
                                 let sbjR = ch.getElementsByTagName('client')[0].getAttribute("xmi:idref"), objR = ch.getElementsByTagName('supplier')[0].getAttribute("xmi:idref"), staR = {
                                     id: ch.getAttribute("xmi:id"),
-                                    class: LIB.makeKey(idStatementClassRealizes || idStatementClassAssociatedWith),
+                                    class: LIB.makeKey(idStatementClassRealizes ?? idStatementClassAssociatedWith),
                                     subject: LIB.makeKey(sbjR),
                                     object: LIB.makeKey(objR),
                                     changedAt: opts.fileDate
@@ -495,7 +495,7 @@ function sysml2specif(xmi, options) {
                                         values: [[{ text: "uml:Port" }]]
                                     }, {
                                         class: LIB.makeKey("PC-UmlIsservice"),
-                                        values: [oA.getAttribute("isService") || "true"]
+                                        values: [oA.getAttribute("isService") ?? "true"]
                                     }],
                                 changedAt: opts.fileDate
                             };
@@ -527,7 +527,7 @@ function sysml2specif(xmi, options) {
                 if (aEnds.length == 1) {
                     spD.statements.push({
                         id: aId,
-                        class: LIB.makeKey(aEnds[0].associationType || (sC ? sC.id : undefined) || idStatementClassAssociatedWith),
+                        class: LIB.makeKey(aEnds[0].associationType ?? (sC ? sC.id : undefined) ?? idStatementClassAssociatedWith),
                         properties: prpL ? prpL : undefined,
                         subject: LIB.makeKey(aEnds[0].thisEnd),
                         object: LIB.makeKey(aEnds[0].otherEnd),
@@ -543,7 +543,7 @@ function sysml2specif(xmi, options) {
                             obj = aEnds[1].otherEnd;
                         }
                         else {
-                            cl = aEnds[0].associationType || (sC ? sC.id : undefined) || idStatementClassAssociatedWith;
+                            cl = aEnds[0].associationType ?? (sC ? sC.id : undefined) ?? idStatementClassAssociatedWith;
                             sbj = aEnds[0].thisEnd;
                             obj = aEnds[0].otherEnd;
                         }
