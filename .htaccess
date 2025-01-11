@@ -1,3 +1,0 @@
-Options +FollowSymLinks
-RewriteEngine On
-RewriteRule ^app-alpha/(.*)$ /v1.2/apps/$1 [R=301,NC,L]
