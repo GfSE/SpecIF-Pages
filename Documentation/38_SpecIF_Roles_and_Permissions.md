@@ -19,10 +19,16 @@ If no permission by class is granted at all, access is *prohibited*.
 If no permission by hierarchy is defined at all, access is *allowed*.  
 
 Permissions are inherited:
-- By Class: project ← resourceClass ← propertyClass or project ← statementClass ← propertyClass. 
-A permission granted at project level is inherited by all instances; where permissions at a lower level override a permission at a higher level.
-- By Hierarchy: A node inherits all permissions of the parent node, unless permissions of its own are defined.
-A permission granted at project level is inherited by all instances; where permissions at a lower level override a permission at a higher level.
+<ul>
+<li>By Class: 
+  <ul>
+    <li>project ← resourceClass ← propertyClass or</li>
+    <li>project ← statementClass ← propertyClass.</li>
+  </ul>
+A permission granted at project level is inherited by all instances; where permissions at a lower level override a permission at a higher level.</li>
+<li>By Hierarchy: A node inherits all permissions of the parent node, unless permissions of its own are defined.
+A permission granted at project level is inherited by all instances; where permissions at a lower level override a permission at a higher level.</li>
+</ul>
 
 Thus, the permissions of an individual *resource* are derived from both its class tree and the hierarchy tree with its nodes.
 The permissions of an individual *statement* are just derived from its class tree.
