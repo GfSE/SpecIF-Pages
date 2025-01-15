@@ -22,7 +22,7 @@ Permissions are inherited:
 <ul>
 <li>By Class: 
   <ul>
-    <li>project ← resourceClass ← propertyClass or</li>
+    <li>project ← resourceClass ← propertyClass resp.</li>
     <li>project ← statementClass ← propertyClass.</li>
   </ul>
 A permission granted at project level is inherited by all instances; where permissions at a lower level override a permission at a higher level.</li>
