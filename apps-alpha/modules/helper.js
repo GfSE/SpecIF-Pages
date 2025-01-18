@@ -9,7 +9,7 @@ function makeTextField(tag, val, opts) {
     if (typeof (opts.tagPos) != 'string')
         opts.tagPos = 'left';
     let fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' oninput="' + opts.handle + '"' : '', sH = simpleHash(tag), fG, cl = (typeof (opts.classes) == 'string' && opts.classes.length > 0) ? ' ' + opts.classes : '', aC;
-    if (opts.typ && ['line', 'area'].includes(opts.typ))
+    if (opts.typ && ['line', 'area', 'outer'].includes(opts.typ))
         fG = '<div id="' + sH + '" class="form-group form-active mt-1' + cl + '" >';
     else
         fG = '<div class="attribute mt-1' + cl + '" >';
@@ -25,7 +25,8 @@ function makeTextField(tag, val, opts) {
             throw Error("Invalid display option '" + opts.tagPos + "' when showing a text form");
     }
     ;
-    val = LIB.noCode(val ?? '');
+    if (opts.typ && !['outer'].includes(opts.typ))
+        val = LIB.noCode(val ?? '');
     switch (opts.typ) {
         case 'line':
             fG += '<div class="' + aC + '">'
@@ -37,6 +38,11 @@ function makeTextField(tag, val, opts) {
         case 'area':
             fG += '<div class="' + aC + '">'
                 + '<textarea id="field' + sH + '" class="form-control" rows="7"' + fn + '>' + val + '</textarea>'
+                + '</div>';
+            break;
+        case 'outer':
+            fG += '<div class="' + aC + '">'
+                + val
                 + '</div>';
             break;
         default:
@@ -105,12 +111,9 @@ function getTextLength(tag) {
         return -1;
     }
 }
-LIB.getHeight = (elm) => {
-    return $(elm).outerHeight(true) ?? 0;
-};
-function makeRadioField(tag, entries, opts) {
-    if (!opts)
-        opts = {};
+function makeSelectionField(tag, entries, opts) {
+    if (!opts || !opts.kind || !['radio', 'checkbox'].includes(opts.kind))
+        throw Error("Kind of selection field must be either 'radio' or 'checkbox'");
     switch (opts.typ) {
         case 'display':
             return '<div class="attribute ' + (opts.classes ?? '') + '">'
@@ -134,26 +137,29 @@ function makeRadioField(tag, entries, opts) {
     let rB = '<div class="form-group mt-1 ' + (opts.classes ?? '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
     switch (opts.tagPos) {
         case 'none':
-            rB += '<div class="radio" >';
+            rB += '<div class="' + opts.kind + '" >';
             break;
         case 'left':
             rB += '<div class="attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
-                + '<div class="attribute-value radio" >';
+                + '<div class="attribute-value ' + opts.kind + '" >';
             break;
         default:
-            throw Error("Invalid display option '" + opts.tagPos + "' when showing a radio form");
+            throw Error("Invalid display option '" + opts.tagPos + "' when showing a '" + opts.kind + "' form");
     }
     ;
-    let found = false, temp;
-    entries.forEach((e) => {
-        temp = found || !!e.checked;
-        if (found && e.checked)
-            e.checked = false;
-        found = temp;
-    });
+    if (opts.kind == 'radio') {
+        let found = false, temp;
+        entries.forEach((e) => {
+            temp = found || !!e.checked;
+            if (found && e.checked)
+                e.checked = false;
+            found = temp;
+        });
+    }
+    ;
     entries.forEach((e, i) => {
         rB += '<label>'
-            + '<input type="radio" name="radio' + simpleHash(tag) + '" value="' + (e.id ?? i) + '"' + (e.checked ? ' checked' : '') + fn + ' />'
+            + '<input type="' + opts.kind + '" name="' + opts.kind + '' + simpleHash(tag) + '" value="' + (e.id ?? i) + '"' + (e.checked ? ' checked' : '') + fn + ' />'
             + '<span ' + popOver(e.description) + '>'
             + '&#160;' + e.title
             + (e.type ? '&#160;(' + e.type + ')' : '')
@@ -164,57 +170,20 @@ function makeRadioField(tag, entries, opts) {
         + '</div>';
     return rB;
 }
+function makeRadioField(tag, entries, opts) {
+    if (!opts)
+        opts = {};
+    opts.kind = 'radio';
+    return makeSelectionField(tag, entries, opts);
+}
 function radioValue(tag) {
     return $('input[name="radio' + simpleHash(tag) + '"]:checked').attr('value') ?? '';
 }
 function makeCheckboxField(tag, entries, opts) {
     if (!opts)
         opts = {};
-    switch (opts.typ) {
-        case 'display':
-            return '<div class="attribute ' + (opts.classes ?? '') + '">'
-                + '<div class="attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
-                + '<div class="attribute-value" >'
-                + function () {
-                    let vals = '';
-                    entries.forEach((e) => {
-                        vals += (e.checked ? (vals.length > 0 ? ', ' : '') + e.title : '');
-                    });
-                    return vals;
-                }()
-                + '</div>'
-                + '</div>';
-    }
-    ;
-    if (typeof (opts.tagPos) != 'string')
-        opts.tagPos = 'left';
-    if (typeof (opts.classes) != 'string')
-        opts.classes = 'form-active';
-    let cB = '<div class="form-group mt-1 ' + (opts.classes ?? '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
-    switch (opts.tagPos) {
-        case 'none':
-            cB += '<div class="checkbox" >';
-            break;
-        case 'left':
-            cB += '<div class="attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
-                + '<div class="attribute-value checkbox" >';
-            break;
-        default:
-            throw Error("Invalid display option '" + opts.tagPos + "' when showing a checkbox form");
-    }
-    ;
-    entries.forEach((e, i) => {
-        cB += '<label>'
-            + '<input type="checkbox" name="checkbox' + simpleHash(tag) + '" value="' + (e.id ?? i) + '"' + (e.checked ? ' checked' : '') + fn + ' />'
-            + '<span ' + popOver(e.description) + '>'
-            + '&#160;' + e.title
-            + (e.type ? '&#160;(' + e.type + ')' : '')
-            + '</span>'
-            + '</label><br />';
-    });
-    cB += '</div>'
-        + '</div>';
-    return cB;
+    opts.kind = 'checkbox';
+    return makeSelectionField(tag, entries, opts);
 }
 function checkboxValues(tag) {
     let chd = $('input[name="checkbox' + simpleHash(tag) + '"]:checked');
@@ -960,6 +929,9 @@ LIB.genID = (pfx) => {
     for (var i = CONFIG.genIdLength; i > 0; --i)
         result += chars[Math.round(Math.random() * (chars.length - 1))];
     return pfx + result;
+};
+LIB.getHeight = (elm) => {
+    return $(elm).outerHeight(true) ?? 0;
 };
 String.prototype.toCamelCase = function () {
     let str = this.replace(/[^a-z\d \:\.]/ig, ''), parts, res = '';

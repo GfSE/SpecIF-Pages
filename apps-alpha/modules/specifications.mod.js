@@ -891,7 +891,7 @@ moduleManager.construct({
         if (!self.parent.tree.selectedNode)
             self.parent.tree.selectFirstNode();
         var nL;
-        getPermissionsPrj();
+        getPermissionsRes();
         getNextResources()
             .then(renderNextResources, (err) => {
             if (err.status == 744) {
@@ -964,7 +964,7 @@ moduleManager.construct({
             return rB + '</div>';
         }
         ;
-        function getPermissionsPrj() {
+        function getPermissionsRes() {
             if (app.title != i18n.LblReader) {
                 self.resCreClasses.length = 0;
                 selPrj.cache.get('resourceClass', selPrj.resourceClasses)
@@ -1040,6 +1040,7 @@ moduleManager.construct({
     var myName = self.loadAs, myFullName = 'app.' + myName, selPrj, cacheData, selRes, net, modeStaDel = false;
     self.staCreClasses = { subjectClasses: [], objectClasses: [] };
     self.staCre = false;
+    self.staDelClasses = [];
     self.staDel = false;
     self.init = () => {
         return true;
@@ -1083,7 +1084,7 @@ moduleManager.construct({
             .then((rResL) => {
             rResL.forEach((r) => { cacheMinRes(net, r); });
             selRes = LIB.itemByKey(rResL, nd.ref);
-            getPermissions(selRes);
+            getPermissionsSta(selRes);
             return getMentionsRels(selRes, opts);
         })
             .then((stL) => {
@@ -1178,32 +1179,50 @@ moduleManager.construct({
         var rB = '<div id="linkBtns" class="btn-group" role="group" style="position:absolute;top:4px;right:4px;z-index:900">';
         if (modeStaDel)
             return rB + '<button class="btn btn-light" onclick="' + myFullName + '.toggleModeStaDel()" >' + i18n.BtnCancel + '</button></div>';
-        if (app.title != i18n.LblReader && self.staCre)
+        if (self.staCre)
             rB += '<button class="btn btn-success" onclick="' + myFullName + '.linkResource()" '
                 + 'data-toggle="popover" title="' + i18n.LblAddRelation + '" >' + i18n.IcoAdd + '</button>';
         else
-            rB += '<button disabled class="btn btn-success" >' + i18n.IcoAdd + '</button>';
-        if (app.title != i18n.LblReader && net.statements.length > 0)
+            rB += '<button disabled class="btn btn-light" >' + i18n.IcoAdd + '</button>';
+        if (self.staDel && net.statements.length > 0)
             rB += '<button class="btn btn-danger ' + (modeStaDel ? 'active' : '') + '" onclick="' + myFullName + '.toggleModeStaDel()" '
                 + 'data-toggle="popover" title="' + i18n.LblDeleteRelation + '" >' + i18n.IcoDelete + '</button>';
         else
-            rB += '<button disabled class="btn btn-danger" >' + i18n.IcoDelete + '</button>';
+            rB += '<button disabled class="btn btn-light" >' + i18n.IcoDelete + '</button>';
         return rB + '</div>';
     }
-    function getPermissions(res) {
+    function getPermissionsSta(res) {
         if (app.title != i18n.LblReader && res) {
             self.staCreClasses.subjectClasses.length = 0;
             self.staCreClasses.objectClasses.length = 0;
-            selPrj.cache.statementClasses.forEach((sC) => {
+            selPrj.cache.get('statementClass', selPrj.statementClasses)
+                .forEach((sC) => {
+                let iPrm = LIB.itemBy(selPrj.myPermissions, 'item', sC.id);
+                if (iPrm)
+                    sC.permissionVector = iPrm.permissionVector;
+                else {
+                    iPrm = LIB.itemBy(selPrj.myPermissions, 'item', selPrj.id);
+                    if (iPrm)
+                        sC.permissionVector = iPrm.permissionVector;
+                    else
+                        sC.permissionVector = noPermission;
+                }
+                ;
                 if (!sC.instantiation || sC.instantiation.includes(SpecifInstantiation.User)) {
-                    if (!sC.subjectClasses || LIB.indexByKey(sC.subjectClasses, res['class']) > -1)
-                        self.staCreClasses.subjectClasses.push(LIB.keyOf(sC));
-                    if (!sC.objectClasses || LIB.indexByKey(sC.objectClasses, res['class']) > -1)
-                        self.staCreClasses.objectClasses.push(LIB.keyOf(sC));
+                    if (sC.permissionVector.C) {
+                        if (!sC.subjectClasses || LIB.indexByKey(sC.subjectClasses, res['class']) > -1)
+                            self.staCreClasses.subjectClasses.push(LIB.keyOf(sC));
+                        if (!sC.objectClasses || LIB.indexByKey(sC.objectClasses, res['class']) > -1)
+                            self.staCreClasses.objectClasses.push(LIB.keyOf(sC));
+                    }
+                    ;
+                    if (sC.permissionVector.D)
+                        self.staDelClasses.push(sC.id);
                 }
                 ;
             });
             self.staCre = self.staCreClasses.subjectClasses.length > 0 || self.staCreClasses.objectClasses.length > 0;
+            self.staDel = self.staDelClasses.length > 0;
         }
     }
     function renderStatements(net) {

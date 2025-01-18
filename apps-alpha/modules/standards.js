@@ -25,6 +25,26 @@ class CStandards {
             fn(ctg, this.listName.get(ctg));
         return this.listName.size;
     }
+    makeTemplate() {
+        let tmp = {
+            '@Context': "http://purl.org/dc/terms/",
+            "id": "",
+            "$schema": "https://specif.de/v" + CONFIG.specifVersion + "/schema.json",
+            "title": [],
+            "description": undefined,
+            "generator": app.title,
+            "generatorVersion": CONFIG.appVersion,
+            "createdAt": new Date().toISOString(),
+            "rights": {
+                "title": "Creative Commons 4.0 CC BY-SA",
+                "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+            }
+        };
+        this.iterateLists((ctg, listName) => {
+            tmp[listName] = [];
+        });
+        return tmp;
+    }
 }
 ;
 CONFIG.propClassId = "dcterms:identifier";
@@ -39,6 +59,7 @@ CONFIG.resClassDiagram = 'SpecIF:View';
 CONFIG.resClassXlsRow = 'XLS:Resource';
 CONFIG.resClassUnreferencedResources = "SpecIF:UnreferencedResources";
 CONFIG.resClassOutline = 'SpecIF:Outline';
+CONFIG.resClassBoM = 'SpecIF:BillOfMaterials';
 CONFIG.resClassGlossary = 'SpecIF:Glossary';
 CONFIG.resClassOntology = "W3C:Ontology";
 CONFIG.resClassProcess = 'SpecIF:BusinessProcess';
@@ -82,9 +103,6 @@ CONFIG.commentProperties = [
     "ReqIF-WF.CustomerComment",
     "ReqIF-WF.SupplierComment",
     "SpecIF:Comment"
-];
-CONFIG.stereotypeProperties = [
-    'uml:Stereotype'
 ];
 CONFIG.hiddenProperties = [
     'VALUE_Table',
@@ -136,7 +154,8 @@ CONFIG.diagramClasses = [
 ];
 CONFIG.folderClasses = [
     CONFIG.resClassOutline,
-    CONFIG.resClassFolder
+    CONFIG.resClassFolder,
+    CONFIG.resClassBoM
 ];
 CONFIG.nativeProperties = new Map([
     ["dcterms:created", { name: "createdAt", type: "xs:dateTime", check: function (val) { return val.length > 0 && LIB.isIsoDateTime(val); } }],

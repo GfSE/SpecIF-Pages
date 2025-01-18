@@ -1449,7 +1449,6 @@ class CProject {
                     let localOpts = {
                         titleProperties: CONFIG.titleProperties.map((e) => { return app.ontology.localize(e, opts); }),
                         descriptionProperties: CONFIG.descProperties.map((e) => { return app.ontology.localize(e, opts); }),
-                        stereotypeProperties: CONFIG.stereotypeProperties.map((e) => { return app.ontology.localize(e, opts); }),
                         showEmptyProperties: opts.showEmptyProperties,
                         imgExtensions: CONFIG.imgExtensions,
                         applExtensions: CONFIG.applExtensions,

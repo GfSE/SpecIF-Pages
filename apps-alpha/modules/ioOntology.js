@@ -58,7 +58,7 @@ class COntology {
             "SpecIF:LifecycleStatusSubmitted",
             "SpecIF:LifecycleStatusExperimental"
         ];
-        this.data = dta;
+        let oData = this.data = dta;
         this.data.nodes = (dta.nodes || dta.hierarchies).filter((n) => {
             let r = LIB.itemByKey(dta.resources, n.resource);
             return this.valueByTitle(r, CONFIG.propClassType) == CONFIG.resClassOntology;
@@ -67,6 +67,18 @@ class COntology {
             message.show("No ontology found.", { severity: 'warning' });
             this.data = undefined;
             return;
+        }
+        ;
+        if (this.data.$schema.includes('v1.1')) {
+            this.data.$schema = this.data.$schema.replace('v1.1', 'v1.2');
+            this.data.resources.forEach((r) => {
+                r.properties.forEach((p) => {
+                    let pC = LIB.itemByKey(oData.propertyClasses, p['class']), dT = LIB.itemByKey(oData.dataTypes, pC.dataType);
+                    p.values = p.values.map((v) => {
+                        return dT.enumeration ? { id: v } : v;
+                    });
+                });
+            });
         }
         ;
         if (!this.checkConstraintsOntology()) {
@@ -289,30 +301,6 @@ class COntology {
             return [];
         }
     }
-    makeTemplate() {
-        return {
-            '@Context': "http://purl.org/dc/terms/",
-            "id": "",
-            "$schema": "https://specif.de/v" + CONFIG.specifVersion + "/schema.json",
-            "title": [],
-            "description": undefined,
-            "generator": app.title,
-            "generatorVersion": CONFIG.appVersion,
-            "createdAt": new Date().toISOString(),
-            "rights": {
-                "title": "Creative Commons 4.0 CC BY-SA",
-                "url": "https://creativecommons.org/licenses/by-sa/4.0/"
-            },
-            "dataTypes": [],
-            "propertyClasses": [],
-            "resourceClasses": [],
-            "statementClasses": [],
-            "resources": [],
-            "statements": [],
-            "files": [],
-            "nodes": []
-        };
-    }
     generateSpecifClasses(opts) {
         if (Array.isArray(opts.domains) && opts.domains.length > 0
             || Array.isArray(opts.terms) && opts.terms.length > 0) {
@@ -365,7 +353,7 @@ class COntology {
                 this.generated.hL.push(h);
             }
             ;
-            return Object.assign(opts.delta ? {} : this.makeTemplate(), opts.delta ? {} : {
+            return Object.assign(opts.delta ? {} : app.standards.makeTemplate(), opts.delta ? {} : {
                 "id": spId,
                 "title": [{
                         "text": "SpecIF Classes" + (opts.domains ? (" for " + opts.domains.toString().replace(/:/g, " ")) : ""),
@@ -388,7 +376,7 @@ class COntology {
         }
         else {
             message.show("No domain or term specified, so no classes will be generated.", { severity: 'warning' });
-            return this.makeTemplate();
+            return app.standards.makeTemplate();
         }
     }
     makeClasses(rCIdL, createFn) {

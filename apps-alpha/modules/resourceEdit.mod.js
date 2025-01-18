@@ -27,10 +27,7 @@ class CPropertyToEdit extends CPropertyToShow {
                 let val = this.dT.type == XsDataType.String ? app.ontology.localize(LIB.languageTextOf(eV.value, localOpts), localOpts) : eV.value;
                 return { title: val, id: eV.id, checked: this.enumIdL.includes(eV.id) };
             });
-            if (this.pC.multiple)
-                return makeCheckboxField(ti, entryL, this.dispOpts());
-            else
-                return makeRadioField(ti, entryL, this.dispOpts());
+            return makeSelectionField(ti, entryL, Object.assign(this.dispOpts(), { kind: this.pC.multiple ? 'checkbox' : 'radio' }));
         }
         ;
         if (this.dT.type == XsDataType.Boolean) {
@@ -42,13 +39,36 @@ class CPropertyToEdit extends CPropertyToShow {
         }
         ;
         if (this.pC.permissionVector.U) {
-            if (opts && opts.dialogForm)
-                opts.dialogForm.addField(ti, this.dT);
-            return makeTextField(ti, this.dT.type == XsDataType.String ? this.get(localOpts).escapeHTML() : this.get(localOpts), {
-                typ: this.dT.type == XsDataType.String && app.ontology.propertyClassIsText(this.pC.title) ? 'area' : 'line',
-                handle: opts.myFullName + '.check()',
-                hint: this.pC.description
-            });
+            let self = this;
+            function makeInner() {
+                let str = '';
+                self.dT.sequence.forEach((d, i) => {
+                    if (opts && opts.dialogForm)
+                        opts.dialogForm.addField(d.title, LIB.itemByKey(app.projects.selected.cache.dataTypes, d.dataType));
+                    str += makeTextField(d.title, self.values[0][i], {
+                        typ: 'line',
+                        handle: opts.myFullName + '.check()',
+                        hint: d.description
+                    });
+                });
+                return str;
+            }
+            if (this.dT.type == XsDataType.ComplexType) {
+                return makeTextField(ti, makeInner(), {
+                    typ: 'outer',
+                    hint: this.pC.description
+                });
+            }
+            else {
+                if (opts && opts.dialogForm)
+                    opts.dialogForm.addField(ti, this.dT);
+                return makeTextField(ti, this.dT.type == XsDataType.String ? this.get(localOpts).escapeHTML() : this.get(localOpts), {
+                    typ: this.dT.type == XsDataType.String && app.ontology.propertyClassIsText(this.pC.title) ? 'area' : 'line',
+                    handle: opts.myFullName + '.check()',
+                    hint: this.pC.description
+                });
+            }
+            ;
         }
         else {
             return makeTextField(ti, this.get(localOpts), {
@@ -154,6 +174,7 @@ class CPropertyToEdit extends CPropertyToShow {
             case XsDataType.Boolean:
                 val = booleanValue(ti).toString();
                 return { class: LIB.makeKey(this.pC.id), values: [val] };
+            case XsDataType.ComplexType:
             default:
                 val = textValue(ti);
                 return { class: LIB.makeKey(this.pC.id), values: (LIB.hasContent(val) ? [val] : []) };
@@ -414,7 +435,7 @@ moduleManager.construct({
                                 + '</div>'
                                 + '<div class="modal-body" >'
                                 + '<div style="max-height:' + (LIB.getHeight('#app') - 220) + 'px; overflow:auto" >'
-                                + makeRadioField(i18n.LblResourceClass, resClasses)
+                                + makeSelectionField(i18n.LblResourceClass, resClasses, { kind: 'radio' })
                                 + '</div>'
                                 + '</div>'
                                 + '<div class="modal-footer" >'

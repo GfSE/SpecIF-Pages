@@ -649,7 +649,7 @@ class CSpecIF {
     toExt(opts) {
         return new Promise((resolve, reject) => {
             let self = this, pend = 0;
-            let spD = Object.assign(app.ontology.makeTemplate(), {
+            let spD = Object.assign(app.standards.makeTemplate(), {
                 id: this.id,
                 title: LIB.selectTargetLanguage(this.title, opts)
             });

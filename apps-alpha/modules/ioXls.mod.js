@@ -45,7 +45,8 @@ moduleManager.construct({
     return self;
     function xlsx2specif(buf, prjN, chAt) {
         "use strict";
-        let ontologyStatementClasses = app.ontology.getTerms('statementClass');
+        const ontologyStatementClasses = app.ontology.getTerms('statementClass');
+		console.debug('ontologyStatementClasses',ontologyStatementClasses);
         class Coord {
             constructor(addr) {
                 let res = addr.match(/([A-Z]+)(\d+)/);
@@ -182,6 +183,7 @@ moduleManager.construct({
                 if (ws.name.startsWith("{") && ws.name.endsWith("}"))
                     return;
                 function isDateTime(cell) {
+				//	console.debug('isDateTime',cell);
                     return cell && (cell.t == 'd' || cell.t == 's' && LIB.isIsoDateTime(cell.v));
                 }
                 function isInt(cell) {
@@ -249,6 +251,7 @@ moduleManager.construct({
                                     ;
                                     return LIB.makeMultiLanguageValue(v);
                                 case XsDataType.DateTime:
+									console.debug('isDateTime',cell);
                                     switch (cell.t) {
                                         case "d": return cell.v.toISOString();
                                         case "s":
@@ -417,11 +420,12 @@ moduleManager.construct({
                         let valL = [], r, R;
                         for (r = ws.firstCell.row, R = ws.lastCell.row + 1; r < R; r++) {
                             valL.push(ws.data[cellName(cX, r)]);
-                        }
-                        ;
+                        };
                         let pTi = valL[0] ? (valL[0].w || valL[0].v) : '', pC = '', nC = '';
-                        if (!pTi || ontologyStatementClasses.includes(pTi))
-                            return;
+                        if (!pTi || ontologyStatementClasses.includes(pTi)) {
+                            console.debug('relation!',pTi);
+							return;
+						};
                         let pc = LIB.itemByTitle(specifData.propertyClasses, pTi);
                         if (pc)
                             return pc;
@@ -432,8 +436,7 @@ moduleManager.construct({
                             if (!pC) {
                                 pC = nC;
                                 continue;
-                            }
-                            ;
+                            };
                             if (pC == nC)
                                 continue;
                             if (pC == 'Real' && nC == 'Integer')
@@ -441,8 +444,7 @@ moduleManager.construct({
                             if (pC == 'Integer' && nC == 'Real') {
                                 pC = 'Real';
                                 continue;
-                            }
-                            ;
+                            };
                             pC = defaultC;
                         }
                         ;
@@ -455,8 +457,7 @@ moduleManager.construct({
                             for (var i = valL.length - 1; i > 0; i--) {
                                 maxL = Math.max(maxL, valL[i] && valL[i].v ? valL[i].v.length : 0);
                                 multLines = multLines || valL[i] && typeof (valL[i].v) == 'string' && valL[i].v.indexOf('\n') > -1;
-                            }
-                            ;
+                            };
                             if (maxL > CONFIG.textThreshold || multLines)
                                 pC = 'Text';
                         }
@@ -484,7 +485,9 @@ moduleManager.construct({
                         if (sTi) {
                             sTi = sTi.w || sTi.v;
                             if (sTi && ontologyStatementClasses.includes(sTi)) {
+								
                                 sC = new StaClass(sTi);
+								console.debug('statementClass',sC);
                                 sCL.push(sC);
                             }
                             ;
