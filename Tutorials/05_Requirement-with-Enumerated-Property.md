@@ -159,7 +159,8 @@ Finally let us have a look at the tab \"Reports\" of the SpecIF-Viewer. You may 
 - However, note that none of the reports have been programmed explicitly. Just the classes of the current projects are used to construct the report panels. Then, the respective instance counts are added. These reports are completely generic by virtue of the SpecIF class definitions.
 - In one of the later tutorials we will see that the enumerated properties may also be used for a faceted filtering of resources.
 
-You may view the example using the <a href="https://specif.de/apps/view#import=../examples/v1.1/05_Requirement-with-Enumerated-Property.specif" target="_blank">SpecIF Viewer</a>, or download the SpecIF data:
-- v1.0: [Requirement with Enumerated Property](https://specif.de/examples/v1.0/05_Requirement-with-Enumerated-Property.specif)
-- v1.1: [Requirement with Enumerated Property](https://specif.de/examples/v1.1/05_Requirement-with-Enumerated-Property.specif)
-- v1.2: [Requirement with Enumerated Property](https://specif.de/examples/v1.2/05_Requirement-with-Enumerated-Property.specif)
+You may 
+- view the example using the <a href="https://specif.de/apps/view.html#import=https://specif.de/examples/v1.1/05_Requirement-with-Enumerated-Property.specif" target="_blank">SpecIF Viewer</a> or 
+- download the SpecIF data: <a href="https://specif.de/examples/v1.0/05_Requirement-with-Enumerated-Property.specif">v1.0</a>, 
+<a href="https://specif.de/examples/v1.1/05_Requirement-with-Enumerated-Property.specif">v1.1</a>, 
+<a href="https://specif.de/examples/v1.2/05_Requirement-with-Enumerated-Property.specif">v1.2</a>.
