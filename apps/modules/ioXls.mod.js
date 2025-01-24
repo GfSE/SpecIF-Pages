@@ -146,7 +146,7 @@ moduleManager.construct({
         function collectMetaData(ws) {
             if (ws && ws.isValid) {
                 switch (ws.name) {
-                    case "(Enumerations)":
+                    case "{Enumerations}":
                         let c, r, cell, dT, pC;
                         for (c = ws.firstCell.col; c < ws.lastCell.col + 1; c++) {
                             cell = ws.data[cellName(c, ws.firstCell.row)];
@@ -181,7 +181,7 @@ moduleManager.construct({
         }
         function transformData(ws) {
             if (ws && ws.isValid) {
-                if (ws.name.indexOf("(") == 0 && ws.name.indexOf(")") == ws.name.length - 1)
+                if (ws.name.indexOf("{") == 0 && ws.name.indexOf("}") == ws.name.length - 1)
                     return;
                 function isDateTime(cell) {
                     return cell && (cell.t == 'd' || cell.t == 's' && LIB.isIsoDateTime(cell.v));
