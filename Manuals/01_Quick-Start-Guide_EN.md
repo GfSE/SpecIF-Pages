@@ -213,7 +213,7 @@ Again, the first line specifies the attribute name and the values below that are
 In worksheets with user data, these values are provided for attributes with the same name; in the example given to the left, 
 these are the attributes named _IREB:RequirementType_ and _SpecIF:Priority_. 
 While Excel® also allows the specification of deviating values, this is not possible in case of SpecIF, therefore all values 
-that do not correspond to those in the worksheet _(Enumerations)_ are ignored during import.
+that do not correspond to those in the worksheet _{Enumerations}_ are ignored during import.
 
 {: .highlight }
 _Note: Excel® assists the user in entering values through a selection box when the values listed in the "(Enumerations)" 
@@ -266,7 +266,7 @@ A model created with ADOIT can be transformed into SpecIF format or integrated w
 2. In the model structure, select all diagrams to be considered. Via context menu follow ↗ `Import/Export`, ↗ `ArchiMate exchange` and ↗ `Export`. A dialog window opens, in which the diagram selection is checked/changed if necessary and a name for project and file is assigned.
 3. From the third step on, the procedure is the same as described above for Archi.
 
-Also for ADOIT, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list.
+Also for ADOIT, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list. Note that HTML formatting is suppressed when using the `ArchiMate exchange` export.
 
 ### Cameo
 
