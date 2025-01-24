@@ -180,8 +180,8 @@ When importing Excel® files, a folder with the file name as title is created in
 
 #### Resources
 
-If there is a term in brackets in the name of a worksheet, it is used as the title of the resource class (SpecIF resourceClass, type of all resources/objects found on this worksheet). 
-If the worksheet name does not contain a term in brackets, a term in brackets in the file name is used as a substitute. 
+If there is a term in curly brackets in the name of a worksheet, it is used as the title of the resource class (SpecIF resourceClass, type of all resources/objects found on this worksheet). 
+If the worksheet name does not contain a term in curly brackets, a term in curly brackets in the file name is used as a substitute. 
 If no type designation is found there either, a generic title without a particular meaning is used for the resource class of the worksheet.
 
 Unfortunately, no vocabulary term ready to be interpreted by the system can be used in the filename, as certain characters (e.g. the colon) may not appear in filenames. 
@@ -207,7 +207,7 @@ for example, text passages can be highlighted in bold or key points can be enume
 
 <img class="my-align-right size-60" src="../assets/images/Manuals/05_Excel_enumerations_EN.png" alt="Excel Enumerations"/>
 
-To define an attribute with enumerated values, a worksheet with name _(Enumerations)_ including the brackets is created. 
+To define an attribute with enumerated values, a worksheet with name _{Enumerations}_ including the curly brackets is created. 
 Here all values of a certain attribute are specified column by column. 
 Again, the first line specifies the attribute name and the values below that are taken over up to the next blank line. 
 In worksheets with user data, these values are provided for attributes with the same name; in the example given to the left, 
