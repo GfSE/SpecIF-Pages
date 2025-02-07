@@ -148,7 +148,6 @@ As we have discussed all concepts before, let's right away discuss the full exam
     "description": "'View' shows 'Model-Element'",
     "instantiation": ["auto"],
     "subjectClasses": ["RC-View"],
-    "objectClasses": ["RC-Actor", "RC-State", "RC-Event"],
     "changedAt": "2018-05-10T11:54:00+01:00"
   },{
     "id": "SC-writes",

@@ -97,7 +97,6 @@ Next, we look at the *statementClasses*:
       "description": "'View' shows 'Model-Element'",
       "instantiation": ["auto"],
       "subjectClasses": ["RC-View"],
-      "objectClasses": ["RC-Actor", "RC-State", "RC-Event"],
       "changedAt": "2018-05-10T11:54:00+01:00"
     }, {
       "id": "SC-writes",
@@ -120,9 +119,10 @@ Next, we look at the *statementClasses*:
 ```
 
 - The first statementClass with \"id\":\"SC-shows\" will be used to relate the model view to all depicted model-elements. In a more complex model it allows to easily find out on which diagrams a given model-element appears. 
-- In such a statement, only an instance of the class with \"id\":\"RC-View" can serve as a subject (source) and only an instance of any fundamental model-element type can serve as an object (target).
+- In such a statement, only an instance of the class with \"id\":\"RC-View" can serve as a subject (source), see the list \"subjectClasses\".
+- There is no list \"objectClasses\" and so instances of _all_ resourceClasses and statementClasses are eligible as object (target), see Tutorial 2: [Related-Terms](./02_Related-Terms.html).
+- Note that a _missing_ list \"subjectClasses\" or \"objectClasses\" is allowed, but not an _empty_ list. Thus, if there is a list, it must have at least one item.
 - The last two statementClasses will be used for the 'writes' and 'reads' predicates (relationships) discussed in the beginning. We see that in both cases only an instance of the class with \"id\":\"RC-Actor" can serve as a subject and only an instance of the class with \"id\":\"RC-State" can serve as an object.
-- The attribute *subjectClasses* can be omitted as discussed in Tutorial 2: [Related-Terms](./02_Related-Terms.html), then any resource can be used as a subject. Similarly for *objectClasses*.
 
 
 Let us at last have a look at the full example, now:
@@ -208,7 +208,6 @@ Let us at last have a look at the full example, now:
       "description": "'View' shows 'Model-Element'",
       "instantiation": ["auto"],
       "subjectClasses": ["RC-View"],
-      "objectClasses": ["RC-Actor", "RC-State", "RC-Event"],
       "changedAt": "2018-05-10T11:54:00+01:00"
     }, {
       "id": "SC-writes",
@@ -284,6 +283,22 @@ Let us at last have a look at the full example, now:
       "object": "MEl-50feddc00029b1a8016e2872e78ecadc",
       "changedAt": "2020-03-06T08:32:00+01:00"
     }, {
+      "id": "SVis-aec0df7900010000017001eaf53e8876-SWri-50fbfe8f0029b1a8016ea86245a9d83a-50feddc00029b1a8016e2872e78ecadc",
+      "title": "SpecIF:shows",
+      "description": "'FMC Block Diagram' shows 'FiCo-Application writes FiCo-Data'",
+      "class": "SC-shows",
+      "subject": "Diagram-aec0df7900010000017001eaf53e8876",
+      "object": "SWri-50fbfe8f0029b1a8016ea86245a9d83a-50feddc00029b1a8016e2872e78ecadc",
+      "changedAt": "2025-01-26T08:32:00+01:00"
+    }, {
+      "id": "SVis-aec0df7900010000017001eaf53e8876-SRea-50fbfe8f0029b1a8016ea86245a9d83a-50feddc00029b1a8016e2872e78ecadc",
+      "title": "SpecIF:shows",
+      "description": "'FMC Block Diagram' shows 'FiCo-Application reads FiCo-Data'",
+      "class": "SC-shows",
+      "subject": "Diagram-aec0df7900010000017001eaf53e8876",
+      "object": "SRea-50fbfe8f0029b1a8016ea86245a9d83a-50feddc00029b1a8016e2872e78ecadc",
+      "changedAt": "2025-01-26T08:32:00+01:00"
+    }, {
       "id": "SWri-50fbfe8f0029b1a8016ea86245a9d83a-50feddc00029b1a8016e2872e78ecadc",
       "title": "SpecIF:writes",
       "description": "'FiCo-Application' writes 'FiCo-Data'",
@@ -320,7 +335,8 @@ Let us at last have a look at the full example, now:
 
 The instances, the actual model content, have not been discussed, yet:
 - You can easily see the diagram and the two model-elements in *resources*. The *properties* carry the information payload; those without a defined value can be omitted, e.g. the diagram has no property of type \"PC-Description\" and the model-elements have no property of type \"PC-Type\".
-- The four *statements* are equally easy to interpret: One *shows* relationship per model-element plus the *writes* and *reads* relationships between the model-elements.
+- The six *statements* are equally easy to interpret: One *shows* relationship per model-element, one *shows* relationship for each of the *reads* and *writes* relations equally visible on the diagram plus the *writes* and *reads* relationships between the model-elements.
+- Important to note that the third and forth *shows* relationship is a so-called 'statement on a statement', which cannot be directly mapped to a 'Labelled Property Graph' (which is base for many graph databases). When transforming to RDF, a special construct named 'reification' is needed or the further developed RDF-star.
 - By the way, if you display this example with the <a href="https://specif.de/apps/view#import=../examples/v1.1/06_Very-Simple-Model-FMC.specifz" target="_blank">SpecIF Viewer</a> and you hover the mouse over one of the model-elements or double-click it, you can see the potential of web-technology. This is not by virtue of SpecIF, but when the SVG is generated in a way that the model-element *id* is associated to a graphic element and an app like the SpecIF Viewer finds it, such behaviour is easily implemented.
 
 You may 
