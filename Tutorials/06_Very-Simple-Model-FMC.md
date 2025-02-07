@@ -316,18 +316,18 @@ Let us at last have a look at the full example, now:
       "changedAt": "2020-03-06T09:05:00+01:00"
     }],
     "hierarchies": [{
-		"id": "N-Diagram-aec0df7900010000017001eaf53e8876",
-		"resource": "Diagram-aec0df7900010000017001eaf53e8876",
-		"nodes": [{
-			"id": "N-MEl-50fbfe8f0029b1a8016ea86245a9d83a",
-			"resource": "MEl-50fbfe8f0029b1a8016ea86245a9d83a",
-			"changedAt": "2020-03-06T09:05:00+01:00"
-		}, {
-			"id": "N-MEl-50feddc00029b1a8016e2872e78ecadc",
-			"resource": "MEl-50feddc00029b1a8016e2872e78ecadc",
-			"changedAt": "2020-03-06T09:05:00+01:00"
-		}],
-		"changedAt": "2018-05-10T11:54:00+01:00"
+      "id": "N-Diagram-aec0df7900010000017001eaf53e8876",
+      "resource": "Diagram-aec0df7900010000017001eaf53e8876",
+      "nodes": [{
+        "id": "N-MEl-50fbfe8f0029b1a8016ea86245a9d83a",
+        "resource": "MEl-50fbfe8f0029b1a8016ea86245a9d83a",
+        "changedAt": "2020-03-06T09:05:00+01:00"
+      },{
+        "id": "N-MEl-50feddc00029b1a8016e2872e78ecadc",
+        "resource": "MEl-50feddc00029b1a8016e2872e78ecadc",
+        "changedAt": "2020-03-06T09:05:00+01:00"
+      }],
+      "changedAt": "2018-05-10T11:54:00+01:00"
     }],
     "files": []
 }

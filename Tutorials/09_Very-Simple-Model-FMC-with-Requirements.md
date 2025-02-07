@@ -286,6 +286,22 @@ As we have discussed all concepts before, let's right away discuss the full exam
     "object": "MEl-50feddc00029b1a8016e2872e78ecadc",
     "changedAt": "2020-03-06T08:32:00+01:00"
   },{
+    "id": "SVis-aec0df7900010000017001eaf53e8876-SWri-50fbfe8f0029b1a8016ea86245a9d83a-50feddc00029b1a8016e2872e78ecadc",
+    "title": "SpecIF:shows",
+    "description": "'FMC Block Diagram' shows 'FiCo-Application writes FiCo-Data'",
+    "class": "SC-shows",
+    "subject": "Diagram-aec0df7900010000017001eaf53e8876",
+    "object": "SWri-50fbfe8f0029b1a8016ea86245a9d83a-50feddc00029b1a8016e2872e78ecadc",
+    "changedAt": "2025-01-26T08:32:00+01:00"
+  },{
+    "id": "SVis-aec0df7900010000017001eaf53e8876-SRea-50fbfe8f0029b1a8016ea86245a9d83a-50feddc00029b1a8016e2872e78ecadc",
+    "title": "SpecIF:shows",
+    "description": "'FMC Block Diagram' shows 'FiCo-Application reads FiCo-Data'",
+    "class": "SC-shows",
+    "subject": "Diagram-aec0df7900010000017001eaf53e8876",
+    "object": "SRea-50fbfe8f0029b1a8016ea86245a9d83a-50feddc00029b1a8016e2872e78ecadc",
+    "changedAt": "2025-01-26T08:32:00+01:00"
+  },{
     "id": "Swri-50fbfe8f0029b1a8016ea86245a9d83a-50feddc00029b1a8016e2872e78ecadc",
     "description": "'FiCo-Application' writes 'FiCo-Data'",
     "class": "SC-writes",
