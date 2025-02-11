@@ -29,21 +29,11 @@ Have a look at the following example:
     "title": "geo:Point",
     "type": "xs:complexType",
     "description": [{
-      "text": "A point in space, specified by three coordinates.",
+      "text": "A point in space, specified by three cartesian coordinates.",
       "language": "en"
     },{
-      "text": "Ein Punkt im Raum, spezifiziert durch drei Koordinaten.",
+      "text": "Ein Punkt im Raum, spezifiziert durch drei kartesische Koordinaten.",
       "language": "de"
-    }],
-    "sequence": [{
-      "title": "X",
-      "dataType": { "id": "DT-Coordinate" }
-    },{
-      "title": "Y",
-      "dataType": { "id": "DT-Coordinate" }
-    },{
-      "title": "Z",
-      "dataType": { "id": "DT-Coordinate" }
     }],
     "revision": "1.2",
     "changedAt": "2024-11-21T10:08:31.960Z"
@@ -55,19 +45,75 @@ The referencing propertyClass and resourceClass is similar to others discussed i
 ```json
 {
   "propertyClasses": [{
-    "id": "PC-GeoPoint",
-    "title": "geo:Point",
+    "id": "PC-Coordinate-X",
+    "title": "X",
     "description": [{
-        "text": "A point in space, specified by three coordinates.",
-        "language": "en"
+      "text": "Coordinate X.",
+      "language": "en"
     },{
-        "text": "Ein Punkt im Raum, spezifiziert durch drei Koordinaten.",
-        "language": "de"
+      "text": "Koordinate X.",
+      "language": "de"
     }],
-    "dataType": { "id": "DT-GeoPoint" },
+    "dataType": { "id": "DT-Coordinate" },
+    "required": "true",
     "multiple": false,
     "revision": "1.2",
-    "changedAt": "2024-11-21T10:08:31.960Z"
+    "changedAt": "2025-02-06T10:08:31.960Z"
+  },{
+    "id": "PC-Coordinate-Y",
+    "title": "Y",
+    "description": [{
+      "text": "Coordinate Y.",
+      "language": "en"
+    },{
+      "text": "Koordinate Y.",
+      "language": "de"
+    }],
+    "dataType": { "id": "DT-Coordinate" },
+    "required": "true",
+    "multiple": false,
+    "revision": "1.2",
+    "changedAt": "2025-02-06T10:08:31.960Z"
+  },{
+    "id": "PC-Coordinate-Z",
+    "title": "Z",
+    "description": [{
+      "text": "Coordinate Z.",
+      "language": "en"
+    },{
+      "text": "Koordinate Z.",
+      "language": "de"
+    }],
+    "dataType": { "id": "DT-Coordinate" },
+    "required": "true",
+    "multiple": false,
+    "revision": "1.2",
+    "changedAt": "2025-02-06T10:08:31.960Z"
+  },{
+    "id": "PC-GeoPoint",
+    "title": "geo:Point",
+    "description": [
+      {
+        "text": "A point in space, specified by three cartesian coordinates.",
+        "language": "en"
+      },{
+        "text": "Ein Punkt im Raum, spezifiziert durch drei kartesische Koordinaten.",
+        "language": "de"
+      }
+    ],
+    "dataType": { "id": "DT-GeoPoint" },
+    "sequence": [
+      {
+        "id": "PC-Coordinate-X"
+      },{
+        "id": "PC-Coordinate-Y"
+      },{
+        "id": "PC-Coordinate-Z"
+      }
+    ],
+    "multiple": false,
+    "revision": "1.2",
+    "changedAt": "2025-02-06T10:08:31.960Z"
   }],
   "resourceClasses": [{
     "id": "RC-94e50d5023b1a80157",
@@ -102,11 +148,20 @@ In general, values of any SpecIF dataType are allowed, e.g. multi-language texts
         [{ "text": "A point in space" }]
       ]
     },{
-      "class": "PC-GeoPoint",
+      "class": {"id": "PC-GeoPoint"},
       "values": [
-        [ "1.2",  "2.3", "4.0" ]
+        [{
+          "class": { "id": "PC-Coordinate-X" },
+          "values": [ "1.2" ]
+        },{
+          "class": { "id": "PC-Coordinate-Y" },
+          "values": [ "2.3" ]
+        },{
+          "class": { "id": "PC-Coordinate-Z" },
+          "values": [ "4.0" ]
+        }]
       ]
-    }]
+    }],
     "changedAt": "2024-11-21T10:08:31.960Z"
   }]
 }
