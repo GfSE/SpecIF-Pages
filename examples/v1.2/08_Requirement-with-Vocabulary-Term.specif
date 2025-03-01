@@ -1,7 +1,7 @@
 {
   "@Context": "http://purl.org/dc/terms/",
   "id": "P-Requirement-with-Vocabulary-Term",
-  "$schema": "https://specif.de/v1.2/schema.json",
+  "$schema": "https://specif.de/v1.2/schema",
   "title": [
     {
       "text": "Project 'Requirement with Vocabulary Term'"

@@ -1,9 +1,11 @@
 "use strict";
 const CONFIG = {};
-CONFIG.appVersion = "1.2.a.11",
-    CONFIG.specifVersion = "1.2";
+CONFIG.appVersion = "1.2.a.12";
+CONFIG.specifVersion = "1.2";
 CONFIG.imgURL = './assets/images';
 CONFIG.ontologyURL = 'https://specif.de/v1.1/Ontology.specif';
+CONFIG.localPath = '../../../SpecIF/Pages/v1.2/';
+CONFIG.localOntologyURL = CONFIG.localPath + 'Ontology.specif';
 CONFIG.QuickStartGuideDe =
     CONFIG.QuickStartGuideEn = "https://gfse.github.io/SpecIF-Pages/Manuals/01_Quick-Start-Guide_EN.html";
 CONFIG.userNameAnonymous = 'Anonymous';

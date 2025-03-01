@@ -33,9 +33,9 @@ moduleManager.construct({
     var iFormats = [];
     self.projectName = '';
     self.importFormat = undefined;
-    var showFileSelect, importMode = { id: 'replace' }, myFullName = 'app.' + self.loadAs, urlP, urlOntology = (window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html') ?
+    var showFileSelect, importMode = { id: 'replace' }, myFullName = 'app.' + self.loadAs, urlP, urlOntology = (LIB.useRemotePath() ?
         CONFIG.ontologyURL
-        : '../../../SpecIF/vocabulary/Ontology.specif'), importing = false;
+        : CONFIG.localOntologyURL), importing = false;
     self.clear = function () {
         $('input[type=file]').val('');
         setTextValue(i18n.LblFileName, '');
@@ -382,6 +382,7 @@ moduleManager.construct({
         function handle(dta, idx) {
             setProgress(importMode.id + ' project', 20);
             let opts = self.importFormat.opts || {};
+            opts.sourceFileName = self.file.name;
             opts.mode = idx < 1 ? importMode.id : opts.multipleMode || 'update';
             opts.normalizeTerms = true;
             opts.deduplicate =

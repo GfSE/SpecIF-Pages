@@ -55,7 +55,7 @@ moduleManager.construct({
         showNotice(i18n.MsgAnalyzing);
         function addResourceClassReport() {
             var rCR = {
-                title: app.ontology.localize("SpecIF:Resource", { targetLanguage: browser.language, plural: true }),
+                title: app.ontology.localize(CONFIG.resClassResource, { targetLanguage: browser.language, plural: true }),
                 category: FilterCategory.resourceClass,
                 pid: selPrj.id,
                 scaleMin: 0,
@@ -79,7 +79,7 @@ moduleManager.construct({
         addResourceClassReport();
         function addStatementClassReport() {
             var sCR = {
-                title: app.ontology.localize("SpecIF:Statement", { targetLanguage: browser.language, plural: true }),
+                title: app.ontology.localize(CONFIG.resClassStatement, { targetLanguage: browser.language, plural: true }),
                 category: FilterCategory.statementClass,
                 pid: selPrj.id,
                 scaleMin: 0,
@@ -191,7 +191,7 @@ moduleManager.construct({
                 throw Error("Did not find a report panel for resourceClass with id:" + sCk.id);
         }
         let pend = 0, visited = [];
-        LIB.iterateNodes(selPrj.cache.get("hierarchy", selPrj.nodes)
+        LIB.iterateSpecifNodes(selPrj.cache.get("hierarchy", selPrj.nodes)
             .filter((h) => {
             return LIB.typeOf(h.resource, selPrj.cache) != CONFIG.resClassUnreferencedResources;
         }), (nd) => {

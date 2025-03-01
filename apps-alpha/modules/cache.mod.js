@@ -140,7 +140,7 @@ class CCache {
         }
     }
     putNode(e) {
-        if (!e.predecessor && !e['parent'] && LIB.iterateNodes(this.nodes, (nd) => { return nd.id != e.id; }, (ndL) => {
+        if (!e.predecessor && !e['parent'] && LIB.iterateSpecifNodes(this.nodes, (nd) => { return nd.id != e.id; }, (ndL) => {
             let i = LIB.indexById(ndL, e.id);
             if (i > -1) {
                 ndL.splice(i, 1, e);
@@ -149,7 +149,7 @@ class CCache {
         }))
             return LIB.indexByKey(this.nodes, e) > -1;
         this.delete('node', [LIB.keyOf(e)]);
-        if (e.predecessor && LIB.iterateNodes(this.nodes, (nd) => { return nd.id != e.predecessor; }, (ndL) => {
+        if (e.predecessor && LIB.iterateSpecifNodes(this.nodes, (nd) => { return nd.id != e.predecessor; }, (ndL) => {
             let i = LIB.indexById(ndL, e.predecessor);
             if (i > -1) {
                 delete e.predecessor;
@@ -158,7 +158,7 @@ class CCache {
             ;
         }))
             return LIB.indexByKey(this.nodes, e) > -1;
-        if (e['parent'] && LIB.iterateNodes(this.nodes, (nd) => {
+        if (e['parent'] && LIB.iterateSpecifNodes(this.nodes, (nd) => {
             if (nd.id == e['parent']) {
                 delete e['parent'];
                 if (Array.isArray(nd.nodes))
@@ -298,6 +298,7 @@ class CProject {
         this.resourceClasses = [];
         this.statementClasses = [];
         this.nodes = [];
+        this.sourceFileName = "";
         this.cache = cData;
         this.exporting = false;
         this.abortFlag = false;
@@ -379,6 +380,7 @@ class CProject {
     create(newD, opts) {
         var cDO = $.Deferred(), self = this, pend = 0;
         this.abortFlag = false;
+        this.sourceFileName = opts.sourceFileName;
         new CSpecIF().set(newD, opts)
             .then((nD) => {
             cDO.notify(i18n.MsgLoadingTypes, 30);
@@ -846,7 +848,7 @@ class CProject {
     }
     aDiagramWithoutShowsStatementsForEdges() {
         let res, isNotADiagram, noDiagramFound = true;
-        return LIB.iterateNodes(this.cache.get('hierarchy', this.nodes), (nd) => {
+        return LIB.iterateSpecifNodes(this.cache.get('hierarchy', this.nodes), (nd) => {
             res = this.cache.get('resource', [nd.resource])[0];
             isNotADiagram = !CONFIG.diagramClasses.includes(LIB.classTitleOf(res['class'], this.cache.resourceClasses));
             noDiagramFound = noDiagramFound && isNotADiagram;
@@ -971,7 +973,7 @@ class CProject {
                 }
                 ;
                 let fldL = [], resL = [];
-                LIB.iterateNodes(dta.get("hierarchy", self.nodes), (nd) => {
+                LIB.iterateSpecifNodes(dta.get("hierarchy", self.nodes), (nd) => {
                     let res = dta.get("resource", [nd.resource])[0], pVs = LIB.valuesByTitle(res, [CONFIG.propClassType], dta);
                     if (pVs.length > 0) {
                         let pV = LIB.languageTextOf(pVs[0], { targetLanguage: 'default' });
@@ -1061,7 +1063,7 @@ class CProject {
                 ;
                 throw Error('Node ' + nd.id + ' references a resource ' + nd.resource.id + ' which is not found.');
             });
-            LIB.iterateNodes(hL, (nd) => {
+            LIB.iterateSpecifNodes(hL, (nd) => {
                 let idx = LIB.indexByKey(resL, nd.resource);
                 if (idx > -1)
                     resL.splice(idx, 1);
@@ -1138,7 +1140,7 @@ class CProject {
                     lastContentH = nd;
                 return res && !LIB.hasType(res, [CONFIG.resClassUnreferencedResources], dta, opts);
             });
-            LIB.iterateNodes(hL, (nd) => {
+            LIB.iterateSpecifNodes(hL, (nd) => {
                 let res = dta.get("resource", [nd.resource])[0];
                 if (LIB.hasType(res, [CONFIG.resClassGlossary], dta, opts)) {
                     gloL.push(nd);
@@ -1366,6 +1368,7 @@ class CProject {
         if (prjN)
             this.exportParams.projectName = prjN;
         let options = {
+            sourceFileName: this.sourceFileName,
             projectName: this.exportParams.projectName,
             fileName: this.exportParams.fileName,
             format: radioValue(i18n.LblFormat),
@@ -1445,7 +1448,8 @@ class CProject {
                     opts.linkifyURLs = ['epub', 'oxml'].includes(opts.format);
                 opts.revisionDate = new Date().toISOString();
                 let optsLabel = Object.assign({}, opts, { plural: true });
-                self.read(opts).then((expD) => {
+                self.read(opts)
+                    .then((expD) => {
                     let localOpts = {
                         titleProperties: CONFIG.titleProperties.map((e) => { return app.ontology.localize(e, opts); }),
                         descriptionProperties: CONFIG.descProperties.map((e) => { return app.ontology.localize(e, opts); }),
@@ -1455,7 +1459,7 @@ class CProject {
                         addIcon: opts.elementsWithIcons,
                         addOrder: opts.elementsWithOrdernumbers,
                         propertiesLabel: opts.withOtherProperties ? app.ontology.localize('SpecIF:Property', optsLabel) : undefined,
-                        statementsLabel: opts.withStatements ? app.ontology.localize('SpecIF:Statement', optsLabel) : undefined,
+                        statementsLabel: opts.withStatements ? app.ontology.localize(CONFIG.resClassStatement, optsLabel) : undefined,
                         fileName: self.exportParams.fileName,
                         colorAccent1: '0071B9',
                         done: () => { app.projects.selected.exporting = false; resolve(); },
@@ -1487,6 +1491,7 @@ class CProject {
                         break;
                     case 'reqif':
                         opts.lookupTitles = true;
+                        opts.targetLanguage = opts.targetLanguage || self.language;
                         opts.targetNamespaces = ["ReqIF."];
                         opts.allDiagramsAsImage = true;
                         opts.makeHTML = true;
@@ -1495,7 +1500,9 @@ class CProject {
                         opts.revisionDate = new Date().toISOString();
                         break;
                     case 'turtle':
-                        opts.lookupTitles = true;
+                        opts.lookupTitles = false;
+                        opts.lookupValues = false;
+                        opts.targetLanguage = opts.targetLanguage || self.language;
                         opts.targetNamespaces = ["rdf:", "rdfs:"];
                         opts.allDiagramsAsImage = true;
                         opts.makeHTML = true;
@@ -1563,9 +1570,10 @@ class CProject {
                             expStr = app.ioReqif.fromSpecif(expD);
                             break;
                         case 'turtle':
+                            opts.baseURI = "https://specif.de/examples/";
                             fName += ".ttl";
                             zName = fName + '.zip';
-                            expStr = app.specif2turtle(expD, { baseURI: "https://specif.de/examples/" });
+                            expStr = app.specif2turtle(expD, opts);
                     }
                     ;
                     expD = null;
@@ -1761,7 +1769,7 @@ class CProject {
             });
     }
     substituteRef(L, rK, dK) {
-        LIB.iterateNodes(L, (nd) => { if (LIB.references(nd.resource, dK)) {
+        LIB.iterateSpecifNodes(L, (nd) => { if (LIB.references(nd.resource, dK)) {
             nd.resource = rK;
         } ; return true; }, (ndL) => { for (var i = ndL.length - 1; i > 0; i--) {
             if (LIB.referenceIndexBy(ndL.slice(0, i), 'resource', ndL[i].resource) > -1) {

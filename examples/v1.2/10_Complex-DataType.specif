@@ -1,7 +1,7 @@
 {
   "@Context": "http://purl.org/dc/terms/",
   "id": "P-Complex-DataTypes",
-  "$schema": "https://specif.de/v1.2/schema.json",
+  "$schema": "https://specif.de/v1.2/schema",
   "title": [
     {
       "text": "Project 'Complex DataTypes'"

@@ -500,6 +500,9 @@ LIB.isEqualStringL = (refL, newL) => {
             return false;
     return true;
 };
+LIB.useRemotePath = () => {
+    return window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html');
+};
 LIB.versionOf = (spD) => {
     return spD.specifVersion ?? RE.versionFromPath.exec(spD['$schema'])[1];
 };
@@ -567,12 +570,23 @@ LIB.languageTextOf = (val, opts) => {
 LIB.selectTargetLanguage = (val, opts) => {
     return LIB.makeMultiLanguageValue(LIB.languageTextOf(val, opts), opts);
 };
+LIB.lookupEnums = (p, dta, opts) => {
+    if (opts && opts.lookupEnums) {
+        let pC = LIB.itemByKey(dta.propertyClasses, p['class']), dT = LIB.itemByKey(dta.dataTypes, pC.dataType);
+        if (dT.enumeration)
+            p.values = p.values.map((v) => LIB.itemById(dT.enumeration, v.id).value);
+    }
+    ;
+    return p;
+};
 LIB.displayValueOf = (val, opts) => {
-    if (LIB.isMultiLanguageValue(val)) {
-        let v = LIB.languageTextOf(val, opts);
-        if (opts.lookupValues)
+    function lookup(v) {
+        if (opts && opts.lookupValues)
             v = app.ontology.localize(v, opts);
-        return opts.stripHTML ? v.stripHTML() : v;
+        return opts && opts.stripHTML ? v.stripHTML() : v;
+    }
+    if (LIB.isMultiLanguageValue(val)) {
+        return lookup(LIB.languageTextOf(val, opts));
     }
     ;
     if (Array.isArray(val)) {
@@ -798,6 +812,8 @@ LIB.addClassesTo = (term, dta) => {
     return item;
 };
 LIB.getExtendedClasses = (cL, toGet) => {
+    if (toGet == 'all')
+        toGet = cL.map(c => LIB.keyOf(c));
     let resL = [];
     for (var clk of toGet) {
         resL.push(extendClass(clk));
@@ -985,7 +1001,7 @@ String.prototype.makeHTML = function (opts) {
         if (CONFIG.convertMarkdown && window.markdown) {
             return window.markdown.render(newS
                 .replace(/\+ /g, '&#x2b; ')
-                .replace(/• /g, '* '));
+                .replace(/• /g, '* ')).stripCtrl();
         }
         ;
         return '<div>' + newS.ctrl2HTML() + '</div>';
@@ -1234,16 +1250,16 @@ LIB.httpGet = (params) => {
 LIB.isReferencedByHierarchy = (itm, H) => {
     if (!H)
         H = app.projects.selected.cache.nodes;
-    return LIB.iterateNodes(H, (nd) => { return nd.resource.id != itm.id; });
+    return LIB.iterateSpecifNodes(H, (nd) => { return nd.resource.id != itm.id; });
 };
 LIB.referencedResources = (rL, h) => {
     var crL = [];
-    LIB.iterateNodes(h, (nd) => { LIB.cacheE(crL, LIB.itemByKey(rL, nd.resource)); return true; });
+    LIB.iterateSpecifNodes(h, (nd) => { LIB.cacheE(crL, LIB.itemByKey(rL, nd.resource)); return true; });
     return crL;
 };
 LIB.referencedResourcesByClass = (rL, h, rCIdL) => {
     let crL = [];
-    (LIB.iterateNodes(h, (nd) => {
+    (LIB.iterateSpecifNodes(h, (nd) => {
         let r = LIB.itemById(rL, nd.resource.id);
         if (r && rCIdL.includes(r['class'].id)) {
             crL.push(r);
@@ -1264,20 +1280,21 @@ LIB.dataTypeOf = (key, prj) => {
     ;
     return { type: XsDataType.String };
 };
-LIB.iterateNodes = (tree, eFn, lFn) => {
+LIB.iterateSpecifNodes = (tree, eFn, lFn, _parent) => {
     let cont = true;
     if (Array.isArray(tree)) {
         for (var i = 0, I = tree.length; cont && (i < I); i++) {
-            cont = !LIB.iterateNodes(tree[i], eFn, lFn);
+            cont = !LIB.iterateSpecifNodes(tree[i], eFn, lFn, _parent);
         }
         ;
         if (typeof (lFn) == 'function')
             lFn(tree);
     }
     else {
-        cont = eFn(tree);
+        cont = eFn(tree, _parent);
         if (cont && tree.nodes) {
-            cont = !LIB.iterateNodes(tree.nodes, eFn, lFn);
+            _parent = tree.resource.id;
+            cont = !LIB.iterateSpecifNodes(tree.nodes, eFn, lFn, _parent);
         }
         ;
     }

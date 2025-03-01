@@ -125,7 +125,7 @@ moduleManager.construct({
         app.busy.set();
         $('#hitlist').empty();
         let pend = 0, hitCnt = 0, visited = [];
-        LIB.iterateNodes(selPrj.cache.get("hierarchy", selPrj.nodes)
+        LIB.iterateSpecifNodes(selPrj.cache.get("hierarchy", selPrj.nodes)
             .filter((h) => {
             return LIB.typeOf(h.resource, selPrj.cache) != CONFIG.resClassUnreferencedResources;
         }), (nd) => {
@@ -387,7 +387,7 @@ moduleManager.construct({
         ;
         function addResourceClassFilter(pre) {
             var oTF = {
-                title: app.ontology.localize("SpecIF:Resource", { targetLanguage: browser.language, plural: true }),
+                title: app.ontology.localize(CONFIG.resClassResource, { targetLanguage: browser.language, plural: true }),
                 category: FilterCategory.resourceClass,
                 primary: true,
                 scope: selPrj.id,

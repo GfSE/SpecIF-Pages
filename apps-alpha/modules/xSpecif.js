@@ -122,9 +122,10 @@ class CSpecIF {
             let checker;
             if (this.isValid(spD)) {
                 if (spD['$schema'] && !spD['$schema'].includes('v1.0')) {
-                    import((window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html')) ?
-                        'https://specif.de/v' + LIB.versionOf(spD) + '/CCheck.mjs'
-                        : '../../../SpecIF-Schema/check/CCheck.mjs')
+                    import((LIB.useRemotePath() ?
+                        'https://specif.de/v' + LIB.versionOf(spD) + '/'
+                        : CONFIG.localPath)
+                        + 'CCheck.mjs')
                         .then(modChk => {
                         getSchema();
                         checker = new modChk.CCheck();
@@ -161,9 +162,9 @@ class CSpecIF {
             }
             function getSchema() {
                 LIB.httpGet({
-                    url: (window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html') ?
+                    url: LIB.useRemotePath() ?
                         (spD['$schema'] || 'https://specif.de/v' + spD.specifVersion + '/schema')
-                        : '../../../SpecIF-Schema/schema/schema.json'),
+                        : CONFIG.localPath + 'schema',
                     responseType: 'arraybuffer',
                     withCredentials: false,
                     done: handleResult,

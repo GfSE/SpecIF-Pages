@@ -1152,7 +1152,7 @@ function Archimate2Specif(xmlString, options) {
 			changedAt: opts.fileDate
 		},{
 			id: "SC-accesses",
-			title: "ArchiMate:accesses",
+			title: "ArchiMate:Access",
 			description: "Statement: Actor (Role, Function) writes and reads State (Information).",
 			instantiation: ["auto"],
 			propertyClasses: ["PC-Type"],
@@ -1203,7 +1203,7 @@ function Archimate2Specif(xmlString, options) {
 			changedAt: opts.fileDate
 		},{
 			id: "SC-serves",
-			title: "ArchiMate:serves",
+			title: "ArchiMate:Serving",
 			description: "Statement: An element provides its functionality to another element.",
 			instantiation: ["auto"],
 			propertyClasses: ["PC-Type"],

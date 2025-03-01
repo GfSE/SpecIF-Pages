@@ -370,7 +370,7 @@ class CResourceToShow {
         });
         rO += '</div>'
             + '<div class="col-xl">';
-        rO += this.renderAttr(app.ontology.localize('SpecIF:Resource', opts), LIB.titleOf(this.rC, opts), { condensed: true });
+        rO += this.renderAttr(app.ontology.localize(CONFIG.resClassResource, opts), LIB.titleOf(this.rC, opts), { condensed: true });
         this.other.forEach((prp) => {
             if (prp.isVisible(opts)) {
                 rO += this.renderAttr(LIB.titleOf(prp, opts), prp.get(opts), { condensed: true });

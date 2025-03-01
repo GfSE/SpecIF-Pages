@@ -60,7 +60,7 @@ moduleManager.construct({
                 chooseResourceToLink();
             }, LIB.stdError);
             self.allResources.length = 0;
-            LIB.iterateNodes(cData.get("hierarchy", selPrj.nodes)
+            LIB.iterateSpecifNodes(cData.get("hierarchy", selPrj.nodes)
                 .filter((h) => {
                 return LIB.typeOf(h.resource, cData) != CONFIG.resClassUnreferencedResources;
             }), (nd) => {
