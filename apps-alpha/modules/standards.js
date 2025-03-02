@@ -29,7 +29,7 @@ class CStandards {
         let tmp = {
             '@Context': "http://purl.org/dc/terms/",
             "id": "",
-            "$schema": "https://specif.de/v" + CONFIG.specifVersion + "/schema.json",
+            "$schema": "https://specif.de/v" + CONFIG.specifVersion + "/schema#",
             "title": [],
             "description": undefined,
             "generator": app.title,
