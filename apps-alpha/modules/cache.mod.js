@@ -365,16 +365,21 @@ class CProject {
             this.myPermissions = role.permissions;
     }
     ;
-    getMeta() {
+    getMeta(opts) {
         var spD = new CSpecIF();
         spD.id = this.id;
         spD.title = this.title;
-        spD.description = this.description;
+        spD.description = makeVal(this.description);
         spD.generator = this.generator;
         spD.generatorVersion = this.generatorVersion;
         spD.createdAt = this.createdAt;
         spD.createdBy = this.createdBy;
         return spD;
+        function makeVal(val) {
+            val = LIB.languageTextOf(val, opts)
+                .makeHTML(opts);
+            return LIB.makeMultiLanguageValue(val);
+        }
     }
     ;
     create(newD, opts) {
@@ -406,7 +411,7 @@ class CProject {
         }
     }
     read(opts) {
-        var exD = this.getMeta();
+        var exD = this.getMeta(opts);
         return new Promise((resolve, reject) => {
             this.readItems('hierarchy', this.nodes.filter((n) => { return !n.id.includes("FolderUnreferencedResources-"); }), opts)
                 .then((hL) => {

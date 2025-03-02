@@ -841,10 +841,7 @@ class CSpecIF {
                                 }
                                 else {
                                     if (pC.format == SpecifTextFormat.Xhtml) {
-                                        txt = txt
-                                            .replace(/^\s+/, "")
-                                            .makeHTML(opts)
-                                            .replace(/<br ?\/>\n/g, "<br/>");
+                                        txt = txt.makeHTML(opts);
                                         if (opts.allDiagramsAsImage)
                                             txt = refDiagramsAsImg(txt);
                                     }

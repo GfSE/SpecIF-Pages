@@ -1000,8 +1000,11 @@ String.prototype.makeHTML = function (opts) {
             .replace(/(?:&copy|\(C\))/g, '&#169;');
         if (CONFIG.convertMarkdown && window.markdown) {
             return window.markdown.render(newS
+                .replace(/^\s+/, "")
                 .replace(/\+ /g, '&#x2b; ')
-                .replace(/• /g, '* ')).stripCtrl();
+                .replace(/• /g, '* '))
+                .replace(/<br ?\/>\n/g, "<br/>")
+                .stripCtrl();
         }
         ;
         return '<div>' + newS.ctrl2HTML() + '</div>';

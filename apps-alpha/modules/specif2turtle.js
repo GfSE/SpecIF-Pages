@@ -139,10 +139,6 @@ app.specif2turtle = (specifData, opts) => {
             + toRdf.newLine('# Property Classes')
             + toRdf.newLine('#################################################################');
         pCs.forEach(pC => {
-            let domain = extendedClasses
-                .filter(cl => {
-                return LIB.containsById(cl.propertyClasses, pC);
-            });
             let dT = LIB.itemByKey(specifData.dataTypes, pC.dataType);
             if (dT.enumeration) {
                 enumPCs.push(pC.id);
@@ -293,14 +289,17 @@ app.specif2turtle = (specifData, opts) => {
     ;
     function transformProperties(el) {
         let ttlStr = '';
-        el.properties.forEach(p => {
-            if (p.values.length > 0) {
-                if (p.values[0].id)
-                    ttlStr += toRdf.tab1(self + p['class'].id, self + p.values[0].id);
-                else
-                    ttlStr += toRdf.tab1(self + p['class'].id, LIB.displayValueOf(p.values[0], { targetLanguage: 'default', lookupValues: true }), '"');
-            }
-        });
+        if (isArrayWithContent(el.properties)) {
+            el.properties.forEach(p => {
+                if (p.values.length > 0) {
+                    if (p.values[0].id)
+                        ttlStr += toRdf.tab1(self + p['class'].id, self + p.values[0].id);
+                    else
+                        ttlStr += toRdf.tab1(self + p['class'].id, LIB.displayValueOf(p.values[0], { targetLanguage: 'default', lookupValues: true }), '"');
+                }
+            });
+        }
+        ;
         return ttlStr;
     }
     ;
