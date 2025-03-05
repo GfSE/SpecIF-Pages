@@ -5,6 +5,11 @@
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
     We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
+
+    SHACL
+        see: https://www.ontotext.com/knowledgehub/fundamentals/what-is-shacl/
+        and: https://graphdb.ontotext.com/documentation/10.8/shacl-validation.html
+        and: https://www.ida.liu.se/~robke04/SHACLTutorial/Introduction%20to%20SHACL.pdf
 */
 function escapeTtl(str) {
     return str.replace("\\", "\\\\").replace(/"/g, '\\$&');
@@ -55,7 +60,7 @@ class CToRdf {
     }
 }
 app.specif2turtle = (specifData, opts) => {
-    const self = ':', sourceURI = encodeURI((opts.sourceFileName.startsWith('http') ? opts.sourceFileName : opts.baseURI + opts.sourceFileName) + '/'), hasSbj = "-hasSubject", hasObj = "-hasObject";
+    const self = ':', sourceURI = encodeURI((opts.sourceFileName.startsWith('http') ? opts.sourceFileName : opts.baseURI + opts.sourceFileName) + '/'), suffixShape = "-Shape", suffixHasSbj = "-hasSubject", suffixHasObj = "-hasObject";
     let toRdf = new CToRdf(), enumPCs = [], extendedClasses = LIB.getExtendedClasses(specifData.resourceClasses, 'all')
         .concat(LIB.getExtendedClasses(specifData.statementClasses, 'all'));
     let result = defineNamespaces()
@@ -153,16 +158,16 @@ app.specif2turtle = (specifData, opts) => {
             }
             else {
                 let dt = dT.type.replace('xs:', 'xsd:');
-                switch (dT.type) {
-                    case XsDataType.String:
-                        ttlStr += toRdf.newLine()
-                            + toRdf.tab0(self + pC.id + "-Shape")
-                            + toRdf.tab1('a', 'sh:PropertyShape')
-                            + toRdf.tab1('sh:path', self + pC.id)
-                            + toRdf.tab1('sh:datatype', dt)
-                            + toRdf.tab1('sh:maxLength', dT.maxLength ? dT.maxLength.toString() : undefined, '"');
-                }
-                ;
+                ttlStr += toRdf.newLine()
+                    + toRdf.tab0(self + pC.id + suffixShape)
+                    + toRdf.tab1('a', 'sh:PropertyShape')
+                    + toRdf.tab1('sh:path', self + pC.id)
+                    + toRdf.tab1('sh:datatype', dt)
+                    + toRdf.tab1('sh:maxLength', dT.maxLength ? dT.maxLength.toString() : undefined, '"')
+                    + toRdf.tab1('sh:minInclusive', dT.minInclusive ? dT.minInclusive.toString() : undefined, '"')
+                    + toRdf.tab1('sh:maxInclusive', dT.maxInclusive ? dT.maxInclusive.toString() : undefined, '"')
+                    + toRdf.tab1('sh:minCount', pC.required ? '1' : undefined, '"')
+                    + toRdf.tab1('sh:maxCount', pC.multiple ? undefined : '1', '"');
                 ttlStr += toRdf.newLine()
                     + toRdf.tab0(self + pC.id)
                     + toRdf.tab1('a', 'owl:DatatypeProperty')
@@ -179,24 +184,23 @@ app.specif2turtle = (specifData, opts) => {
     }
     ;
     function MakeClassShape(meC) {
+        let ttlStr = toRdf.newLine()
+            + toRdf.tab0(self + meC.id + suffixShape)
+            + toRdf.tab1('a', 'sh:NodeShape')
+            + toRdf.tab1('sh:targetClass', self + meC.id);
         if (isArrayWithContent(meC.propertyClasses)) {
-            let ttlStr = toRdf.newLine()
-                + toRdf.tab0(self + meC.id + "-Shape")
-                + toRdf.tab1('a', 'sh:NodeShape')
-                + toRdf.tab1('sh:targetClass', self + meC.id);
             let noSh = [];
             meC.propertyClasses.forEach((pC) => {
                 if (enumPCs.includes(pC.id))
                     noSh.push(pC.id);
                 else
-                    ttlStr += toRdf.tab1('sh:property', self + pC.id + "-Shape");
+                    ttlStr += toRdf.tab1('sh:property', self + pC.id + suffixShape);
             });
             if (noSh.length > 0)
                 ttlStr += toRdf.newLine("# No shapes yet for propertyClasses with enumerated dataType: " + noSh.toString());
-            return ttlStr;
         }
         ;
-        return '';
+        return ttlStr;
     }
     function transformResourceClasses(rCL) {
         if (!isArrayWithContent(rCL))
@@ -218,7 +222,10 @@ app.specif2turtle = (specifData, opts) => {
             + toRdf.tab1('rdfs:comment', app.ontology.valueByTitle(rTerm, CONFIG.propClassDesc), '"');
         rCL.forEach(rC => {
             rC = LIB.itemByKey(extendedClasses, LIB.keyOf(rC));
-            ttlStr += MakeClassShape(rC);
+            if (isArrayWithContent(rC.propertyClasses))
+                ttlStr += MakeClassShape(rC);
+            else
+                console.warn("RDF/Turtle Export: The resourceClass " + rC.id + " has no propertyClasses");
             ttlStr += toRdf.newLine()
                 + toRdf.tab0(self + rC.id)
                 + toRdf.tab1('a', 'owl:Class')
@@ -252,13 +259,17 @@ app.specif2turtle = (specifData, opts) => {
             + toRdf.newLine()
             + toRdf.tab0('dcterms:hasPart')
             + toRdf.tab1('a', 'owl:ObjectProperty')
+            + toRdf.tab1('rdfs:comment', "General containment relationship", '"')
             + toRdf.newLine()
             + toRdf.tab0('SpecIF:hasItem')
             + toRdf.tab1('a', 'owl:ObjectProperty')
-            + toRdf.tab1('owl:subPropertyOf', 'dcterms:hasPart');
+            + toRdf.tab1('owl:subPropertyOf', 'dcterms:hasPart')
+            + toRdf.tab1('rdfs:comment', "Containment relationship reserved for use in a hierarchy", '"');
         sCL.forEach(sC => {
             sC = LIB.itemByKey(extendedClasses, LIB.keyOf(sC));
             ttlStr += MakeClassShape(sC)
+                + toRdf.tab1('sh:property', self + sC.id + suffixHasSbj + suffixShape)
+                + toRdf.tab1('sh:property', self + sC.id + suffixHasObj + suffixShape)
                 + toRdf.newLine()
                 + toRdf.tab0(self + sC.id)
                 + toRdf.tab1('a', 'owl:Class')
@@ -268,20 +279,36 @@ app.specif2turtle = (specifData, opts) => {
                 + toRdf.tab1('SpecIF:Icon', sC.icon, '"')
                 + toRdf.tab1('dcterms:modified', sC.changedAt, '"')
                 + toRdf.newLine()
-                + toRdf.tab0(self + sC.id + hasSbj)
+                + toRdf.newLine('# Limit the node classes eligible as subject. Correct this way?')
+                + toRdf.tab0(self + sC.id + suffixHasSbj + suffixShape)
+                + toRdf.tab1('a', 'sh:PropertyShape')
+                + toRdf.tab1('sh:path', self + sC.id + suffixHasSbj)
+                + makeObjectList('sh:class', sC.subjectClasses)
+                + toRdf.tab1('sh:minCount', '1', '"')
+                + toRdf.tab1('sh:maxCount', '1', '"')
+                + toRdf.newLine()
+                + toRdf.tab0(self + sC.id + suffixHasSbj)
                 + toRdf.tab1('a', 'owl:ObjectProperty')
                 + toRdf.tab1('rdfs:subPropertyOf', 'SpecIF:hasSubject')
                 + toRdf.tab1('rdfs:label', "Connects the subject of " + self + sC.id, '"')
                 + toRdf.tab1('rdfs:domain', self + sC.id)
-                + makeObjectList('rdfs:range', sC.subjectClasses)
+                + makeObjectUnion('rdfs:range', sC.subjectClasses)
                 + toRdf.tab1('dcterms:modified', sC.changedAt, '"')
                 + toRdf.newLine()
-                + toRdf.tab0(self + sC.id + hasObj)
+                + toRdf.newLine('# Limit the node classes eligible as object. Correct this way?')
+                + toRdf.tab0(self + sC.id + suffixHasObj + suffixShape)
+                + toRdf.tab1('a', 'sh:PropertyShape')
+                + toRdf.tab1('sh:path', self + sC.id + suffixHasObj)
+                + makeObjectList('sh:class', sC.objectClasses)
+                + toRdf.tab1('sh:minCount', '1', '"')
+                + toRdf.tab1('sh:maxCount', '1', '"')
+                + toRdf.newLine()
+                + toRdf.tab0(self + sC.id + suffixHasObj)
                 + toRdf.tab1('a', 'owl:ObjectProperty')
                 + toRdf.tab1('rdfs:subPropertyOf', 'SpecIF:hasObject')
                 + toRdf.tab1('rdfs:label', "Connects the object of " + self + sC.id, '"')
                 + toRdf.tab1('rdfs:domain', self + sC.id)
-                + makeObjectList('rdfs:range', sC.objectClasses)
+                + makeObjectUnion('rdfs:range', sC.objectClasses)
                 + toRdf.tab1('dcterms:modified', sC.changedAt, '"');
         });
         return ttlStr;
@@ -313,7 +340,8 @@ app.specif2turtle = (specifData, opts) => {
                 ttlStr += toRdf.newLine()
                     + toRdf.tab0(self + r.id)
                     + toRdf.tab1('a', self + r['class'].id)
-                    + transformProperties(r);
+                    + transformProperties(r)
+                    + toRdf.tab1('dcterms:modified', r.changedAt, '"');
             });
             return ttlStr;
         }
@@ -331,9 +359,10 @@ app.specif2turtle = (specifData, opts) => {
                 ttlStr += toRdf.newLine()
                     + toRdf.tab0(self + s.id)
                     + toRdf.tab1('a', self + s['class'].id)
-                    + toRdf.tab1(self + s['class'].id + hasSbj, self + s.subject.id)
-                    + toRdf.tab1(self + s['class'].id + hasObj, self + s.object.id)
-                    + transformProperties(s);
+                    + toRdf.tab1(self + s['class'].id + suffixHasSbj, self + s.subject.id)
+                    + toRdf.tab1(self + s['class'].id + suffixHasObj, self + s.object.id)
+                    + transformProperties(s)
+                    + toRdf.tab1('dcterms:modified', s.changedAt, '"');
             });
             return ttlStr;
         }
@@ -375,7 +404,22 @@ app.specif2turtle = (specifData, opts) => {
         return '';
     }
     ;
+    function isArrayWithContent(array) {
+        return (Array.isArray(array) && array.length > 0);
+    }
     function makeObjectList(pred, L) {
+        let str = "";
+        if (Array.isArray(L) && L.length > 0) {
+            str += toRdf.tab1(pred, self + L[0].id);
+            for (let i = 1; i < L.length; i++) {
+                str += ", " + self + L[i].id;
+            }
+            ;
+        }
+        ;
+        return str;
+    }
+    function makeObjectUnion(pred, L) {
         let str = "";
         if (Array.isArray(L) && L.length > 0) {
             if (L.length > 1) {
@@ -391,8 +435,5 @@ app.specif2turtle = (specifData, opts) => {
         }
         ;
         return str;
-    }
-    function isArrayWithContent(array) {
-        return (Array.isArray(array) && array.length > 0);
     }
 };

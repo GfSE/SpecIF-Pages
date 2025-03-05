@@ -169,6 +169,7 @@ class COntology {
                     let newT = LIB.languageTextOf(lnL[0], opts);
                     return newT;
                 }
+                ;
             }
         }
         ;

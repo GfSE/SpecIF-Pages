@@ -89,7 +89,9 @@ moduleManager.construct({
     return self;
     function ddpSchema2specifClasses(xsd) {
         "use strict";
-        var xlsTerms = ["xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI", CONFIG.propClassId, CONFIG.propClassType, CONFIG.resClassFolder], spD = app.ontology.generateSpecifClasses({ terms: xlsTerms });
+        var xlsTerms = ["xs:string", "xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI"], 
+			spD = app.ontology.generateSpecifClasses({ terms: xlsTerms });
+		console.debug('#1',simpleClone(spD));
         spD.title = [{ text: "SpecIF Classes for prostep iViP DDP (Data Model)" }];
         spD.description = [{ text: "SpecIF Classes derived from DDP Schema Version 2.0 created 10.03.2023 08:09:28 by Michael Kirsch, :em engineering methods AG on behalf of prostep iViP Association" }];
         spD.id = "P-DDP-Classes-V20";
@@ -100,18 +102,21 @@ moduleManager.construct({
             .filter((ch) => { return ch.getAttribute("name") == "DictionaryEntitiesCollection"; });
         Array.from(dictionaryEntities[0].children[0].children, (d) => {
             let dE = d.children[0].children[0].children[0];
-            let ti = dE.getAttribute("name") || "", rC = {
-                id: CONFIG.prefixRC + simpleHash(ti),
-                title: ti,
-                description: getDesc(dE),
-                instantiation: ["auto", "user"],
-                propertyClasses: [],
-                changedAt: spD.createdAt
-            };
-            let attC = dE.getElementsByTagName('xs:complexContent'), atts = attC[0].children[0].children;
+            let ti = dE.getAttribute("name") || "", 
+				rC = {
+					id: CONFIG.prefixRC + ti.toJsId(),
+					title: ti,
+					description: getDesc(dE),
+					instantiation: ["auto", "user"],
+					propertyClasses: [],
+					changedAt: spD.createdAt
+				};
+            let attC = dE.getElementsByTagName('xs:complexContent'), 
+				atts = attC[0].children[0].children;
             let prpL = (atts && atts.length == 1) ? Array.from(atts[0].getElementsByTagName('xs:element')) : [];
+			console.debug('d', ti, rC, dE, atts/*,seq*/, prpL);
             prpL.forEach((prp) => {
-                let ti = prp.getAttribute("ref") || prp.getAttribute("name") || "", id = CONFIG.prefixPC + simpleHash(ti), ty = prp.getAttribute("type") || "xs:string", dT = LIB.itemBy(spD.dataTypes, "type", ty);
+                let ti = prp.getAttribute("ref") || prp.getAttribute("name") || "", id = CONFIG.prefixPC + ti.toJsId(), ty = prp.getAttribute("type") || "xs:string", dT = LIB.itemBy(spD.dataTypes, "type", ty);
                 if (dT) {
                     let pC = {
                         id: id,
@@ -134,7 +139,7 @@ moduleManager.construct({
         Array.from(dictionaryRelations[0].children[0].children, (rel) => {
             if (rel.tagName == "xs:element") {
                 let ti = rel.getAttribute("name") || "", sC = {
-                    id: CONFIG.prefixSC + simpleHash(ti),
+                    id: CONFIG.prefixSC + ti.toJsId(),
                     title: ti,
                     description: getDesc(rel),
                     subjectClasses: [],
@@ -148,10 +153,10 @@ moduleManager.construct({
                 });
                 let sTi = sbj[0].getAttribute("name").substring(7), oTi = obj[0].getAttribute("name").substring(6);
                 sC.subjectClasses.push({
-                    id: CONFIG.prefixRC + simpleHash(sTi)
+                    id: CONFIG.prefixRC + sTi.toJsId()
                 });
                 sC.objectClasses.push({
-                    id: CONFIG.prefixRC + simpleHash(oTi)
+                    id: CONFIG.prefixRC + oTi.toJsId()
                 });
                 LIB.cacheE(spD.statementClasses, sC);
             }

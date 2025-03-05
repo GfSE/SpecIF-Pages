@@ -376,9 +376,19 @@ class CProject {
         spD.createdBy = this.createdBy;
         return spD;
         function makeVal(val) {
-            val = LIB.languageTextOf(val, opts)
-                .makeHTML(opts);
-            return LIB.makeMultiLanguageValue(val);
+            if (val) {
+                if (opts && opts.targetLanguage) {
+                    val = LIB.languageTextOf(val, opts);
+                    if (typeof (val) == 'string') {
+                        val = val.makeHTML(opts);
+                        return LIB.makeMultiLanguageValue(val);
+                    }
+                    ;
+                }
+                ;
+                return val;
+            }
+            ;
         }
     }
     ;
@@ -1332,10 +1342,15 @@ class CProject {
                 { title: 'ePub v2', id: 'epub' },
                 { title: 'MS Word® (Open XML)', id: 'oxml' }
             ]
-            :
+            : (app.title == "DDP Schema to SpecIF" ?
                 [
-                    { title: 'HTML with embedded SpecIF v' + CONFIG.specifVersion, id: 'html', checked: true },
-                ];
+                    { title: 'SpecIF v' + CONFIG.specifVersion, id: 'specif', checked: true },
+                    { title: 'HTML with embedded SpecIF v' + CONFIG.specifVersion, id: 'html' }
+                ]
+                :
+                    [
+                        { title: 'HTML with embedded SpecIF v' + CONFIG.specifVersion, id: 'html', checked: true },
+                    ]);
         if (moduleManager.isReady('ioOntology') && this.hasOntology())
             formats.splice(3, 0, { title: 'SpecIF Class Definitions', id: 'specifClasses' });
         let form = $('<div class="modal fade" id="exportFormat" tabindex="-1" >'
