@@ -24,19 +24,6 @@ Have a look at the following example:
     "type": "xs:double",
     "revision": "1.2",
     "changedAt": "2024-11-21T10:08:31.960Z"
-  },{
-    "id": "DT-GeoPoint",
-    "title": "geo:Point",
-    "type": "xs:complexType",
-    "description": [{
-      "text": "A point in space, specified by three cartesian coordinates.",
-      "language": "en"
-    },{
-      "text": "Ein Punkt im Raum, spezifiziert durch drei kartesische Koordinaten.",
-      "language": "de"
-    }],
-    "revision": "1.2",
-    "changedAt": "2024-11-21T10:08:31.960Z"
   }]
 }
 ```
@@ -101,8 +88,8 @@ The referencing propertyClass and resourceClass is similar to others discussed i
         "language": "de"
       }
     ],
-    "dataType": { "id": "DT-GeoPoint" },
-    "sequence": [
+    "dataType": "xs:complexType",
+    "propertyClasses": [
       {
         "id": "PC-Coordinate-X"
       },{
