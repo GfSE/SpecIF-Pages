@@ -254,6 +254,9 @@ var app, browser, message, moduleManager = function () {
             }
         }
     };
+    self.isRegistered = (mod) => {
+        return self.registered.includes(mod);
+    };
     self.isReady = (mod) => {
         return self.ready.includes(mod);
     };
@@ -378,12 +381,18 @@ var app, browser, message, moduleManager = function () {
                 case 'toHtml':
                     getScript(loadPath + 'modules/specif2html.js');
                     return true;
-                case "toXhtml":
-                    getScript(loadPath + 'assets/javascripts/toXhtml.js');
+                case 'toXhtml':
+                    if (!self.isRegistered('makeXhtml'))
+                        loadModule('makeXhtml');
+                    getScript(loadPath + 'modules/specif2xhtml.js');
                     return true;
                 case "toEpub":
-                    loadModule('toXhtml');
+                    if (!self.isRegistered('makeXhtml'))
+                        loadModule('makeXhtml');
                     getScript(loadPath + 'assets/javascripts/toEpub.js');
+                    return true;
+                case "makeXhtml":
+                    getScript(loadPath + 'assets/javascripts/makeXhtml.js');
                     return true;
                 case "toOxml":
                     getScript(loadPath + 'assets/javascripts/toOxml.js');
@@ -398,7 +407,7 @@ var app, browser, message, moduleManager = function () {
                     getScript(loadPath + 'assets/javascripts/archimate2SpecIF.js');
                     return true;
                 case "sysml2specif":
-                    getScript(loadPath + 'modules/sysml2specif.js');
+                    getScript(loadPath + 'modules/sysml2specIF.js');
                     return true;
                 case 'reqif2specif':
                     getScript(loadPath + 'assets/javascripts/reqif2specif.js');

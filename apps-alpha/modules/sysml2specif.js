@@ -14,12 +14,13 @@
 */
 function sysml2specif(xmi, options) {
     "use strict";
-    const idResourceClassDiagram = app.ontology.getClassId("resourceClass", "SpecIF:View"), idResourceClassActor = app.ontology.getClassId("resourceClass", "FMC:Actor"), idResourceClassState = app.ontology.getClassId("resourceClass", "FMC:State"), idResourceClassPackage = app.ontology.getClassId("resourceClass", "uml:Package"), idResourceClassDefault = app.ontology.getClassId("resourceClass", "SpecIF:ModelElement"), idStatementClassContains = app.ontology.getClassId("statementClass", "SpecIF:contains"), idStatementClassHasPart = app.ontology.getClassId("statementClass", "dcterms:hasPart"), idStatementClassAggregates = idStatementClassHasPart, idStatementClassComprises = idStatementClassHasPart, idStatementClassSpecializes = app.ontology.getClassId("statementClass", "SpecIF:isSpecializationOf"), idStatementClassRealizes = app.ontology.getClassId("statementClass", "uml:Realization"), idStatementClassServes = app.ontology.getClassId("statementClass", "SpecIF:serves"), idStatementClassAssociatedWith = app.ontology.getClassId("statementClass", "SpecIF:isAssociatedWith"), idStatementClassHandles = app.ontology.getClassId("statementClass", "SpecIF:handles"), idStatementClassProvides = app.ontology.getClassId("statementClass", "SpecIF:provides"), idStatementClassConsumes = app.ontology.getClassId("statementClass", "SpecIF:consumes"), idStatementClassShows = app.ontology.getClassId("statementClass", "SpecIF:shows"), idStatementClassDefault = idStatementClassAssociatedWith;
+    const idResourceClassDiagram = app.ontology.getClassId("resourceClass", CONFIG.resClassView), idResourceClassActor = app.ontology.getClassId("resourceClass", "FMC:Actor"), idResourceClassState = app.ontology.getClassId("resourceClass", "FMC:State"), idResourceClassPackage = app.ontology.getClassId("resourceClass", "uml:Package"), idResourceClassDefault = app.ontology.getClassId("resourceClass", CONFIG.resClassModelElement), idStatementClassContains = app.ontology.getClassId("statementClass", "SpecIF:contains"), idStatementClassHasPart = app.ontology.getClassId("statementClass", "dcterms:hasPart"), idStatementClassAggregates = idStatementClassHasPart, idStatementClassComprises = idStatementClassHasPart, idStatementClassSpecializes = app.ontology.getClassId("statementClass", "SpecIF:isSpecializationOf"), idStatementClassRealizes = app.ontology.getClassId("statementClass", "uml:Realization"), idStatementClassServes = app.ontology.getClassId("statementClass", "SpecIF:serves"), idStatementClassAssociatedWith = app.ontology.getClassId("statementClass", "SpecIF:isAssociatedWith"), idStatementClassHandles = app.ontology.getClassId("statementClass", "SpecIF:handles"), idStatementClassProvides = app.ontology.getClassId("statementClass", "SpecIF:provides"), idStatementClassConsumes = app.ontology.getClassId("statementClass", "SpecIF:consumes"), idStatementClassShows = app.ontology.getClassId("statementClass", "SpecIF:shows"), idStatementClassDefault = idStatementClassAssociatedWith;
     if (typeof (options) != 'object' || !options.fileName)
         throw Error("Programming Error: Cameo import gets no parameter options");
     let opts = Object.assign({
         mimeType: "application/vnd.xmi+xml",
-        fileDate: new Date().toISOString()
+        fileDate: new Date().toISOString(),
+        replaceSeparatorNamespace: '*'
     }, options);
     var parser = new DOMParser(), xmiDoc = parser.parseFromString(xmi, "text/xml");
     if (validateCameo(xmiDoc))
@@ -230,7 +231,7 @@ function sysml2specif(xmi, options) {
             spD.statements = spD.statements
                 .filter(validateStatement);
         } while (prevLength > spD.statements.length);
-        console.debug('SysML', spD, opts);
+        console.debug('from SysML:', spD, opts);
         return spD;
         function parseElements(parent, params) {
             Array.from(parent.children, (ch) => {
@@ -243,7 +244,8 @@ function sysml2specif(xmi, options) {
                                 r["class"] = LIB.makeKey(idResourceClassDefault);
                                 spD.resources.push(r);
                                 nd = makeNode(r, params.package);
-                                params.nodes.push(nd);
+                                if (opts.addElementsToHierarchy)
+                                    params.nodes.push(nd);
                         }
                         ;
                 }
@@ -262,7 +264,8 @@ function sysml2specif(xmi, options) {
                                 r["class"] = LIB.makeKey(idResourceClassPackage);
                                 spD.resources.push(r);
                                 nd = makeNode(r, params.package);
-                                params.nodes.push(nd);
+                                if (opts.addElementsToHierarchy)
+                                    params.nodes.push(nd);
                                 parseElements(ch, { package: r.id, nodes: nd.nodes });
                                 break;
                             case 'uml:Class':
@@ -335,7 +338,8 @@ function sysml2specif(xmi, options) {
                 r2["class"] = LIB.makeKey(idResourceClassDefault);
                 spD.resources.push(r2);
                 let nd2 = makeNode(r2, params.package), nextLevel = { package: params.package, nodes: nd2.nodes };
-                params.nodes.push(nd2);
+                if (opts.addElementsToHierarchy)
+                    params.nodes.push(nd2);
                 if (params.package)
                     spD.statements.push({
                         id: CONFIG.prefixS + simpleHash(params.package + idStatementClassContains + r2.id),
@@ -365,7 +369,8 @@ function sysml2specif(xmi, options) {
                             let oO = makeResource(ch2);
                             oO["class"] = LIB.makeKey(idResourceClassActor);
                             spD.resources.push(oO);
-                            nd2.nodes.push(makeNode(oO, r2.id));
+                            if (opts.addElementsToHierarchy)
+                                nd2.nodes.push(makeNode(oO, r2.id));
                             spD.statements.push({
                                 id: CONFIG.prefixS + simpleHash(r2.id + idStatementClassComprises + oO.id),
                                 class: LIB.makeKey(idStatementClassComprises),
@@ -411,14 +416,15 @@ function sysml2specif(xmi, options) {
                                         class: LIB.makeKey(idResourceClassDefault),
                                         properties: [{
                                                 class: LIB.makeKey("PC-Name"),
-                                                values: [[{ text: nm }]]
+                                                values: [[{ text: replaceSeparatorNS(nm) }]]
                                             }, {
                                                 class: LIB.makeKey("PC-Type"),
                                                 values: [[{ text: "uml:Class" }]]
                                             }],
                                         changedAt: opts.fileDate
                                     });
-                                    params.nodes.push(makeNode(LIB.makeKey(pId), params.parent.id));
+                                    if (opts.addElementsToHierarchy)
+                                        params.nodes.push(makeNode(LIB.makeKey(pId), params.parent.id));
                                     specializations.push({
                                         id: CONFIG.prefixS + simpleHash(pId + idStatementClassSpecializes + ty),
                                         class: LIB.makeKey(idStatementClassSpecializes),
@@ -468,7 +474,8 @@ function sysml2specif(xmi, options) {
                                 let r = makeResource(oA);
                                 r["class"] = LIB.makeKey(idResourceClassState);
                                 spD.resources.push(r);
-                                nd2.nodes.push(makeNode(r, params.parent.id));
+                                if (opts.addElementsToHierarchy)
+                                    nd2.nodes.push(makeNode(r, params.parent.id));
                                 spD.statements.push({
                                     id: CONFIG.prefixS + simpleHash(params.parent.id + idStatementClassComprises + r.id),
                                     class: LIB.makeKey(idStatementClassComprises),
@@ -482,7 +489,7 @@ function sysml2specif(xmi, options) {
                         case "uml:Port":
                             pId = oA.getAttribute("xmi:id");
                             ty = oA.getAttribute("type");
-                            nm = oA.getAttribute("name");
+                            nm = replaceSeparatorNS(oA.getAttribute("name"));
                             ti = LIB.titleFromProperties(params.parent.properties, spD.propertyClasses, { targetLanguage: "default" });
                             let prt = {
                                 id: pId,
@@ -520,7 +527,7 @@ function sysml2specif(xmi, options) {
                     if (!sC)
                         prpL = [{
                                 class: LIB.makeKey("PC-Type"),
-                                values: [[{ text: nm }]]
+                                values: [[{ text: replaceSeparatorNS(nm) }]]
                             }];
                 }
                 ;
@@ -597,13 +604,13 @@ function sysml2specif(xmi, options) {
                     class: LIB.makeKey(idResourceClassDiagram),
                     properties: [{
                             class: LIB.makeKey("PC-Name"),
-                            values: [[{ text: oD.getAttribute("name") }]]
+                            values: [[{ text: replaceSeparatorNS(oD.getAttribute("name")) }]]
                         }, {
                             class: LIB.makeKey("PC-Type"),
                             values: [[{ text: oD.getAttribute("xmi:type") }]]
                         }, {
                             class: LIB.makeKey("PC-Notation"),
-                            values: [[{ text: dg.getAttribute("type") }]]
+                            values: [[{ text: "UML " + dg.getAttribute("type") }]]
                         }],
                     changedAt: opts.fileDate
                 };
@@ -631,7 +638,7 @@ function sysml2specif(xmi, options) {
                 id: el.getAttribute("xmi:id"),
                 properties: [{
                         class: LIB.makeKey("PC-Name"),
-                        values: [[{ text: pars && pars.name ? pars.name : el.getAttribute("name") }]]
+                        values: [[{ text: replaceSeparatorNS(pars && pars.name ? pars.name : el.getAttribute("name")) }]]
                     }, {
                         class: LIB.makeKey("PC-Type"),
                         values: [[{ text: el.getAttribute("xmi:type") }]]
@@ -703,5 +710,13 @@ function sysml2specif(xmi, options) {
     function validateCameo(xmi) {
         return xmi.getElementsByTagName('xmi:exporter')[0].innerHTML.includes("MagicDraw")
             && xmi.getElementsByTagName('xmi:exporterVersion')[0].innerHTML.includes("19.0");
+    }
+    function replaceSeparatorNS(name) {
+        if (opts.replaceSeparatorNamespace) {
+            let rx = new RegExp('^(.{1,9})\\' + opts.replaceSeparatorNamespace + '(.+)$');
+            return name.replace(rx, (match, $2, $3) => { return $2 + ':' + $3; });
+        }
+        ;
+        return name;
     }
 }

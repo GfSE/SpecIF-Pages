@@ -255,9 +255,6 @@ class CSpecIF {
                 case XsDataType.String:
                     if (typeof (iE.maxLength) == 'number')
                         oE.maxLength = iE.maxLength;
-                    break;
-                case XsDataType.ComplexType:
-                    oE.sequence = iE.sequence;
             }
             ;
             if (iE.enumeration)
@@ -298,6 +295,10 @@ class CSpecIF {
                 throw "The dataType " + oE.dataType.id + " for propertyClass " + oE.id + " has not been found.";
             if (iE.required)
                 oE.required = true;
+            if (typeof (iE.multiLanguage) == 'boolean' && !iE.multiLanguage)
+                oE.singleLanguage = true;
+            if (iE.singleLanguage)
+                oE.singleLanguage = true;
             dT = LIB.itemByKey(self.dataTypes, oE.dataType);
             if (iE.value || iE.values) {
                 let vL = makeValues(iE, dT);
@@ -651,7 +652,7 @@ class CSpecIF {
             });
             function nodeIsNoRoot(r) {
                 let valL = LIB.valuesByTitle(r, [CONFIG.propClassType], self);
-                return valL.length < 1 || LIB.languageTextOf(valL[0], { targetLanguage: "default" }) != CONFIG.hierarchyRoot;
+                return valL.length < 1 || LIB.languageTextOf(valL[0], { targetLanguage: "default" }) != CONFIG.reqifHierarchyRoot;
             }
             if (opts && opts.createHierarchyRootIfMissing) {
                 for (var i = this.nodes.length - 1; i > -1; i--) {
@@ -772,12 +773,14 @@ class CSpecIF {
                 if (iE.values)
                     oE.values = iE.values;
                 oE.dataType = iE.dataType;
-                if (iE.multiple)
-                    oE.multiple = true;
-                if (iE.format)
-                    oE.format = iE.format;
                 if (iE.required)
                     oE.required = true;
+                if (iE.multiple)
+                    oE.multiple = true;
+                if (iE.singleLanguage)
+                    oE.singleLanguage = true;
+                if (iE.format)
+                    oE.format = iE.format;
                 if (iE.values)
                     oE.values = iE.values;
                 if (iE.unit)
@@ -814,7 +817,7 @@ class CSpecIF {
                     oE.objectClasses = iE.objectClasses;
                 return oE;
             }
-            function p2ext(iE) {
+            function p2ext(iE, opts) {
                 if (opts.showEmptyProperties || Array.isArray(iE.values) && iE.values.length > 0) {
                     let pC = LIB.itemByKey(spD.propertyClasses, iE['class']);
                     if (Array.isArray(opts.skipProperties)) {
@@ -836,19 +839,23 @@ class CSpecIF {
                             for (var v of iE.values) {
                                 txt = LIB.languageTextOf(v, opts);
                                 if (RE.vocabularyTerm.test(txt)) {
-                                    if (opts.lookupValues)
+                                    if (opts.lookupValues &&
+                                        (!opts.dontLookupHeadings
+                                            || !CONFIG.titleProperties
+                                                .map((e) => { return app.ontology.localize(e, opts); })
+                                                .includes(pC.title)))
                                         txt = app.ontology.localize(txt, opts);
                                 }
                                 else {
-                                    if (pC.format == SpecifTextFormat.Xhtml) {
-                                        txt = txt.makeHTML(opts);
-                                        if (opts.allDiagramsAsImage)
-                                            txt = refDiagramsAsImg(txt);
-                                    }
-                                    else {
+                                    if (pC.format == SpecifTextFormat.Plain) {
                                         txt = txt
                                             .replace(/^\s+/, "")
                                             .stripHTML();
+                                    }
+                                    else {
+                                        txt = txt.makeHTML(opts);
+                                        if (opts.allDiagramsAsImage)
+                                            txt = replaceObjectRefs(txt);
                                     }
                                     ;
                                 }
@@ -864,12 +871,13 @@ class CSpecIF {
                             for (var v of iE.values) {
                                 lL = [];
                                 for (var l of v)
-                                    lL.push(l.language ? { text: refDiagramsAsImg(l.text), language: l.language } : { text: refDiagramsAsImg(l.text) });
+                                    lL.push(l.language ? { text: replaceObjectRefs(l.text), language: l.language } : { text: replaceObjectRefs(l.text) });
                                 oE.values.push(lL);
                             }
                             ;
                             return oE;
                         }
+                        ;
                     }
                     ;
                     oE.values = iE.values;
@@ -877,7 +885,7 @@ class CSpecIF {
                 }
                 ;
                 return;
-                function refDiagramsAsImg(val) {
+                function replaceObjectRefs(val) {
                     let replaced = false;
                     val = val.replace(RE.tagObject, ($0, $1, $2) => {
                         if ($1)
@@ -898,22 +906,22 @@ class CSpecIF {
                     return val;
                 }
             }
-            function a2ext(iE) {
+            function a2ext(iE, opts) {
                 var oE = i2ext(iE);
                 oE['class'] = iE['class'];
                 if (iE.alternativeIds)
                     oE.alternativeIds = iE.alternativeIds;
                 let pL = iE.properties;
                 if (pL && pL.length > 0)
-                    oE.properties = LIB.forAll(pL, p2ext);
+                    oE.properties = pL.map(p => p2ext(p, opts));
                 return oE;
             }
             function r2ext(iE) {
-                var oE = a2ext(iE);
+                var oE = a2ext(iE, Object.assign({}, opts, { dontLookupHeadings: true }));
                 return oE;
             }
             function s2ext(iE) {
-                var oE = a2ext(iE);
+                var oE = a2ext(iE, opts);
                 oE.subject = iE.subject;
                 oE.object = iE.object;
                 return oE;
@@ -943,7 +951,7 @@ class CSpecIF {
                                 values: [[{ text: "Root for " + iN.id }]]
                             }, {
                                 class: LIB.makeKey("PC-Type"),
-                                values: [[{ text: CONFIG.hierarchyRoot }]]
+                                values: [[{ text: CONFIG.reqifHierarchyRoot }]]
                             }],
                         changedAt: new Date().toISOString()
                     });
@@ -958,21 +966,40 @@ class CSpecIF {
                 return n2ext(iN);
             }
             function f2ext(iE) {
-                return new Promise((resolve, reject) => {
-                    if (!opts || !opts.allDiagramsAsImage || CONFIG.imgTypes.includes(iE.type)) {
-                        resolve(iE);
-                    }
-                    else {
+                return new Promise((resolve) => {
+                    if (opts && opts.preferPng) {
                         switch (iE.type) {
-                            default:
-                                console.warn("Cannot transform file '" + iE.title + "' of type '" + iE.type + "' to an image.");
-                                resolve({
-                                    id: 'F-' + simpleHash(iE.title),
-                                    title: iE.title,
-                                    changedAt: iE.changedAt
+                            case 'image/svg+xml':
+                                let pngN = f.title.fileName() + '.png';
+                                if (LIB.itemByTitle(self.files, pngN)) {
+                                    console.info("File '" + f.title + "' has a sibling of type PNG");
+                                    break;
+                                }
+                                ;
+                                function storeV() {
+                                    can.width = img.width;
+                                    can.height = img.height;
+                                    ctx.drawImage(img, 0, 0);
+                                    can.toBlob((b) => {
+                                        resolve({ id: f.id, title: pngN, type: 'image/png', h: img.height, w: img.width, blob: b });
+                                    }, 'image/png');
+                                }
+                                let can = document.createElement('canvas'), ctx = can.getContext('2d'), img = new Image();
+                                img.addEventListener('load', storeV, false);
+                                const reader = new FileReader();
+                                reader.addEventListener('loadend', (e) => {
+                                    img.src = 'data:image/svg+xml,' + encodeURIComponent(e.target.result);
                                 });
+                                reader.readAsText(f.blob);
+                                console.info("File '" + f.title + "' transformed to PNG");
+                                return;
+                            default:
+                                if (!CONFIG.imgTypes.includes(iE.type))
+                                    console.warn("Cannot transform file '" + iE.title + "' of type '" + iE.type + "' to a raster image.");
                         }
                     }
+                    ;
+                    resolve(iE);
                 });
             }
         });

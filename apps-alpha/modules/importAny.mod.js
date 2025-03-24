@@ -90,7 +90,7 @@ moduleManager.construct({
                 name: 'ioSysml',
                 desc: 'System Modeling Language',
                 label: 'UML/SysML',
-                extensions: [".mdzip"],
+                extensions: [".mdzip", ".mdzip.bak"],
                 help: "Experimental: Import an XMI file from Cameo v19.0."
             }, {
                 id: 'reqif',

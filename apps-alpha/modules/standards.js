@@ -56,9 +56,9 @@ CONFIG.propClassLifecycleStatus = 'SpecIF:LifecycleStatus';
 CONFIG.propClassDomain = "SpecIF:Domain";
 CONFIG.propClassDiagram = 'SpecIF:Diagram';
 CONFIG.propClassLocalTerm = "SpecIF:LocalTerm";
-CONFIG.resClassResource = 'SpecIF:Resource';
-CONFIG.resClassStatement = 'SpecIF:Statement';
-CONFIG.resClassDiagram = 'SpecIF:View';
+CONFIG.resClassResource = "SpecIF:Resource";
+CONFIG.resClassStatement = "SpecIF:Statement";
+CONFIG.resClassView = "SpecIF:View";
 CONFIG.resClassXlsRow = 'XLS:Resource';
 CONFIG.resClassUnreferencedResources = "SpecIF:UnreferencedResources";
 CONFIG.resClassHierarchyRoot = 'SpecIF:HierarchyRoot';
@@ -72,8 +72,9 @@ CONFIG.resClassCondition = "SpecIF:Condition";
 CONFIG.resClassRole = "SpecIF:Role";
 CONFIG.resClassFolder = 'SpecIF:Heading';
 CONFIG.resClassParagraph = "SpecIF:Paragraph";
+CONFIG.resClassModelElement = "SpecIF:ModelElement";
 CONFIG.resClassComment = 'SpecIF:Comment';
-CONFIG.hierarchyRoot = 'ReqIF:HierarchyRoot';
+CONFIG.reqifHierarchyRoot = 'ReqIF:HierarchyRoot';
 CONFIG.staClassShows = 'SpecIF:shows';
 CONFIG.staClassCommentRefersTo = 'SpecIF:commentRefersTo';
 CONFIG.staClassMentions = 'SpecIF:mentions';
@@ -126,7 +127,7 @@ CONFIG.excludedFromTypeFiltering = [
 CONFIG.excludedFromDeduplication = [
     CONFIG.resClassFolder,
     CONFIG.resClassParagraph,
-    CONFIG.resClassDiagram,
+    CONFIG.resClassView,
     CONFIG.resClassCondition,
     "uml:Port",
     'bpmn:parallelGateway',
@@ -151,7 +152,7 @@ CONFIG.diagramTypesHavingShowsStatementsForEdges = [
     "ArchiMate:Viewpoint"
 ];
 CONFIG.diagramClasses = [
-    CONFIG.resClassDiagram,
+    CONFIG.resClassView,
     CONFIG.resClassProcess,
     "ArchiMate:Viewpoint",
     "FMC:Plan"

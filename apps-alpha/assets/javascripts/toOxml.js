@@ -118,7 +118,7 @@ function toOxml( data, options ) {
 					console.info("File '"+f.title+"' has a sibling of type PNG");
 					return;
 				};
-				// else, transform SVG to PNG:
+			/*	// else, transform SVG to PNG:
 					function storeV(){
 //						console.debug('vector',pend);
 						can.width = img.width;
@@ -147,7 +147,7 @@ function toOxml( data, options ) {
 				reader.readAsText(f.blob);
 
 				console.info("File '"+f.title+"' transformed to PNG and made available as Base64");
-				return;
+				return;  */
 			};
 			console.warn("Format of file '"+f.title+"' is not supported by MS Word.")
 		});
@@ -242,7 +242,9 @@ function toOxml( data, options ) {
 				};
 			
 			// Create the title:
-			let ti = stripHtml(languageValueOf(data.title));
+			// export should have selected a single language:
+			let ti = stripHtml(languageValueOf(data.title[0]['text']));
+		//	let ti = stripHtml(languageValueOf(data.title));
 
 			oxml.sections.push(
 				wParagraph({ text: ti, format: { heading:0 } })
@@ -266,7 +268,21 @@ function toOxml( data, options ) {
 				// - or as text for further processing (if pars.level is not a number)
 
 				// First, find and set the configured title:
-				let a = titleIdx( itm.properties ), ti;
+				let ti = LIB.valueByTitle(itm, opts.titleProperties[0], data)  // assuming that the first entry is the translation of dcterms:title
+					|| LIB.valueByTitle(itm, opts.typeProperty, data)
+					|| (itm.subject ? LIB.classTitleOf(itm['class'], data.statementClasses) : '');
+/* previously without LIB. But it does not use the content of the 'type' property.
+				function titleIdx( aL ) {
+					// Find the index of the property to be used as resource or statement title.
+					// The result depends on the current user - only the properties with read permission are taken into consideration
+					if( Array.isArray( aL ) )
+						for( var a=0,A=aL.length;a<A;a++ ) {
+							// First, check the configured title properties:
+							if( opts.titleProperties.includes( prpTitleOf(aL[a]) ) ) return a;
+						};
+					return -1;
+				}
+				let a = titleIdx(itm.properties), ti;
 				// The title property may be present, but empty, when opts.showEmptyProperties is set:
 				if (a > -1 && itm.properties[a].values.length>0) {  // found!
 					// Remove all formatting for the title, as the app's format shall prevail.
@@ -277,8 +293,9 @@ function toOxml( data, options ) {
 				else {
 					// In case of a statement, use the class' title by default:
 					ti = classTitleOf(itm);
-				};
-//				console.debug('titleOf 1',itm,ti);
+				}; */
+
+				//				console.debug('titleOf 1',itm,ti);
 				ti = minimizeXmlExcapes( ti );
 				if( !ti ) return '';  // no paragraph, if title is empty
 				
@@ -304,17 +321,6 @@ function toOxml( data, options ) {
 				let lvl = pars.level < 2 ? pars.level : (eC.isHeading? 2:3);
 				// all titles get a bookmark, so that any titleLink has a target:
 				return wParagraph( {text: ti, format:{ heading:lvl, bookmark:pars.nodeId }} );
-				
-				function titleIdx( aL ) {
-					// Find the index of the property to be used as resource or statement title.
-					// The result depends on the current user - only the properties with read permission are taken into consideration
-					if( Array.isArray( aL ) )
-						for( var a=0,A=aL.length;a<A;a++ ) {
-							// First, check the configured title properties:
-							if( opts.titleProperties.includes( prpTitleOf(aL[a]) ) ) return a;
-						};
-					return -1;
-				}
 			}	
 			
 			function statementsOf( r, opts ) {
@@ -978,7 +984,8 @@ function toOxml( data, options ) {
 						let u = getXhtmlPrp( 'src', img.properties ).replace('\\','/'), 
 							d = getXhtmlPrp( 'alt', img.properties ) || withoutPath( u ),	// the description
 							e = extOf(u).toLowerCase();	// the file extension
-						
+
+						// ToDo: imageL should contain a png image and u should point to it, so no need for the following:
 						if( opts.imgExtensions.includes( e ) ) {  
 							// It is an image, show it;
 							// if the type is svg, png is preferred and available, replace it:
@@ -1424,7 +1431,7 @@ function toOxml( data, options ) {
 					+	'</w:pict>'
 
 				function pushReferencedFile( p ) {
-					// Add the image to the relationships and return it's index:
+					// Add the image to the relationships and return its index:
 					// check, if available:
 					let n = indexById( oxml.relations, p.id );
 					// avoid duplicate entries:
@@ -1498,7 +1505,7 @@ function toOxml( data, options ) {
 //		console.debug('createOxml',data);
 		let file = createText( data, opts );
 
-		file.name = opts.fileName || data.title;
+		file.name = opts.fileName || data.title[0]['text'];
 
 		file.parts = [];
 		file.parts.push( packGlobalRels() );

@@ -29,7 +29,7 @@ function BPMN2Specif( xmlString, options ) {
 			modified: new Date().toISOString(),
 			titleLength: 96,
 			textLength: 8192,
-			imgMime: "application/bpmn+xml",
+			imgMime: "application/bpmn+xml", // often superseded
 			strNamespace: "bpmn:",
 			modelElementClasses: [idResourceClassActor, idResourceClassState, idResourceClassEvent, idResourceClassCollection],
 			strRoleType: "SpecIF:Role",

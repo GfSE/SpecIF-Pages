@@ -1,39 +1,59 @@
-function toEpub( data, opts ) {
+/*!	Create and save an ePub document using SpecIF data.
+
+	(C)copyright enso managers gmbh(http://enso-managers.de)
+	Author: se@enso-managers.de, Berlin
+	License: Apache 2.0 (http://www.apache.org/licenses/)
+	Dependencies:
+	- jszip ( https://github.com/Stuk/jszip ),
+	- fileSaver ( https://github.com/eligrey/FileSaver.js ),
+	
+	ePub Tutorials:
+	- https://www.ibm.com/developerworks/xml/tutorials/x-epubtut/index.html
+	- http://www.jedisaber.com/eBooks/formatsource.shtml
+    
+	We appreciate any correction, comment or contribution as Github issue(https://github.com/enso-managers/SpecIF-Tools/issues)
+
+	Limitations:
+	- Accepts data-sets according to SpecIF v1.1.
+	- All values must be strings, the language must be selected before calling this function, i.e.languageValues as permitted by the schema are not supported!
+	- There must only be one revision per class, resource or statement
+
+	ToDo:
+	- Embed font with sufficient UTF-8 coverage: http://www.dpc-consulting.org/epub-praxis-fonts-einbinden-und-verwenden/
+	- Control pagination: http://www.dpc-consulting.org/epub-praxis-seitenumbruche-steuern-und-elemente-zusammenhalten/
+	- move image transformation to export filter
+*/
+
+function toEpub(data, options) {
 	"use strict";
-	// Accepts data-sets according to SpecIF v0.10.4 or v0.11.2 and later.
-	// (C)copyright enso managers gmbh(http://enso-managers.de)
-	// Author: se@enso-managers.de, Berlin
-	// License: Apache 2.0 (http://www.apache.org/licenses/)
-	// Dependencies:
-	// - jszip ( https://github.com/Stuk/jszip ),
-	// - fileSaver ( https://github.com/eligrey/FileSaver.js ),
-	// ePub Tutorials:
-	// - https://www.ibm.com/developerworks/xml/tutorials/x-epubtut/index.html
-	// - http://www.jedisaber.com/eBooks/formatsource.shtml
-    // We appreciate any correction, comment or contribution as Github issue(https://github.com/enso-managers/SpecIF-Tools/issues)
 
-	// ToDo: 
-	// - Embed font with sufficient UTF - 8 coverage: http://www.dpc-consulting.org/epub-praxis-fonts-einbinden-und-verwenden/
-	// - Control pagination: http://www.dpc-consulting.org/epub-praxis-seitenumbruche-steuern-und-elemente-zusammenhalten/
-	// - move image transformation to export filter
+	let opts = Object.assign(
+		{
+			// colorAccent1: '5B9BD5',   // original Office
+			// colorAccent1: 'CB0A1B',  // GfSE red-brown
 
-	// Check for missing options:
-	if ( !opts ) opts = {};
-	if( !opts.metaFontSize ) opts.metaFontSize = '90%';	
-	if( !opts.metaFontColor ) opts.metaFontColor = '#0071B9';	// adesso blue
-	if( !opts.linkFontColor ) opts.linkFontColor = '#0071B9';
-//	if( !opts.linkFontColor ) opts.linkFontColor = '#005A92';	// darker
-	if( typeof(opts.linkNotUnderlined)!='boolean' ) opts.linkNotUnderlined = false;
-	if( typeof(opts.preferPng)!='boolean' ) opts.preferPng = true;
-	opts.epubImgPath = 'Images/';
+			metaFontSize: '90%',
+			metaFontColor: '#0071B9',	// adesso blue
+			linkFontColor: '#0071B9',
+			//	linkFontColor: '#005A92',	// darker
+			linkNotUnderlined: false,
+			preferPng: true,
+			// imageResolution: 8, // 10 dots per mm = ~256 dpi
+			imgPath: 'Images/',  // path for image-file(s)
+			placeholder: '%h0kusPokus%',
+			txtPath: 'sect%h0kusPokus%.xhtml',  // path + filename for text-files with placeholder for file index as base for anchors
+			titlePage: true
+		},
+		options
+	);
 
 	// Check the files:
 	// - any raster image is OK right away,
 	// - If SVG, look if there is a sibling (same filename) of type PNG. If so, nothing to do.
-	// - Otherwise transform SVG to PNG, as many ePub-Readers does not (yet) support SVG.
+	// - Otherwise transform SVG to PNG, as many ePub-Readers do not (yet) support SVG.
 	// To get the image size, see: https://stackoverflow.com/questions/8903854/check-image-width-and-height-before-upload-with-javascript
 
-	var transformedImgL = [],
+	var // transformedImgL = [],
 		pend = 0;		// the number of pending operations
 	// Select and/or transform files as outlined above:
 	if( data.files ) {
@@ -44,13 +64,13 @@ function toEpub( data, opts ) {
 			};
 
 			// If it is a raster image:
-			if ( ['image/png','image/jpg','image/jpeg','image/gif'].indexOf(f.type)>-1 ) {
+			if ( ['image/png','image/jpg','image/jpeg','image/gif'].includes(f.type) ) {
 				// nothing to do:
 				return
 			};
 			
 			// If it is a vector image:
-			if ( ['image/svg+xml'].indexOf(f.type)>-1 ) {
+			if ( ['image/svg+xml'].includes(f.type) ) {
 				if( !opts.preferPng ) {
 					// take it as is:
 					return
@@ -62,7 +82,7 @@ function toEpub( data, opts ) {
 					// A corresponding PNG file exists already, so nothing to do:
 					return
 				};
-				// else, transform SVG to PNG:
+		/*		// else, transform SVG to PNG:
 					function storeV(){
 //						console.debug('vector',pend);
 						can.width = img.width;
@@ -92,7 +112,7 @@ function toEpub( data, opts ) {
 				reader.readAsText(f.blob);
 
 				console.info("File '"+f.title+"' transformed to PNG");
-				return
+				return */
 			};
 			console.warn("Format of file '"+f.title+"' is not supported by ePub.")
 		})
@@ -106,9 +126,9 @@ function toEpub( data, opts ) {
 // -----------------------
 	function makeEpub() {
 		// transform to ePub/xhtml:
-		let ePub = toXhtml( data, opts );
+		let ePub = makeXhtml(data, Object.assign({}, opts, { imgPath: '../' + opts.imgPath }));
 
-		ePub.fileName = opts.fileName || data.title;
+		ePub.fileName = opts.fileName || data.title[0]['text'];
 		ePub.mimetype = 'application/epub+zip';
 
 	//	ePub.cover = undefined;
@@ -138,10 +158,10 @@ function toEpub( data, opts ) {
 			+		'</container>';
 		ePub.content = 
 					'<?xml version="1.0" encoding="UTF-8"?>'
-			+		'<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookID" version="2.0" >'
+			+		'<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="' + data.id + '" version="2.0" >'
 			+		'<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">'
-			+			'<dc:identifier id="BookID" opf:scheme="UUID">SpecIF-'+data.id+'</dc:identifier>'	
-			+			'<dc:title>'+data.title+'</dc:title>'
+			+			'<dc:identifier id="' + data.id + '" opf:scheme="UUID">SpecIF-' + data.id + '</dc:identifier>'	
+			+			'<dc:title>'+data.title[0]['text']+'</dc:title>'
 			+			'<dc:creator opf:role="aut">'+(typeof(data.createdBy)=='object'&&typeof(data.createdBy.familyName)=='string'&&data.createdBy.familyName.length>0?data.createdBy.familyName+', ':'')+(typeof(data.createdBy)=='object'&&typeof(data.createdBy.givenName)=='string'?data.createdBy.givenName:'')+'</dc:creator>'
 			+			'<dc:publisher>'+(typeof(data.createdBy)=='object'&&typeof(data.createdBy.org)=='object'?data.createdBy.org.organizationName:'')+'</dc:publisher>'
 			+			'<dc:language>en-US</dc:language>'
@@ -156,7 +176,7 @@ function toEpub( data, opts ) {
 			ePub.content += '<item id="sect'+i+'" href="Text/sect'+i+'.xhtml" media-type="application/xhtml+xml" />'
 		});
 		ePub.images.forEach( function(f,i) {
-			ePub.content += '<item id="img'+i+'" href="'+opts.epubImgPath+f.id+'" media-type="'+f.type+'"/>'
+			ePub.content += '<item id="img'+i+'" href="'+opts.imgPath+f.id+'" media-type="'+f.type+'"/>'
 		});
 
 		ePub.content += '</manifest>'
@@ -178,7 +198,7 @@ function toEpub( data, opts ) {
 			+			'<meta name="dtb:maxPageNumber" content="0"/>'
 			+		'</head>'
 			+		'<docTitle>'
-			+			'<text>'+data.title+'</text>'
+			+			'<text>'+data.title[0]['text']+'</text>'
 			+		'</docTitle>'
 		// http://epubsecrets.com/nesting-your-toc-in-the-ncx-file-and-the-nookkindle-workaround.php
 			+		'<navMap>'
@@ -191,8 +211,8 @@ function toEpub( data, opts ) {
 			(h,i)=>{
 				// Build a table of content;
 				// not all readers support nested ncx, so we provide a flat list.
-				// Some tutorials have proposed to indent the title instead, but this does not work, 
-				// as leading whitespace seems to be ignored.
+				// Some tutorials have proposed to indent the title instead, but this does not work,
+				// as leading whitespace seemingly are ignored.
 				ePub.toc += 	'<navPoint id="tocHd'+i+'" playOrder="'+(i+1)+'">'
 					+				'<navLabel><text>'+h.title+'</text></navLabel>'
 					+				'<content src="Text/sect'+h.section+'.xhtml#'+h.id+'"/>'
@@ -226,14 +246,15 @@ function toEpub( data, opts ) {
 			zip.file( "OEBPS/Text/title.xhtml", ePub.title ); 
 		*/
 			// Add a XHTML-file per hierarchy:
-			ePub.sections.forEach( function(s,i) {
-				zip.file( "OEBPS/Text/sect"+i+".xhtml", s )
+			ePub.sections.forEach(function (s, i) {
+				s.styles = '../Styles/styles.css';
+				zip.file("OEBPS/Text/" + opts.txtPath.replace(opts.placeholder,i), makeXhtmlFile(s) )
 			});
 
 //			console.debug('files',ePub.images);
 			// Add the images:
 			ePub.images.forEach( function(f) {
-				zip.file( "OEBPS/"+opts.epubImgPath+f.id, f.blob )
+				zip.file( "OEBPS/"+opts.imgPath+f.id, f.blob )
 			});
 			// finally store the ePub file in a zip container:
 			zip.generateAsync({
@@ -242,13 +263,13 @@ function toEpub( data, opts ) {
 				})
 				.then(
 					function(blob) {
-//						console.debug('storing ',blob,ePub.fileName+".epub");
+//						console.debug('storing ',blob,ePub.fileName);
 						saveAs(blob, ePub.fileName);
 						if( typeof(opts.done)=="function" ) opts.done();
 					}, 
 					function(error) {
-//						console.debug("cannot store ",ePub.fileName+".epub");
-						if( typeof(opts.fail)=="function" ) opts.fail({status:299,statusText:"Cannot store "+ePub.fileName+".epub"});
+//						console.debug("cannot store ",ePub.fileName);
+						if( typeof(opts.fail)=="function" ) opts.fail({status:299,statusText:"Cannot store "+ePub.fileName});
 					}
 				);
 		}
@@ -264,5 +285,20 @@ function toEpub( data, opts ) {
 	}
 	function nameOf( str ) {
 		return str.substring( 0, str.lastIndexOf('.') )
+	}
+	function makeXhtmlFile(doc) {
+		// make a xhtml file content from the elements provided:
+		//		console.debug('makeXhtmlFile',doc);
+		return '<?xml version="1.0" encoding="UTF-8"?>'
+			+ '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
+			+ '<html xmlns="http://www.w3.org/1999/xhtml">'
+			+ '<head>'
+			+ '<link rel="stylesheet" type="text/css" href="' + doc.styles + '" />'
+			+ '<title>' + doc.title + '</title>'
+			+ '</head>'
+			+ '<body>'
+			+ doc.body
+			+ '</body>'
+			+ '</html>'
 	}
 }

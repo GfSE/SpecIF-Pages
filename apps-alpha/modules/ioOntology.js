@@ -694,17 +694,29 @@ class COntology {
         ;
         console.error("Ontology: No item with id '" + termId + "' found in the Ontology or it has no value");
     }
-    getModelElementClasses() {
-        let tR = this.getTermResource('resourceClass', "SpecIF:ModelElement"), sL = [];
+    getSpecializationsOf(ctg, term) {
+        if (!["resourceClass", "statementClass"].includes(ctg))
+            return [];
+        let tR = this.getTermResource(ctg, term), spL = [term];
         if (tR) {
-            sL = this.statementsByTitle(tR, ["SpecIF:isSpecializationOfResource"], { asObject: true })
+            spL = this.statementsByTitle(tR, [ctg == 'resourceClass' ? "SpecIF:isSpecializationOfResource" : "SpecIF:isSpecializationOfStatement"], { asObject: true })
                 .map((s) => {
-                let r = LIB.itemByKey(this.data.resources, s.subject);
+                return LIB.itemByKey(this.data.resources, s.subject);
+            })
+                .filter((r) => {
+                let stat = this.valueByTitle(r, "SpecIF:TermStatus");
+                return this.eligibleLifecycleStatus.includes(stat);
+            })
+                .map((r) => {
                 return this.valueByTitle(r, CONFIG.propClassTerm);
             });
+            spL.forEach((sp) => { spL = spL.concat(this.getSpecializationsOf(ctg, sp)); });
         }
         ;
-        return ["SpecIF:ModelElement"].concat(sL);
+        return spL;
+    }
+    getModelElementClasses() {
+        return [CONFIG.resClassModelElement].concat(this.getSpecializationsOf('resourceClass', CONFIG.resClassModelElement));
     }
     getHeadings() {
         return this.data.resources

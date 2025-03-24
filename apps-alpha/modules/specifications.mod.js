@@ -773,7 +773,7 @@ moduleManager.construct({
         return;
         function toJqTreeWithoutRoot(iE) {
             let r = LIB.itemByKey(self.cData.resources, iE.resource), ty = LIB.valueByTitle(r, CONFIG.propClassType, self.cData);
-            if (ty == CONFIG.hierarchyRoot)
+            if ([CONFIG.resClassHierarchyRoot, CONFIG.reqifHierarchyRoot].includes(ty))
                 return LIB.forAll(iE.nodes, toJqTree);
             return toJqTree(iE);
         }

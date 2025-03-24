@@ -200,11 +200,8 @@ As we have discussed all concepts before, let's right away discuss the full exam
       "class": "PC-Name",
       "value": "IT-Integration: FiCo-Application and FiCo-Data"
     },{
-      "class": "PC-Description",
-      "value": "<div></div>"
-    },{
       "class": "PC-Diagram",
-      "value": "<div><p class=\"inline-label\">Model Diagram:</p><p><object type=\"image/png\" data=\"files_and_images/Very-Simple-Model-FMC.png\">Notation: FMC Block Diagram</object></p></div>"
+      "value": "<p class=\"inline-label\">Model Diagram:</p><p><object type=\"image/png\" data=\"files_and_images/Very-Simple-Model-FMC.png\">Notation: FMC Block Diagram</object></p>"
     },{
       "class": "PC-Type",
       "value": "FMC Block Diagram"
@@ -219,7 +216,7 @@ As we have discussed all concepts before, let's right away discuss the full exam
       "value": "FiCo-Application"
     },{
       "class": "PC-Description",
-      "value": "<div><p>IT-Application for Finance and Controlling.</p></div>"
+      "value": "<p>IT-Application for Finance and Controlling.</p>"
     }],
     "changedAt": "2020-03-06T09:04:00+01:00"
   },{
@@ -231,7 +228,7 @@ As we have discussed all concepts before, let's right away discuss the full exam
       "value": "FiCo-Data"
     },{
       "class": "PC-Description",
-      "value": "<div><p>Finance and Controlling Data, such as cost-units per project with budget, accrued cost etc.</p></div>"
+      "value": "<p>Finance and Controlling Data, such as cost-units per project with budget, accrued cost etc.</p>"
     }],
     "changedAt": "2020-03-06T09:03:00+01:00"
   },{
@@ -243,7 +240,7 @@ As we have discussed all concepts before, let's right away discuss the full exam
       "value": "Consistency"
     },{
       "class": "PC-Description",
-      "value": "<div><p>The data store MUST be consistent at all times.</p></div>"
+      "value": "<p>The data store MUST be consistent at all times.</p>"
     }],
     "changedAt": "2020-10-17T10:00:00+01:00"
   },{
@@ -255,7 +252,7 @@ As we have discussed all concepts before, let's right away discuss the full exam
       "value": "Data Volume"
     },{
       "class": "PC-Description",
-      "value": "<div><p>The data store MUST support a total volume up to 850 GB.</p></div>"
+      "value": "<p>The data store MUST support a total volume up to 850 GB.</p>"
     }],
     "changedAt": "2020-10-17T10:00:00+01:00"
   },{
@@ -267,7 +264,7 @@ As we have discussed all concepts before, let's right away discuss the full exam
       "value": "Response Time"
     },{
       "class": "PC-Description",
-      "value": "<div><p>The system SHOULD respond on user queries within 300 ms.</p></div>"
+      "value": "<p>The system SHOULD respond on user queries within 300 ms.</p>"
     }],
     "changedAt": "2020-10-17T10:00:00+01:00"
   }],

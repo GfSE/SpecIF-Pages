@@ -235,7 +235,7 @@ Let us at last have a look at the full example, now:
         "value": "IT-Integration: FiCo-Application and FiCo-Data"
       }, {
         "class": "PC-Diagram",
-        "value": "<div><p class=\"inline-label\">Model Diagram:</p><p><object type=\"image/svg+xml\" data=\"files_and_images/Very-Simple-Model-FMC.svg\">Notation: FMC Block Diagram</object></p></div>"
+        "value": "<p class=\"inline-label\">Model Diagram:</p><p><object type=\"image/svg+xml\" data=\"files_and_images/Very-Simple-Model-FMC.svg\">Notation: FMC Block Diagram</object></p>"
       }, {
         "class": "PC-Type",
         "value": "FMC Block Diagram"
@@ -250,7 +250,7 @@ Let us at last have a look at the full example, now:
         "value": "FiCo-Application"
       }, {
         "class": "PC-Description",
-        "value": "<div><p>IT-Application for Finance and Controlling.</p></div>"
+        "value": "<p>IT-Application for Finance and Controlling.</p>"
       }],
       "changedAt": "2020-03-06T09:04:00+01:00"
     }, {
@@ -262,7 +262,7 @@ Let us at last have a look at the full example, now:
         "value": "FiCo-Data"
       }, {
         "class": "PC-Description",
-        "value": "<div><p>Finance and Controlling Data, such as cost-units per project with budget, accrued cost etc.</p></div>"
+        "value": "<p>Finance and Controlling Data, such as cost-units per project with budget, accrued cost etc.</p>"
       }],
       "changedAt": "2020-03-06T09:03:00+01:00"
     }],

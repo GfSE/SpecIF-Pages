@@ -599,29 +599,35 @@ LIB.displayValueOf = (val, opts) => {
     return val;
 };
 LIB.valuesByTitle = (itm, pNs, dta) => {
-    let valL = [];
-    if (itm.properties) {
-        let dT, pC;
-        for (var p of itm.properties) {
-            pC = LIB.itemByKey(dta.propertyClasses, p['class']);
-            for (var pN of pNs) {
-                if (pC && pC.title == pN) {
-                    dT = LIB.itemByKey(dta.dataTypes, pC.dataType);
-                    if (dT) {
-                        valL = valL.concat(dT.enumeration ?
-                            p.values.map((v) => { return LIB.itemById(dT.enumeration, v.id).value; })
-                            : p.values);
+    if (itm) {
+        let valL = [];
+        if (itm.properties) {
+            let dT, pC;
+            for (var p of itm.properties) {
+                pC = LIB.itemByKey(dta.propertyClasses, p['class']);
+                for (var pN of pNs) {
+                    if (pC && pC.title == pN) {
+                        dT = LIB.itemByKey(dta.dataTypes, pC.dataType);
+                        if (dT) {
+                            valL = valL.concat(dT.enumeration ?
+                                p.values.map((v) => { return LIB.itemById(dT.enumeration, v.id).value; })
+                                : p.values);
+                        }
                     }
                 }
             }
         }
+        ;
+        return valL;
     }
     ;
-    return valL;
 };
 LIB.valueByTitle = (el, ti, dta, opts) => {
-    let lOpts = Object.assign({ targetLanguage: 'default' }, opts), pVL = LIB.valuesByTitle(el, [ti], dta);
-    return pVL.length > 0 ? LIB.displayValueOf(pVL[0], lOpts) : undefined;
+    if (el) {
+        let lOpts = Object.assign({ targetLanguage: 'default' }, opts), pVL = LIB.valuesByTitle(el, [ti], dta);
+        return pVL.length > 0 ? LIB.displayValueOf(pVL[0], lOpts) : undefined;
+    }
+    ;
 };
 LIB.enumeratedValuesOf = (dTk, dta) => {
     var dT = dTk.type ? dTk : LIB.itemByKey((dta ? dta.dataTypes : app.projects.selected.cache.get('dataType', app.projects.selected.dataTypes)), dTk), oL = [];

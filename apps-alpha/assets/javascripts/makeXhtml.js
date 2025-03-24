@@ -16,7 +16,7 @@
 	- move the title linking to the export filter
 */
 
-function toXhtml( data, options ) {
+function makeXhtml( data, options ) {
 	"use strict";
 
 	// Reject versions < 1.1:
@@ -81,27 +81,27 @@ function toXhtml( data, options ) {
 			sections: [],		// the xhtml files for the title and each chapter=section
 			images: []			// the referenced images
 		},
-		prTi = escapeXML(languageValueOf(data.title));
+		// Create the title:
+		// export should have selected a single language:
+		prTi = escapeXML(languageValueOf(data.title[0]['text']));
 
 	// Create a title page as xhtml-file and add it as first section:
-	xhtml.sections.push(
-			makeXhtmlFile({ 
-				title: prTi,
-				body: '<div class="title">'+prTi+'</div>'
-			})
-	);
+	if(opts.titlePage)
+		xhtml.sections.push({
+			title: prTi,
+			body: '<div class="title">' + prTi + '</div>'
+		});
 	
 	// For each SpecIF hierarchy, create a xhtml-file and add it as subsequent section:
 	const firstHierarchySection = xhtml.sections.length;  // index of the next section number
 	data.nodes.forEach(
 		(h, i) => {
-			pushHeading( h.title, {nodeId: h.id, level: 1} );
-			xhtml.sections.push(
-				makeXhtmlFile({ 
-					title: prTi,
-					body: renderHierarchy( h, i, 1, '' )
-				})
-			)
+		//	let r = itemById(data.resources,h.resource);
+		//	pushHeading( h.title, {nodeId: h.id, level: 1} ); // h.title is undefined
+			xhtml.sections.push({
+				title: prTi,
+				body: renderHierarchy(h, i, 1, '')
+			})
 		}
 	);
 
@@ -121,6 +121,20 @@ function toXhtml( data, options ) {
 		// render the resource or statement title
 
 		// First, find and set the configured title:
+		let ti = LIB.valueByTitle(itm, opts.titleProperties[0], data)  // assuming that the first entry is the translation of dcterms:title
+			|| LIB.valueByTitle(itm, opts.typeProperty, data)
+			|| (itm.subject ? LIB.classTitleOf(itm['class'], data.statementClasses) : '');
+/* previously without LIB. But it does not use the content of the 'type' property.
+		function titleIdx(aL) {
+			// Find the index of the property to be used as title.
+			// The result depends on the current user - only the properties with read permission are taken into consideration
+			if (Array.isArray(aL))
+				for (var a = 0, A = aL.length; a < A; a++) {
+					// First, check the configured title properties:
+					if (opts.titleProperties.includes(prpTitleOf(aL[a]))) return a;
+				};
+			return -1
+		}
 		let a = titleIdx(itm.properties), ti;
 		// The title property may be present, but empty, when opts.showEmptyProperties is set:
 		if (a > -1 && itm.properties[a].values.length > 0) {  // found!
@@ -132,7 +146,7 @@ function toXhtml( data, options ) {
 		else {
 			// In case of a statement, use the class' title by default:
 			ti = classTitleOf(itm);
-		};
+		}; */
 
 		ti = escapeXML(ti);
 		if( !ti ) return '';
@@ -153,16 +167,6 @@ function toXhtml( data, options ) {
 		let lvl = pars.level==1? 1 : (eC&&eC.isHeading? 2:3);
 		return '<h'+lvl+' id="'+pars.nodeId+'">'+ti+'</h'+lvl+'>';
 				
-		function titleIdx( aL ) {
-			// Find the index of the property to be used as title.
-			// The result depends on the current user - only the properties with read permission are taken into consideration
-			if( Array.isArray( aL ) )
-				for( var a=0,A=aL.length;a<A;a++ ) {
-					// First, check the configured title properties:
-					if( opts.titleProperties.includes( prpTitleOf(aL[a]) ) ) return a;
-				};
-			return -1
-		}
 	}
 	function statementsOf( r, hi, opts ) { // resource, options
 		// render the statements (relations) about the resource in a table
@@ -247,7 +251,7 @@ function toXhtml( data, options ) {
 		
 		function nodeByRef( nd ) {
 			if ((nd.resource.id || nd.resource) == res.id)
-				return 'sect' + (y + firstHierarchySection) + '.xhtml#' + nd.id;  // fully qualified anchor including filename
+				return opts.txtPath.replace(opts.placeholder, (y + firstHierarchySection)) + '#' + nd.id;  // fully qualified anchor including filename
 			if (nd.nodes) {
 				let ndId;
 				for (var n of nd.nodes) {
@@ -283,7 +287,8 @@ function toXhtml( data, options ) {
 
 		if( descriptions.length>0 )
 			descriptions.forEach( (p)=>{
-				c1 += '<p>'+propertyValuesOf( p, hi )+'</p>';
+				c1 += propertyValuesOf( p, hi );  // has passed makeHTML
+			//	c1 += '<p>' + propertyValuesOf(p, hi) + '</p>';
 			})
 		else
 			if( r.description ) c1 += '<p>'+propertyValuesOf( r.description, hi )+'</p>';
@@ -323,23 +328,25 @@ function toXhtml( data, options ) {
 				}
 				function withoutPath( str ) {
 					str = str.replace('\\','/');
-					return str.substring(str.lastIndexOf('/')+1)
+					return str.substring(str.lastIndexOf('/') + 1);
 				}
 				function fileName( str ) {
 					str = str.replace('\\','/');
-					return str.substring( 0, str.lastIndexOf('.') )
+					return str.substring(0, str.lastIndexOf('.'));
 				}
-				function fileNameWithPath( u ) {
+				function fileNameWithPath( f ) {
 					// Unfortunately some (or even most) ePub-Readers do not support subfolders for images,
 					// so we need to generate a GUID and to store all files in a single folder.
-					return '../' + opts.epubImgPath + 'F-' + simpleHash(u)
+					// The filename must correspond to pushReferencedFile.
+					return opts.imgPath + 'F-' + simpleHash(f.title) + '.' + extOf(f.title);
 				}
 				function pushReferencedFile( f ) {
-					if( f && f.blob ) {
+					if (f && f.blob) {
+						let fId = 'F-' + simpleHash(f.title) + '.' + extOf(f.title);  // must correspond to fileNameWithPath
 						// avoid duplicate entries:
-						if( indexByTitle( xhtml.images, f.title )<0 ) {
+						if( !itemById( xhtml.images, fId ) ) {
 							xhtml.images.push({
-								id: 'F-' + simpleHash(f.title),
+								id: fId,
 							//	id: f.id,
 							//	title: f.title,  // is the distinguishing/relative part of the URL
 								blob: f.blob,
@@ -418,7 +425,7 @@ function toXhtml( data, options ) {
 							let noPreview = true;
 							// replace by preview image, if possible:
 							for( var i=data.files.length-1; noPreview && i>-1; i-- ) {
-								if( data.files[i].title.indexOf( fileName(u1) )>-1 ) {
+								if( data.files[i].title.includes( fileName(u1) ) ) {
 									u1 = data.files[i].title;
 									e = extOf(u1).toLowerCase();
 									noPreview = false;
@@ -439,15 +446,17 @@ function toXhtml( data, options ) {
 				function findBestFile( ti, ext, alt ) {
 					// ToDo: Check whether the referenced file exists
 
-					if( opts.imgExtensions.indexOf( ext )>-1 ) {  
+					if( opts.imgExtensions.includes( ext ) ) {  
 						// it is an image, show it:
 
 						// if the type is svg and if png is preferred and available, replace it:
-						if( ( ti.indexOf('svg')>-1 ) && opts.preferPng )
+						// ToDo: imageL should contain a png image and u should point to it, so no need for the following:
+						if( ( ti.includes('svg') ) && opts.preferPng )
 							ti = fileName(ti)+'.png';
 						
-						if( pushReferencedFile( itemByTitle( data.files, ti )) )
-							return '<img src="'+fileNameWithPath(ti)+'" style="max-width:100%" alt="'+alt+'" />';
+						let f = itemByTitle(data.files, ti);
+						if( pushReferencedFile( f ) )
+							return '<img src="'+fileNameWithPath(f)+'" style="max-width:100%" alt="'+alt+'" />';
 					};
 					// else:
 					console.warn('No image file found for ',ti);
@@ -585,24 +594,9 @@ function toXhtml( data, options ) {
 			});
 		return ch
 	}
-	function makeXhtmlFile( doc ) {
-		// make a xhtml file content from the elements provided:
-//		console.debug('makeXhtmlFile',doc);
-		return	'<?xml version="1.0" encoding="UTF-8"?>'
-		+		'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
-		+		'<html xmlns="http://www.w3.org/1999/xhtml">'
-		+			'<head>'
-		+				'<link rel="stylesheet" type="text/css" href="../Styles/styles.css" />'
-		+				'<title>'+doc.title+'</title>'
-		+			'</head>'
-		+			'<body>'
-		+				doc.body
-		+			'</body>'
-		+		'</html>'
-	}
 
 	// ---------- helper -----------
-/*	function indexById(L, key) {
+	function indexById(L, key) {
 		if (L && key) {
 			// given an ID of an item in a list, return it's index:
 			let id = key.id || key;
@@ -611,15 +605,10 @@ function toXhtml( data, options ) {
 				if (L[i].id == id) return i   // return list index 
 		};
 		return -1
-	} */
+	}
 	function itemById(L, key) {
-		if (L && key) {
-			// given the ID of an element in a list, return the element itself:
-			let id = key.id || key;
-			//	id = id.trim();
-			for (var i = L.length - 1; i > -1; i--)
-				if (L[i].id === id) return L[i];   // return list item
-		};
+		let i = indexById(L, key);
+		if (i > -1) return L[i];
 		//	return undefined
 	}
 	function itemByTitle(L, ln) {
@@ -630,7 +619,7 @@ function toXhtml( data, options ) {
 		};
 		//	return undefined
 	}
-	function indexByTitle( L, s ) {
+/*	function indexByTitle( L, s ) {
 		if( L && s ) {
 			// Return the index of an element in list 'L' whose property 'p' equals searchterm 's':
 			// hand in property and searchTerm as string !
@@ -638,7 +627,7 @@ function toXhtml( data, options ) {
 				if( L[i].title==s ) return i;
 		};
 		return -1;
-	}
+	} */
 	function prpTitleOf( prp ) {
 		// get the title of a resource/statement property as defined by itself or it's class:
 		return prp.title || itemById(data.propertyClasses, prp['class']).title;

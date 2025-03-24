@@ -501,8 +501,6 @@ class CProject {
                         if (pC && dT) {
                             if (!dT.enumeration && dT.type == XsDataType.String) {
                                 for (var v of p.values) {
-                                    if (pC.multiLanguage == undefined && v.length > 1)
-                                        pC.multiLanguage = true;
                                     for (var l of v) {
                                         let re = /data="([^"]+)"/g, mL;
                                         while ((mL = re.exec(l.text)) !== null) {
@@ -1290,10 +1288,10 @@ class CProject {
             + makeTextField('&#x200b;' + i18n.LblFileName, (fmt == 'specifClasses' ? 'SpecIF-Classes' : this.exportParams.fileName), { typ: 'line' });
         switch (fmt) {
             case 'epub':
+            case 'xhtml':
             case 'oxml':
                 pnl += makeCheckboxField(i18n.LblOptions, [
                     { title: i18n.elementsWithIcons, id: 'elementsWithIcons', checked: true },
-                    { title: i18n.elementsWithOrdernumbers, id: 'elementsWithOrdernumbers', checked: false },
                     { title: i18n.withStatements, id: 'withStatements', checked: false },
                     { title: i18n.withOtherProperties, id: 'withOtherProperties', checked: false },
                     { title: i18n.showEmptyProperties, id: 'showEmptyProperties', checked: CONFIG.showEmptyProperties }
@@ -1339,6 +1337,7 @@ class CProject {
                 { title: 'ReqIF v1.0', id: 'reqif' },
                 { title: 'MS Excel® <em>(experimental)</em>', id: 'xlsx' },
                 { title: 'Turtle <em>(experimental)</em>', id: 'turtle' },
+                { title: 'XHTML', id: 'xhtml' },
                 { title: 'ePub v2', id: 'epub' },
                 { title: 'MS Word® (Open XML)', id: 'oxml' }
             ]
@@ -1443,6 +1442,7 @@ class CProject {
                         break;
                     case 'xlsx':
                     case 'epub':
+                    case 'xhtml':
                     case 'oxml':
                         publish(opts);
                         break;
@@ -1465,7 +1465,8 @@ class CProject {
                     opts.lookupValues =
                         opts.allDiagramsAsImage = true;
                 opts.makeHTML =
-                    opts.linkifyURLs = ['epub', 'oxml'].includes(opts.format);
+                    opts.linkifyURLs = ['epub', 'xhtml', 'oxml'].includes(opts.format);
+                opts.preferPng = ['epub', 'oxml', 'xlsx'].includes(opts.format);
                 opts.revisionDate = new Date().toISOString();
                 let optsLabel = Object.assign({}, opts, { plural: true });
                 self.read(opts)
@@ -1473,6 +1474,7 @@ class CProject {
                     let localOpts = {
                         titleProperties: CONFIG.titleProperties.map((e) => { return app.ontology.localize(e, opts); }),
                         descriptionProperties: CONFIG.descProperties.map((e) => { return app.ontology.localize(e, opts); }),
+                        typeProperty: app.ontology.localize(CONFIG.propClassType, opts),
                         showEmptyProperties: opts.showEmptyProperties,
                         imgExtensions: CONFIG.imgExtensions,
                         applExtensions: CONFIG.applExtensions,
@@ -1487,6 +1489,10 @@ class CProject {
                     };
                     expD.title = LIB.makeMultiLanguageValue(opts.projectName);
                     switch (opts.format) {
+                        case 'xhtml':
+                            localOpts.fileName = LIB.addFileExtIfMissing(localOpts.fileName, ".xhtml.zip");
+                            specif2xhtml(expD, localOpts);
+                            break;
                         case 'epub':
                             localOpts.fileName = LIB.addFileExtIfMissing(localOpts.fileName, ".epub");
                             toEpub(expD, localOpts);
@@ -1503,6 +1509,7 @@ class CProject {
             }
             function storeAs(opts) {
                 opts.allDiagramsAsImage = ["html", "turtle", "reqif"].includes(opts.format);
+                opts.preferPng = ["turtle", "reqif"].includes(opts.format);
                 switch (opts.format) {
                     case 'specif':
                     case 'html':
