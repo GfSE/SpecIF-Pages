@@ -167,20 +167,18 @@ Applications and suggestions are welcome!
 
 # Examples
 
-Two examples belonging to the application domains mechatronic systems and enterprise IT are described in [11], chapter 5. It is shown how process-models, system-structures and requirements are interrelated and which are the practical benefits.
+The following examples can be
+- **viewed** online using the free SpecIF Model-Integrator and Editor, a web-application running in a web browser without any server.
+- **downloaded** as a data set for inspection. Technically speaking you find ZIP-files containing the model-information in JSON format plus the images referenced by the model. A hierarchical document outline lets you comfortably read the content, whereas the relations let you browse the semantic net.
 
-The examples are stored in a data set following the current version of SpecIF. Technically speaking you find ZIP-files containing the model-information in JSON format plus the images referenced by the model. A hierarchical document outline lets you comfortably read the content, whereas the relations let you browse the semantic net.
-
-- A vey small system model with related requirements: <a href="./examples/v1.1/09_Very-Simple-Model-FMC-with-Requirements.specifz" target="_blank">ZIP-file with JSON pursuant SpecIF v1.1</a> and <a href="https://specif.de/apps/view.html#import=%22../examples/v1.1/09_Very-Simple-Model-FMC-with-Requirements.specifz%22" target="_blank">Online Demo</a>.
-- Semantically integrated system model of a dimmer: <a href="./examples/Dimmer.specifz" target="_blank">ZIP-file with JSON pursuant SpecIF v1.1</a> and <a href="https://specif.de/apps/view.html#import=%22../examples/Dimmer.specifz%22" target="_blank">Online Demo</a>.
-- Semantically integrated Process- und IT-Documentation: <a href="./examples/IT-Documentation.specifz" target="_blank">ZIP-file with JSON pursuant SpecIF v1.1</a> and <a href="https://specif.de/apps/view.html#import=%22../examples/IT-Documentation.specifz%22" target="_blank">Online Demo</a>.
+1. A very small system model with related requirements: <a href="https://specif.de/apps/view.html#import=%22../examples/v1.1/09_Very-Simple-Model-FMC-with-Requirements.specifz%22" target="_blank">Online Demo</a> and <a href="./examples/v1.1/09_Very-Simple-Model-FMC-with-Requirements.specifz" target="_blank">ZIP-file with JSON pursuant SpecIF v1.1</a>.
+1. Semantically integrated system model of a dimmer: <a href="https://specif.de/apps/view.html#import=%22../examples/Dimmer.specifz%22" target="_blank">Online Demo</a> and <a href="./examples/Dimmer.specifz" target="_blank">ZIP-file with JSON pursuant SpecIF v1.1</a>.
+1. Semantically integrated Process- und IT-Documentation: <a href="https://specif.de/apps/view.html#import=%22../examples/IT-Documentation.specifz%22" target="_blank">Online Demo</a> and <a href="./examples/IT-Documentation.specifz" target="_blank">ZIP-file with JSON pursuant SpecIF v1.1</a>.
 <!-- - A simple <a href="" target="_blank">BPMN Model</a> as an example of model transformation to SpecIF. The data is available <a href="" target="_blank">here</a>. -->
-- Archimate, BPMN and Excel integrated: <a href="./examples/Telephone-Connection-Request.specif.zip" target="_blank">ZIP-file with JSON pursuant SpecIF v1.1</a> and <a href="https://specif.de/apps/view.html#import=%22../examples/Telephone-Connection-Request.specif.zip%22" target="_blank">Online Demo</a>
-<!-- - Manually transformed from SysML to SpecIF: <a href="./examples/SmAV.specifz" target="_blank">ZIP-file with JSON pursuant SpecIF v1.1</a> and <a href="https://specif.de/apps/view.html#import=%22./examples/SmAV.specifz;view=doc;node=N-Folder-Requirements" target="_blank">Online Demo</a> -->
+1. Archimate, BPMN and Excel integrated: <a href="https://specif.de/apps/view.html#import=%22../examples/Telephone-Connection-Request.specif.zip%22" target="_blank">Online Demo</a> and <a href="./examples/Telephone-Connection-Request.specif.zip" target="_blank">ZIP-file with JSON pursuant SpecIF v1.1</a>. It is shown how process-models, system-structures and requirements are interrelated. The model integration is described in <a href="https://specif.de/files/literature/TdSE-2021%20Dungern%20-%20Integrate%20BPMN%20and%20Archimate%20Models%20using%20SpecIF.pdf" target="_blank">Integrate BPMN and Archimate Models using SpecIF</a>.
+1. 'Small Automomous Vehicle' modeled using SysML: <a href="https://specif.de/apps/view.html#import=%22./examples/SmAV.specifz;view=doc;node=N-Folder-Requirements" target="_blank">Online Demo</a> and <a href="./examples/SmAV.specifz" target="_blank">ZIP-file with JSON pursuant SpecIF v1.1</a>.
 
-Notice: The first three examples have been created using the method 'Fundamental Modelling Concepts' (FMC). Please do not infer that model integration with SpecIF can only be achieved using FMC. In contrary, current research shows that transformation of SysML Model diagrams to SpecIF is possible; the first results are shown in the forth example. We are looking for further examples to formalize the transformation.
-
-The goal of SpecIF is to develop conventions to facilitate the use of system models independently of certain methods and tools. SpecIF is first mapped to the OMG Requirements Interchange Format (ReqIF), so that all tools supporting ReqIF can be used to work with SpecIF models.
+The goal of SpecIF is to develop conventions to facilitate the use of system models independently of certain methods and tools. SpecIF data can be transformed to the OMG Requirements Interchange Format (ReqIF), so that all tools supporting ReqIF can be used to work with SpecIF models. _Note that some tools support only a part of the ReqIF standard as far as needed for the exchange of requirement sets. Polarion and ReqView have been tested to successfully exchange SpecIF system models as listed above._
 
 # First Steps
 
@@ -222,7 +220,7 @@ The SpecIF Initiative is being supported by (in alphabetical sequence):
 
 Interested to support the SpecIF Initiative with active collaboration on theoretic fundementals or on practical application or simply with „moral support“? 
 
-## Contact
+# Contact
 - Dr.-Ing. Oskar von Dungern via <a href="https://github.com/odungern" target="_blank">GitHub</a>, <a href="https://www.linkedin.com/in/odungern/" target="_blank">linkedIn</a> or [e-mail](mailto:oskar.dungern@gfse.org)
 - Dr.-Ing. Oliver Alt via <a href="https://github.com/oalt" target="_blank">GitHub</a> or <a href="https://www.linkedin.com/in/oliver-alt-448597145/" target="_blank">linkedIn</a>
 - Uwe Kaufmann via <a href="https://www.linkedin.com/in/uwekaufmann/" target="_blank">linkedIn</a>
@@ -232,8 +230,6 @@ Interested to support the SpecIF Initiative with active collaboration on theoret
 <img class="my-align-right size-20" src="./assets/logos/GfSE-Incose-Logo.web.png" alt="GfSE-Logo">
 
 The SpecIF initiative is hosted by the <a href="http://www.gfse.org/" target="_blank">Gesellschaft für Systems Engineering e.V. (GfSE)</a>, German Chapter of <a href="http://www.incose.org/" target="_blank">INCOSE</a>.
-
-
 
 <!-- 
 # Specification Integration Facility (SpecIF)
@@ -268,14 +264,11 @@ SpecIF consists of multiple parts, that are covered by this repository and linke
 ## Examples
 
 For examples have a look into the [tutorials](./tutorials/Readme.md).
+-->
 
-## Acknowledgments
+# Acknowledgments
 
 This work has been sponsored and supported by 
-* [enso-managers gmbh](http://enso-managers.de) 
-* [mdd4all](http://mdd4all.de)
-* Members of the GfSE working group *Product Lifecycle Management for Systems Engineering* (PLM4MBSE)
-
-
-
--->
+- [enso-managers gmbh](http://enso-managers.de) 
+- [mdd4all](http://mdd4all.de)
+- Members of the GfSE working group *Product Lifecycle Management for Systems Engineering* (PLM4MBSE)
