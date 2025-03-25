@@ -407,7 +407,7 @@ var app, browser, message, moduleManager = function () {
                     getScript(loadPath + 'assets/javascripts/archimate2SpecIF.js');
                     return true;
                 case "sysml2specif":
-                    getScript(loadPath + 'modules/sysml2specIF.js');
+                    getScript(loadPath + 'modules/sysml2specif.js');
                     return true;
                 case 'reqif2specif':
                     getScript(loadPath + 'assets/javascripts/reqif2specif.js');
