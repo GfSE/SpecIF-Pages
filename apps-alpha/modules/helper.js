@@ -10,16 +10,16 @@ function makeTextField(tag, val, opts) {
         opts.tagPos = 'left';
     let fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' oninput="' + opts.handle + '"' : '', sH = simpleHash(tag), fG, cl = (typeof (opts.classes) == 'string' && opts.classes.length > 0) ? ' ' + opts.classes : '', aC;
     if (opts.typ && ['line', 'area', 'outer'].includes(opts.typ))
-        fG = '<div id="' + sH + '" class="form-group form-active mt-1' + cl + '" >';
+        fG = '<div id="' + sH + '" class="row mx-0 my-1 attribute form-active' + cl + '" >';
     else
-        fG = '<div class="attribute mt-1' + cl + '" >';
+        fG = '<div class="row mx-0 my-1 attribute' + cl + '" >';
     switch (opts.tagPos) {
         case 'none':
-            aC = 'attribute-wide';
+            aC = 'col-12';
             break;
         case 'left':
-            fG += '<div class="attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>';
-            aC = 'attribute-value';
+            fG += '<div class="col-3 attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>';
+            aC = 'col-9 attribute-value';
             break;
         default:
             throw Error("Invalid display option '" + opts.tagPos + "' when showing a text form");
@@ -116,9 +116,9 @@ function makeSelectionField(tag, entries, opts) {
         throw Error("Kind of selection field must be either 'radio' or 'checkbox'");
     switch (opts.typ) {
         case 'display':
-            return '<div class="attribute ' + (opts.classes ?? '') + '">'
-                + '<div class="attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
-                + '<div class="attribute-value" >'
+            return '<div class="row mx-0 my-1 attribute ' + (opts.classes ?? '') + '">'
+                + '<div class="col-3 attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
+                + '<div class="col-9 attribute-value" >'
                 + function () {
                     let vals = '';
                     entries.forEach((e) => {
@@ -134,14 +134,14 @@ function makeSelectionField(tag, entries, opts) {
         opts.tagPos = 'left';
     if (typeof (opts.classes) != 'string')
         opts.classes = 'form-active';
-    let rB = '<div class="form-group mt-1 ' + (opts.classes ?? '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
+    let rB = '<div class="row mx-0 my-1 attribute ' + (opts.classes ?? '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
     switch (opts.tagPos) {
         case 'none':
             rB += '<div class="' + opts.kind + '" >';
             break;
         case 'left':
-            rB += '<div class="attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
-                + '<div class="attribute-value ' + opts.kind + '" >';
+            rB += '<div class="col-3 attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
+                + '<div class="col-9 attribute-value ' + opts.kind + '" >';
             break;
         default:
             throw Error("Invalid display option '" + opts.tagPos + "' when showing a '" + opts.kind + "' form");
@@ -201,14 +201,14 @@ function makeBooleanField(tag, val, opts) {
         fn = ' onclick="' + opts.handle + '"';
     switch (opts.typ) {
         case 'display':
-            return '<div class="attribute mt-1">'
-                + '<div class="attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
-                + '<div class="attribute-value">' + (val ? 'true' : 'false') + '</div>'
+            return '<div class="row mx-0 my-1 attribute">'
+                + '<div class="col-3 attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
+                + '<div class="col-9 attribute-value">' + (val ? 'true' : 'false') + '</div>'
                 + '</div>';
         default:
-            return '<div class="form-group form-active mt-1">'
-                + '<div class="attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
-                + '<div class="attribute-value checkbox" >'
+            return '<div class="row my-1 attribute form-active">'
+                + '<div class="col-3 attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
+                + '<div class="col-9 attribute-value checkbox" >'
                 + '<label>'
                 + '<input type="checkbox" name="boolean' + simpleHash(tag) + '"' + (val ? ' checked' : '') + fn + ' />'
                 + '</label><br />'

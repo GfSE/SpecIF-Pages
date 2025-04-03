@@ -321,9 +321,9 @@ class CResourceToShow {
     }
     renderAttr(lbl, val, opts) {
         let cl = opts && opts.condensed ? "attribute-condensed" : "attribute";
-        return '<div class="' + cl + '">'
-            + (lbl ? '<div class="attribute-label" >' + lbl + '</div><div class="attribute-value" >'
-                : '<div class="attribute-wide" >')
+        return '<div class="row ' + cl + '">'
+            + (lbl ? '<div class="col-3 attribute-label" >' + lbl + '</div><div class="col-9 attribute-value" >'
+                : '<div class="col-12" >')
             + val
             + '</div>'
             + '</div>';
@@ -662,7 +662,7 @@ moduleManager.construct({
 }, (self) => {
     let myName = self.loadAs, myFullName = 'app.' + myName;
     self.selectedView = () => {
-        return self.ViewControl.selected.view.substring(1);
+        return self.viewControl.selected.view.substring(1);
     };
     self.emptyTab = (tab) => {
         app.busy.reset();
@@ -670,18 +670,18 @@ moduleManager.construct({
     };
     self.init = () => {
         self.clear();
-        let h = '<div id="specLeft" class="paneLeft" style="position:relative">'
-            + '<div id="navBtns" class="btn-group-vertical btn-group-sm" role="group" style="position:absolute;top:4px;right:12px;z-index:900">'
+        let h = '<div class="container-fluid"><div id="specContent" class="row">'
+            + '<div id="specLeft" class="col-lg-3 background-select" style="position:relative">'
+            + '<div id="navBtns" class="btn-group-vertical btn-group-sm" role="group" style="position:absolute;top:1em;right:1.2em;z-index:900">'
             + '<button class="btn btn-light" onclick="' + myFullName + '.tree.moveUp()" data-toggle="popover" title="' + i18n.LblPrevious + '" >' + i18n.IcoPrevious + '</button>'
             + '<button class="btn btn-light" onclick="' + myFullName + '.tree.moveDown()" data-toggle="popover" title="' + i18n.LblNext + '" >' + i18n.IcoNext + '</button>'
             + '</div>'
             + '<div id="hierarchy" class="pane-tree" ></div>'
             + '<div id="details" class="pane-details" ></div>'
-            + '</div>';
-        if (self.selector)
-            $(self.selector).after(h);
-        else
-            $(self.view).prepend(h);
+            + '</div>'
+            + '</div></div>';
+        $(self.selector).after(h);
+        $('#specContent').append($('#' + CONFIG.objectList).addClass('col-lg'), $('#' + CONFIG.relations).addClass('col-lg'));
         self.tree = new Tree({
             loc: '#hierarchy',
             dragAndDrop: app.title != i18n.LblReader,
@@ -833,7 +833,7 @@ moduleManager.construct({
         }, CONFIG.noMultipleRefreshWithin);
     };
     self.doRefresh = (parms) => {
-        self.ViewControl.selected.show(parms);
+        self.viewControl.selected.show(parms);
     };
     self.reworkTree = () => {
         self.selPrj.createFolderWithGlossary({ addGlossary: true })
@@ -853,6 +853,7 @@ moduleManager.construct({
         if ([CONFIG.objectRevisions, CONFIG.comments].includes(self.selectedView()))
             return;
         if (self.tree.selectedNode.ref != rId) {
+            self.showTree.set();
             self.tree.selectNodeByRef(LIB.makeKey(rId));
             document.getElementById(CONFIG.objectList).scrollTop = 0;
             self.tree.openNode();
@@ -937,7 +938,7 @@ moduleManager.construct({
             app.busy.reset();
         }
         function actionBtns() {
-            var rB = '<div class="btn-group" role="group" style="position:absolute;top:4px;right:4px;z-index:900">';
+            var rB = '<div class="btn-group" role="group" style="position:absolute;top:1em;right:1em;z-index:900">';
             if (self.resCre && (!selRes || selRes.isUserInstantiated()))
                 rB += '<button class="btn btn-success" onclick="' + myFullName + '.editResource(\'create\')" '
                     + 'data-toggle="popover" title="' + i18n.LblAddObject + '" >' + i18n.IcoAdd + '</button>';
@@ -1176,9 +1177,9 @@ moduleManager.construct({
     function linkBtns() {
         if (!selRes)
             return '';
-        var rB = '<div id="linkBtns" class="btn-group" role="group" style="position:absolute;top:4px;right:4px;z-index:900">';
+        var rB = '<div id="linkBtns" class="btn-group" role="group" style="position:absolute;top:1em;right:1em;z-index:900">';
         if (modeStaDel)
-            return rB + '<button class="btn btn-light" onclick="' + myFullName + '.toggleModeStaDel()" >' + i18n.BtnCancel + '</button></div>';
+            return rB + '<button class="btn btn-light" onclick="' + myFullName + '.toggleModeStaDel()" >' + i18n.BtnTerminate + '</button></div>';
         if (self.staCre)
             rB += '<button class="btn btn-success" onclick="' + myFullName + '.linkResource()" '
                 + 'data-toggle="popover" title="' + i18n.LblAddRelation + '" >' + i18n.IcoAdd + '</button>';
@@ -1243,7 +1244,7 @@ moduleManager.construct({
             nodeColor: modeStaDel ? '#ef9a9a' : '#afcbef'
         });
         net.show(graphOptions);
-        $(self.view).prepend('<div style="position:absolute;left:4px;z-index:900">'
+        $(self.view).prepend('<div style="position:absolute;left:1em;z-index:900">'
             + (modeStaDel ? '<span class="notice-danger" >' + i18n.MsgClickToDeleteRel
                 : '<span class="notice-default" >' + i18n.MsgClickToNavigate)
             + '</span></div>');

@@ -48,13 +48,13 @@ function specif2xhtml(data, options) {
         });
     }
     ;
-    console.debug('specif2xhtml input: ', data, opts);
     let x = makeXhtml(data, Object.assign({}, opts, { imgPath: './' + opts.imgPath }));
     x.fileName = opts.fileName || (data.title ? data.title[0]['text'] : 'undefined');
     x.mimetype = 'text/html';
     x.styles =
         'body { margin-top:2%; margin-right:2%; margin-bottom:2%; margin-left:2%; font-family:Arial,sans-serif; font-size:100%; font-weight: normal; } \n'
             + 'div.max-width-md { max-width: 768px; margin: auto; } \n'
+            + 'div.max-width-lg { max-width: 992px; margin: auto; } \n'
             + 'div, p { margin: 0.6em 0em 0em 0em; } \n'
             + 'div.title { font-size:200%; margin-top:2.4rem } \n'
             + 'ul { padding-left: 1.2rem; } \n'
@@ -95,8 +95,6 @@ function specif2xhtml(data, options) {
         ;
     });
     x.toc += '</ul>';
-    console.debug('toc', x.toc);
-    console.debug('x', x);
     storeZip(x);
     return;
     function storeZip(x) {
@@ -139,8 +137,8 @@ function specif2xhtml(data, options) {
             + '<link rel="stylesheet" type="text/css" href="' + doc.styles + '" />'
             + '<title>' + doc.title + '</title>'
             + '</head>'
-            + '<body style="overflow:auto;" >'
-            + '<div class="container max-width-md" >'
+            + '<body>'
+            + '<div class="container max-width-lg" >'
             + '<div class="row" >'
             + '<div class="col-12" >'
             + '<div class="title">' + doc.title + '</div>'

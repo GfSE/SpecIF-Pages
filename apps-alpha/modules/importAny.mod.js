@@ -109,26 +109,26 @@ moduleManager.construct({
                 opts: { dontCheck: ["statement.object"] },
                 help: i18n.MsgImportXls
             }];
-        let h = '<div style="max-width:768px; margin-top:1em">'
-            + '<div class="fileSelect" style="display:none;" >'
-            + '<div class="attribute-label" style="vertical-align:top; padding-top:0.2em" >' + i18n.LblOntology + '</div>'
-            + '<div class="attribute-value" >'
+        let h = '<div class="container max-width-lg mt-3" >'
+            + '<div class="row attribute fileSelect" style="display:none;" >'
+            + '<div class="col-3 attribute-label" style="vertical-align:top; padding-top:0.2em" >' + i18n.LblOntology + '</div>'
+            + '<div class="col-9 attribute-value" >'
             + '<div id="ontologySelector" style="margin: 0 0 0.4em 0" ></div>'
             + '</div>'
             + '</div>'
-            + '<div class="fileSelect" style="display:none;" >'
-            + '<div class="attribute-label" style="vertical-align:top; font-size:140%; padding-top:0.2em" >' + i18n.LblImport + '</div>'
-            + '<div class="attribute-value" >'
+            + '<div class="row attribute fileSelect" style="display:none;" >'
+            + '<div class="col-3 attribute-label" style="vertical-align:top; font-size:140%; padding-top:0.2em" >' + i18n.LblImport + '</div>'
+            + '<div class="col-9 attribute-value" >'
             + '<div id="formatSelector" class="btn-group" style="margin: 0 0 0.4em 0" ></div>'
             + '<div id="helpImport" style="margin: 0 0 0.4em 0" ></div>'
             + '<div id="fileSelectBtn" class="btn btn-light btn-fileinput" style="margin: 0 0 0.8em 0" ></div>'
             + '</div>'
             + '</div>'
             + '<form id="formNames" class="form-horizontal" role="form"></form>'
-            + '<div class="fileSelect" style="display:none;" >'
-            + '<div class="attribute-label" ></div>'
-            + '<div class="attribute-value" >'
-            + '<div id="modeSelector" class="btn-group mt-1" style="margin: 0 0 0.4em 0" >'
+            + '<div class="row attribute fileSelect" style="display:none;" >'
+            + '<div class="col-3 attribute-label" ></div>'
+            + '<div class="col-9 attribute-value" >'
+            + '<div id="modeSelector" class="btn-group my-1" style="margin: 0 0 0.4em 0" >'
             + function () {
                 let btns = '';
                 actions.forEach((a) => {
@@ -139,17 +139,17 @@ moduleManager.construct({
             + '</div>'
             + '</div>'
             + '</div>'
-            + '<div>'
-            + '<div class="attribute-label" ></div>'
-            + '<div class="attribute-value" >'
+            + '<div class="row attribute">'
+            + '<div class="col-3 attribute-label" ></div>'
+            + '<div class="col-9 attribute-value" >'
             + '<div id="progress" class="progress" >'
             + '<div class="progress-bar progress-bar-primary" ></div>'
             + '</div>'
             + '</div>'
             + '</div>'
-            + '<div style="padding-top:2em">'
-            + '<div class="attribute-label" ></div>'
-            + '<div class="attribute-value" >' + i18n.MsgIntro + '</div>'
+            + '<div class="row pt-3 attribute">'
+            + '<div class="col-3 attribute-label" ></div>'
+            + '<div class="col-9 attribute-value" >' + i18n.MsgIntro + '</div>'
             + '</div>'
             + '</div>';
         $(self.view).prepend(h);
@@ -419,24 +419,6 @@ moduleManager.construct({
     ;
     function setProgress(msg, perc) {
         $('#progress .progress-bar').css('width', perc + '%').html(msg);
-    }
-    function getOntology(urlO) {
-        return new Promise((resolve, reject) => {
-            LIB.httpGet({
-                url: urlO + "?" + new Date().toISOString(),
-                responseType: 'arraybuffer',
-                withCredentials: false,
-                done: (xhr) => {
-                    let txt = JSON.parse(LIB.ab2str(xhr.response)), ont = new COntology(txt);
-                    if (ont.isValid()) {
-                        resolve(ont);
-                    }
-                    else
-                        reject(new resultMsg(539, "bad file", "text", "Ontology is invalid."));
-                },
-                fail: reject
-            });
-        });
     }
     return self;
 });

@@ -1337,7 +1337,7 @@ class CProject {
                 { title: 'ReqIF v1.0', id: 'reqif' },
                 { title: 'MS Excel® <em>(experimental)</em>', id: 'xlsx' },
                 { title: 'Turtle <em>(experimental)</em>', id: 'turtle' },
-                { title: 'XHTML', id: 'xhtml' },
+                { title: 'Plain HTML', id: 'xhtml' },
                 { title: 'ePub v2', id: 'epub' },
                 { title: 'MS Word® (Open XML)', id: 'oxml' }
             ]

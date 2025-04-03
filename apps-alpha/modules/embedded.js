@@ -79,26 +79,30 @@ function SpecifApp() {
         console.info(self.title + " " + CONFIG.appVersion + " started!");
         self.me.login()
             .then((me) => {
-            me.roleAssignments = [new CRoleAssignment("any", app.ontology.normalize("resourceClass", window.role || "ReqIF-WF:Supplier"))];
             self.ioSpecif.init({ mediaTypeOf: LIB.attachment2mediaType });
             self.ioSpecif.verify({ name: 'data.specif' });
             self.busy.set();
-            self.ioSpecif.toSpecif(LIB.str2ab(window.data))
-                .done(function (newD) {
-                var opts = {
-                    noCheck: true,
-                    deduplicate: false,
-                    addGlossary: false,
-                    collectProcesses: false
-                };
-                self.projects.create(newD, opts)
-                    .done(function () {
-                    message.show(i18n.lookup('MsgImportSuccessful', newD.title), { severity: "success", duration: CONFIG.messageDisplayTimeShort });
-                    setTimeout(self.show, CONFIG.showTimelag);
+            getOntology(CONFIG.ontologyURL)
+                .then((ont) => {
+                app.ontology = ont;
+                me.roleAssignments = [new CRoleAssignment("any", app.ontology.normalize("resourceClass", window.role || "ReqIF-WF:Supplier"))];
+                self.ioSpecif.toSpecif(LIB.str2ab(window.data))
+                    .done(function (newD) {
+                    var opts = {
+                        noCheck: true,
+                        deduplicate: false,
+                        addGlossary: false,
+                        collectProcesses: false
+                    };
+                    self.projects.create(newD, opts)
+                        .done(function () {
+                        message.show(i18n.lookup('MsgImportSuccessful', newD.title), { severity: "success", duration: CONFIG.messageDisplayTimeShort });
+                        setTimeout(self.show, CONFIG.showTimelag);
+                    })
+                        .fail(LIB.stdError);
                 })
                     .fail(LIB.stdError);
-            })
-                .fail(LIB.stdError);
+            });
         })
             .catch(self.logout);
     };

@@ -149,7 +149,7 @@ var app, browser, message, moduleManager = function () {
             return;
             function loadChildren(e) {
                 if (e.selector) {
-                    e.ViewControl = new ViewControl();
+                    e.viewControl = new ViewControl();
                     if ($(e.selector).length < 1) {
                         let s = '';
                         switch (e.selectorType) {
@@ -170,7 +170,7 @@ var app, browser, message, moduleManager = function () {
                                 throw Error("Module '" + ch.name + "' must have both properties 'view' and 'selectedBy' or none.");
                             }
                             ;
-                            e.ViewControl.add(ch);
+                            e.viewControl.add(ch);
                             id = ch.selectedBy.substring(1);
                             lbl = ch.label || id;
                             switch (e.selectorType) {
@@ -226,7 +226,7 @@ var app, browser, message, moduleManager = function () {
         if (typeof (params) != 'object')
             throw Error("Undefined target view.");
         let mo = findModule(self.tree, params.view);
-        if (!mo || !mo.parent.ViewControl)
+        if (!mo || !mo.parent.viewControl)
             throw Error("'" + params.view + "' is not a defined view");
         setViewFromRoot(mo, params);
         setViewToLeaf(mo, params);
@@ -236,7 +236,7 @@ var app, browser, message, moduleManager = function () {
                 setViewFromRoot(le.parent, Object.assign({}, pars, { view: le.parent.view }));
             }
             ;
-            le.parent.ViewControl.show(pars);
+            le.parent.viewControl.show(pars);
         }
         function setViewToLeaf(le, pars) {
             function findDefault(vL) {
@@ -247,9 +247,9 @@ var app, browser, message, moduleManager = function () {
                 ;
                 return vL[0];
             }
-            if (le.ViewControl && le.ViewControl.list.length > 0) {
-                let ch = findDefault(le.ViewControl.list);
-                le.ViewControl.show(Object.assign({}, pars, { view: ch.view }));
+            if (le.viewControl && le.viewControl.list.length > 0) {
+                let ch = findDefault(le.viewControl.list);
+                le.viewControl.show(Object.assign({}, pars, { view: ch.view }));
                 setViewToLeaf(ch, pars);
             }
         }
@@ -564,7 +564,7 @@ function doResize() {
         || document.body.clientHeight, hH = LIB.getHeight('#pageHeader') + LIB.getHeight('.nav-tabs'), pH = wH - hH;
     $('.content').outerHeight(pH);
     $('.contentWide').outerHeight(pH);
-    $('.pane-tree').outerHeight(pH);
-    $('.pane-details').outerHeight(pH);
+    $('.pane-tree').css('max-height', pH);
+    $('.pane-details').css('max-height', pH);
     $('#aboutFrame').outerHeight(pH - 8);
 }

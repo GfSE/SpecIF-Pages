@@ -779,3 +779,21 @@ class COntology {
             console.warn("Ontology: No statementClass 'SpecIF:isNamespace' defined");
     }
 }
+function getOntology(urlO) {
+    return new Promise((resolve, reject) => {
+        LIB.httpGet({
+            url: urlO + "?" + new Date().toISOString(),
+            responseType: 'arraybuffer',
+            withCredentials: false,
+            done: (xhr) => {
+                let txt = JSON.parse(LIB.ab2str(xhr.response)), ont = new COntology(txt);
+                if (ont.isValid()) {
+                    resolve(ont);
+                }
+                else
+                    reject(new resultMsg(539, "bad file", "text", "Ontology is invalid."));
+            },
+            fail: reject
+        });
+    });
+}

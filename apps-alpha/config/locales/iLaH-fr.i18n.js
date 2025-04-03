@@ -165,6 +165,7 @@ var i18n = function () {
     self.LblDirectLink = "Lien direct";
     self.BtnProfile = 'Profile';
     self.BtnBack = self.LblPreviousStep;
+    self.BtnTerminate = '´Terminer';
     self.BtnCancel = 'Annuler';
     self.BtnCancelImport = "Interrompre";
     self.BtnApply = 'Appliquer';
