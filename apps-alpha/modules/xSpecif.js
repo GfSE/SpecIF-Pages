@@ -589,10 +589,7 @@ class CSpecIF {
                                 console.warn('Unknown boolean value ' + LIB.cleanValue(val) + ' skipped.');
                                 break;
                             case XsDataType.ComplexType:
-                                if (Array.isArray(val) && dT.sequence.length == val.length)
-                                    return val.map(LIB.cleanValue);
-                                else
-                                    throw Error("Importing the value of a complexType: Number of values is not equal to the dataType's sequence length.");
+                                break;
                             default:
                                 return LIB.cleanValue(val);
                         }
@@ -749,9 +746,6 @@ class CSpecIF {
                     case XsDataType.String:
                         if (iE.maxLength)
                             oE.maxLength = iE.maxLength;
-                        break;
-                    case XsDataType.ComplexType:
-                        oE.sequence = iE.sequence;
                 }
                 ;
                 if (iE.enumeration) {

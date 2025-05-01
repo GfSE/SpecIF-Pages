@@ -73,11 +73,15 @@ CONFIG.resClassRole = "SpecIF:Role";
 CONFIG.resClassFolder = 'SpecIF:Heading';
 CONFIG.resClassParagraph = "SpecIF:Paragraph";
 CONFIG.resClassModelElement = "SpecIF:ModelElement";
+CONFIG.resClassActor = "FMC:Actor";
+CONFIG.resClassState = "FMC:State";
+CONFIG.resClassEvent = "FMC:Event";
 CONFIG.resClassComment = 'SpecIF:Comment';
 CONFIG.reqifHierarchyRoot = 'ReqIF:HierarchyRoot';
 CONFIG.staClassShows = 'SpecIF:shows';
 CONFIG.staClassCommentRefersTo = 'SpecIF:commentRefersTo';
 CONFIG.staClassMentions = 'SpecIF:mentions';
+CONFIG.prefixP = "P-";
 CONFIG.prefixDT = "DT-";
 CONFIG.prefixPC = "PC-";
 CONFIG.prefixRC = "RC-";
@@ -130,6 +134,11 @@ CONFIG.excludedFromDeduplication = [
     CONFIG.resClassView,
     CONFIG.resClassCondition,
     "uml:Port",
+    "uml:Pseudostate",
+    "uml:Region",
+    "uml:Transition",
+    "uml:InitialNode",
+    "uml:ActivityFinalNode",
     'bpmn:parallelGateway',
     'bpmn:exclusiveGateway',
     'bpmn:inclusiveGateway',

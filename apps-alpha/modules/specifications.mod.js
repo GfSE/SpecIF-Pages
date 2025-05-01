@@ -670,7 +670,7 @@ moduleManager.construct({
     };
     self.init = () => {
         self.clear();
-        let h = '<div class="container-fluid"><div id="specContent" class="row">'
+        let h = '<div id="specContent" class="container-fluid"><div class="row">'
             + '<div id="specLeft" class="col-lg-3 background-select" style="position:relative">'
             + '<div id="navBtns" class="btn-group-vertical btn-group-sm" role="group" style="position:absolute;top:1em;right:1.2em;z-index:900">'
             + '<button class="btn btn-light" onclick="' + myFullName + '.tree.moveUp()" data-toggle="popover" title="' + i18n.LblPrevious + '" >' + i18n.IcoPrevious + '</button>'
@@ -681,7 +681,15 @@ moduleManager.construct({
             + '</div>'
             + '</div></div>';
         $(self.selector).after(h);
-        $('#specContent').append($('#' + CONFIG.objectList).addClass('col-lg'), $('#' + CONFIG.relations).addClass('col-lg'));
+        $('#specLeft').after($('#' + CONFIG.objectList).addClass('col-lg'), $('#' + CONFIG.relations).addClass('col-lg'));
+        self.showLeft = new State({
+            showWhenSet: ['#specLeft'],
+            hideWhenSet: []
+        });
+        self.showTree = new State({
+            showWhenSet: ['#hierarchy', '#navBtns'],
+            hideWhenSet: ['#details']
+        });
         self.tree = new Tree({
             loc: '#hierarchy',
             dragAndDrop: app.title != i18n.LblReader,
@@ -740,14 +748,6 @@ moduleManager.construct({
                     }, LIB.stdError);
                 }
             }
-        });
-        self.showLeft = new State({
-            showWhenSet: ['#specLeft'],
-            hideWhenSet: []
-        });
-        self.showTree = new State({
-            showWhenSet: ['#hierarchy', '#navBtns'],
-            hideWhenSet: ['#details']
         });
         refreshReqCnt = 0;
         return true;

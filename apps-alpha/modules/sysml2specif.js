@@ -14,12 +14,46 @@
 */
 function sysml2specif(xmi, options) {
     "use strict";
-    const idResourceClassDiagram = app.ontology.getClassId("resourceClass", CONFIG.resClassView), idResourceClassActor = app.ontology.getClassId("resourceClass", "FMC:Actor"), idResourceClassState = app.ontology.getClassId("resourceClass", "FMC:State"), idResourceClassPackage = app.ontology.getClassId("resourceClass", "uml:Package"), idResourceClassDefault = app.ontology.getClassId("resourceClass", CONFIG.resClassModelElement), idStatementClassContains = app.ontology.getClassId("statementClass", "SpecIF:contains"), idStatementClassHasPart = app.ontology.getClassId("statementClass", "dcterms:hasPart"), idStatementClassAggregates = idStatementClassHasPart, idStatementClassComprises = idStatementClassHasPart, idStatementClassSpecializes = app.ontology.getClassId("statementClass", "SpecIF:isSpecializationOf"), idStatementClassRealizes = app.ontology.getClassId("statementClass", "uml:Realization"), idStatementClassServes = app.ontology.getClassId("statementClass", "SpecIF:serves"), idStatementClassAssociatedWith = app.ontology.getClassId("statementClass", "SpecIF:isAssociatedWith"), idStatementClassHandles = app.ontology.getClassId("statementClass", "SpecIF:handles"), idStatementClassProvides = app.ontology.getClassId("statementClass", "SpecIF:provides"), idStatementClassConsumes = app.ontology.getClassId("statementClass", "SpecIF:consumes"), idStatementClassShows = app.ontology.getClassId("statementClass", "SpecIF:shows"), idStatementClassDefault = idStatementClassAssociatedWith;
+    const terms = {};
+    [
+        { id: "resourceClassFolder", type: "resourceClass", term: CONFIG.resClassFolder },
+        { id: "resourceClassDiagram", type: "resourceClass", term: CONFIG.resClassView },
+        { id: "resourceClassActor", type: "resourceClass", term: CONFIG.resClassActor },
+        { id: "resourceClassState", type: "resourceClass", term: CONFIG.resClassState },
+        { id: "resourceClassEvent", type: "resourceClass", term: CONFIG.resClassEvent },
+        { id: "resourceClassPackage", type: "resourceClass", term: "uml:Package" },
+        { id: "resourceClassDefault", type: "resourceClass", term: CONFIG.resClassModelElement },
+        { id: "statementClassControlFlow", type: "statementClass", term: "uml:ControlFlow" },
+        { id: "statementClassTriggers", type: "statementClass", term: "uml:Trigger" },
+        { id: "statementClassTransitionSource", type: "statementClass", term: "uml:TransitionSource" },
+        { id: "statementClassTransitionTarget", type: "statementClass", term: "uml:TransitionTarget" },
+        { id: "statementClassContains", type: "statementClass", term: "SpecIF:contains" },
+        { id: "statementClassHasPart", type: "statementClass", term: "dcterms:hasPart" },
+        { id: "statementClassSpecializes", type: "statementClass", term: "SpecIF:isSpecializationOf" },
+        { id: "statementClassRealizes", type: "statementClass", term: "uml:Realization" },
+        { id: "statementClassServes", type: "statementClass", term: "SpecIF:serves" },
+        { id: "statementClassAssociatedWith", type: "statementClass", term: "SpecIF:isAssociatedWith" },
+        { id: "statementClassHandles", type: "statementClass", term: "SpecIF:handles" },
+        { id: "statementClassProvides", type: "statementClass", term: "SpecIF:provides" },
+        { id: "statementClassConsumes", type: "statementClass", term: "SpecIF:consumes" },
+        { id: "statementClassShows", type: "statementClass", term: "SpecIF:shows" },
+        { id: "statementClassHasOwnedBehavior", type: "statementClass", term: "uml:ownedBehavior" }
+    ].forEach((t) => {
+        let term = app.ontology.getClassId(t.type, t.term);
+        if (term)
+            terms[t.id] = term;
+        else
+            console.error("Cameo Import: Term '" + t.term + "' not found in the ontology");
+    });
+    terms.statementClassAggregates =
+        terms.statementClassComprises = terms.statementClassHasPart;
+    terms.statementClassDefault = terms.statementClassAssociatedWith;
     if (typeof (options) != 'object' || !options.fileName)
-        throw Error("Programming Error: Cameo import gets no parameter options");
+        throw Error("Programming Error: Cameo import gets no 'options'");
     let opts = Object.assign({
         mimeType: "application/vnd.xmi+xml",
         fileDate: new Date().toISOString(),
+        addElementsToHierarchy: true,
         replaceSeparatorNamespace: '*'
     }, options);
     var parser = new DOMParser(), xmiDoc = parser.parseFromString(xmi, "text/xml");
@@ -47,20 +81,36 @@ function sysml2specif(xmi, options) {
                 "SpecIF:DomainSystemsEngineering",
                 "SpecIF:DomainSystemModelIntegration"
             ],
-            SpecIF_LifecycleStatusReleased: true,
-            SpecIF_LifecycleStatusEquivalent: true
-        }), usedElements = [], specializations = [], associationEnds = [], abstractions = [], portL = [], connectors = [];
-        spD.id = modDoc.getAttribute("xmi:id");
+            lifeCycles: [
+                "SpecIF:LifecycleStatusReleased",
+                "SpecIF:LifecycleStatusEquivalent"
+            ]
+        }), diagramL = [], usedElementL = [], abstractions = [], specializations = [], associationEnds = [], portL = [], connectorL = [], stateTransitionL = [];
+        spD.id = CONFIG.prefixP + modDoc.getAttribute("xmi:id");
         spD.title = [{ text: modDoc.getAttribute("name") }];
-        parseElements(modDoc, { package: '', nodes: spD.nodes });
+        let r = {
+            id: modDoc.getAttribute("xmi:id"),
+            class: LIB.makeKey(terms.resourceClassFolder),
+            properties: [{
+                    class: LIB.makeKey("PC-Name"),
+                    values: [[{ text: replaceSeparatorNS(modDoc.getAttribute("name")) }]]
+                }, {
+                    class: LIB.makeKey("PC-Type"),
+                    values: [[{ text: modDoc.getAttribute("xmi:type") }]]
+                }],
+            changedAt: opts.fileDate
+        }, nd = makeNode(r, spD.id);
+        spD.resources.push(r);
+        spD.nodes.push(nd);
+        parseElements(modDoc, { package: '', nodes: nd.nodes });
         specializations = specializations
             .filter(validateStatement);
         spD.resources
             .forEach((me) => {
-            if (me["class"].id == idResourceClassDefault) {
+            if (me["class"].id == terms.resourceClassDefault) {
                 let rC;
                 rC = generalizingResourceClassOf(me);
-                if (rC && rC.id != idResourceClassDefault) {
+                if (rC && rC.id != terms.resourceClassDefault) {
                     me["class"] = LIB.makeKey(rC.id);
                     console.info("Cameo Import: Re-assigning class " + rC.id + " to model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
                 }
@@ -68,8 +118,8 @@ function sysml2specif(xmi, options) {
                 let sTy = classStereotypes.get(me.id);
                 if (sTy) {
                     if (sTy == "sysml:InterfaceBlock") {
-                        me["class"] = LIB.makeKey(idResourceClassState);
-                        console.info("Cameo Import: Reassigning class '" + idResourceClassState + "' to  model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
+                        me["class"] = LIB.makeKey(terms.resourceClassState);
+                        console.info("Cameo Import: Reassigning class '" + terms.resourceClassState + "' to  model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
                         return;
                     }
                     ;
@@ -132,9 +182,9 @@ function sysml2specif(xmi, options) {
                         class: "PC-UmlFlowdirection",
                         values: [[{ text: p.isConjugated ? 'out' : 'in' }]]
                     });
-                    acc = p.isConjugated ? idStatementClassProvides : idStatementClassConsumes;
+                    acc = p.isConjugated ? terms.statementClassProvides : terms.statementClassConsumes;
                     spD.statements.push({
-                        id: CONFIG.prefixS + simpleHash(p.resource.id + acc + ibId),
+                        id: CONFIG.prefixS + (p.isConjugated ? 'provides-' : 'consumes-') + simpleHash(p.resource.id + acc + ibId),
                         class: LIB.makeKey(acc),
                         subject: LIB.makeKey(p.resource),
                         object: LIB.makeKey(ibId),
@@ -146,9 +196,9 @@ function sysml2specif(xmi, options) {
                         class: "PC-UmlFlowdirection",
                         values: [[{ text: p.isConjugated ? 'in' : 'out' }]]
                     });
-                    acc = p.isConjugated ? idStatementClassConsumes : idStatementClassProvides;
+                    acc = p.isConjugated ? terms.statementClassConsumes : terms.statementClassProvides;
                     spD.statements.push({
-                        id: CONFIG.prefixS + simpleHash(p.resource.id + acc + ibId),
+                        id: CONFIG.prefixS + (p.isConjugated ? 'consumes-' : 'provides-') + simpleHash(p.resource.id + acc + ibId),
                         class: LIB.makeKey(acc),
                         subject: LIB.makeKey(p.resource),
                         object: LIB.makeKey(ibId),
@@ -161,8 +211,8 @@ function sysml2specif(xmi, options) {
                         values: [[{ text: 'inout' }]]
                     });
                     spD.statements.push({
-                        id: CONFIG.prefixS + simpleHash(p.resource.id + idStatementClassHandles + ibId),
-                        class: LIB.makeKey(idStatementClassHandles),
+                        id: CONFIG.prefixS + 'handles-' + simpleHash(p.resource.id + terms.statementClassHandles + ibId),
+                        class: LIB.makeKey(terms.statementClassHandles),
                         subject: LIB.makeKey(p.resource),
                         object: LIB.makeKey(ibId),
                         changedAt: opts.fileDate
@@ -170,12 +220,12 @@ function sysml2specif(xmi, options) {
             }
             ;
         });
-        connectors.forEach((co) => {
+        connectorL.forEach((co) => {
             let port0 = LIB.itemById(portL, co.ends[0]), port1 = LIB.itemById(portL, co.ends[1]), p0serves = LIB.valueByTitle(port0.resource, 'uml:is_Service', spD) == 'true', p1serves = LIB.valueByTitle(port1.resource, 'uml:is_Service', spD) == 'true';
             if (p0serves && !p1serves) {
                 spD.statements.push({
                     id: co.id,
-                    class: LIB.makeKey(idStatementClassServes),
+                    class: LIB.makeKey(terms.statementClassServes),
                     subject: LIB.makeKey(port0.id),
                     object: LIB.makeKey(port1.id),
                     changedAt: opts.fileDate
@@ -186,7 +236,7 @@ function sysml2specif(xmi, options) {
             if (!p0serves && p1serves) {
                 spD.statements.push({
                     id: co.id,
-                    class: LIB.makeKey(idStatementClassServes),
+                    class: LIB.makeKey(terms.statementClassServes),
                     subject: LIB.makeKey(port1.id),
                     object: LIB.makeKey(port0.id),
                     changedAt: opts.fileDate
@@ -195,11 +245,11 @@ function sysml2specif(xmi, options) {
             }
             ;
             spD.statements.forEach((st) => {
-                if (st['class'].id == idStatementClassComprises) {
+                if (st['class'].id == terms.statementClassComprises) {
                     if (st.subject.id == port0.parent.id && st.object.id == port1.parent.id) {
                         spD.statements.push({
                             id: co.id,
-                            class: LIB.makeKey(idStatementClassServes),
+                            class: LIB.makeKey(terms.statementClassServes),
                             subject: LIB.makeKey(p0serves && p1serves ? port1.id : port0.id),
                             object: LIB.makeKey(p0serves && p1serves ? port0.id : port1.id),
                             changedAt: opts.fileDate
@@ -210,7 +260,7 @@ function sysml2specif(xmi, options) {
                     if (st.subject.id == port1.parent.id && st.object.id == port0.parent.id) {
                         spD.statements.push({
                             id: co.id,
-                            class: LIB.makeKey(idStatementClassServes),
+                            class: LIB.makeKey(terms.statementClassServes),
                             subject: LIB.makeKey(p0serves && p1serves ? port0.id : port1.id),
                             object: LIB.makeKey(p0serves && p1serves ? port1.id : port0.id),
                             changedAt: opts.fileDate
@@ -221,31 +271,44 @@ function sysml2specif(xmi, options) {
                 ;
             });
         });
+        stateTransitionL.forEach((stT) => {
+            let src = LIB.itemById(spD.resources, stT.source), sTi = LIB.valueByTitle(src, 'dcterms:title', spD), tgt = LIB.itemById(spD.resources, stT.target), tTi = LIB.valueByTitle(tgt, 'dcterms:title', spD), tr = LIB.itemById(spD.resources, stT.id);
+            if (sTi == 'uml:Pseudostate') {
+                sTi = 'entry';
+                LIB.updatePropertyByTitle(src, 'dcterms:title', () => { return [[{ text: sTi }]]; }, spD);
+            }
+            ;
+            let trName = sTi + '→' + tTi;
+            LIB.updatePropertyByTitle(tr, 'dcterms:title', () => {
+                let ti = LIB.valueByTitle(tr, 'dcterms:title', spD);
+                return ti == 'uml:Transition' ? [[{ text: trName }]] : undefined;
+            }, spD);
+        });
         spD.statements = spD.statements
             .concat(abstractions)
             .concat(specializations)
-            .concat(usedElements);
+            .concat(usedElementL);
         let prevLength;
         do {
             prevLength = spD.statements.length;
             spD.statements = spD.statements
                 .filter(validateStatement);
         } while (prevLength > spD.statements.length);
+        spD = LIB.keepUsedClasses(spD);
         console.debug('from SysML:', spD, opts);
         return spD;
         function parseElements(parent, params) {
             Array.from(parent.children, (ch) => {
-                let r, nd;
+                let r;
                 switch (ch.tagName) {
                     case "packagedElement":
-                        switch (ch.getAttribute("xmi:type")) {
+                        let ty = ch.getAttribute("xmi:type");
+                        switch (ty) {
                             case "uml:DataType":
-                                r = makeResource(ch);
-                                r["class"] = LIB.makeKey(idResourceClassDefault);
+                                r = makeResource(ch, { class: terms.resourceClassDefault });
                                 spD.resources.push(r);
-                                nd = makeNode(r, params.package);
                                 if (opts.addElementsToHierarchy)
-                                    params.nodes.push(nd);
+                                    params.nodes.push(makeNode(r, params.package));
                         }
                         ;
                 }
@@ -260,8 +323,7 @@ function sysml2specif(xmi, options) {
                     case "packagedElement":
                         switch (ch.getAttribute("xmi:type")) {
                             case 'uml:Package':
-                                r = makeResource(ch);
-                                r["class"] = LIB.makeKey(idResourceClassPackage);
+                                r = makeResource(ch, { class: terms.resourceClassPackage });
                                 spD.resources.push(r);
                                 nd = makeNode(r, params.package);
                                 if (opts.addElementsToHierarchy)
@@ -271,6 +333,12 @@ function sysml2specif(xmi, options) {
                             case 'uml:Class':
                                 parseClass(ch, params);
                                 break;
+                            case 'uml:CallEvent':
+                            case 'uml:ChangeEvent':
+                            case 'uml:SignalEvent':
+                            case 'uml:TimeEvent':
+                                parseEvent(ch, params);
+                                break;
                             case "uml:DataType":
                                 break;
                             case "uml:Association":
@@ -279,7 +347,6 @@ function sysml2specif(xmi, options) {
                                 break;
                             case "uml:Profile":
                                 break;
-                            case "uml:ProfileApplication":
                             case "uml:Usage":
                                 break;
                         }
@@ -297,6 +364,10 @@ function sysml2specif(xmi, options) {
                             case 'uml:Package':
                             case 'uml:Class':
                             case "uml:DataType":
+                            case 'uml:CallEvent':
+                            case 'uml:ChangeEvent':
+                            case 'uml:SignalEvent':
+                            case 'uml:TimeEvent':
                                 break;
                             case "uml:Association":
                                 parseAssociation(ch);
@@ -305,7 +376,7 @@ function sysml2specif(xmi, options) {
                                 let sbj = ch.getElementsByTagName('client')[0].getAttribute("xmi:idref"), obj = ch.getElementsByTagName('supplier')[0].getAttribute("xmi:idref");
                                 abstractions.push({
                                     id: ch.getAttribute("xmi:id"),
-                                    class: LIB.makeKey(idStatementClassDefault),
+                                    class: LIB.makeKey(terms.statementClassDefault),
                                     subject: LIB.makeKey(sbj),
                                     object: LIB.makeKey(obj),
                                     changedAt: opts.fileDate
@@ -314,7 +385,7 @@ function sysml2specif(xmi, options) {
                             case "uml:Realization":
                                 let sbjR = ch.getElementsByTagName('client')[0].getAttribute("xmi:idref"), objR = ch.getElementsByTagName('supplier')[0].getAttribute("xmi:idref"), staR = {
                                     id: ch.getAttribute("xmi:id"),
-                                    class: LIB.makeKey(idStatementClassRealizes ?? idStatementClassAssociatedWith),
+                                    class: LIB.makeKey(terms.statementClassRealizes ?? terms.statementClassAssociatedWith),
                                     subject: LIB.makeKey(sbjR),
                                     object: LIB.makeKey(objR),
                                     changedAt: opts.fileDate
@@ -323,64 +394,79 @@ function sysml2specif(xmi, options) {
                                 break;
                             case "uml:Profile":
                                 break;
-                            case "uml:ProfileApplication":
                             case "uml:Usage":
                                 break;
                             default:
                                 console.info("Cameo Import: Skipping the packagedElement", ch, "with name", ch.getAttribute("name"), "and type", ty, ".");
                         }
                         ;
+                        break;
+                    case 'profileApplication':
+                        break;
+                    default:
+                        console.info("Cameo Import: Skipping tag", ch.tagName, "with name", ch.getAttribute("name"), ".");
                 }
                 ;
             });
-            function parseClass(ch, params) {
-                let r2 = makeResource(ch);
-                r2["class"] = LIB.makeKey(idResourceClassDefault);
+            function parseClass(el, params) {
+                let r2 = makeResource(el, { class: terms.resourceClassDefault });
                 spD.resources.push(r2);
-                let nd2 = makeNode(r2, params.package), nextLevel = { package: params.package, nodes: nd2.nodes };
+                let nd2 = makeNode(r2, params.package), pars = { package: params.package, parent: r2, nodes: nd2.nodes };
                 if (opts.addElementsToHierarchy)
                     params.nodes.push(nd2);
                 if (params.package)
                     spD.statements.push({
-                        id: CONFIG.prefixS + simpleHash(params.package + idStatementClassContains + r2.id),
-                        class: LIB.makeKey(idStatementClassContains),
+                        id: CONFIG.prefixS + 'contains-' + simpleHash(params.package + terms.statementClassContains + r2.id),
+                        class: LIB.makeKey(terms.statementClassContains),
                         subject: LIB.makeKey(params.package),
                         object: LIB.makeKey(r2.id),
                         changedAt: opts.fileDate
                     });
-                Array.from(ch.children, (ch2) => {
-                    switch (ch2.tagName) {
+                Array.from(el.children, (ch) => {
+                    switch (ch.tagName) {
+                        case 'nestedClassifier':
+                            parseClass(ch, pars);
+                            break;
                         case "xmi:Extension":
-                            makeDiagrams(ch2, nextLevel);
+                            makeDiagrams(ch, pars);
+                            break;
+                        case 'ownedBehavior':
+                            switch (ch.getAttribute("xmi:type")) {
+                                case 'uml:StateMachine':
+                                    makeStateMachine(ch, pars);
+                                    break;
+                                case 'uml:Activity':
+                                    makeActivity(ch, pars);
+                            }
+                            ;
                             break;
                         case 'generalization':
                             specializations.push({
-                                id: ch2.getAttribute("xmi:id"),
-                                class: LIB.makeKey(idStatementClassSpecializes),
+                                id: ch.getAttribute("xmi:id"),
+                                class: LIB.makeKey(terms.statementClassSpecializes),
                                 subject: LIB.makeKey(r2.id),
-                                object: LIB.makeKey(ch2.getAttribute("general")),
+                                object: LIB.makeKey(ch.getAttribute("general")),
                                 changedAt: opts.fileDate
                             });
                             break;
                         case 'ownedAttribute':
-                            parseOwnedAttribute(ch2, { parent: r2, nodes: nd2.nodes });
+                            parseOwnedAttribute(ch, { parent: r2, nodes: nd2.nodes });
                             break;
                         case 'ownedOperation':
-                            let oO = makeResource(ch2);
-                            oO["class"] = LIB.makeKey(idResourceClassActor);
+                            let oO = makeResource(ch, { class: terms.resourceClassActor });
                             spD.resources.push(oO);
                             if (opts.addElementsToHierarchy)
                                 nd2.nodes.push(makeNode(oO, r2.id));
                             spD.statements.push({
-                                id: CONFIG.prefixS + simpleHash(r2.id + idStatementClassComprises + oO.id),
-                                class: LIB.makeKey(idStatementClassComprises),
+                                id: CONFIG.prefixS + 'comprises-' + simpleHash(r2.id + terms.statementClassComprises + oO.id),
+                                class: LIB.makeKey(terms.statementClassComprises),
                                 subject: LIB.makeKey(r2.id),
                                 object: LIB.makeKey(oO.id),
                                 changedAt: opts.fileDate
                             });
                             break;
                         case 'ownedConnector':
-                            let cId = ch2.getAttribute("xmi:id"), ports = Array.from(ch2.getElementsByTagName("end"), (ch3) => {
+                            let cId = ch.getAttribute("xmi:id"), ports = Array.from(ch.getElementsByTagName("end"), (ch3) => {
                                 return ch3.getAttribute("role");
                             });
                             if (ports.length < 2) {
@@ -393,10 +479,10 @@ function sysml2specif(xmi, options) {
                                 return;
                             }
                             ;
-                            connectors.push({ id: cId, ends: [ports[0], ports[1]] });
+                            connectorL.push({ id: cId, ends: [ports[0], ports[1]] });
                             break;
-                        case 'nestedClassifier':
-                            parseClass(ch2, nextLevel);
+                        default:
+                            console.info("Cameo Import: Skipping tag", ch.tagName, "with name", ch.getAttribute("name"), ".");
                     }
                 });
                 function parseOwnedAttribute(oA, params) {
@@ -408,12 +494,12 @@ function sysml2specif(xmi, options) {
                             ty = oA.getAttribute("type");
                             ag = oA.getAttribute("aggregation");
                             if (ac && ty) {
-                                cl = ag == "composite" ? idStatementClassComprises : (ag == "shared" ? idStatementClassAggregates : undefined);
+                                cl = ag == "composite" ? terms.statementClassComprises : (ag == "shared" ? terms.statementClassAggregates : undefined);
                                 nm = oA.getAttribute("name");
                                 if (nm) {
                                     spD.resources.push({
                                         id: pId,
-                                        class: LIB.makeKey(idResourceClassDefault),
+                                        class: LIB.makeKey(terms.resourceClassDefault),
                                         properties: [{
                                                 class: LIB.makeKey("PC-Name"),
                                                 values: [[{ text: replaceSeparatorNS(nm) }]]
@@ -426,8 +512,8 @@ function sysml2specif(xmi, options) {
                                     if (opts.addElementsToHierarchy)
                                         params.nodes.push(makeNode(LIB.makeKey(pId), params.parent.id));
                                     specializations.push({
-                                        id: CONFIG.prefixS + simpleHash(pId + idStatementClassSpecializes + ty),
-                                        class: LIB.makeKey(idStatementClassSpecializes),
+                                        id: CONFIG.prefixS + 'specializes-' + simpleHash(pId + terms.statementClassSpecializes + ty),
+                                        class: LIB.makeKey(terms.statementClassSpecializes),
                                         subject: LIB.makeKey(pId),
                                         object: LIB.makeKey(ty),
                                         changedAt: opts.fileDate
@@ -441,7 +527,7 @@ function sysml2specif(xmi, options) {
                                     thisEnd: LIB.makeKey(params.parent.id),
                                     otherEnd: LIB.makeKey(ty)
                                 });
-                                usedElements
+                                usedElementL
                                     .filter((e) => {
                                     return e.object.id == pId;
                                 })
@@ -453,7 +539,7 @@ function sysml2specif(xmi, options) {
                                 if (ty) {
                                     spD.statements.push({
                                         id: pId,
-                                        class: LIB.makeKey(idStatementClassDefault),
+                                        class: LIB.makeKey(terms.statementClassDefault),
                                         subject: LIB.makeKey(params.parent.id),
                                         object: LIB.makeKey(ty),
                                         properties: [{
@@ -471,14 +557,13 @@ function sysml2specif(xmi, options) {
                                     flowProperties.set(params.parent.id, stT.dir);
                             }
                             else {
-                                let r = makeResource(oA);
-                                r["class"] = LIB.makeKey(idResourceClassState);
+                                let r = makeResource(oA, { class: terms.resourceClassState });
                                 spD.resources.push(r);
                                 if (opts.addElementsToHierarchy)
                                     nd2.nodes.push(makeNode(r, params.parent.id));
                                 spD.statements.push({
-                                    id: CONFIG.prefixS + simpleHash(params.parent.id + idStatementClassComprises + r.id),
-                                    class: LIB.makeKey(idStatementClassComprises),
+                                    id: CONFIG.prefixS + 'comprises-' + simpleHash(params.parent.id + terms.statementClassComprises + r.id),
+                                    class: LIB.makeKey(terms.statementClassComprises),
                                     subject: LIB.makeKey(params.parent.id),
                                     object: LIB.makeKey(r.id),
                                     changedAt: opts.fileDate
@@ -508,8 +593,8 @@ function sysml2specif(xmi, options) {
                             };
                             spD.resources.push(prt);
                             spD.statements.push({
-                                id: CONFIG.prefixS + simpleHash(params.parent.id + idStatementClassHasPart + pId),
-                                class: LIB.makeKey(idStatementClassHasPart),
+                                id: CONFIG.prefixS + 'hasPart-' + simpleHash(params.parent.id + terms.statementClassHasPart + pId),
+                                class: LIB.makeKey(terms.statementClassHasPart),
                                 subject: LIB.makeKey(params.parent.id),
                                 object: LIB.makeKey(pId),
                                 changedAt: opts.fileDate
@@ -519,6 +604,20 @@ function sysml2specif(xmi, options) {
                     ;
                 }
                 ;
+            }
+            function parseEvent(el, params) {
+                let re = makeResource(el, { class: terms.resourceClassEvent });
+                spD.resources.push(re);
+                if (opts.addElementsToHierarchy)
+                    params.nodes.push(makeNode(re, params.package));
+                if (params.package)
+                    spD.statements.push({
+                        id: CONFIG.prefixS + 'contains-' + simpleHash(params.package + terms.statementClassContains + re.id),
+                        class: LIB.makeKey(terms.statementClassContains),
+                        subject: LIB.makeKey(params.package),
+                        object: LIB.makeKey(re.id),
+                        changedAt: opts.fileDate
+                    });
             }
             function parseAssociation(el) {
                 let nm = el.getAttribute("name"), sC, prpL, aId = el.getAttribute("xmi:id"), aEnds = associationEnds.filter(aE => aE.associationId == aId);
@@ -534,7 +633,7 @@ function sysml2specif(xmi, options) {
                 if (aEnds.length == 1) {
                     spD.statements.push({
                         id: aId,
-                        class: LIB.makeKey(aEnds[0].associationType ?? (sC ? sC.id : undefined) ?? idStatementClassAssociatedWith),
+                        class: LIB.makeKey(aEnds[0].associationType ?? (sC ? sC.id : undefined) ?? terms.statementClassAssociatedWith),
                         properties: prpL ? prpL : undefined,
                         subject: LIB.makeKey(aEnds[0].thisEnd),
                         object: LIB.makeKey(aEnds[0].otherEnd),
@@ -550,7 +649,7 @@ function sysml2specif(xmi, options) {
                             obj = aEnds[1].otherEnd;
                         }
                         else {
-                            cl = aEnds[0].associationType ?? (sC ? sC.id : undefined) ?? idStatementClassAssociatedWith;
+                            cl = aEnds[0].associationType ?? (sC ? sC.id : undefined) ?? terms.statementClassAssociatedWith;
                             sbj = aEnds[0].thisEnd;
                             obj = aEnds[0].otherEnd;
                         }
@@ -576,7 +675,7 @@ function sysml2specif(xmi, options) {
                     Array.from(el.getElementsByTagName('ownedEnd'), (oE) => {
                         let ag = oE.getAttribute("aggregation");
                         if (ag && ['composite', 'shared'].includes(ag)) {
-                            st['class'] = LIB.makeKey(ag == 'composite' ? idStatementClassComprises : idStatementClassAggregates);
+                            st['class'] = LIB.makeKey(ag == 'composite' ? terms.statementClassComprises : terms.statementClassAggregates);
                             st.object = LIB.makeKey(oE.getAttribute("type"));
                         }
                         else {
@@ -598,32 +697,39 @@ function sysml2specif(xmi, options) {
         }
         function makeDiagrams(el, params) {
             Array.from(el.getElementsByTagName('ownedDiagram'), (oD) => {
-                let dg = oD.getElementsByTagName('diagram:DiagramRepresentationObject')[0];
+                let dg = oD.getElementsByTagName('diagram:DiagramRepresentationObject')[0], ty = dg.getAttribute("type"), nm = replaceSeparatorNS(oD.getAttribute("name"));
                 let r = {
                     id: oD.getAttribute("xmi:id"),
-                    class: LIB.makeKey(idResourceClassDiagram),
+                    class: LIB.makeKey(terms.resourceClassDiagram),
                     properties: [{
                             class: LIB.makeKey("PC-Name"),
-                            values: [[{ text: replaceSeparatorNS(oD.getAttribute("name")) }]]
+                            values: [[{ text: nm }]]
                         }, {
                             class: LIB.makeKey("PC-Type"),
                             values: [[{ text: oD.getAttribute("xmi:type") }]]
                         }, {
                             class: LIB.makeKey("PC-Notation"),
-                            values: [[{ text: "UML " + dg.getAttribute("type") }]]
+                            values: [[{ text: (ty.startsWith("SysML") ? "" : "UML ") + ty }]]
                         }],
                     changedAt: opts.fileDate
                 };
-                addDesc(r, el);
+                addDesc(r, oD);
+                diagramL.push({
+                    id: r.id,
+                    name: nm,
+                    type: ty
+                });
                 if (params.package)
                     spD.statements.push({
-                        id: CONFIG.prefixS + simpleHash(params.package + idStatementClassContains + r.id),
-                        class: LIB.makeKey(idStatementClassContains),
+                        id: CONFIG.prefixS + 'contains-' + simpleHash(params.package + terms.statementClassContains + r.id),
+                        class: LIB.makeKey(terms.statementClassContains),
                         subject: LIB.makeKey(params.package),
                         object: LIB.makeKey(r.id),
                         changedAt: opts.fileDate
                     });
                 Array.from(dg.getElementsByTagName('usedElements'), uE => makeStatementShows(r.id, uE.innerHTML));
+                if (params.parent)
+                    makeStatementShows(r.id, params.parent);
                 spD.resources.push(r);
                 params.nodes.push({
                     id: CONFIG.prefixN + simpleHash(params.package + r.id),
@@ -632,13 +738,168 @@ function sysml2specif(xmi, options) {
                 });
             });
         }
-        ;
+        function makeStateMachine(el, params) {
+            let r = makeResource(el, { class: terms.resourceClassActor });
+            spD.resources.push(r);
+            spD.statements.push({
+                id: CONFIG.prefixS + 'ownedBehavior-' + simpleClone(params.parent.id + r.id),
+                class: LIB.makeKey(terms.statementClassHasOwnedBehavior),
+                subject: LIB.makeKey(params.parent),
+                object: LIB.makeKey(r),
+                changedAt: opts.fileDate
+            });
+            Array.from(el.children, (ch) => {
+                switch (ch.tagName) {
+                    case "xmi:Extension":
+                        makeDiagrams(ch, Object.assign({}, params, { parent: r }));
+                        break;
+                    case "region":
+                        let stm = diagramL[diagramL.length - 1];
+                        makeStatementShows(stm.id, ch.getAttribute("xmi:id"));
+                        makeRegion(ch, Object.assign({}, params, { parent: r, diagram: stm }));
+                        break;
+                    default:
+                        console.info("Cameo Import: Skipping tag", ch.tagName, "with name", ch.getAttribute("name"), ".");
+                }
+                ;
+            });
+            return;
+            function makeRegion(rg, params) {
+                let reg = makeResource(rg, { class: terms.resourceClassActor });
+                spD.resources.push(reg);
+                spD.statements.push({
+                    id: CONFIG.prefixS + 'contains-' + simpleHash(params.parent.id + terms.statementClassContains + reg.id),
+                    class: LIB.makeKey(terms.statementClassContains),
+                    subject: LIB.makeKey(params.parent),
+                    object: LIB.makeKey(reg),
+                    changedAt: opts.fileDate
+                });
+                Array.from(rg.children, (ch) => {
+                    let r;
+                    switch (ch.tagName) {
+                        case "subvertex":
+                            r = makeResource(ch, { class: terms.resourceClassState });
+                            spD.statements.push({
+                                id: CONFIG.prefixS + 'contains-' + simpleHash(reg.id + terms.statementClassContains + r.id),
+                                class: LIB.makeKey(terms.statementClassContains),
+                                subject: LIB.makeKey(reg),
+                                object: LIB.makeKey(r),
+                                changedAt: opts.fileDate
+                            });
+                            Array.from(ch.children, (ch) => {
+                                switch (ch.tagName) {
+                                    case "region":
+                                        makeRegion(ch, Object.assign({}, params, { parent: r }));
+                                }
+                                ;
+                            });
+                            break;
+                        case "transition":
+                            r = makeResource(ch, { class: terms.resourceClassActor });
+                            let src = ch.getAttribute("source"), tgt = ch.getAttribute("target"), stTransition = { id: r.id, source: src, target: tgt };
+                            spD.statements.push({
+                                id: CONFIG.prefixS + 'startsFrom-' + simpleHash(src + terms.statementClassTransitionSource + r.id),
+                                class: LIB.makeKey(terms.statementClassTransitionSource),
+                                subject: LIB.makeKey(r),
+                                object: LIB.makeKey(src),
+                                changedAt: opts.fileDate
+                            });
+                            spD.statements.push({
+                                id: CONFIG.prefixS + 'endsAt-' + simpleHash(tgt + terms.statementClassTransitionTarget + r.id),
+                                class: LIB.makeKey(terms.statementClassTransitionTarget),
+                                subject: LIB.makeKey(r),
+                                object: LIB.makeKey(tgt),
+                                changedAt: opts.fileDate
+                            });
+                            Array.from(ch.children, (ch) => {
+                                switch (ch.tagName) {
+                                    case "trigger":
+                                        let evId = ch.getAttribute("event");
+                                        stTransition.event = evId;
+                                        spD.statements.push({
+                                            id: CONFIG.prefixS + 'triggers-' + simpleHash(evId + terms.statementClassTriggers + r.id),
+                                            class: LIB.makeKey(terms.statementClassTriggers),
+                                            subject: LIB.makeKey(evId),
+                                            object: LIB.makeKey(r),
+                                            changedAt: opts.fileDate
+                                        });
+                                        makeStatementShows(params.diagram.id, evId);
+                                        break;
+                                    case "effect":
+                                        makeActivity(ch, Object.assign({}, params, { parent: r }));
+                                        break;
+                                    default:
+                                        console.info("Cameo Import: Skipping tag", ch.tagName, "with name", ch.getAttribute("name"), ".");
+                                }
+                                ;
+                            });
+                            stateTransitionL.push(stTransition);
+                            break;
+                        default:
+                            console.info("Cameo Import: Skipping tag", ch.tagName, "with name", ch.getAttribute("name"), ".");
+                    }
+                    ;
+                    spD.resources.push(r);
+                });
+            }
+        }
+        function makeActivity(el, params) {
+            console.debug('makeActivity still incomplete', el, params);
+            let r = makeResource(el, { class: terms.resourceClassActor });
+            spD.resources.push(r);
+            spD.statements.push({
+                id: CONFIG.prefixS + 'ownedBehavior-' + simpleClone(params.parent.id + terms.statementClassHasOwnedBehavior + r.id),
+                class: LIB.makeKey(terms.statementClassHasOwnedBehavior),
+                subject: LIB.makeKey(params.parent),
+                object: LIB.makeKey(r),
+                changedAt: opts.fileDate
+            });
+            Array.from(el.children, (ch) => {
+                switch (ch.tagName) {
+                    case "xmi:Extension":
+                        makeDiagrams(ch, Object.assign({}, params, { parent: r }));
+                        break;
+                    case "node":
+                        let act = makeResource(ch, { class: terms.resourceClassActor });
+                        spD.resources.push(act);
+                        spD.statements.push({
+                            id: CONFIG.prefixS + 'contains-' + simpleHash(r.id + terms.statementClassContains + act.id),
+                            class: LIB.makeKey(terms.statementClassContains),
+                            subject: LIB.makeKey(r),
+                            object: LIB.makeKey(act),
+                            changedAt: opts.fileDate
+                        });
+                        break;
+                }
+                ;
+            });
+            Array.from(el.children, (ch) => {
+                switch (ch.tagName) {
+                    case "xmi:Extension":
+                    case "node":
+                        break;
+                    case "edge":
+                        spD.statements.push({
+                            id: ch.getAttribute('xmi:id'),
+                            class: LIB.makeKey(terms.statementClassControlFlow),
+                            subject: LIB.makeKey(ch.getAttribute('source')),
+                            object: LIB.makeKey(ch.getAttribute('target')),
+                            changedAt: opts.fileDate
+                        });
+                        break;
+                    default:
+                        console.info("Cameo Import: Skipping tag", ch.tagName, "with name", ch.getAttribute("name"), ".");
+                }
+                ;
+            });
+        }
         function makeResource(el, pars) {
             let r = {
                 id: el.getAttribute("xmi:id"),
+                class: pars && pars["class"] ? LIB.makeKey(pars["class"]) : undefined,
                 properties: [{
                         class: LIB.makeKey("PC-Name"),
-                        values: [[{ text: replaceSeparatorNS(pars && pars.name ? pars.name : el.getAttribute("name")) }]]
+                        values: [[{ text: replaceSeparatorNS(pars && pars.name ? pars.name : (el.getAttribute("name")) ?? (el.getAttribute("xmi:type"))) }]]
                     }, {
                         class: LIB.makeKey("PC-Type"),
                         values: [[{ text: el.getAttribute("xmi:type") }]]
@@ -658,30 +919,33 @@ function sysml2specif(xmi, options) {
             return nd;
         }
         function addDesc(r, el) {
-            Array.from(el.getElementsByTagName('ownedComment'), (oC, i) => {
-                if (i > 0) {
-                    console.warn("Element " + r.id + " has more than one comment/description.");
-                    return;
+            Array.from(el.children, (ch) => {
+                switch (ch.tagName) {
+                    case 'ownedComment':
+                        let desc = ch.getAttribute("body");
+                        if (desc)
+                            r.properties.push({
+                                class: LIB.makeKey("PC-Description"),
+                                values: [[{ text: desc }]]
+                            });
                 }
                 ;
-                let desc = oC.getAttribute("body");
-                if (desc)
-                    r.properties.push({
-                        class: LIB.makeKey("PC-Description"),
-                        values: [[{ text: desc }]]
-                    });
             });
         }
         function makeStatementShows(sbj, obj) {
-            let stId = CONFIG.prefixS + simpleHash(sbj + idStatementClassShows + obj);
-            if (LIB.indexById(usedElements, stId) < 0)
-                usedElements.push({
-                    id: stId,
-                    class: LIB.makeKey(idStatementClassShows),
-                    subject: LIB.makeKey(sbj),
-                    object: LIB.makeKey(obj),
-                    changedAt: opts.fileDate
-                });
+            if (sbj && obj) {
+                let stId = CONFIG.prefixS + 'shows-' + simpleHash(sbj + terms.statementClassShows + obj);
+                if (LIB.indexById(usedElementL, stId) < 0)
+                    usedElementL.push({
+                        id: stId,
+                        class: LIB.makeKey(terms.statementClassShows),
+                        subject: LIB.makeKey(sbj),
+                        object: LIB.makeKey(obj),
+                        changedAt: opts.fileDate
+                    });
+            }
+            else
+                console.error("When creating 'shows' statement, the subject or object is undefined", sbj, obj);
         }
         function validateStatement(st, idx, stL) {
             if (LIB.isKey(st.subject) && LIB.isKey(st.object) && LIB.isKey(st["class"])) {

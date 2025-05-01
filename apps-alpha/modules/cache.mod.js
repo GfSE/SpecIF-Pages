@@ -1537,7 +1537,6 @@ class CProject {
                         opts.revisionDate = new Date().toISOString();
                         break;
                     case 'specifClasses':
-                        opts.adoptOntologyDataTypes = true;
                         break;
                     default:
                         reject(new resultMsg(999, "Programming Error: Invalid format selector on export."));

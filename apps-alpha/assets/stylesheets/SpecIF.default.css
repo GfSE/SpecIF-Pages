@@ -21,7 +21,7 @@ body {
 }
 #pageHeader {
 	/* padding: 0.3em calc(var(--bs-gutter-x) * .5);  /* like bootstrap 5.3 row */
-	padding: 0.4em 1em 0;
+	padding: 0.4em 0.8em 0;
 }
 #logo {
 	width: 132px;
@@ -45,7 +45,7 @@ body {
 }
 #specsSelector {
 	/* padding: 0 calc(var(--bs-gutter-x) * .5); /* like bootstrap 5.3 row */
-	padding: 0.4em 1em 0;
+	padding: 0.4em 0.8em 0;
 }
 .pageTitle {
 	font-size: 180%;
@@ -142,16 +142,14 @@ div.content {   /* width is 75% with wide screen, 100% otherwise */
 }
 div.pane-tree {
 	background-color: #f5f5f5;
-	box-sizing: border-box;
 	overflow: auto;
-	padding: 8px 4px 4px 4px;
+	padding: 0.5em 0 0 0;
 }
 div.pane-details {
 	display: none;
 	background-color: #c8def0;
-	box-sizing: border-box;
 	overflow: auto;
-	padding: 8px 4px 4px 4px;
+	padding: 0.5em 0 0 0;
 }
 .listEntry {
 	border-bottom:1px solid #ddd;

@@ -1,10 +1,10 @@
 "use strict";
 const CONFIG = {};
-CONFIG.appVersion = "1.2.a.19";
 CONFIG.specifVersion = "1.2";
+CONFIG.appVersion = CONFIG.specifVersion + ".a.21";
 CONFIG.imgURL = './assets/images';
 CONFIG.remotePath = 'https://specif.de/v' + CONFIG.specifVersion + '/';
-CONFIG.localPath = '../../../SpecIF/Pages/v1.2/';
+CONFIG.localPath = '../../../SpecIF/Pages/v' + CONFIG.specifVersion + '/';
 CONFIG.ontologyURL = CONFIG.remotePath + 'Ontology.specif';
 CONFIG.localOntologyURL = CONFIG.localPath + 'Ontology.specif';
 CONFIG.QuickStartGuideDe =

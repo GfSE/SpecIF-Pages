@@ -306,6 +306,10 @@ class COntology {
         if (Array.isArray(opts.domains) && opts.domains.length > 0
             || Array.isArray(opts.terms) && opts.terms.length > 0) {
             this.options = opts;
+            if (Array.isArray(this.options.lifeCycles))
+                LIB.cacheE(this.options.lifeCycles, "SpecIF:LifecycleStatusReleased");
+            else
+                this.options.lifeCycles = ["SpecIF:LifecycleStatusReleased"];
             let spId = "P-SpecifClasses", now = new Date().toISOString();
             if (Array.isArray(opts.domains)) {
                 opts.domains.forEach((d) => { spId += '-' + d.toCamelCase(); });
@@ -391,7 +395,6 @@ class COntology {
         ;
         return cL;
         function isSelected(r) {
-            let localOpts = Object.assign({ SpecIF_LifecycleStatusReleased: true }, self.options);
             return hasSelectedStatus(r)
                 && (hasSelectedDomain(r) || hasSelectedTerm(r));
             function hasSelectedDomain(el) {
@@ -416,8 +419,8 @@ class COntology {
             }
             function hasSelectedStatus(el) {
                 let selStatus = LIB.valuesByTitle(el, ["SpecIF:TermStatus"], self.data);
-                for (let s of selStatus) {
-                    if (localOpts[LIB.displayValueOf(s, { targetLanguage: 'default' }).toJsId()])
+                for (let st of selStatus) {
+                    if (self.options.lifeCycles.includes(LIB.displayValueOf(st, { targetLanguage: 'default' })))
                         return true;
                 }
                 ;

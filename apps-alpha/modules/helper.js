@@ -598,6 +598,25 @@ LIB.displayValueOf = (val, opts) => {
     ;
     return val;
 };
+LIB.propertyByTitle = (itm, pN, dta) => {
+    if (itm) {
+        if (itm.properties) {
+            let pC;
+            for (var p of itm.properties) {
+                pC = LIB.itemByKey(dta.propertyClasses, p['class']);
+                if (pC && pC.title == pN)
+                    return p;
+            }
+        }
+        ;
+    }
+    ;
+};
+LIB.updatePropertyByTitle = (itm, pN, fn, dta) => {
+    let prp = LIB.propertyByTitle(itm, pN, dta), ti = fn();
+    if (ti)
+        prp.values = ti;
+};
 LIB.valuesByTitle = (itm, pNs, dta) => {
     if (itm) {
         let valL = [];
@@ -862,6 +881,74 @@ LIB.getExtendedClasses = (cL, toGet) => {
         });
         delete rC['extends'];
         return rC;
+    }
+};
+LIB.keepUsedClasses = (spD) => {
+    spD.statementClasses = keepUsed(spD.statementClasses, spD.statements, spD.statementClasses);
+    spD.resourceClasses = keepUsed(spD.resourceClasses, spD.resources, spD.statementClasses);
+    spD.propertyClasses = keepUsedPC(spD.propertyClasses, spD.statementClasses.concat(spD.resourceClasses));
+    spD.dataTypes = keepUsedDT(spD.dataTypes, spD.propertyClasses);
+    return spD;
+    function keepUsedDT(cL, iL) {
+        let prevLength;
+        do {
+            prevLength = cL.length;
+            cL = cL.filter((c) => {
+                for (let i of iL) {
+                    if (LIB.references(i.dataType, c))
+                        return true;
+                }
+                ;
+                console.info("Deleting unused ", c.id);
+            });
+        } while (prevLength > cL.length);
+        return cL;
+    }
+    function keepUsedPC(cL, iL) {
+        let prevLength;
+        do {
+            prevLength = cL.length;
+            cL = cL.filter((c) => {
+                for (let i of iL) {
+                    if (Array.isArray(i.propertyClasses))
+                        for (let p of i.propertyClasses)
+                            if (LIB.references(p, c))
+                                return true;
+                }
+                ;
+                console.info("Deleting unused ", c.id);
+            });
+        } while (prevLength > cL.length);
+        return cL;
+    }
+    function keepUsed(cL, iL, sCL) {
+        let prevLength;
+        do {
+            prevLength = cL.length;
+            cL = cL.filter((c) => {
+                for (let c1 of cL)
+                    if (LIB.references(c1.extends, c))
+                        return true;
+                for (let i of iL) {
+                    if (LIB.references(i['class'], c))
+                        return true;
+                }
+                ;
+                for (let sC of sCL) {
+                    if (sC.subjectClasses)
+                        for (let sbjC of sC.subjectClasses)
+                            if (LIB.references(sbjC, c))
+                                return true;
+                    if (sC.objectClasses)
+                        for (let objC of sC.objectClasses)
+                            if (LIB.references(objC, c))
+                                return true;
+                }
+                ;
+                console.info("Deleting unused ", c.id);
+            });
+        } while (prevLength > cL.length);
+        return cL;
     }
 };
 LIB.cmp = (i, a) => {
