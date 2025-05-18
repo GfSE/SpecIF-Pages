@@ -14,5 +14,5 @@ _site/
 .bundle/
 vendor/
 
-# Added for this project for use with VisualStudio
+# Added to this project using VisualStudio
 .vs
