@@ -118,12 +118,19 @@ function makeXhtml( data, options ) {
 		})
 	}
 	function titleOf( itm, pars, opts ) { // resource, resourceClass, parameters, options
-		// render the resource or statement title
+		// Render the resource or statement title
+		function getTitle(itm) {
+			for (var p of opts.titleProperties) {
+				let ti = LIB.valueByTitle(itm, p, data);
+                if (ti) return ti;  // return the first found title
+			};
+		}
 
-		// First, find and set the configured title:
-		let ti = LIB.valueByTitle(itm, opts.titleProperties[0], data)  // assuming that the first entry is the translation of dcterms:title
-			|| LIB.valueByTitle(itm, opts.typeProperty, data)
-			|| (itm.subject ? LIB.classTitleOf(itm['class'], data.statementClasses) : '');
+		// First, find the title to use:
+		let ti = getTitle(itm)	// get the title from the configured title properties
+			?? LIB.valueByTitle(itm, opts.typeProperty, data)
+			?? (itm.subject ? LIB.classTitleOf(itm['class'], data.statementClasses) : ''); 	// In case of a statement, use the class' title by default:
+
 /* previously without LIB. But it does not use the content of the 'type' property.
 		function titleIdx(aL) {
 			// Find the index of the property to be used as title.

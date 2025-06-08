@@ -9,6 +9,7 @@
 class COntology {
     constructor(dta) {
         this.headings = [];
+        this.organizerClasses = [];
         this.modelElementClasses = [];
         this.termCategories = new Map([
             ["resourceClass", { synonymStatement: "SpecIF:isSynonymOfResource", prefix: CONFIG.prefixRC }],
@@ -52,11 +53,10 @@ class COntology {
             "SpecIF:DefaultValueDuration",
             "SpecIF:DefaultValueAnyURI",
         ];
-        this.eligibleLifecycleStatus = [
+        this.eligibleLifecycles = [
             "SpecIF:LifecycleStatusReleased",
             "SpecIF:LifecycleStatusEquivalent",
-            "SpecIF:LifecycleStatusSubmitted",
-            "SpecIF:LifecycleStatusExperimental"
+            "SpecIF:LifecycleStatusSubmitted"
         ];
         let oData = this.data = dta;
         this.data.nodes = (dta.nodes || dta.hierarchies).filter((n) => {
@@ -89,6 +89,7 @@ class COntology {
         ;
         this.namespaces = this.getNamespaces();
         this.headings = this.getHeadings();
+        this.organizerClasses = this.getOrganizerClasses();
         this.modelElementClasses = this.getModelElementClasses();
         this.makeStatementsIsNamespace();
         this.options = {};
@@ -106,7 +107,7 @@ class COntology {
                 console.warn("Ontology: Term " + r.id + " has multiple values (" + valL.toString() + ")");
             return (valL.length > 0
                 && LIB.languageTextOf(valL[0], { targetLanguage: "default" }) == nTerm
-                && (!opts || !opts.eligibleOnly || this.eligibleLifecycleStatus.includes(stat))
+                && (!opts || !opts.eligibleOnly || this.eligibleLifecycles.includes(stat))
                 && (ctg == 'all' || LIB.classTitleOf(r['class'], this.data.resourceClasses).toLowerCase().includes(ctg)));
         });
     }
@@ -117,16 +118,20 @@ class COntology {
         if (resL.length > 0)
             return resL[0];
     }
-    getTerms(ctg) {
+    getTerms(ctg, opts) {
+        if (Array.isArray(opts.lifeCycles))
+            LIB.cacheE(opts.lifeCycles, "SpecIF:LifecycleStatusReleased");
+        else
+            this.options.lifeCycles = ["SpecIF:LifecycleStatusReleased"];
         let ctgL = Array.from(this.termCategories.keys());
         if (ctgL.includes(ctg)) {
-            ctg = ctg.toLowerCase();
             return this.data.resources
                 .filter((r) => {
-                return LIB.classTitleOf(r['class'], this.data.resourceClasses).toLowerCase().includes(ctg);
+                return LIB.classTitleOf(r['class'], this.data.resourceClasses).toLowerCase().includes(ctg.toLowerCase())
+                    && this.hasSelectedStatus(r, opts);
             })
                 .map((r) => {
-                return this.valueByTitle(r, CONFIG.propClassTerm);
+                return this.makeIdAndTitle(r, this.termCategories.get(ctg).prefix);
             });
         }
         ;
@@ -145,6 +150,29 @@ class COntology {
             ;
         }
         ;
+    }
+    getPreferredTerm(ctg, term) {
+        if (term.startsWith('dcterms:'))
+            return term;
+        let tR = this.getTermResource(ctg, term);
+        if (tR) {
+            if (this.valueByTitle(tR, "SpecIF:TermStatus") == "SpecIF:LifecycleStatusReleased")
+                return term;
+            let ctgV = this.termCategories.get(ctg), ctgL = ctgV ? [ctgV] : Array.from(this.termCategories.values()), staL = this.statementsByTitle(tR, ctgL.map(c => c.synonymStatement), { asSubject: true, asObject: true }), resL = staL.map((st) => {
+                return LIB.itemById(this.data.resources, (st.object.id == tR.id ? st.subject.id : st.object.id));
+            }), synL = resL.filter((r) => {
+                return this.valueByTitle(r, "SpecIF:TermStatus") == "SpecIF:LifecycleStatusReleased";
+            });
+            if (synL.length < 1)
+                return term;
+            if (synL.length > 1)
+                console.warn('Ontology: Multiple equivalent terms are released: ', synL.map((r) => { return r.id; }).toString());
+            let newT = this.valueByTitle(synL[0], CONFIG.propClassTerm);
+            console.info('Ontology: Preferred term assigned: ' + term + ' → ' + newT);
+            return newT;
+        }
+        ;
+        return term;
     }
     localize(term, opts) {
         if (RE.vocabularyTerm.test(term)) {
@@ -196,7 +224,7 @@ class COntology {
             return false;
         });
         if (termL.length > 0) {
-            for (let status of this.eligibleLifecycleStatus)
+            for (let status of this.eligibleLifecycles)
                 for (let t of termL) {
                     if (this.valueByTitle(t, "SpecIF:TermStatus") == status) {
                         let newT = this.valueByTitle(t, CONFIG.propClassTerm);
@@ -207,29 +235,6 @@ class COntology {
         }
         ;
         return name;
-    }
-    getPreferredTerm(ctg, term) {
-        if (term.startsWith('dcterms:'))
-            return term;
-        let tR = this.getTermResource(ctg, term);
-        if (tR) {
-            if (this.valueByTitle(tR, "SpecIF:TermStatus") == "SpecIF:LifecycleStatusReleased")
-                return term;
-            let ctgV = this.termCategories.get(ctg), ctgL = ctgV ? [ctgV] : Array.from(this.termCategories.values()), staL = this.statementsByTitle(tR, ctgL.map(c => c.synonymStatement), { asSubject: true, asObject: true }), resL = staL.map((st) => {
-                return LIB.itemById(this.data.resources, (st.object.id == tR.id ? st.subject.id : st.object.id));
-            }), synL = resL.filter((r) => {
-                return this.valueByTitle(r, "SpecIF:TermStatus") == "SpecIF:LifecycleStatusReleased";
-            });
-            if (synL.length < 1)
-                return term;
-            if (synL.length > 1)
-                console.warn('Ontology: Multiple equivalent terms are released: ', synL.map((r) => { return r.id; }).toString());
-            let newT = this.valueByTitle(synL[0], CONFIG.propClassTerm);
-            console.info('Ontology: Preferred term assigned: ' + term + ' → ' + newT);
-            return newT;
-        }
-        ;
-        return term;
     }
     normalize(ctg, term) {
         let str = this.globalize(ctg, term);
@@ -259,23 +264,18 @@ class COntology {
             return term;
         }
         ;
-        for (var nsp of opts.targetNamespaces) {
-            if (term.startsWith(nsp))
-                return term;
-        }
-        ;
         let tR = this.getTermResource('all', term, { eligibleOnly: true });
         if (tR) {
             let v = findSynonymStatementOf(tR['class']), staL = this.statementsByTitle(tR, [v], { asSubject: true, asObject: true }), resL = staL.map((st) => {
                 return LIB.itemById(this.data.resources, (st.object.id == tR.id ? st.subject.id : st.object.id));
-            }), synL = findSynonym(resL, opts.targetNamespaces);
-            if (synL.length < 1)
-                return term;
-            if (synL.length > 1)
-                console.warn('Ontology: Multiple equivalent terms have the desired namespace: ', synL.map((r) => { return r.id; }).toString());
-            let newT = this.valueByTitle(synL[0], CONFIG.propClassTerm);
-            console.info('Ontology: Term with desired namespace assigned: ' + term + ' → ' + newT);
-            return newT;
+            }), syn = findSynonym(resL, opts.targetNamespaces);
+            if (syn) {
+                let newT = this.valueByTitle(syn, CONFIG.propClassTerm);
+                console.info('Ontology: Term with desired namespace assigned: ' + term + ' → ' + newT);
+                return newT;
+            }
+            ;
+            return term;
         }
         ;
         return term;
@@ -283,23 +283,36 @@ class COntology {
             let rC = LIB.itemByKey(self.data.resourceClasses, rCk);
             for (let [ctg, syn] of self.termCategories) {
                 if (rC.title.toLowerCase().includes(ctg.toLowerCase()))
-                    return syn;
+                    return syn.synonymStatement;
             }
             ;
             throw (new Error("No synonym statement found for '" + rCk.id + "'."));
         }
-        function findSynonym(rL, nspL) {
+        function findSynonym(rL, nsL) {
             let sL = [];
-            for (var nsp of nspL) {
+            for (var ns of nsL) {
                 sL = rL.filter((r) => {
-                    return self.valueByTitle(r, CONFIG.propClassTerm).startsWith(nsp)
-                        && ["SpecIF:LifecycleStatusReleased", "SpecIF:LifecycleStatusEquivalent"].includes(self.valueByTitle(r, "SpecIF:TermStatus"));
+                    return self.valueByTitle(r, CONFIG.propClassTerm).startsWith(ns)
+                        && (opts.lifeCycles ?? self.eligibleLifecycles).includes(self.valueByTitle(r, "SpecIF:TermStatus"));
                 });
+                if (sL.length > 1) {
+                    for (let ls of opts.lifeCycles ?? self.eligibleLifecycles) {
+                        sL = sL.filter((r) => {
+                            return self.valueByTitle(r, "SpecIF:TermStatus") == ls;
+                        });
+                        if (sL.length < 1)
+                            continue;
+                        if (sL.length > 1)
+                            console.warn('Ontology: Multiple terms of a desired namespace with lifecycleStatus "' + ls + '" are synonyms: ', sL.map((r) => { return r.id; }).toString());
+                        break;
+                    }
+                    ;
+                }
+                ;
                 if (sL.length > 0)
-                    return sL;
+                    return sL[0];
             }
             ;
-            return [];
         }
     }
     generateSpecifClasses(opts) {
@@ -384,6 +397,17 @@ class COntology {
             return app.standards.makeTemplate();
         }
     }
+    hasSelectedStatus(el, opts) {
+        if (!opts || !opts.lifeCycles || opts.lifeCycles.length < 1)
+            return true;
+        let selStatus = LIB.valuesByTitle(el, ["SpecIF:TermStatus"], this.data);
+        for (let st of selStatus) {
+            if (opts.lifeCycles.includes(LIB.displayValueOf(st, { targetLanguage: 'default' })))
+                return true;
+        }
+        ;
+        return false;
+    }
     makeClasses(rCIdL, createFn) {
         let self = this;
         let cL = [], idL = LIB.referencedResourcesByClass(this.data.resources, this.data.nodes, rCIdL);
@@ -395,7 +419,7 @@ class COntology {
         ;
         return cL;
         function isSelected(r) {
-            return hasSelectedStatus(r)
+            return self.hasSelectedStatus(r, self.options)
                 && (hasSelectedDomain(r) || hasSelectedTerm(r));
             function hasSelectedDomain(el) {
                 if (Array.isArray(self.options.domains)) {
@@ -412,15 +436,6 @@ class COntology {
                 if (Array.isArray(self.options.terms)) {
                     let elTerms = LIB.valuesByTitle(el, [CONFIG.propClassTerm], self.data);
                     if (elTerms.length > 0 && self.options.terms.includes(LIB.displayValueOf(elTerms[0], { targetLanguage: 'default' })))
-                        return true;
-                }
-                ;
-                return false;
-            }
-            function hasSelectedStatus(el) {
-                let selStatus = LIB.valuesByTitle(el, ["SpecIF:TermStatus"], self.data);
-                for (let st of selStatus) {
-                    if (self.options.lifeCycles.includes(LIB.displayValueOf(st, { targetLanguage: 'default' })))
                         return true;
                 }
                 ;
@@ -708,7 +723,7 @@ class COntology {
             })
                 .filter((r) => {
                 let stat = this.valueByTitle(r, "SpecIF:TermStatus");
-                return this.eligibleLifecycleStatus.includes(stat);
+                return this.eligibleLifecycles.includes(stat);
             })
                 .map((r) => {
                 return this.valueByTitle(r, CONFIG.propClassTerm);
@@ -717,6 +732,9 @@ class COntology {
         }
         ;
         return spL;
+    }
+    getOrganizerClasses() {
+        return [CONFIG.resClassOrganizer].concat(this.getSpecializationsOf('resourceClass', CONFIG.resClassOrganizer));
     }
     getModelElementClasses() {
         return [CONFIG.resClassModelElement].concat(this.getSpecializationsOf('resourceClass', CONFIG.resClassModelElement));

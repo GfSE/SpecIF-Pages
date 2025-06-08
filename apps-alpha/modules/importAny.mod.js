@@ -75,7 +75,7 @@ moduleManager.construct({
                 desc: 'ArchiMate Open Exchange',
                 label: 'ArchiMate®',
                 extensions: [".xml"],
-                opts: { mediaTypeOf: LIB.attachment2mediaType },
+                opts: { ingest: ["source"], mediaTypeOf: LIB.attachment2mediaType },
                 help: "Experimental: Import an ArchiMate Open Exchange file (*.xml) and add the diagrams (*.png or *.svg) to their respective resources using the 'edit' function."
             }, {
                 id: 'bpmn',
@@ -91,6 +91,7 @@ moduleManager.construct({
                 desc: 'System Modeling Language',
                 label: 'UML/SysML',
                 extensions: [".mdzip", ".mdzip.bak"],
+                opts: { ingest: ["source"] },
                 help: "Experimental: Import an XMI file from Cameo v19.0."
             }, {
                 id: 'reqif',
@@ -106,19 +107,19 @@ moduleManager.construct({
                 desc: 'MS Excel® or LibreOffice Spreadsheet',
                 label: 'Excel®',
                 extensions: [".xlsx", ".xls", ".csv", ".ods", ".fods"],
-                opts: { dontCheck: ["statement.object"] },
+                opts: { replacePropertiesWithStatements: [CONFIG.propClassVisibleId] },
                 help: i18n.MsgImportXls
             }];
         let h = '<div class="container max-width-lg mt-3" >'
             + '<div class="row attribute fileSelect" style="display:none;" >'
-            + '<div class="col-3 attribute-label" style="vertical-align:top; padding-top:0.2em" >' + i18n.LblOntology + '</div>'
-            + '<div class="col-9 attribute-value" >'
+            + '<div class="col-2 attribute-label" style="vertical-align:top; padding-top:0.2em" >' + i18n.LblOntology + '</div>'
+            + '<div class="col attribute-value" >'
             + '<div id="ontologySelector" style="margin: 0 0 0.4em 0" ></div>'
             + '</div>'
             + '</div>'
             + '<div class="row attribute fileSelect" style="display:none;" >'
-            + '<div class="col-3 attribute-label" style="vertical-align:top; font-size:140%; padding-top:0.2em" >' + i18n.LblImport + '</div>'
-            + '<div class="col-9 attribute-value" >'
+            + '<div class="col-2 attribute-label" style="vertical-align:top; font-size:140%; padding-top:0.2em" >' + i18n.LblImport + '</div>'
+            + '<div class="col attribute-value" >'
             + '<div id="formatSelector" class="btn-group" style="margin: 0 0 0.4em 0" ></div>'
             + '<div id="helpImport" style="margin: 0 0 0.4em 0" ></div>'
             + '<div id="fileSelectBtn" class="btn btn-light btn-fileinput" style="margin: 0 0 0.8em 0" ></div>'
@@ -126,8 +127,8 @@ moduleManager.construct({
             + '</div>'
             + '<form id="formNames" class="form-horizontal" role="form"></form>'
             + '<div class="row attribute fileSelect" style="display:none;" >'
-            + '<div class="col-3 attribute-label" ></div>'
-            + '<div class="col-9 attribute-value" >'
+            + '<div class="col-2 attribute-label" ></div>'
+            + '<div class="col attribute-value" >'
             + '<div id="modeSelector" class="btn-group my-1" style="margin: 0 0 0.4em 0" >'
             + function () {
                 let btns = '';
@@ -183,9 +184,9 @@ moduleManager.construct({
             return uP ? uP[CONFIG.keyOntology] : undefined;
         }
         urlP = opts.urlParams;
-        urlOntology = getOntologyURL(urlP) || urlOntology;
+        urlOntology = getOntologyURL(urlP) ?? urlOntology;
         if (urlP && urlP[CONFIG.keyImport]) {
-            importMode = { id: urlP[CONFIG.keyMode] || 'replace' };
+            importMode = { id: urlP[CONFIG.keyMode] ?? 'replace' };
             self.file.name = urlP[CONFIG.keyImport];
             self.importFormat = getFormat(urlP);
             if (self.importFormat && app[self.importFormat.name]) {
@@ -350,7 +351,12 @@ moduleManager.construct({
             self.clear();
             if (urlP)
                 delete urlP[CONFIG.keyImport];
-            moduleManager.show({ view: '#' + (app.title == "check" ? CONFIG.importAny : (urlP && urlP[CONFIG.keyView] ? urlP[CONFIG.keyView] : CONFIG.specifications)), urlParams: urlP });
+            moduleManager.show({
+                view: '#'
+                    + (app.title == "check" ? CONFIG.importAny
+                        : (urlP && urlP[CONFIG.keyView] && urlP[CONFIG.keyView] != CONFIG.importAny ? urlP[CONFIG.keyView] : CONFIG.specifications)),
+                urlParams: urlP
+            });
         }, CONFIG.showTimelag);
     }
     function handleError(xhr) {
@@ -381,9 +387,9 @@ moduleManager.construct({
         }
         function handle(dta, idx) {
             setProgress(importMode.id + ' project', 20);
-            let opts = self.importFormat.opts || {};
+            let opts = self.importFormat.opts ?? {};
             opts.sourceFileName = self.file.name;
-            opts.mode = idx < 1 ? importMode.id : opts.multipleMode || 'update';
+            opts.mode = idx < 1 ? importMode.id : opts.multipleMode ?? 'update';
             opts.normalizeTerms = true;
             opts.deduplicate =
                 opts.addGlossary =

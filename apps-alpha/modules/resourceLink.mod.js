@@ -134,7 +134,7 @@ moduleManager.construct({
                 && LIB.referenceIndexBy(sL, 'object', res) < 0
                 && (candidateMayBeObject(self.selectedStatementClass, res)
                     || candidateMayBeSubject(self.selectedStatementClass, res))) {
-                let ti = cData.instanceTitleOf(res, $.extend({}, opts, { neverEmpty: true }));
+                let ti = cData.instanceTitleOf(res, Object.assign({}, opts, { neverEmpty: true }));
                 if (reTi.test(ti))
                     eligibleRs += '<div id="cand-' + i + '" class="candidates text-black bg-white" onclick="' + myFullName + '.itemClicked(\'' + i + '\')">' + ti + '</div>';
             }

@@ -82,14 +82,14 @@ moduleManager.construct({
             }
             ;
             let result = sysml2specif(xmi, xOpts);
-            if (result.status != 0) {
-                sDO.reject(result);
+            if (result.ok()) {
+                resL.push(result.response);
+                if (--pend < 1)
+                    sDO.resolve(resL);
                 return;
             }
             ;
-            resL.push(result.response);
-            if (--pend < 1)
-                sDO.resolve(resL);
+            sDO.reject(result);
         }
     };
     self.abort = function () {

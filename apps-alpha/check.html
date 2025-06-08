@@ -10,12 +10,12 @@
 <body>
 
 <div id="app" class="noOverflow" >
-	<div id="pageHeader">
-		<div id="logo"></div>
-		<div id="pageSelector" class="btn-group pageActions"></div>
-		<div id="spinner"><i class="fa fa-spinner fa-spin"></i></div>
-		<div id="pageTitle" class="pageTitle"></div>
-	</div>
+    <div id="pageHeader">
+        <div id="logo"></div>
+        <div id="pageSelector" class="btn-group pageActions"></div>
+        <div id="spinner" class="spinner-border text-primary"></div>
+        <div id="pageTitle" class="pageTitle"></div>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -52,8 +52,7 @@
 				loadAs: 'me'					// the name of the controller object to construct
 				// no view
 			}, {
-				name: 'cache',
-				loadAs: 'projects'
+				name: 'projects'
 				// no view
 			}, {
 				name: 'importAny',

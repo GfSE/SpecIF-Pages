@@ -45,8 +45,7 @@ class CCache {
                     throw Error("Cache 'put' operation with old reference (string instead of object with id)");
                 let n = LIB.indexById(L, e.id);
                 if (n < 0
-                    || L[n].changedAt && e.changedAt && new Date(L[n].changedAt) < new Date(e.changedAt)
-                    || L[n].resourceToLink && !e.resourceToLink) {
+                    || L[n].changedAt && e.changedAt && new Date(L[n].changedAt) < new Date(e.changedAt)) {
                     LIB.cacheE(L, e);
                     return true;
                 }
@@ -184,7 +183,7 @@ class CCache {
             let ti = "";
             if (el.subject) {
                 ti = LIB.titleFromProperties(el.properties, self.propertyClasses, opts)
-                    || LIB.classTitleOf(el['class'], self.statementClasses, opts);
+                    ?? LIB.classTitleOf(el['class'], self.statementClasses, opts);
             }
             else {
                 let rC = LIB.itemByKey(self.resourceClasses, el['class']);
@@ -197,13 +196,13 @@ class CCache {
                         ti = LIB.addIcon(ti, rC.icon);
                 }
                 else {
-                    ti = (LIB.valueByTitle(el, CONFIG.propClassDesc, self) || '')
+                    ti = (LIB.valueByTitle(el, CONFIG.propClassDesc, self) ?? '')
                         .substring(0, CONFIG.maxTitleLengthTree);
                 }
             }
             ;
             return ti.stripHTML();
-        }(el, opts) || (opts.neverEmpty ? el.id : '');
+        }(el, opts) ?? (opts.neverEmpty ? el.id : '');
     }
     resourcesByTitle(ti, opts) {
         if (ti) {
@@ -315,23 +314,25 @@ class CProject {
     }
     ;
     setMeta(spD) {
-        this.id = spD.id;
-        this.$schema = spD.$schema;
-        this.title = spD.title;
-        this.description = spD.description;
-        this.language = spD.language || browser.language;
-        this.generator = spD.generator;
-        this.generatorVersion = spD.generatorVersion;
-        this.createdAt = spD.createdAt;
-        this.createdBy = spD.createdBy;
-        this.exportParams = {
-            projectName: LIB.languageTextOf(this.title, { targetLanguage: this.language }),
-            fileName: LIB.languageTextOf(this.title, { targetLanguage: this.language })
+        let meta = {
+            id: spD.id,
+            $schema: spD.$schema,
+            title: spD.title,
+            description: spD.description,
+            language: spD.language ?? browser.language,
+            generator: spD.generator,
+            generatorVersion: spD.generatorVersion,
+            createdAt: spD.createdAt,
+            createdBy: spD.createdBy
         };
         ["nodes", "resourceClasses", "statementClasses", "propertyClasses", "dataTypes"].forEach((list) => {
-            for (var p of spD[list])
-                this[list].push({ id: p.id });
+            meta[list] = spD[list].map((el) => { return { id: el.id }; });
         });
+        const ti = LIB.languageTextOf(meta.title, { targetLanguage: meta.language });
+        this.exportParams = {
+            projectName: ti,
+            fileName: ti
+        };
         function findPrp(ti) {
             for (var pC of spD.propertyClasses) {
                 if (ti == app.ontology.normalize("propertyClass", pC.title))
@@ -363,6 +364,32 @@ class CProject {
         let role = LIB.itemById(this.roles, app.me.myRole(spD.id).toJsId());
         if (role)
             this.myPermissions = role.permissions;
+        return new Promise((resolve, reject) => {
+            if (app.server) {
+                app.server.get('project', meta)
+                    .then((msg) => {
+                    console.debug('get meta 1a:', msg);
+                    return app.server.put('project', Object.assign({}, meta, { revision: msg.response.revision }));
+                }, (msg) => {
+                    console.debug('get meta 1b:', msg);
+                    return app.server.put('project', meta);
+                })
+                    .then((msg) => {
+                    console.debug('get meta 2:', msg);
+                    Object.assign(this, meta);
+                    resolve(msg);
+                })
+                    .catch((msg) => {
+                    console.error(msg);
+                    reject(msg);
+                });
+            }
+            else {
+                Object.assign(this, meta);
+                resolve({ status: 0, statusText: "ok" });
+            }
+            ;
+        });
     }
     ;
     getMeta(opts) {
@@ -399,19 +426,23 @@ class CProject {
         new CSpecIF().set(newD, opts)
             .then((nD) => {
             cDO.notify(i18n.MsgLoadingTypes, 30);
-            this.setMeta(nD);
-            pend = app.standards.iterateLists((ctg, listName) => {
-                this.createItems(ctg, nD[listName])
-                    .then(finalize, cDO.reject);
-            });
+            return this.setMeta(nD)
+                .then(() => {
+                pend = app.standards.iterateLists((ctg, listName) => {
+                    this.createItems(ctg, nD[listName])
+                        .then(finalize, cDO.reject);
+                });
+            }, cDO.reject);
         }, cDO.reject);
         return cDO;
         function finalize() {
             if (--pend < 1) {
                 cDO.notify(i18n.MsgLoadingFiles, 100);
-                self.hookStatements();
-                self.deduplicate(opts);
-                self.createFolderWithGlossary(opts)
+                self.replacePropertiesWithStatements(opts)
+                    .then(() => {
+                    self.deduplicate(opts);
+                    return self.createFolderWithGlossary(opts);
+                })
                     .then(() => {
                     return self.createFolderWithUnreferencedResources(opts);
                 })
@@ -588,9 +619,11 @@ class CProject {
         function finalize() {
             if (--pend < 1) {
                 uDO.notify(i18n.MsgLoadingFiles, 100);
-                self.hookStatements();
-                self.deduplicate(opts);
-                self.createFolderWithGlossary(opts)
+                self.replacePropertiesWithStatements(opts)
+                    .then(() => {
+                    self.deduplicate(opts);
+                    return self.createFolderWithGlossary(opts);
+                })
                     .then(() => {
                     return self.createFolderWithUnreferencedResources(opts);
                 })
@@ -640,7 +673,7 @@ class CProject {
                     let existR = LIB.itemByKey(dta.resources, newR);
                     if (existR && self.equalR(existR, newR))
                         return;
-                    let selOpts = Object.assign({}, opts, { targetLanguage: self.language || newD.language });
+                    let selOpts = Object.assign({}, opts, { targetLanguage: self.language ?? newD.language });
                     if (LIB.hasResClass(newR, app.ontology.modelElementClasses.concat(CONFIG.diagramClasses), newD)
                         && !LIB.hasType(newR, CONFIG.excludedFromDeduplication, newD, opts)) {
                         existR = self.cache.resourcesByTitle(LIB.titleFromProperties(newR.properties, newD.propertyClasses, selOpts), selOpts)[0];
@@ -704,9 +737,11 @@ class CProject {
         return aDO;
         function finalize() {
             if (--pend < 1) {
-                self.hookStatements();
-                self.deduplicate(opts);
-                self.createFolderWithResourcesByType(opts)
+                self.replacePropertiesWithStatements(opts)
+                    .then(() => {
+                    self.deduplicate(opts);
+                    return self.createFolderWithResourcesByType(opts);
+                })
                     .then(() => {
                     return self.createFolderWithGlossary(opts);
                 })
@@ -772,7 +807,7 @@ class CProject {
                 let idL = [], pCid;
                 el.properties.forEach((p) => {
                     pCid = p['class'].id;
-                    if (idL.indexOf(pCid) < 0)
+                    if (!idL.includes(pCid))
                         idL.push(pCid);
                     else
                         console.warn('The property class ' + pCid + ' of element ' + el.id + ' is occurring more than once.');
@@ -787,7 +822,7 @@ class CProject {
                 if (CONFIG.hiddenProperties.includes(pC.title))
                     return;
                 let p = theListItemReferencingByClass(el.properties, pC);
-                nL.push(p || { class: LIB.makeKey(pC.id), values: [] });
+                nL.push(p ?? { class: LIB.makeKey(pC.id), values: [] });
             });
             return nL;
             function theListItemReferencingByClass(L, cl) {
@@ -867,44 +902,73 @@ class CProject {
             noDiagramFound = noDiagramFound && isNotADiagram;
             return (isNotADiagram
                 || LIB.hasType(res, CONFIG.diagramTypesHavingShowsStatementsForEdges, this.cache));
-        }) || noDiagramFound;
+        }) ?? noDiagramFound;
     }
-    hookStatements() {
-        var self = this, dta = this.cache, opts = {
-            targetLanguage: 'any',
-            addIcon: false
-        };
-        let toReplace = [];
-        dta.get("statement", "all").forEach((st) => {
-            if (st.resourceToLink) {
-                let oL = itemsByVisibleId(st.resourceToLink), o = oL.length > 0 ?
-                    oL[0]
-                    :
-                        dta.resourcesByTitle(st.resourceToLink, opts)[0];
-                if (o) {
-                    st.object = LIB.keyOf(o);
-                    delete st.resourceToLink;
-                    toReplace.push(st);
-                    return;
-                }
-                ;
+    replacePropertiesWithStatements(opts) {
+        let self = this, dta = this.cache;
+        return new Promise((resolve, reject) => {
+            if (typeof (opts) != 'object' || !Array.isArray(opts.replacePropertiesWithStatements)) {
+                resolve();
+                return;
             }
             ;
-        });
-        if (toReplace.length > 0)
-            dta.put('statement', toReplace);
-        return;
-        function itemsByVisibleId(vId) {
-            return dta.get("resource", (r) => {
-                for (var p of r.properties) {
-                    if (CONFIG.idProperties.includes(LIB.classTitleOf(p['class'], dta.propertyClasses))
-                        && LIB.languageTextOf(p.values[0], { targetLanguage: self.language }) == vId)
-                        return true;
+            if (opts.replacePropertiesWithStatements.length != 1) {
+                console.warn("Option 'replacePropertiesWithStatements' does not have an array with exactly one element.");
+                resolve();
+                return;
+            }
+            ;
+            const ontologyStatementTerms = app.ontology.getTerms('statementClass', {
+                lifeCycles: ["SpecIF:LifecycleStatusEquivalent"]
+            });
+            let referencedResources = LIB.referencedResources(dta.resources, dta.nodes, opts), statementClassesToAdd = [], statementsToAdd = [];
+            referencedResources.forEach((r) => {
+                for (let i = r.properties.length - 1; i > -1; i--) {
+                    let pTi = LIB.classTitleOf(r.properties[i]['class'], dta.propertyClasses), sCx = LIB.indexBy(ontologyStatementTerms, 'title', pTi);
+                    if (sCx > -1) {
+                        let pVal = LIB.displayValueOf(r.properties[i].values[0], { targetLanguage: 'default' }), vL = pVal.split(",");
+                        if (vL.length < 2)
+                            vL = pVal.split(";");
+                        vL = vL.map((v) => {
+                            let inner = RE.contentInQuotes.exec(v);
+                            if (inner && inner.length > 2)
+                                return inner[1] ?? inner[2];
+                            else
+                                return v.trim();
+                        });
+                        referencedResources
+                            .filter((r2) => {
+                            let tVals = LIB.valuesByTitle(r2, opts.replacePropertiesWithStatements, dta);
+                            if (tVals.length > 1)
+                                console.warn('Resource ' + r.id + ' has more than one property with class ' + opts.replacePropertiesWithStatements[0]);
+                            return tVals.length > 0 && vL.includes(LIB.displayValueOf(tVals[0], { targetLanguage: 'default' }));
+                        })
+                            .forEach((r3) => {
+                            LIB.cacheE(statementClassesToAdd, pTi);
+                            LIB.cacheE(statementsToAdd, {
+                                id: CONFIG.prefixS + simpleHash(r.id + ontologyStatementTerms[sCx].title + r3.id),
+                                class: LIB.makeKey(ontologyStatementTerms[sCx].id),
+                                subject: LIB.makeKey(r.id),
+                                object: LIB.makeKey(r3.id),
+                                changedAt: new Date().toISOString()
+                            });
+                        });
+                    }
+                    ;
                 }
                 ;
-                return false;
             });
-        }
+            let tpl = app.ontology.generateSpecifClasses({
+                terms: statementClassesToAdd,
+                lifeCycles: ["SpecIF:LifecycleStatusEquivalent"]
+            });
+            tpl.statements = statementsToAdd.filter((s) => {
+                return LIB.indexBy(tpl.statementClasses, 'id', s['class'].id) > -1;
+            });
+            self.adopt(tpl, { noCheck: true, deduplicate: true })
+                .done(resolve)
+                .fail(reject);
+        });
     }
     deduplicate(opts) {
         if (!opts || !opts.deduplicate)
@@ -1033,7 +1097,7 @@ class CProject {
                                 values: [LIB.makeMultiLanguageValue(ti)]
                             }, {
                                 class: LIB.makeKey("PC-Type"),
-                                values: [LIB.makeMultiLanguageValue(ty || ti)]
+                                values: [LIB.makeMultiLanguageValue(ty ?? ti)]
                             }],
                         changedAt: tim
                     }];
@@ -1272,7 +1336,7 @@ class CProject {
                                     && LIB.isReferencedByHierarchy(s.object)
                                 :
                                     CONFIG.staClassCommentRefersTo != ti
-                                        && CONFIG.hiddenStatements.indexOf(ti) < 0
+                                        && !CONFIG.hiddenStatements.includes(ti)
                                         && LIB.isReferencedByHierarchy(s.subject)
                                         && LIB.isReferencedByHierarchy(s.object)));
                     console.error("When searching for statements of resource '" + res.id + "' no title was found for statement '" + s.id + "'.");
@@ -1334,9 +1398,10 @@ class CProject {
             [
                 { title: 'SpecIF v' + CONFIG.specifVersion, id: 'specif', checked: true },
                 { title: 'HTML with embedded SpecIF v' + CONFIG.specifVersion, id: 'html' },
+                { title: 'PIG (JSON-LD) <em>(experimental)</em>', id: 'pig-jsonld' },
+                { title: 'PIG (Turtle) <em>(experimental)</em>', id: 'pig-ttl' },
                 { title: 'ReqIF v1.0', id: 'reqif' },
                 { title: 'MS Excel® <em>(experimental)</em>', id: 'xlsx' },
-                { title: 'Turtle <em>(experimental)</em>', id: 'turtle' },
                 { title: 'Plain HTML', id: 'xhtml' },
                 { title: 'ePub v2', id: 'epub' },
                 { title: 'MS Word® (Open XML)', id: 'oxml' }
@@ -1383,7 +1448,7 @@ class CProject {
         app.busy.set();
         message.show(i18n.MsgBrowserSaving, { severity: 'success', duration: CONFIG.messageDisplayTimeShort });
         let prjN = textValue('&#x200b;' + i18n.LblProjectName);
-        this.exportParams.fileName = textValue('&#x200b;' + i18n.LblFileName) || prjN || this.id;
+        this.exportParams.fileName = textValue('&#x200b;' + i18n.LblFileName) ?? prjN ?? this.id;
         if (prjN)
             this.exportParams.projectName = prjN;
         let options = {
@@ -1400,7 +1465,7 @@ class CProject {
                     options.role = radioValue(app.ontology.localize("SpecIF:Permissions", { targetLanguage: browser.language }));
                 }
                 else
-                    options.role = window.role || "SpecIF:Supplier";
+                    options.role = window.role ?? "SpecIF:Supplier";
                 break;
             case 'specifClasses':
                 let chkDomains = checkboxValues(i18n.LblOptions);
@@ -1428,14 +1493,15 @@ class CProject {
             opts.format = 'specif';
         return new Promise((resolve, reject) => {
             if (self.exporting) {
-                reject(new resultMsg(999, "Export in process, please wait a little while"));
+                reject(new resultMsg(999, "Export in process, please wait a little while."));
             }
             else {
                 self.exporting = true;
                 switch (opts.format) {
-                    case 'turtle':
+                    case 'pig-ttl':
                     case 'reqif':
                     case 'specif':
+                    case 'pig-jsonld':
                     case 'html':
                     case 'specifClasses':
                         storeAs(opts);
@@ -1447,8 +1513,8 @@ class CProject {
                         publish(opts);
                         break;
                     default:
-                        let msg = "Programming error: Invalid format specified on export.";
-                        throw Error(msg);
+                        let txt = "Programming error: Invalid format specified on export.";
+                        throw Error(txt);
                 }
                 ;
             }
@@ -1508,32 +1574,35 @@ class CProject {
                 }, reject);
             }
             function storeAs(opts) {
-                opts.allDiagramsAsImage = ["html", "turtle", "reqif"].includes(opts.format);
-                opts.preferPng = ["turtle", "reqif"].includes(opts.format);
+                opts.allDiagramsAsImage = ["html", "pig-ttl", "reqif", "pig-jsonld"].includes(opts.format);
+                opts.preferPng = ["pig-ttl", "reqif"].includes(opts.format);
                 switch (opts.format) {
                     case 'specif':
                     case 'html':
                         opts.lookupTitles = false;
                         opts.lookupValues = false;
                         break;
+                    case 'pig-jsonld':
+                        opts.lookupTitles = true;
+                        opts.lookupValues = false;
+                        opts.targetNamespaces = ["pig:", "rdf:", "rdfs:"];
+                        opts.revisionDate = new Date().toISOString();
+                        break;
+                    case 'pig-ttl':
+                        opts.lookupTitles = true;
+                        opts.lookupValues = false;
+                        opts.targetNamespaces = ["pig:", "rdf:", "rdfs:"];
+                        opts.makeHTML = true;
+                        opts.linkifyURLs = true;
+                        opts.revisionDate = new Date().toISOString();
+                        break;
                     case 'reqif':
                         opts.lookupTitles = true;
-                        opts.targetLanguage = opts.targetLanguage || self.language;
+                        opts.targetLanguage = opts.targetLanguage ?? self.language;
                         opts.targetNamespaces = ["ReqIF."];
-                        opts.allDiagramsAsImage = true;
                         opts.makeHTML = true;
                         opts.linkifyURLs = true;
                         opts.createHierarchyRootIfMissing = true;
-                        opts.revisionDate = new Date().toISOString();
-                        break;
-                    case 'turtle':
-                        opts.lookupTitles = false;
-                        opts.lookupValues = false;
-                        opts.targetLanguage = opts.targetLanguage || self.language;
-                        opts.targetNamespaces = ["rdf:", "rdfs:"];
-                        opts.allDiagramsAsImage = true;
-                        opts.makeHTML = true;
-                        opts.linkifyURLs = true;
                         opts.revisionDate = new Date().toISOString();
                         break;
                     case 'specifClasses':
@@ -1546,13 +1615,13 @@ class CProject {
                 self.read(opts)
                     .then((expD) => {
                     let fName = opts.fileName;
-                    if (['html', 'reqif', 'turtle'].includes(opts.format))
+                    if (['html', 'reqif', 'pig-ttl'].includes(opts.format))
                         expD.title = LIB.makeMultiLanguageValue(opts.projectName);
                     if (opts.targetLanguage)
                         expD.language = opts.targetLanguage;
                     if (opts.format == 'html') {
                         opts.cdn = window.cdn
-                            || window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1);
+                            ?? window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1);
                         app.specif2html(expD, opts)
                             .then((dta) => {
                             let blob = new Blob([dta], { type: "text/html; charset=utf-8" });
@@ -1589,17 +1658,23 @@ class CProject {
                             ;
                             expStr = JSON.stringify(new COntology(expD).generateSpecifClasses(opts));
                             break;
+                        case 'pig-jsonld':
+                            opts.baseURI = "https://product-information-graph.org/examples/";
+                            fName += ".pig";
+                            zName = fName + '.zip';
+                            expStr = app.ioPig.fromSpecif(expD, opts);
+                            break;
+                        case 'pig-ttl':
+                            opts.baseURI = "https://product-information-graph.org/examples/";
+                            fName += ".ttl";
+                            zName = fName + '.zip';
+                            expStr = app.specif2turtle(expD, opts);
+                            break;
                         case 'reqif':
                             fName += ".reqif";
                             zName = fName + 'z';
                             mimetype = "application/reqif+zip";
                             expStr = app.ioReqif.fromSpecif(expD);
-                            break;
-                        case 'turtle':
-                            opts.baseURI = "https://specif.de/examples/";
-                            fName += ".ttl";
-                            zName = fName + '.zip';
-                            expStr = app.specif2turtle(expD, opts);
                     }
                     ;
                     expD = null;
@@ -1860,11 +1935,13 @@ class CProject {
     ;
 }
 moduleManager.construct({
-    name: 'cache'
+    name: 'projects'
 }, (self) => {
     self.init = () => {
         app.standards = new CStandards();
         self.cache = new CCache({ cacheInstances: true });
+        if (app.server)
+            app.server.open("SpecIF");
         self.clear();
         return true;
     };

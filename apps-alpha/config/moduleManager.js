@@ -20,7 +20,7 @@ class ViewControl {
     }
     show(params) {
         if (typeof (params) != 'object')
-            throw Error("moduleManager.show() needs a parameter.");
+            throw new Error("moduleManager.show() needs a parameter.");
         let v, s;
         this.list.forEach((le) => {
             v = $(le.view);
@@ -113,7 +113,7 @@ var app, browser, message, moduleManager = function () {
             if (opts && typeof (opts.done) == "function")
                 callWhenReady = opts.done;
             else
-                throw Error("No callback provided to continue after initializing.");
+                throw new Error("No callback provided to continue after initializing.");
             L.forEach((e) => { loadModule(e); });
         }
     };
@@ -167,7 +167,7 @@ var app, browser, message, moduleManager = function () {
                     e.children.forEach(function (ch) {
                         if (ch.view) {
                             if (!ch.selectedBy) {
-                                throw Error("Module '" + ch.name + "' must have both properties 'view' and 'selectedBy' or none.");
+                                throw new Error("Module '" + ch.name + "' must have both properties 'view' and 'selectedBy' or none.");
                             }
                             ;
                             e.viewControl.add(ch);
@@ -185,7 +185,7 @@ var app, browser, message, moduleManager = function () {
                         ;
                         if (ch.action) {
                             if (!ch.selectedBy) {
-                                throw Error("Module '" + ch.name + "' must have both properties 'action' and 'selectedBy' or none.");
+                                throw new Error("Module '" + ch.name + "' must have both properties 'action' and 'selectedBy' or none.");
                             }
                             ;
                             id = ch.selectedBy.substring(1);
@@ -195,7 +195,7 @@ var app, browser, message, moduleManager = function () {
                                     $(e.selector).append('<button id="' + id + '" type="button" class="btn btn-light" onclick="' + ch.action + '" >' + lbl + '</button>');
                                     break;
                                 default:
-                                    throw Error("Action'" + lbl + "' needs a parent selector of type 'btns'.");
+                                    throw new Error("Action'" + lbl + "' needs a parent selector of type 'btns'.");
                             }
                             ;
                         }
@@ -211,12 +211,12 @@ var app, browser, message, moduleManager = function () {
         }
     };
     self.construct = (defs, constructorFn) => {
-        let mo = findModule(self.tree, defs.name || defs.view);
+        let mo = findModule(self.tree, defs.name ?? defs.view);
         if (!mo)
-            throw Error(defs.name ? "'" + defs.name + "' is not a defined module name" : "'" + defs.view + "' is not a defined view");
-        $.extend(mo, defs);
+            throw new Error(defs.name ? "'" + defs.name + "' is not a defined module name" : "'" + defs.view + "' is not a defined view");
+        Object.assign(mo, defs);
         if (!mo.loadAs)
-            mo.loadAs = mo.name || mo.view.substring(1);
+            mo.loadAs = mo.name ?? mo.view.substring(1);
         constructorFn(mo);
         app[mo.loadAs] = mo;
         if (defs.name && self.registered.includes(defs.name))
@@ -224,10 +224,10 @@ var app, browser, message, moduleManager = function () {
     };
     self.show = (params) => {
         if (typeof (params) != 'object')
-            throw Error("Undefined target view.");
+            throw new Error("Undefined target view.");
         let mo = findModule(self.tree, params.view);
         if (!mo || !mo.parent.viewControl)
-            throw Error("'" + params.view + "' is not a defined view");
+            throw new Error("'" + params.view + "' is not a defined view");
         setViewFromRoot(mo, params);
         setViewToLeaf(mo, params);
         return;
@@ -336,6 +336,9 @@ var app, browser, message, moduleManager = function () {
                 case "graphViz":
                     getScript('https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/standalone/umd/vis-network.min.js');
                     return true;
+                case "pouchDB":
+                    getScript('https://cdn.jsdelivr.net/npm/pouchdb@9.0.0/dist/pouchdb.min.js');
+                    return true;
                 case "markdown":
                     getScript('https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js')
                         .done(() => { window.markdown = window.markdownit({ html: true, xhtmlOut: true, breaks: true, linkify: false }); });
@@ -371,7 +374,7 @@ var app, browser, message, moduleManager = function () {
                 case "xSpecif":
                     getScript(loadPath + 'modules/xSpecif.js');
                     return true;
-                case "cache":
+                case "projects":
                     loadModule('fileSaver');
                     getScript(loadPath + 'modules/cache.mod.js');
                     return true;
@@ -416,31 +419,28 @@ var app, browser, message, moduleManager = function () {
                     loadModule('graphViz');
                     getScript(loadPath + 'modules/graph.js');
                     return true;
-                case "about":
-                    getScript(loadPath + 'modules/about.mod.js');
+                case "serverPouch":
+                    loadModule('pouchDB');
+                    getScript(loadPath + 'modules/serverPouch.mod.js');
                     return true;
                 case 'sheet2reqif':
                 case 'importAny':
                     loadModule('zip');
                     loadModule('jsonSchema');
-                    getScript(loadPath + 'modules/' + mod + '.mod.js');
-                    return true;
+                case "about":
                 case 'ioSpecif':
-                    getScript(loadPath + 'modules/ioSpecif.mod.js');
-                    return true;
                 case 'ioDdpSchema':
-                    getScript(loadPath + 'modules/ioDdpSchema.mod.js');
-                    return true;
                 case 'ioReqif':
-                    getScript(loadPath + 'modules/ioReqif.mod.js');
+                case 'ioPig':
+                    getScript(loadPath + 'modules/' + mod + '.mod.js');
                     return true;
                 case 'ioXls':
                     loadModule('excel');
                     getScript(loadPath + 'modules/ioXls.mod.js');
                     return true;
                 case 'ioBpmn':
-                    loadModule('bpmn2specif');
                     loadModule('bpmnViewer');
+                    loadModule('bpmn2specif');
                     getScript(loadPath + 'modules/ioBpmn.mod.js');
                     return true;
                 case 'ioArchimate':
@@ -473,7 +473,7 @@ var app, browser, message, moduleManager = function () {
             }
         }
         function getScript(url, options) {
-            let settings = $.extend(options || {}, {
+            let settings = Object.assign(options ?? {}, {
                 dataType: "script",
                 cache: true,
                 url: bust(url)
@@ -505,7 +505,7 @@ var app, browser, message, moduleManager = function () {
             console.info("Loaded module '" + mod + "' (" + self.ready.length + " of " + self.registered.length + ").");
         }
         else
-            throw Error("Module '" + mod + "' cannot be set 'ready' more than once");
+            throw new Error("Module '" + mod + "' cannot be set 'ready' more than once");
         if (self.registered.length === self.ready.length) {
             if (self.tree) {
                 getStyle(loadPath + 'assets/stylesheets/SpecIF.default.css');
@@ -517,7 +517,7 @@ var app, browser, message, moduleManager = function () {
             if (typeof (callWhenReady) == 'function')
                 callWhenReady();
             else
-                throw Error("No callback provided to continue after module loading.");
+                throw new Error("No callback provided to continue after module loading.");
         }
         ;
     }

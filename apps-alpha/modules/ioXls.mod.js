@@ -13,6 +13,7 @@ moduleManager.construct({
     name: 'ioXls'
 }, function (self) {
     "use strict";
+    const myName = self.loadAs;
     var fName, fDate;
     self.init = function () {
         return true;
@@ -45,7 +46,6 @@ moduleManager.construct({
     return self;
     function xlsx2specif(buf, prjN, chAt) {
         "use strict";
-        const ontologyStatementClasses = app.ontology.getTerms('statementClass');
         class Coord {
             constructor(addr) {
                 let res = addr.match(/([A-Z]+)(\d+)/);
@@ -204,7 +204,7 @@ moduleManager.construct({
                         class: LIB.makeKey("RC-Folder"),
                         properties: [{
                                 class: LIB.makeKey("PC-Name"),
-                                values: [LIB.makeMultiLanguageValue(withoutBracketsAtEnd(sh.name))]
+                                values: [LIB.makeMultiLanguageValue(withoutContentInBracketsAtEnd(sh.name))]
                             }],
                         changedAt: chAt
                     };
@@ -279,7 +279,7 @@ moduleManager.construct({
                             properties: [],
                             changedAt: chAt
                         };
-                        let c, C, cell, val, pC, dT, id, stL = [], pTi;
+                        let c, C, cell, val, pC, dT, id, pTi;
                         for (c = ws.firstCell.col, C = ws.lastCell.col + 1; c < C; c++) {
                             cell = ws.data[cellName(c, ws.firstCell.row)];
                             pTi = cell && cell.v ? cell.v.trim() : '';
@@ -319,30 +319,11 @@ moduleManager.construct({
                                             });
                                     }
                                     else {
-                                        console.error('No dataType with id ' + pC.dataType.id + ' found for value ' + cell.v + ' in cell ' + cellName(c, row) + ' of worksheet ' + ws.name);
+                                        console.error(myName + ': No dataType with id ' + pC.dataType.id + ' found for value ' + cell.v + ' in cell ' + cellName(c, row) + ' of worksheet ' + ws.name);
                                     }
                                 }
                                 else {
-                                    let obL = cell.w.split(",");
-                                    if (obL.length < 2)
-                                        obL = cell.w.split(";");
-                                    obL.forEach((ob) => {
-                                        let oInner = RE.inQuotes.exec(ob), res2l;
-                                        if (oInner && oInner.length > 2) {
-                                            res2l = oInner[1] || oInner[2];
-                                        }
-                                        else {
-                                            res2l = ob.trim();
-                                        }
-                                        ;
-                                        if (res2l.length > CONFIG.titleLinkMinLength - 1)
-                                            stL.push({
-                                                class: LIB.makeKey(staClassId(pTi)),
-                                                object: LIB.makeKey(CONFIG.placeholder),
-                                                resourceToLink: res2l,
-                                                changedAt: chAt
-                                            });
-                                    });
+                                    console.error(myName + ': Did not find the key of a propertyClass that should have been created earlier');
                                 }
                             }
                         }
@@ -369,13 +350,6 @@ moduleManager.construct({
                                 changedAt: chAt
                             });
                             specifData.resources.push(res);
-                            if (stL.length > 0) {
-                                stL.forEach((st) => {
-                                    st.id = CONFIG.prefixS + simpleHash(res.id + st['class'].id + st.resourceToLink);
-                                    st.subject = LIB.keyOf(res);
-                                });
-                                specifData.statements = specifData.statements.concat(stL);
-                            }
                         }
                     }
                 }
@@ -420,8 +394,6 @@ moduleManager.construct({
                         }
                         ;
                         let pTi = valL[0] ? (valL[0].w || valL[0].v) : '', pC = '', nC = '';
-                        if (!pTi || ontologyStatementClasses.includes(pTi))
-                            return;
                         let pc = LIB.itemByTitle(specifData.propertyClasses, pTi);
                         if (pc)
                             return pc;
@@ -477,26 +449,8 @@ moduleManager.construct({
                         }
                     }
                 }
-                function getStaClasses(ws) {
-                    var sTi, sC, sCL = [];
-                    for (var c = ws.firstCell.col, C = ws.lastCell.col + 1; c < C; c++) {
-                        sTi = ws.data[cellName(c, ws.firstCell.row)];
-                        if (sTi) {
-                            sTi = sTi.w || sTi.v;
-                            if (sTi && ontologyStatementClasses.includes(sTi)) {
-                                sC = new StaClass(sTi);
-                                sCL.push(sC);
-                            }
-                            ;
-                        }
-                        ;
-                    }
-                    ;
-                    return sCL;
-                }
                 if (ws.range) {
-                    LIB.cacheL(specifData.statementClasses, getStaClasses(ws));
-                    let rC = new ResClass(ws.resClass, inBracketsAtEnd(ws.name) || inBracketsAtEnd(prjN) || CONFIG.resClassXlsRow);
+                    let rC = new ResClass(ws.resClass, inBracketsAtEnd(ws.name) ?? inBracketsAtEnd(prjN) ?? CONFIG.resClassXlsRow);
                     rC.propertyClasses = getPropClasses(ws);
                     specifData.resourceClasses.push(rC);
                     createFld(ws);
@@ -506,7 +460,7 @@ moduleManager.construct({
         let xDta = new Uint8Array(buf), wb = XLSX.read(xDta, { type: 'array', cellDates: true, cellStyles: true }), wsCnt = wb.SheetNames.length;
         console.info('SheetNames: ' + wb.SheetNames + ' (' + wsCnt + ')');
         var xlsTerms = ["xs:string", "xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI", CONFIG.propClassId, CONFIG.propClassTitle, CONFIG.propClassDesc, CONFIG.propClassType, CONFIG.resClassFolder], specifData = app.ontology.generateSpecifClasses({ terms: xlsTerms });
-        specifData.title = LIB.makeMultiLanguageValue(withoutBracketsAtEnd(fName.fileName()));
+        specifData.title = LIB.makeMultiLanguageValue(withoutContentInBracketsAtEnd(fName.fileName()));
         specifData.resources.push({
             id: CONFIG.prefixR + prjN.toSpecifId(),
             class: LIB.makeKey("RC-Folder"),
@@ -530,8 +484,9 @@ moduleManager.construct({
             collectDefinitions(new Worksheet(wb.SheetNames[idx]));
         for (idx = 0; idx < wsCnt; idx++)
             transformData(new Worksheet(wb.SheetNames[idx]));
+        console.debug('from xlsx:', specifData);
         return specifData;
-        function withoutBracketsAtEnd(str) {
+        function withoutContentInBracketsAtEnd(str) {
             let resL = RE.withoutBracketsAtEnd.exec(str);
             if (Array.isArray(resL) && resL.length > 1)
                 return resL[1];

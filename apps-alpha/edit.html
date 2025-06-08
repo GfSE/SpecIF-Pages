@@ -15,7 +15,7 @@
 	<div id="pageHeader">
 		<div id="logo"></div>
 		<div id="pageSelector" class="btn-group pageActions"></div>
-		<div id="spinner"><i class="fa fa-spinner fa-spin"></i></div>
+		<div id="spinner" class="spinner-border text-primary"></div>
 		<div id="pageTitle" class="pageTitle"></div>
 	</div>
 </div>
@@ -53,21 +53,19 @@
             selectorType: 'btns',
             children: [{
                 name: 'profileAnonymous',
-                loadAs: 'me'					// the name of the controller object to construct
+                loadAs: 'me'	// the name of the controller object to construct
                 // no view
             }, {
-                name: 'cache',
-                loadAs: 'projects'
+                name: 'projects'
+                // no loadAs, so 'name' will be used for the controller object
                 // no view
-                /*	children: [{
-                        name: 'serverPouch',
-                        loadAs: 'server'
-                        // no view
-                    }] */
+            /*    children: [{
+                    name: 'serverPouch',
+                    loadAs: 'server'
+                }] */
             }, {
                 name: 'importAny',
-                // no loadAs, so name will be used for the controller object
-                // This is a view of the parent:
+                // This is a view controlled by the parent:
                 view: '#' + CONFIG.importAny,	// uses implicit actions show/hide
                 viewClass: 'contentWide',		// whole width under control of the view
                 label: i18n.BtnImport,
@@ -75,6 +73,8 @@
                 // no selector: the children don't have views
                 children: [{
                     name: 'ioSpecif'
+                }, {
+                    name: 'ioPig'
                 }, {
                     name: 'ioArchimate'
                 }, {
@@ -88,15 +88,15 @@
                     }]
                 }, {
                     name: 'ioXls'
-                    /*	}, {
-                            name: 'ioDdpSchema'
-                        },{
-                            name: 'ioRdf' */
+            /*	}, {
+                    name: 'ioDdpSchema'
+                },{
+                    name: 'ioRdf' */
                 }]
             }, {
                 name: CONFIG.specifications,
                 loadAs: 'specs',					// the name of the controller object to construct
-                // This is a view of the parent:
+                // This is a view controlled by the parent:
                 view: '#' + CONFIG.specifications,	// uses implicit actions show/hide
                 label: i18n.BtnEdit,
                 selectedBy: '#selectSpecs',			// DOM element in parent's selector to choose this view

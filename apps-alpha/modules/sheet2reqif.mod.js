@@ -34,9 +34,10 @@ moduleManager.construct({
     self.projectName = '';
     self.importFormat = undefined;
     self.exportFormat = undefined;
-    var showFileSelect, myFullName = 'app.' + self.loadAs, urlP, urlOntology = (window.location.href.startsWith('http') ?
+    const myFullName = 'app.' + self.loadAs;
+    var showFileSelect, urlP, urlOntology = (LIB.useRemotePath() ?
         CONFIG.ontologyURL
-        : '../../../SpecIF/vocabulary/Ontology.specif'), importing = false;
+        : CONFIG.localOntologyURL), importing = false;
     self.clear = function () {
         $('input[type=file]').val('');
         setTextValue(i18n.LblFileName, '');
@@ -59,24 +60,24 @@ moduleManager.construct({
             + '<div id="intro">' + intro() + '</div>'
             + '</div>'
             + '<div class="col-md-8 col-lg-6 mt-4">'
-            + '<div class="fileSelect" style="display:none;" >'
-            + '<div class="attribute-label" style="vertical-align:top; padding-top:0.2em" >' + i18n.LblOntology + '</div>'
-            + '<div class="attribute-value" >'
+            + '<div class="row attribute fileSelect" style="display:none;" >'
+            + '<div class="col-3 attribute-label" style="vertical-align:top; padding-top:0.2em" >' + i18n.LblOntology + '</div>'
+            + '<div class="col-9 attribute-value" >'
             + '<div id="ontologySelector" style="margin: 0 0 0.4em 0" ></div>'
             + '</div>'
             + '</div>'
-            + '<div class="fileSelect" style="display:none;" >'
-            + '<div class="attribute-label" style="vertical-align:top; font-size:140%; padding-top:0.2em" >' + i18n.LblImport + '</div>'
-            + '<div class="attribute-value" >'
+            + '<div class="row attribute fileSelect" style="display:none;" >'
+            + '<div class="col-3 attribute-label" style="vertical-align:top; font-size:140%; padding-top:0.2em" >' + i18n.LblImport + '</div>'
+            + '<div class="col-9 attribute-value" >'
             + '<div id="formatSelector" class="btn-group" style="margin: 0 0 0.4em 0" ></div>'
             + '<div id="helpImport" style="margin: 0 0 0.4em 0" ></div>'
             + '<div id="fileSelectBtn" class="btn btn-primary btn-fileinput" style="margin: 0 0 0.8em 0" ></div>'
             + '</div>'
             + '</div>'
             + '<form id="formNames" class="form-horizontal" role="form"></form>'
-            + '<div class="fileSelect" style="display:none;" >'
-            + '<div class="attribute-label" ></div>'
-            + '<div class="attribute-value" >'
+            + '<div class="row attribute fileSelect" style="display:none;" >'
+            + '<div class="col-3 attribute-label" ></div>'
+            + '<div class="col-9 attribute-value" >'
             + '<div id="modeSelector" class="btn-group mt-1" style="margin: 0 0 0.4em 0" >'
             + function () {
                 let btns = '';
@@ -88,17 +89,17 @@ moduleManager.construct({
             + '</div>'
             + '</div>'
             + '</div>'
-            + '<div>'
-            + '<div class="attribute-label" ></div>'
-            + '<div class="attribute-value" >'
+            + '<div class="row attribute">'
+            + '<div class="col-3 attribute-label" ></div>'
+            + '<div class="col-9 attribute-value" >'
             + '<div id="progress" class="progress" >'
             + '<div class="progress-bar progress-bar-primary" ></div>'
             + '</div>'
             + '</div>'
             + '</div>'
-            + '<div class="mt-4">'
-            + '<div class="attribute-label" ></div>'
-            + '<div class="attribute-value" >'
+            + '<div class="row attribute mt-4">'
+            + '<div class="col-3 attribute-label" ></div>'
+            + '<div class="col-9 attribute-value" >'
             + donate()
             + '</div>'
             + '</div>'
@@ -123,7 +124,7 @@ moduleManager.construct({
         function getOntologyURL(uP) {
             return uP ? uP[CONFIG.keyOntology] : undefined;
         }
-        urlOntology = getOntologyURL(urlP) || urlOntology;
+        urlOntology = getOntologyURL(urlP) ?? urlOntology;
         self.setFormat(iFormats[0].id);
         let str = '';
         iFormats.forEach(function (s) {

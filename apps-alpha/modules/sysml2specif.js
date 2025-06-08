@@ -58,18 +58,21 @@ function sysml2specif(xmi, options) {
     }, options);
     var parser = new DOMParser(), xmiDoc = parser.parseFromString(xmi, "text/xml");
     if (validateCameo(xmiDoc))
-        return new resultMsg(0, '', 'object', cameo2specif(xmiDoc, opts));
-    return new resultMsg(899, 'Cameo Import: Input file is not supported');
+        return new resultMsg(0, 'Cameo Import done', 'json', cameo2specif(xmiDoc, opts));
+    return new resultMsg(899, 'Cameo Import: Input file is not supported.');
     function cameo2specif(xmi, opts) {
         function makeMap(att) {
             let top = xmi.getElementsByTagName('xmi:XMI')[0], map = new Map();
             Array.from(top.children, (ch) => {
                 let base = ch.getAttribute(att);
                 if (base) {
+                    let txt = ch.getAttribute("Text");
                     if (att == "base_Property")
                         map.set(base, { tag: ch.tagName, dir: ch.getAttribute("direction") });
+                    else if (txt)
+                        map.set(base, { tag: ch.tagName, text: txt });
                     else
-                        map.set(base, ch.tagName);
+                        map.set(base, { tag: ch.tagName });
                 }
                 ;
             });
@@ -117,16 +120,31 @@ function sysml2specif(xmi, options) {
                 ;
                 let sTy = classStereotypes.get(me.id);
                 if (sTy) {
-                    if (sTy == "sysml:InterfaceBlock") {
+                    if (sTy.tag == "sysml:InterfaceBlock") {
                         me["class"] = LIB.makeKey(terms.resourceClassState);
                         console.info("Cameo Import: Reassigning class '" + terms.resourceClassState + "' to  model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
                         return;
                     }
                     ;
+                    rC = LIB.itemByTitle(spD.resourceClasses, sTy.tag);
+                    if (rC) {
+                        me["class"] = LIB.makeKey(rC.id);
+                        console.info("Cameo Import: Reassigning class '" + rC.id + "' to  model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
+                        if (sTy.tag == "sysml:Requirement") {
+                            let prp = LIB.propByTitle(me, CONFIG.propClassDesc, spD);
+                            if (prp) {
+                                prp.values = [[{ text: sTy.text }]];
+                            }
+                            ;
+                        }
+                        ;
+                        return;
+                    }
+                    ;
                     let prp = LIB.propByTitle(me, CONFIG.propClassType, spD);
                     if (prp) {
-                        prp.values = [[{ text: sTy }]];
-                        console.info("Cameo Import: Assigning stereotype '" + sTy + "' to  model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
+                        prp.values = [[{ text: sTy.tag }]];
+                        console.info("Cameo Import: Assigning stereotype '" + sTy.tag + "' to  model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
                     }
                     ;
                 }
@@ -156,18 +174,18 @@ function sysml2specif(xmi, options) {
             .map((a) => {
             let sTy = abstractionStereotypes.get(a.id);
             if (sTy) {
-                let sC = LIB.itemByTitle(spD.statementClasses, sTy);
+                let sC = LIB.itemByTitle(spD.statementClasses, sTy.tag);
                 if (sC) {
                     a['class'] = LIB.makeKey(sC.id);
-                    console.info("Cameo Import: Re-assigning class " + sC.id + " with title " + sTy + " to statement " + a.id);
+                    console.info("Cameo Import: Re-assigning class " + sC.id + " with title " + sTy.tag + " to statement " + a.id);
                 }
                 else {
                     let prp = {
                         class: LIB.makeKey("PC-Type"),
-                        values: [[{ text: sTy }]]
+                        values: [[{ text: sTy.tag }]]
                     };
                     LIB.addProperty(a, prp);
-                    console.info("Cameo Import: Assigning stereotype " + sTy + " to statement " + a.id);
+                    console.info("Cameo Import: Assigning stereotype " + sTy.tag + " to statement " + a.id);
                 }
                 ;
             }
@@ -669,7 +687,7 @@ function sysml2specif(xmi, options) {
                 else if (aEnds.length < 1) {
                     let st = {
                         id: aId,
-                        properties: prpL,
+                        properties: prpL ? prpL : undefined,
                         changedAt: opts.fileDate
                     };
                     Array.from(el.getElementsByTagName('ownedEnd'), (oE) => {
@@ -839,7 +857,8 @@ function sysml2specif(xmi, options) {
                             console.info("Cameo Import: Skipping tag", ch.tagName, "with name", ch.getAttribute("name"), ".");
                     }
                     ;
-                    spD.resources.push(r);
+                    if (r)
+                        spD.resources.push(r);
                 });
             }
         }

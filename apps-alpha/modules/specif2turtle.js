@@ -1,20 +1,26 @@
 "use strict";
 /*!
-    SpecIF to Turtle Transformation
-    (C)copyright enso managers gmbh (http://enso-managers.de)
-    Author: se@enso-managers.de, Berlin
-    License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
-
-    SHACL
-        see: https://www.ontotext.com/knowledgehub/fundamentals/what-is-shacl/
-        and: https://book.validatingrdf.com/bookHtml011.html
-        and: https://graphdb.ontotext.com/documentation/10.8/shacl-validation.html
-        and: https://www.ida.liu.se/~robke04/SHACLTutorial/Introduction%20to%20SHACL.pdf
-        and: https://archive.topquadrant.com/technology/shacl/tutorial/
+*   SpecIF to Turtle Transformation
+*   (C)copyright enso managers gmbh (http://enso-managers.de)
+*   Author: se@enso-managers.de, Berlin
+*   License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
+*   We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
+*
+*   Assumptions:
+*   - specifData is expected in v1.2 format.
+*
+*   SHACL
+*       see: https://www.ontotext.com/knowledgehub/fundamentals/what-is-shacl/
+*       and: https://book.validatingrdf.com/bookHtml011.html
+*       and: https://graphdb.ontotext.com/documentation/10.8/shacl-validation.html
+*       and: https://www.ida.liu.se/~robke04/SHACLTutorial/Introduction%20to%20SHACL.pdf
+*       and: https://archive.topquadrant.com/technology/shacl/tutorial/
+*       and: https://shacl.dev/article/Top_10_SHACL_rules_for_RDF_validation.html
+*       and: https://www.w3.org/TR/shacl/
 */
 function escapeTtl(str) {
-    return str.replace("\\", "\\\\").replace(/"/g, '\\$&');
+    if (str)
+        return str.replace("\\", "\\\\").replace(/\u000a|\u000d/g, '').replace(/"/g, '\\$&');
 }
 class CToRdf {
     constructor() {
@@ -61,7 +67,7 @@ class CToRdf {
     }
 }
 app.specif2turtle = (specifData, opts) => {
-    const self = ':', sourceURI = encodeURI((opts.sourceFileName.startsWith('http') ? opts.sourceFileName : opts.baseURI + opts.sourceFileName) + '/'), organizerClass = "pig:OrganizerClass", entityClass = "pig:EntityClass", relationshipClass = "pig:RelationshipClass", icon = "pig:Icon", hasSubject = "pig:hasSubject", hasObject = "pig:hasObject", hasPart = "dcterms:hasPart", hasItem = "pig:organizes", suffixShape = "-Shape", suffixHasSbj = "-hasSubject", suffixHasObj = "-hasObject";
+    const self = ':', sourceURI = encodeURI((opts.sourceFileName.startsWith('http') ? opts.sourceFileName : opts.baseURI + opts.sourceFileName) + '/'), organizerClass = "pig:OrganizerClass", organizer = "pig:Organizer", entityClass = "pig:EntityClass", relationshipClass = "pig:RelationshipClass", icon = "pig:Icon", hasSubject = "pig:hasSubject", hasObject = "pig:hasObject", hasPart = "dcterms:hasPart", hasItem = "pig:hasElement", hasChild = "pig:hasChild", suffixShape = "-Shape", suffixHasSbj = "-hasSubject", suffixHasObj = "-hasObject";
     let toRdf = new CToRdf(), enumPCs = [], extendedClasses = LIB.getExtendedClasses(specifData.resourceClasses, 'all')
         .concat(LIB.getExtendedClasses(specifData.statementClasses, 'all'));
     let result = defineNamespaces()
@@ -118,7 +124,7 @@ app.specif2turtle = (specifData, opts) => {
                 ttlStr += toRdf.newLine()
                     + toRdf.tab0(self + dT.id)
                     + toRdf.tab1('a', 'owl:Class')
-                    + toRdf.tab1('rdfs:label', dT.title, '"')
+                    + toRdf.tab1('rdfs:label', dT.title.replace('.', ':'), '"')
                     + toRdf.tab1('rdfs:comment', dT.description, '"')
                     + toRdf.tab1('dcterms:modified', dT.changedAt, '"')
                     + toRdf.tab1('owl:oneOf', '(');
@@ -145,7 +151,7 @@ app.specif2turtle = (specifData, opts) => {
             + toRdf.newLine('# Property Classes')
             + toRdf.newLine('#################################################################');
         pCs.forEach(pC => {
-            let dT = LIB.itemByKey(specifData.dataTypes, pC.dataType);
+            let dT = LIB.itemByKey(specifData.dataTypes, pC.dataType), ti = pC.title.replace('.', ':');
             if (dT.enumeration) {
                 enumPCs.push(pC.id);
                 ttlStr += toRdf.newLine()
@@ -158,9 +164,9 @@ app.specif2turtle = (specifData, opts) => {
                 let dt = dT.type.replace('xs:', 'xsd:'), term = app.ontology.getTermResource('propertyClass', pC.title);
                 if (term) {
                     ttlStr += toRdf.newLine()
-                        + toRdf.tab0(pC.title)
+                        + toRdf.tab0(ti)
                         + toRdf.tab1('a', 'owl:DatatypeProperty')
-                        + toRdf.tab1('rdfs:comment', app.ontology.valueByTitle(term, CONFIG.propClassDesc), '"');
+                        + toRdf.tab1('rdfs:comment', getDescFromOntology(term), '"');
                 }
                 ;
                 ttlStr += toRdf.newLine()
@@ -176,12 +182,12 @@ app.specif2turtle = (specifData, opts) => {
                 ttlStr += toRdf.newLine()
                     + toRdf.tab0(self + pC.id);
                 if (term)
-                    ttlStr += toRdf.tab1('owl:subPropertyOf', pC.title);
+                    ttlStr += toRdf.tab1('owl:subPropertyOf', ti);
                 else
                     ttlStr += toRdf.tab1('a', 'owl:DatatypeProperty');
             }
             ;
-            ttlStr += toRdf.tab1('rdfs:label', pC.title, '"')
+            ttlStr += toRdf.tab1('rdfs:label', ti, '"')
                 + toRdf.tab1('rdfs:comment', pC.description, '"')
                 + toRdf.tab1('dcterms:modified', pC.changedAt, '"');
         });
@@ -218,19 +224,19 @@ app.specif2turtle = (specifData, opts) => {
             + toRdf.newLine()
             + toRdf.tab0(organizerClass)
             + toRdf.tab1('a', 'owl:Class')
-            + toRdf.tab1('rdfs:comment', app.ontology.valueByTitle(hTerm, CONFIG.propClassDesc), '"')
+            + toRdf.tab1('rdfs:comment', getDescFromOntology(hTerm), '"')
             + toRdf.newLine()
             + toRdf.tab0(entityClass)
             + toRdf.tab1('a', 'owl:Class')
-            + toRdf.tab1('rdfs:comment', app.ontology.valueByTitle(rTerm, CONFIG.propClassDesc), '"');
+            + toRdf.tab1('rdfs:comment', getDescFromOntology(rTerm), '"');
         rCL.forEach(rC => {
             rC = LIB.itemByKey(extendedClasses, LIB.keyOf(rC));
-            let term = app.ontology.getTermResource('resourceClass', rC.title);
+            let term = app.ontology.getTermResource('resourceClass', rC.title), ti = rC.title.replace('.', ':');
             if (term) {
                 ttlStr += toRdf.newLine()
-                    + toRdf.tab0(rC.title)
-                    + toRdf.tab1('a', 'owl:Class')
-                    + toRdf.tab1('rdfs:comment', app.ontology.valueByTitle(term, CONFIG.propClassDesc), '"');
+                    + toRdf.tab0(ti)
+                    + toRdf.tab1('owl:subClassOf', app.ontology.organizerClasses.includes(ti) ? organizerClass : entityClass)
+                    + toRdf.tab1('rdfs:comment', getDescFromOntology(term), '"');
             }
             ;
             if (isArrayWithContent(rC.propertyClasses))
@@ -240,10 +246,10 @@ app.specif2turtle = (specifData, opts) => {
             ttlStr += toRdf.newLine()
                 + toRdf.tab0(self + rC.id);
             if (term)
-                ttlStr += toRdf.tab1('owl:subClassOf', rC.title);
+                ttlStr += toRdf.tab1('owl:subClassOf', ti);
             else
                 ttlStr += toRdf.tab1('rdfs:subClassOf', entityClass);
-            ttlStr += toRdf.tab1('rdfs:label', rC.title, '"')
+            ttlStr += toRdf.tab1('rdfs:label', ti, '"')
                 + toRdf.tab1('rdfs:comment', rC.description, '"')
                 + toRdf.tab1(icon, rC.icon, '"')
                 + toRdf.tab1('dcterms:modified', rC.changedAt, '"');
@@ -263,7 +269,7 @@ app.specif2turtle = (specifData, opts) => {
             + toRdf.tab0(relationshipClass)
             + toRdf.tab1('a', 'owl:Class')
             + toRdf.tab1('rdfs:label', app.ontology.valueByTitle(sTerm, CONFIG.propClassLocalTerm), '"')
-            + toRdf.tab1('rdfs:comment', app.ontology.valueByTitle(sTerm, CONFIG.propClassDesc), '"')
+            + toRdf.tab1('rdfs:comment', getDescFromOntology(sTerm), '"')
             + toRdf.newLine()
             + toRdf.tab0(hasSubject)
             + toRdf.tab1('a', 'owl:ObjectProperty')
@@ -280,12 +286,12 @@ app.specif2turtle = (specifData, opts) => {
             + toRdf.tab1('rdfs:comment', "Containment relationship reserved for use in a hierarchy.", '"');
         sCL.forEach(sC => {
             sC = LIB.itemByKey(extendedClasses, LIB.keyOf(sC));
-            let term = app.ontology.getTermResource('statementClass', sC.title);
+            let term = app.ontology.getTermResource('statementClass', sC.title), ti = sC.title.replace('.', ':');
             if (term) {
                 ttlStr += toRdf.newLine()
-                    + toRdf.tab0(sC.title)
+                    + toRdf.tab0(ti)
                     + toRdf.tab1('a', 'owl:Class')
-                    + toRdf.tab1('rdfs:comment', app.ontology.valueByTitle(term, CONFIG.propClassDesc), '"');
+                    + toRdf.tab1('rdfs:comment', getDescFromOntology(term), '"');
             }
             ;
             ttlStr += MakeClassShape(sC)
@@ -294,10 +300,10 @@ app.specif2turtle = (specifData, opts) => {
                 + toRdf.newLine()
                 + toRdf.tab0(self + sC.id);
             if (term)
-                ttlStr += toRdf.tab1('owl:subClassOf', sC.title);
+                ttlStr += toRdf.tab1('owl:subClassOf', ti);
             else
                 ttlStr += toRdf.tab1('rdfs:subClassOf', relationshipClass);
-            ttlStr += toRdf.tab1('rdfs:label', sC.title, '"')
+            ttlStr += toRdf.tab1('rdfs:label', ti, '"')
                 + toRdf.tab1('rdfs:comment', sC.description, '"')
                 + toRdf.tab1(icon, sC.icon, '"')
                 + toRdf.tab1('dcterms:modified', sC.changedAt, '"')
@@ -393,17 +399,19 @@ app.specif2turtle = (specifData, opts) => {
     ;
     function transformHierarchies(nodes) {
         if (isArrayWithContent(nodes)) {
-            let lastParent = "", usedFolders = [], ttlStr = toRdf.newLine()
+            let usedFolders = [], ttlStr = toRdf.newLine()
                 + toRdf.newLine('#################################################################')
                 + toRdf.newLine('# Hierarchies')
                 + toRdf.newLine('#################################################################')
                 + toRdf.newLine()
-                + toRdf.tab0(self + 'HierarchyRoot')
-                + toRdf.tab1('a', organizerClass)
+                + toRdf.tab0(self + 'N-HierarchyRoot')
+                + toRdf.tab1('a', organizer)
                 + toRdf.tab1('rdfs:label', 'Hierarchy Root', '"')
                 + toRdf.tab1('rdfs:comment', '... anchoring all hierarchies of this graph (project)', '"');
-            LIB.iterateSpecifNodes(specifData.nodes, (tree, _parent) => {
-                _parent = _parent || 'HierarchyRoot';
+            nodes.forEach((nd) => {
+                ttlStr += toRdf.tab1(hasChild, nd.id);
+            });
+            LIB.iterateSpecifNodes(nodes, (tree) => {
                 if (isArrayWithContent(tree.nodes)) {
                     if (usedFolders.includes(tree.id))
                         console.warn("RDF/Turtle Export: Hierarchy Node " + tree.id + " with children appears more than once.");
@@ -411,13 +419,17 @@ app.specif2turtle = (specifData, opts) => {
                         usedFolders.push(tree.id);
                 }
                 ;
-                if (lastParent != _parent) {
-                    lastParent = _parent;
-                    ttlStr += toRdf.newLine()
-                        + toRdf.tab0(self + _parent);
-                }
-                ;
-                ttlStr += toRdf.tab1(hasItem, self + tree.resource.id);
+                ttlStr += toRdf.newLine()
+                    + toRdf.tab0(self + tree.id)
+                    + toRdf.tab1('dcterms:modified', tree.changedAt, '"')
+                    + toRdf.tab1(hasItem, self + tree.resource.id);
+                if (Array.isArray(tree.nodes))
+                    tree.nodes.forEach((nd, i) => {
+                        if (i == 0)
+                            ttlStr += toRdf.tab1(hasChild, nd.id);
+                        else
+                            ttlStr += toRdf.tab2(nd.id);
+                    });
                 return true;
             });
             return ttlStr;
@@ -440,21 +452,7 @@ app.specif2turtle = (specifData, opts) => {
         ;
         return str;
     }
-    function makeObjectUnion(pred, L) {
-        let str = "";
-        if (Array.isArray(L) && L.length > 0) {
-            if (L.length > 1) {
-                str += toRdf.tab1(pred, '[ owl:unionOf(');
-                for (let i = 0; i < L.length; i++) {
-                    str += " " + self + L[i].id;
-                }
-                ;
-                str += " )]";
-            }
-            else
-                str += toRdf.tab1(pred, self + L[0].id);
-        }
-        ;
-        return str;
+    function getDescFromOntology(term) {
+        return app.ontology.valueByTitle(term, CONFIG.propClassDesc);
     }
 };

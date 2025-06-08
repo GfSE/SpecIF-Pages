@@ -7,7 +7,7 @@
 */
 moduleManager.construct({
     name: CONFIG.reports
-}, function (self) {
+}, (self) => {
     "use strict";
     var selPrj;
     self.list = [];

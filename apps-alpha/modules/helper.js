@@ -10,9 +10,9 @@ function makeTextField(tag, val, opts) {
         opts.tagPos = 'left';
     let fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' oninput="' + opts.handle + '"' : '', sH = simpleHash(tag), fG, cl = (typeof (opts.classes) == 'string' && opts.classes.length > 0) ? ' ' + opts.classes : '', aC;
     if (opts.typ && ['line', 'area', 'outer'].includes(opts.typ))
-        fG = '<div id="' + sH + '" class="row mx-0 my-1 attribute form-active' + cl + '" >';
+        fG = '<div id="' + sH + '" class="row attribute form-active' + cl + '" >';
     else
-        fG = '<div class="row mx-0 my-1 attribute' + cl + '" >';
+        fG = '<div class="row attribute' + cl + '" >';
     switch (opts.tagPos) {
         case 'none':
             aC = 'col-12';
@@ -116,7 +116,7 @@ function makeSelectionField(tag, entries, opts) {
         throw Error("Kind of selection field must be either 'radio' or 'checkbox'");
     switch (opts.typ) {
         case 'display':
-            return '<div class="row mx-0 my-1 attribute ' + (opts.classes ?? '') + '">'
+            return '<div class="row attribute ' + (opts.classes ?? '') + '">'
                 + '<div class="col-3 attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
                 + '<div class="col-9 attribute-value" >'
                 + function () {
@@ -134,7 +134,7 @@ function makeSelectionField(tag, entries, opts) {
         opts.tagPos = 'left';
     if (typeof (opts.classes) != 'string')
         opts.classes = 'form-active';
-    let rB = '<div class="row mx-0 my-1 attribute ' + (opts.classes ?? '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
+    let rB = '<div class="row attribute ' + (opts.classes ?? '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
     switch (opts.tagPos) {
         case 'none':
             rB += '<div class="' + opts.kind + '" >';
@@ -201,12 +201,12 @@ function makeBooleanField(tag, val, opts) {
         fn = ' onclick="' + opts.handle + '"';
     switch (opts.typ) {
         case 'display':
-            return '<div class="row mx-0 my-1 attribute">'
+            return '<div class="row attribute">'
                 + '<div class="col-3 attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
                 + '<div class="col-9 attribute-value">' + (val ? 'true' : 'false') + '</div>'
                 + '</div>';
         default:
-            return '<div class="row my-1 attribute form-active">'
+            return '<div class="row attribute form-active">'
                 + '<div class="col-3 attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
                 + '<div class="col-9 attribute-value checkbox" >'
                 + '<label>'
@@ -267,6 +267,9 @@ class resultMsg {
         this.statusText = sTxt;
         this.responseType = rTyp;
         this.response = resp;
+    }
+    ok() {
+        return ["0", "200", "201"].includes(this.status.toString());
     }
     asString() {
         return this.statusText + " (" + this.status + (this.responseType == 'text' ? "): " + (this.response ?? this.responseText) : ")");
@@ -587,13 +590,6 @@ LIB.displayValueOf = (val, opts) => {
     }
     if (LIB.isMultiLanguageValue(val)) {
         return lookup(LIB.languageTextOf(val, opts));
-    }
-    ;
-    if (Array.isArray(val)) {
-        let str = '';
-        for (var v of val)
-            str += (str.length > 0 ? ', ' : '') + LIB.displayValueOf(v, opts);
-        return str;
     }
     ;
     return val;
@@ -1024,6 +1020,12 @@ LIB.uncacheL = (L, es) => {
     es.forEach((e) => { ok = ok && LIB.uncacheE(L, e) > -1; });
     return ok;
 };
+LIB.randomString = () => {
+    let chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', result = '';
+    for (var i = CONFIG.genIdLength; i > 0; --i)
+        result += chars[Math.round(Math.random() * (chars.length - 1))];
+    return result;
+};
 LIB.genID = (pfx) => {
     if (!pfx || pfx.length < 1) {
         pfx = 'ID_';
@@ -1033,11 +1035,7 @@ LIB.genID = (pfx) => {
         pfx = '_' + pfx;
     }
     ;
-    let chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    var result = '';
-    for (var i = CONFIG.genIdLength; i > 0; --i)
-        result += chars[Math.round(Math.random() * (chars.length - 1))];
-    return pfx + result;
+    return pfx + LIB.randomString();
 };
 LIB.getHeight = (elm) => {
     return $(elm).outerHeight(true) ?? 0;
@@ -1379,7 +1377,7 @@ LIB.dataTypeOf = (key, prj) => {
 LIB.iterateSpecifNodes = (tree, eFn, lFn, _parent) => {
     let cont = true;
     if (Array.isArray(tree)) {
-        for (var i = 0, I = tree.length; cont && (i < I); i++) {
+        for (let i = 0, I = tree.length; cont && (i < I); i++) {
             cont = !LIB.iterateSpecifNodes(tree[i], eFn, lFn, _parent);
         }
         ;
@@ -1389,7 +1387,7 @@ LIB.iterateSpecifNodes = (tree, eFn, lFn, _parent) => {
     else {
         cont = eFn(tree, _parent);
         if (cont && tree.nodes) {
-            _parent = tree.resource.id;
+            _parent = tree.id;
             cont = !LIB.iterateSpecifNodes(tree.nodes, eFn, lFn, _parent);
         }
         ;

@@ -109,7 +109,7 @@ class CSpecIF {
                     reject(msg);
             }
             else {
-                msg = new resultMsg(999, "SpecIF id is not defined or version is not supported.").warn();
+                msg = new resultMsg(999, "SpecIF input is not valid or version is not supported.").warn();
                 reject(msg);
             }
         });

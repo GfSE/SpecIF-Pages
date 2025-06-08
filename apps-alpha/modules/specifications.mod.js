@@ -167,7 +167,7 @@ class CPropertyToShow {
                     f1.renderDownloadLink('<div class="' + opts.imgClass + ' ' + tagId(u2) + '"'
                         + makeStyle(w2, h2)
                         + '></div>', opts);
-                    f2.renderImage($.extend({}, opts, { timelag: opts.timelag * 1.2 }));
+                    f2.renderImage(Object.assign({}, opts, { timelag: opts.timelag * 1.2 }));
                 }
                 else {
                     repStrings.push('<span class="' + tagId(u1) + '"></span>');
@@ -660,7 +660,7 @@ class CFileWithContent {
 moduleManager.construct({
     name: CONFIG.specifications
 }, (self) => {
-    let myName = self.loadAs, myFullName = 'app.' + myName;
+    const myName = self.loadAs, myFullName = 'app.' + myName;
     self.selectedView = () => {
         return self.viewControl.selected.view.substring(1);
     };
@@ -867,7 +867,8 @@ moduleManager.construct({
 moduleManager.construct({
     view: '#' + CONFIG.objectList
 }, (self) => {
-    var myName = self.loadAs, myFullName = 'app.' + myName, selPrj, selRes, modalDelNode;
+    const myName = self.loadAs, myFullName = 'app.' + myName;
+    var selPrj, selRes, modalDelNode;
     self.init = () => {
         self.resCreClasses = [];
         self.resCre = false;
@@ -1038,7 +1039,8 @@ moduleManager.construct({
 moduleManager.construct({
     view: '#' + CONFIG.relations
 }, (self) => {
-    var myName = self.loadAs, myFullName = 'app.' + myName, selPrj, cacheData, selRes, net, modeStaDel = false;
+    const myName = self.loadAs, myFullName = 'app.' + myName;
+    var selPrj, cacheData, selRes, net, modeStaDel = false;
     self.staCreClasses = { subjectClasses: [], objectClasses: [] };
     self.staCre = false;
     self.staDelClasses = [];
