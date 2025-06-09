@@ -408,8 +408,11 @@ app.specif2turtle = (specifData, opts) => {
                 + toRdf.tab1('a', organizer)
                 + toRdf.tab1('rdfs:label', 'Hierarchy Root', '"')
                 + toRdf.tab1('rdfs:comment', '... anchoring all hierarchies of this graph (project)', '"');
-            nodes.forEach((nd) => {
-                ttlStr += toRdf.tab1(hasChild, nd.id);
+            nodes.forEach((nd, idx) => {
+                if (idx == 0)
+                    ttlStr += toRdf.tab1(hasChild, self + nd.id);
+                else
+                    ttlStr += toRdf.tab2(self + nd.id);
             });
             LIB.iterateSpecifNodes(nodes, (tree) => {
                 if (isArrayWithContent(tree.nodes)) {
@@ -426,9 +429,9 @@ app.specif2turtle = (specifData, opts) => {
                 if (Array.isArray(tree.nodes))
                     tree.nodes.forEach((nd, i) => {
                         if (i == 0)
-                            ttlStr += toRdf.tab1(hasChild, nd.id);
+                            ttlStr += toRdf.tab1(hasChild, self + nd.id);
                         else
-                            ttlStr += toRdf.tab2(nd.id);
+                            ttlStr += toRdf.tab2(self + nd.id);
                     });
                 return true;
             });
