@@ -1,7 +1,7 @@
 "use strict";
 const CONFIG = {};
 CONFIG.specifVersion = "1.2";
-CONFIG.appVersion = CONFIG.specifVersion + ".a.26";
+CONFIG.appVersion = CONFIG.specifVersion + ".a.27";
 CONFIG.imgURL = './assets/images';
 CONFIG.remotePath = 'https://specif.de/v' + CONFIG.specifVersion + '/';
 CONFIG.localPath = '../../../SpecIF/Pages/v' + CONFIG.specifVersion + '/';

@@ -114,7 +114,7 @@ moduleManager.construct({
         }
         function makeElement(e, ctg) {
             let el = makeItem(e, ctg);
-            el['pig.hasClass'] = self + e.class.id;
+            el['pig:hasClass'] = self + e.class.id;
             if (e.properties && e.properties.length > 0) {
                 el['pig:hasProperty'] = e.properties.map(p => {
                     return {
