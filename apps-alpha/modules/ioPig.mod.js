@@ -10,10 +10,11 @@
 *   - specifData is expected in v1.2 format.
 *
 *	See:
-*	- https://www.w3.org/TR/json-ld/
+*	- https://www.w3.org/TR/json-ld/ (= https://www.w3.org/TR/json-ld11/)
 *	- https://json-ld.org/
 *	- https://paulfrazee.medium.com/pauls-notes-on-how-json-ld-works-965732ea559d
 *	- https://linkeddatatools.com/introduction-json-ld/
+*	- https://json-ld.org/playground/
 */
 moduleManager.construct({
     name: 'ioPig'
@@ -32,7 +33,7 @@ moduleManager.construct({
         const self = "#", sourceURI = encodeURI((opts.sourceFileName.startsWith('http') ? opts.sourceFileName : opts.baseURI + opts.sourceFileName)), date = new Date().toISOString();
         var pig = {
             "@context": makeContext(),
-            "@type": "pig:Product",
+            "@type": "pig:Package",
             "@id": self + spD.id,
             "dcterms:title": spD.title,
             "dcterms:description": spD.description && spD.description[0] ? spD.description[0].text : null,
@@ -158,9 +159,9 @@ moduleManager.construct({
             }
         }
         function cacheL(tgtL, srcL) {
-            for (let itm of srcL) {
-                if (!tgtL.some(t => t['@id'] === itm['@id']))
-                    tgtL.push(itm);
+            for (let s of srcL) {
+                if (!tgtL.some(t => t['@id'] == s['@id']))
+                    tgtL.push(s);
             }
             ;
         }

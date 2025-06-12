@@ -1660,7 +1660,7 @@ class CProject {
                             break;
                         case 'pig-jsonld':
                             opts.baseURI = "https://product-information-graph.org/examples/";
-                            fName += ".pig";
+                            fName += ".jsonld";
                             zName = fName + '.zip';
                             expStr = app.ioPig.fromSpecif(expD, opts);
                             break;

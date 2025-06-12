@@ -379,13 +379,19 @@
 	<script type="text/javascript">
         // see https://www.sitepoint.com/community/t/window-load-function-getscript-not-jquery/195657/3
         function getScript(url) {
-            var el = document.createElement('script');
+            let el = document.createElement('script');
 			el.onload = function () {
                 document.getElementById('appVersion').innerHTML = CONFIG.appVersion;
                 document.getElementById('specifVersion').innerHTML = CONFIG.specifVersion;
             };
             el.src = url;
             document.body.appendChild(el)
+            if (!window.location.href.includes('://specif.de/apps/')) {
+                el = document.createElement('link');
+                el.rel = "canonical";
+                el.href = "https://specif.de/apps/index.html";
+                document.head.appendChild(el);
+            };
         }
         getScript('./config/definitions.js?' + Date.now().toString()); // with cache-busting
 	</script>
