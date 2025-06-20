@@ -94,7 +94,7 @@ class CPropertyToEdit extends CPropertyToShow {
         if (this.pC.permissionVector.U) {
             return '<div class="row mx-0 my-1 attribute form-active" >'
                 + '<div class="col-3 attribute-label" >' + LIB.titleOf(this, opts) + '</div>'
-                + '<div class="col-9 attribute-value">'
+                + '<div class="col attribute-value">'
                 + '<div class="btn-group" style="float: right;" >'
                 + '<span class="btn btn-light btn-fileinput">'
                 + '<span>' + i18n.IcoEdit + '</span>'
@@ -112,7 +112,7 @@ class CPropertyToEdit extends CPropertyToShow {
         else {
             return '<div class="row mx-0 my-1 attribute">'
                 + '<div class="col-3 attribute-label" >' + LIB.titleOf(this, opts) + '</div>'
-                + '<div class="col-9 attribute-value">' + this.renderImg(opts) + '</div>'
+                + '<div class="col attribute-value">' + this.renderImg(opts) + '</div>'
                 + '</div>';
         }
     }
@@ -210,7 +210,7 @@ class CResourceToEdit {
                 + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" > </button>'
                 + '</div>'
                 + '<div class="modal-body" >'
-                + '<div style="container max-height:' + (LIB.getHeight('#app') - 220) + 'px; overflow:auto" >'
+                + '<div class="container" style="max-height:' + (LIB.getHeight('#app') - 220) + 'px; overflow:auto" >'
                 + function () {
                     let form = '';
                     self.properties.forEach((p) => { form += p.editField(editOpts); });
@@ -434,7 +434,7 @@ moduleManager.construct({
                                 + '<button id="selRCclose" type="button" class="btn-close" aria-label="Close" > </button>'
                                 + '</div>'
                                 + '<div class="modal-body" >'
-                                + '<div style="max-height:' + (LIB.getHeight('#app') - 220) + 'px; overflow:auto" >'
+                                + '<div class="container" style="max-height:' + (LIB.getHeight('#app') - 220) + 'px; overflow:auto" >'
                                 + makeSelectionField(i18n.LblResourceClass, resClasses, { kind: 'radio' })
                                 + '</div>'
                                 + '</div>'
