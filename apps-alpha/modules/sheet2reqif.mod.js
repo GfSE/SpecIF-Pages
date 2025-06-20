@@ -1,6 +1,6 @@
 "use strict";
-/*!	GUI and control for all importers
-    Dependencies: jQuery 3.1+, bootstrap 3.1
+/*!	GUI and control for the importer of 'Sheet to ReqIF'
+    Dependencies: jQuery 3.1+, bootstrap 5.3+
     Copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
@@ -55,30 +55,30 @@ moduleManager.construct({
             return false;
         }
         ;
-        let h = '<div class="container"><div class="row justify-content-lg-center">'
-            + '<div class="col-md-4 col-lg-3 mt-4">'
+        let h = '<div class="container"><div class="row justify-content-lg-center mt-4">'
+            + '<div class="col-md-4 col-lg-3">'
             + '<div id="intro">' + intro() + '</div>'
             + '</div>'
-            + '<div class="col-md-8 col-lg-6 mt-4">'
+            + '<div class="col-md-8 col-lg-6">'
             + '<div class="row attribute fileSelect" style="display:none;" >'
-            + '<div class="col-3 attribute-label" style="vertical-align:top; padding-top:0.2em" >' + i18n.LblOntology + '</div>'
-            + '<div class="col-9 attribute-value" >'
-            + '<div id="ontologySelector" style="margin: 0 0 0.4em 0" ></div>'
+            + '<div class="col-3 attribute-label" >' + i18n.LblOntology + '</div>'
+            + '<div class="col attribute-value" >'
+            + '<div id="ontologySelector" ></div>'
             + '</div>'
             + '</div>'
-            + '<div class="row attribute fileSelect" style="display:none;" >'
-            + '<div class="col-3 attribute-label" style="vertical-align:top; font-size:140%; padding-top:0.2em" >' + i18n.LblImport + '</div>'
-            + '<div class="col-9 attribute-value" >'
-            + '<div id="formatSelector" class="btn-group" style="margin: 0 0 0.4em 0" ></div>'
-            + '<div id="helpImport" style="margin: 0 0 0.4em 0" ></div>'
-            + '<div id="fileSelectBtn" class="btn btn-primary btn-fileinput" style="margin: 0 0 0.8em 0" ></div>'
+            + '<div class="row attribute fileSelect mt-3" style="display:none;" >'
+            + '<div class="col-3 attribute-label" style="font-size:140%;" >' + i18n.LblImport + '</div>'
+            + '<div class="col attribute-value" >'
+            + '<div id="formatSelector" class="btn-group" ></div>'
+            + '<div id="helpImport" class="mt-1" ></div>'
+            + '<div id="fileSelectBtn" class="btn btn-primary btn-fileinput mt-1" ></div>'
             + '</div>'
             + '</div>'
-            + '<form id="formNames" class="form-horizontal" role="form"></form>'
-            + '<div class="row attribute fileSelect" style="display:none;" >'
+            + '<form id="formNames" class="form-horizontal mt-3" role="form"></form>'
+            + '<div class="row attribute fileSelect mt-1" style="display:none;" >'
             + '<div class="col-3 attribute-label" ></div>'
-            + '<div class="col-9 attribute-value" >'
-            + '<div id="modeSelector" class="btn-group mt-1" style="margin: 0 0 0.4em 0" >'
+            + '<div class="col attribute-value" >'
+            + '<div id="modeSelector" class="btn-group mt-1" >'
             + function () {
                 let btns = '';
                 actions.forEach((a) => {
@@ -89,9 +89,9 @@ moduleManager.construct({
             + '</div>'
             + '</div>'
             + '</div>'
-            + '<div class="row attribute">'
+            + '<div class="row attribute mt-1">'
             + '<div class="col-3 attribute-label" ></div>'
-            + '<div class="col-9 attribute-value" >'
+            + '<div class="col attribute-value" >'
             + '<div id="progress" class="progress" >'
             + '<div class="progress-bar progress-bar-primary" ></div>'
             + '</div>'
@@ -99,7 +99,7 @@ moduleManager.construct({
             + '</div>'
             + '<div class="row attribute mt-4">'
             + '<div class="col-3 attribute-label" ></div>'
-            + '<div class="col-9 attribute-value" >'
+            + '<div class="col attribute-value" >'
             + donate()
             + '</div>'
             + '</div>'

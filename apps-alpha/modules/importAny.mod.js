@@ -110,26 +110,26 @@ moduleManager.construct({
                 opts: { replacePropertiesWithStatements: [CONFIG.propClassVisibleId] },
                 help: i18n.MsgImportXls
             }];
-        let h = '<div class="container max-width-lg mt-3" >'
+        let h = '<div class="container max-width-lg mt-4" >'
             + '<div class="row attribute fileSelect" style="display:none;" >'
-            + '<div class="col-2 attribute-label" style="vertical-align:top; padding-top:0.2em" >' + i18n.LblOntology + '</div>'
+            + '<div class="col-2 attribute-label" >' + i18n.LblOntology + '</div>'
             + '<div class="col attribute-value" >'
-            + '<div id="ontologySelector" style="margin: 0 0 0.4em 0" ></div>'
+            + '<div id="ontologySelector" ></div>'
             + '</div>'
             + '</div>'
-            + '<div class="row attribute fileSelect" style="display:none;" >'
-            + '<div class="col-2 attribute-label" style="vertical-align:top; font-size:140%; padding-top:0.2em" >' + i18n.LblImport + '</div>'
+            + '<div class="row attribute fileSelect mt-3" style="display:none;" >'
+            + '<div class="col-2 attribute-label" style="font-size:140%; " >' + i18n.LblImport + '</div>'
             + '<div class="col attribute-value" >'
-            + '<div id="formatSelector" class="btn-group" style="margin: 0 0 0.4em 0" ></div>'
-            + '<div id="helpImport" style="margin: 0 0 0.4em 0" ></div>'
-            + '<div id="fileSelectBtn" class="btn btn-light btn-fileinput" style="margin: 0 0 0.8em 0" ></div>'
+            + '<div id="formatSelector" class="btn-group" ></div>'
+            + '<div id="helpImport" class="mt-1" ></div>'
+            + '<div id="fileSelectBtn" class="btn btn-primary btn-fileinput mt-1" ></div>'
             + '</div>'
             + '</div>'
-            + '<form id="formNames" class="form-horizontal" role="form"></form>'
-            + '<div class="row attribute fileSelect" style="display:none;" >'
+            + '<form id="formNames" class="form-horizontal mt-3" role="form"></form>'
+            + '<div class="row attribute fileSelect mt-1" style="display:none;" >'
             + '<div class="col-2 attribute-label" ></div>'
             + '<div class="col attribute-value" >'
-            + '<div id="modeSelector" class="btn-group my-1" style="margin: 0 0 0.4em 0" >'
+            + '<div id="modeSelector" class="btn-group my-1" >'
             + function () {
                 let btns = '';
                 actions.forEach((a) => {
@@ -140,17 +140,17 @@ moduleManager.construct({
             + '</div>'
             + '</div>'
             + '</div>'
-            + '<div class="row attribute">'
-            + '<div class="col-3 attribute-label" ></div>'
-            + '<div class="col-9 attribute-value" >'
+            + '<div class="row attribute mt-1">'
+            + '<div class="col-2 attribute-label" ></div>'
+            + '<div class="col attribute-value" >'
             + '<div id="progress" class="progress" >'
             + '<div class="progress-bar progress-bar-primary" ></div>'
             + '</div>'
             + '</div>'
             + '</div>'
-            + '<div class="row pt-3 attribute">'
-            + '<div class="col-3 attribute-label" ></div>'
-            + '<div class="col-9 attribute-value" >' + i18n.MsgIntro + '</div>'
+            + '<div class="row attribute mt-3">'
+            + '<div class="col-2 attribute-label" ></div>'
+            + '<div class="col attribute-value" >' + i18n.MsgIntro + '</div>'
             + '</div>'
             + '</div>';
         $(self.view).prepend(h);
@@ -192,7 +192,7 @@ moduleManager.construct({
             if (self.importFormat && app[self.importFormat.name]) {
                 app[self.importFormat.name].init(self.importFormat.opts);
                 if (app[self.importFormat.name].verify({ name: urlP[CONFIG.keyImport] })) {
-                    let rF = makeTextField(i18n.LblFileName, self.file.name);
+                    let rF = makeTextField(i18n.LblFileName, self.file.name, { colsLabel: 2 });
                     $("#formNames").html(rF);
                     self.projectName = self.file.name.fileName();
                     setImporting(true);
@@ -254,9 +254,9 @@ moduleManager.construct({
         }
         ;
         app[self.importFormat.name].init(self.importFormat.opts);
-        let rF = makeTextField(i18n.LblFileName, '');
+        let rF = makeTextField(i18n.LblFileName, '', { colsLabel: 2 });
         if (fId == 'xls')
-            rF += makeTextField(i18n.LblProjectName, self.projectName, { typ: 'line', handle: myFullName + '.enableActions()' });
+            rF += makeTextField(i18n.LblProjectName, self.projectName, { typ: 'line', handle: myFullName + '.enableActions()', colsLabel: 2 });
         $('#helpImport').html(self.importFormat.help);
         $("#formNames").html(rF);
         $("#fileSelectBtn").html('<span>' + i18n.BtnFileSelect + '</span>'

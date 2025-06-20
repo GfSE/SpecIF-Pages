@@ -7,9 +7,10 @@ class CGraphOptions {
         this.focusColor = '#6ca0dc';
         this.nodeColor = '#afcbef';
         this.edgeColor = 'black';
-        this.clusterColor = '#c3daf6';
+        this.clusterColor = '#9FA6B2';
         this.fontFace = 'Arial';
         this.fontSize = '14px';
+        this.fontColor = '#fff';
         if (typeof (opts.canvas) == 'string' && opts.canvas.length > 0) {
             for (var p in opts)
                 this[p] = opts[p];
@@ -259,6 +260,7 @@ class CGraph {
                 x: pos.x,
                 y: pos.y,
                 color: res.id ? opts.nodeColor : opts.clusterColor,
+                font: opts.fontSize + " " + opts.fontFace + " " + opts.fontColor,
                 shape: res.id ? "box" : "circle"
             });
             let edge = {
@@ -279,7 +281,7 @@ class CGraph {
                 x: 0,
                 y: 0,
                 color: opts.focusColor,
-                font: opts.fontSize + " " + opts.fontFace + " #fff",
+                font: opts.fontSize + " " + opts.fontFace + " " + opts.fontColor,
                 shape: "box"
             });
             return 1;

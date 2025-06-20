@@ -8,6 +8,10 @@ function makeTextField(tag, val, opts) {
         opts = {};
     if (typeof (opts.tagPos) != 'string')
         opts.tagPos = 'left';
+    if (typeof (opts.colsLabel) == 'number')
+        opts.colsLabel = 'col-' + opts.colsLabel;
+    else
+        opts.colsLabel = 'col-3';
     let fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' oninput="' + opts.handle + '"' : '', sH = simpleHash(tag), fG, cl = (typeof (opts.classes) == 'string' && opts.classes.length > 0) ? ' ' + opts.classes : '', aC;
     if (opts.typ && ['line', 'area', 'outer'].includes(opts.typ))
         fG = '<div id="' + sH + '" class="row attribute form-active' + cl + '" >';
@@ -18,8 +22,8 @@ function makeTextField(tag, val, opts) {
             aC = 'col-12';
             break;
         case 'left':
-            fG += '<div class="col-3 attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>';
-            aC = 'col-9 attribute-value';
+            fG += '<div class="' + opts.colsLabel + ' attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>';
+            aC = 'col attribute-value';
             break;
         default:
             throw Error("Invalid display option '" + opts.tagPos + "' when showing a text form");
@@ -118,7 +122,7 @@ function makeSelectionField(tag, entries, opts) {
         case 'display':
             return '<div class="row attribute ' + (opts.classes ?? '') + '">'
                 + '<div class="col-3 attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
-                + '<div class="col-9 attribute-value" >'
+                + '<div class="col attribute-value" >'
                 + function () {
                     let vals = '';
                     entries.forEach((e) => {
@@ -141,7 +145,7 @@ function makeSelectionField(tag, entries, opts) {
             break;
         case 'left':
             rB += '<div class="col-3 attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
-                + '<div class="col-9 attribute-value ' + opts.kind + '" >';
+                + '<div class="col attribute-value ' + opts.kind + '" >';
             break;
         default:
             throw Error("Invalid display option '" + opts.tagPos + "' when showing a '" + opts.kind + "' form");
@@ -203,12 +207,12 @@ function makeBooleanField(tag, val, opts) {
         case 'display':
             return '<div class="row attribute">'
                 + '<div class="col-3 attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
-                + '<div class="col-9 attribute-value">' + (val ? 'true' : 'false') + '</div>'
+                + '<div class="col attribute-value">' + (val ? 'true' : 'false') + '</div>'
                 + '</div>';
         default:
             return '<div class="row attribute form-active">'
                 + '<div class="col-3 attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
-                + '<div class="col-9 attribute-value checkbox" >'
+                + '<div class="col attribute-value checkbox" >'
                 + '<label>'
                 + '<input type="checkbox" name="boolean' + simpleHash(tag) + '"' + (val ? ' checked' : '') + fn + ' />'
                 + '</label><br />'

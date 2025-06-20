@@ -76,6 +76,10 @@ class CSpecIF {
         this.resources = [];
         this.statements = [];
         this.nodes = [];
+        let tpl = app.standards.makeTemplate();
+        for (let p in tpl) {
+            this[p] = tpl[p];
+        }
     }
     isValid(spD) {
         if (!spD)
@@ -220,8 +224,7 @@ class CSpecIF {
         if (spD.title)
             this.title = makeMultiLanguageText(spD.title);
         this.id = spD.id;
-        this.$schema = 'https://specif.de/v' + CONFIG.specifVersion + '/schema.json';
-        return new resultMsg(0, 'SpecIF data has been successfully imported!');
+        return new resultMsg(0, 'SpecIF data has been successfully transformed!');
         function i2int(iE) {
             var oE = {
                 id: iE.id ? iE.id.toSpecifId() : undefined,

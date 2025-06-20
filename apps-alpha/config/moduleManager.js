@@ -94,8 +94,8 @@ var app, browser, message, moduleManager = function () {
         ;
         if (opts && opts.path)
             loadPath = opts.path;
-        self.registered = [];
-        self.ready = [];
+        self.registered = new Set();
+        self.ready = new Set();
         let initL = ['bootstrap', 'font', 'types', 'standards', 'i18n', 'helper', "xSpecif", 'ioOntology'];
         if (CONFIG.convertMarkdown)
             initL.push('markdown');
@@ -118,12 +118,12 @@ var app, browser, message, moduleManager = function () {
         }
     };
     function register(mod) {
-        if (self.registered.includes(mod)) {
+        if (self.registered.has(mod)) {
             console.warn("WARNING: Did not reload module '" + mod + "'.");
             return false;
         }
         ;
-        self.registered.push(mod);
+        self.registered.add(mod);
         return true;
     }
     self.load = (tr, opts) => {
@@ -219,7 +219,7 @@ var app, browser, message, moduleManager = function () {
             mo.loadAs = mo.name ?? mo.view.substring(1);
         constructorFn(mo);
         app[mo.loadAs] = mo;
-        if (defs.name && self.registered.includes(defs.name))
+        if (defs.name && self.registered.has(defs.name))
             setReady(defs.name);
     };
     self.show = (params) => {
@@ -255,10 +255,10 @@ var app, browser, message, moduleManager = function () {
         }
     };
     self.isRegistered = (mod) => {
-        return self.registered.includes(mod);
+        return self.registered.has(mod);
     };
     self.isReady = (mod) => {
-        return self.ready.includes(mod);
+        return self.ready.has(mod);
     };
     return self;
     function initModuleTree(h) {
@@ -268,9 +268,8 @@ var app, browser, message, moduleManager = function () {
             if (e.children)
                 e.children.forEach((c) => { it(c); });
         }
-        if (h) {
+        if (h)
             it(h);
-        }
     }
     function findModule(tr, token) {
         let m = undefined;
@@ -310,8 +309,8 @@ var app, browser, message, moduleManager = function () {
                     setReady(mod);
                     return true;
                 case "bootstrap":
-                    getStyle("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css");
-                    getScript("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js");
+                    getStyle("https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css");
+                    getScript("https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js");
                     return true;
                 case "tree":
                     loadModule('helperTree');
@@ -485,7 +484,7 @@ var app, browser, message, moduleManager = function () {
                     .done(() => { setReady(module.name); });
         }
         function loadAfterRequiredModules(mod, fn) {
-            if ((!Array.isArray(mod.requires) || LIB.containsAllStrings(self.ready, mod.requires))
+            if ((!Array.isArray(mod.requires) || new Set(mod.requires).isSubsetOf(self.ready))
                 && pend < 9)
                 fn(mod.name);
             else
@@ -499,18 +498,19 @@ var app, browser, message, moduleManager = function () {
         $('head').append('<link rel="stylesheet" type="text/css" href="' + bust(url) + '" />');
     }
     function setReady(mod) {
-        if (self.ready.indexOf(mod) < 0) {
-            pend--;
-            self.ready.push(mod);
-            console.info("Loaded module '" + mod + "' (" + self.ready.length + " of " + self.registered.length + ").");
-        }
-        else
+        if (self.ready.has(mod))
             throw new Error("Module '" + mod + "' cannot be set 'ready' more than once");
-        if (self.registered.length === self.ready.length) {
+        else {
+            pend--;
+            self.ready.add(mod);
+            console.info("Loaded module '" + mod + "' (" + self.ready.length + " of " + self.registered.size + ").");
+        }
+        ;
+        if (self.registered.size === self.ready.size) {
             if (self.tree) {
                 getStyle(loadPath + 'assets/stylesheets/SpecIF.default.css');
                 initModuleTree(self.tree);
-                console.info("All " + self.ready.length + " modules loaded --> ready!");
+                console.info("All " + self.ready.size + " modules loaded --> ready!");
             }
             else
                 console.info("Initialization completed!");

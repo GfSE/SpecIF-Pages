@@ -81,17 +81,16 @@ class COntology {
             });
         }
         ;
-        if (!this.checkConstraintsOntology()) {
-            message.show("The Ontology violates one or more constraints, so no classes will be generated. Please see the browser log for details.", { severity: 'error' });
-            this.data = undefined;
-            return;
-        }
-        ;
         this.namespaces = this.getNamespaces();
         this.headings = this.getHeadings();
         this.organizerClasses = this.getOrganizerClasses();
         this.modelElementClasses = this.getModelElementClasses();
-        this.makeStatementsIsNamespace();
+        if (!this.checkConstraintsOntology()) {
+            message.show("The Ontology has not been loaded, because one or more constraints are violated. Please see the browser log for details.", { severity: 'error' });
+            this.data = undefined;
+            return;
+        }
+        ;
         this.options = {};
     }
     isValid() {
@@ -681,7 +680,75 @@ class COntology {
             changedAt: r.changedAt
         };
     }
+    makeStatementsIsNamespace() {
+        let item = LIB.itemBy(this.data.statementClasses, "title", "SpecIF:isNamespace");
+        if (item) {
+            for (var i = this.data.statements.length - 1; i > -1; i--) {
+                if (LIB.classTitleOf(this.data.statements[i]['class'], this.data.statementClasses) == "SpecIF:isNamespace")
+                    this.data.statements.splice(i, 1);
+            }
+            ;
+            let now = new Date().toISOString();
+            for (var r of this.data.resources) {
+                if (this.termClasses.includes(LIB.classTitleOf(r['class'], this.data.resourceClasses))) {
+                    let term = this.valueByTitle(r, CONFIG.propClassTerm), match = RE.splitVocabularyTerm.exec(term);
+                    if (Array.isArray(match) && match[1]) {
+                        let stC = LIB.makeKey(item), noNs = true;
+                        for (let [key, val] of this.namespaces) {
+                            if (match[1] == key) {
+                                this.data.statements.push({
+                                    id: LIB.genID(CONFIG.prefixS),
+                                    changedAt: now,
+                                    class: stC,
+                                    subject: LIB.makeKey(val.id),
+                                    object: LIB.makeKey(r)
+                                });
+                                noNs = false;
+                                break;
+                            }
+                            ;
+                        }
+                        ;
+                        if (noNs)
+                            console.warn("Ontology: No namespace found for " + r.id);
+                    }
+                    else
+                        console.warn("Ontology: No namespace given for " + r.id);
+                }
+                ;
+            }
+            ;
+        }
+        else
+            console.warn("Ontology: No statementClass 'SpecIF:isNamespace' defined");
+    }
     checkConstraintsOntology() {
+        this.makeStatementsIsNamespace();
+        for (var r of this.data.resources) {
+            if (this.termClasses.includes(LIB.classTitleOf(r['class'], this.data.resourceClasses))) {
+                let ti = this.valueByTitle(r, CONFIG.propClassTerm);
+                if (!ti) {
+                    console.error("Ontology: No term name defined for " + r.id + ".");
+                }
+                else if (!RE.splitVocabularyTerm.test(ti)) {
+                    console.error("Ontology: Term " + r.id + " has no namespace, so it is not a valid term name.");
+                }
+                ;
+                let dL = LIB.valuesByTitle(r, [CONFIG.propClassDomain], this.data), stat = this.valueByTitle(r, "SpecIF:TermStatus");
+                if (dL.length < 1 && this.eligibleLifecycles.includes(stat)) {
+                    console.warn("Ontology: Term " + r.id + " has no domain, so the default domain 'SpecIF:DomainBase' is assigned.");
+                    r.properties.push({
+                        class: { id: "PC-Domain" },
+                        values: [{
+                                id: "V-Domain-00"
+                            }]
+                    });
+                }
+                ;
+            }
+            ;
+        }
+        ;
         return true;
     }
     statementsByTitle(r, tiL, opts) {
@@ -759,45 +826,6 @@ class COntology {
             m.set(this.valueByTitle(r, CONFIG.propClassTerm), { id: r.id, url: this.valueByTitle(r, "SpecIF:Origin") });
         });
         return m;
-    }
-    makeStatementsIsNamespace() {
-        let item = LIB.itemBy(this.data.statementClasses, "title", "SpecIF:isNamespace");
-        if (item) {
-            for (var i = this.data.statements.length - 1; i > -1; i--) {
-                if (LIB.classTitleOf(this.data.statements[i]['class'], this.data.statementClasses) == "SpecIF:isNamespace")
-                    this.data.statements.splice(i, 1);
-            }
-            ;
-            let now = new Date().toISOString();
-            for (var r of this.data.resources) {
-                if (this.termClasses.includes(LIB.classTitleOf(r['class'], this.data.resourceClasses))) {
-                    let term = this.valueByTitle(r, CONFIG.propClassTerm), match = RE.splitVocabularyTerm.exec(term);
-                    if (Array.isArray(match) && match[1]) {
-                        let stC = LIB.makeKey(item), noNs = true;
-                        for (let [key, val] of this.namespaces) {
-                            if (match[1] == key) {
-                                this.data.statements.push({
-                                    id: LIB.genID(CONFIG.prefixS),
-                                    changedAt: now,
-                                    class: stC,
-                                    subject: LIB.makeKey(val.id),
-                                    object: LIB.makeKey(r)
-                                });
-                                noNs = false;
-                                break;
-                            }
-                        }
-                        ;
-                        if (noNs)
-                            console.warn("Ontology: No namespace found for " + r.id);
-                    }
-                    else
-                        console.warn("Ontology: No namespace given for " + r.id);
-                }
-            }
-        }
-        else
-            console.warn("Ontology: No statementClass 'SpecIF:isNamespace' defined");
     }
 }
 function getOntology(urlO) {

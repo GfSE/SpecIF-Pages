@@ -14,12 +14,11 @@ moduleManager.construct({
 }, function (self) {
     "use strict";
     const myName = self.loadAs;
-    var fName, fDate;
+    var fDate;
     self.init = function () {
         return true;
     };
     self.verify = function (f) {
-        fName = f.name;
         if (f.lastModified) {
             fDate = new Date(f.lastModified).toISOString();
         }
@@ -460,9 +459,11 @@ moduleManager.construct({
         let xDta = new Uint8Array(buf), wb = XLSX.read(xDta, { type: 'array', cellDates: true, cellStyles: true }), wsCnt = wb.SheetNames.length;
         console.info('SheetNames: ' + wb.SheetNames + ' (' + wsCnt + ')');
         var xlsTerms = ["xs:string", "xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI", CONFIG.propClassId, CONFIG.propClassTitle, CONFIG.propClassDesc, CONFIG.propClassType, CONFIG.resClassFolder], specifData = app.ontology.generateSpecifClasses({ terms: xlsTerms });
-        specifData.title = LIB.makeMultiLanguageValue(withoutContentInBracketsAtEnd(fName.fileName()));
+        let ti = withoutContentInBracketsAtEnd(prjN), pid = ti.toSpecifId();
+        specifData.id = CONFIG.prefixP + pid;
+        specifData.title = LIB.makeMultiLanguageValue(ti);
         specifData.resources.push({
-            id: CONFIG.prefixR + prjN.toSpecifId(),
+            id: CONFIG.prefixR + pid,
             class: LIB.makeKey("RC-Folder"),
             properties: [{
                     class: LIB.makeKey("PC-Name"),
@@ -474,8 +475,8 @@ moduleManager.construct({
             changedAt: chAt
         });
         specifData.nodes.push({
-            id: CONFIG.prefixH + prjN.toSpecifId(),
-            resource: LIB.makeKey(CONFIG.prefixR + prjN.toSpecifId()),
+            id: CONFIG.prefixH + pid,
+            resource: LIB.makeKey(CONFIG.prefixR + pid),
             nodes: [],
             changedAt: chAt
         });

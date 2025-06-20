@@ -176,6 +176,7 @@ div.attribute-wide {
 /* or use two blocks for label and value: */
 div.attribute-label {
 	padding-right: 0.4em;
+/*	vertical-align: middle; */
 	text-align: right;
 	font-style: italic;
 	font-size: 90%;
@@ -184,7 +185,7 @@ div.attribute-label {
 }
 div.attribute-value {
 	padding-left: 0.4em;
-	vertical-align: middle;
+/*	vertical-align: middle; */
 	word-wrap: break-word;
 }
 div.attribute table {

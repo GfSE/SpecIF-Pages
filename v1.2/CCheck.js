@@ -55,7 +55,7 @@ class CCheck {
             return { status: 971, statusText: "This constraint checker does not support any SpecIF version below 1.1" };
 
         switch( data['$schema'] ) {
-            case "https://specif.de/v1.2/schema.json":
+            case "https://specif.de/v1.2/schema#":
             case "https://json.schemastore.org/specif-1.2.json":
                 break;
             case "https://specif.de/v1.0/schema.json":

@@ -919,7 +919,7 @@ class CProject {
             }
             ;
             const ontologyStatementTerms = app.ontology.getTerms('statementClass', {
-                lifeCycles: ["SpecIF:LifecycleStatusEquivalent"]
+                lifeCycles: ["SpecIF:LifecycleStatusReleased", "SpecIF:LifecycleStatusEquivalent"]
             });
             let referencedResources = LIB.referencedResources(dta.resources, dta.nodes, opts), statementClassesToAdd = [], statementsToAdd = [];
             referencedResources.forEach((r) => {
@@ -958,6 +958,11 @@ class CProject {
                 }
                 ;
             });
+            if (statementsToAdd.length < 1) {
+                resolve();
+                return;
+            }
+            ;
             let tpl = app.ontology.generateSpecifClasses({
                 terms: statementClassesToAdd,
                 lifeCycles: ["SpecIF:LifecycleStatusEquivalent"]
