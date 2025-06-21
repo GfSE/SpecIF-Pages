@@ -70,11 +70,11 @@ You always benefit from the latest release.
 
 ### Prepare the Model-data
 
-Currently the formats SpecIF, ReqIF, UML/SysML (Cameo), BPMN (BPMN-XML), ArchiMate (Open-Exchange XML) and MS Excel® (XLSX. XLS and CSV) are supported.
+Currently the formats SpecIF, ReqIF, UML/SysML (Cameo), BPMN (BPMN-XML), ArchiMate (Open-Exchange XML) and various spreadsheets (ODS, XLSX. XLS and CSV) are supported.
 
 In case of SpecIF, ReqIF, BPMN and ArchiMate, no further preparations are required; files of this type can be imported directly.
 
-In Excel® files, meaning can be assigned to resources, statements and their attributes by applying certain conventions; see Chap. 3.
+In spreadsheets such as Excel® files, meaning can be assigned to resources, statements and their attributes by applying certain conventions; see Chap. 3.
 
 ### Import a Model
 
@@ -119,7 +119,7 @@ Entries are checked key by key for correctness: For example, a red frame immedia
 Fields of type text (data type xs:string) allow formatting by means of XHTML or <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a>, 
 which is interpreted accordingly during display or document generation.
 
-By the way, texts can also be formatted using XHTML and markdown in many authoring tools, including Excel®, Archi, Camunda Modeler and Cameo. The formatting is preserved during import.
+By the way, texts can also be formatted using XHTML and markdown in many authoring tools, including LibreOffice, Excel®, Archi, Camunda Modeler and Cameo. The formatting is preserved during import.
 
 ### Investigate Semantic Relationships
 
@@ -172,11 +172,11 @@ As is well known, Word files in change mode are a popular means of collaboration
 
 The term authoring tool is used here to describe software that is used to create partial models or compile other information related to a target system to be designed and specified.
 
-### Microsoft Excel®
+### Spreadsheet
 
 #### Folder
 
-When importing Excel® files, a folder with the file name as title is created in the hierarchy of the SpecIF data-set. For each worksheet a subfolder is created with its name as a title. 
+When importing spreadsheets such as LibreOffice Calc or Excel® files, a folder with the file name as title is created in the hierarchy of the SpecIF data-set. For each worksheet a subfolder is created with its name as a title. 
 
 #### Resources
 
@@ -187,7 +187,7 @@ If no type designation is found there either, a generic title without a particul
 Unfortunately, no vocabulary term ready to be interpreted by the system can be used in the filename, as certain characters (e.g. the colon) may not appear in filenames. 
 However, the terms “requirement”, “feature”, “annotation”, “user-story” and “pain-point“ are interpreted correctly by the viewer or editor and replaced by a vocabulary term.
 
-For example, if an Excel file has the file name "Project-name (Requirement).xslx" and it contains two worksheets with the names "Functions (User Story)" and "Constraints", 
+For example, if a spreadsheet has the file name "Project-name (Requirement).xslx" and it contains two worksheets with the names "Functions (User Story)" and "Constraints", 
 a resource-class with the title "User-Story" replaced by "SpecIF:UserStory" for the first worksheet and a resource-class with the title "Requirement" replaced by "IREB:Requirement" 
 for the second worksheet are created.
 
@@ -212,18 +212,18 @@ Here all values of a certain attribute are specified column by column.
 Again, the first line specifies the attribute name and the values below that are taken over up to the next blank line. 
 In worksheets with user data, these values are provided for attributes with the same name; in the example given to the left, 
 these are the attributes named _IREB:RequirementType_ and _SpecIF:Priority_. 
-While Excel® also allows the specification of deviating values, this is not possible in case of SpecIF, therefore all values 
+While spreadsheets also allows the specification of deviating values, this is not possible in case of SpecIF, therefore all values 
 that do not correspond to those in the worksheet _{Enumerations}_ are ignored during import.
 
 {: .highlight }
-_Note: Excel® assists the user in entering values through a selection box when the values listed in the "(Enumerations)" 
+_Note: LibreOffice and Excel® assist the user in entering values through a selection box when the values listed in the "(Enumerations)" 
 worksheet are selected for the column in question using the menu Data > Data Tools > Data Validation._
 
 This <a href="https://specif.de/examples/Example%20Telephone-Connection-Request%20(Requirements).xlsx" target="_blank">example</a> 
 shows the described conventions. Here vocabulary terms have also been chosen for the enumerated attribute values. 
 These are replaced in SpecIF Editor/Viewer by terms of the active national language, 
 for example _SpecIF:priorityHigh_ is displayed as _hoch_ if German is selected in the browser. 
-Of course, any terms can be used in the Excel worksheet, which will then be used directly in 
+Of course, any terms can be used in the worksheet, which will then be used directly in 
 SpecIF Editor/Viewer regardless of the active browser language (without a defined meaning).
 
 #### Relations
@@ -275,7 +275,7 @@ It can be obtained from <a href="https://www.3ds.com/products/catia/no-magic/cam
 
 {: .highlight }
 _Note: The transformation of UML/SysML models authored with Cameo to SpecIF is in development. 
-Currently the UML Class Diagram, SysML Block Diagram (bdd) and Internal Block Diagram (ibd) are transformed._
+Currently the UML Class Diagram, SysML Block Diagram (bdd), Internal Block Diagram (ibd) and State Machine Diagrem (stm) are transformed._
 
 A model created with Cameo can be transformed into SpecIF format or integrated with models from other sources as follows:
 1. In the Cameo tool, export all desired diagrams individually as an image in PNG or SVG format. To do this, 
