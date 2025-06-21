@@ -87,7 +87,8 @@ function sysml2specif(xmi, options) {
             lifeCycles: [
                 "SpecIF:LifecycleStatusReleased",
                 "SpecIF:LifecycleStatusEquivalent"
-            ]
+            ],
+            referencesWithoutRevision: true
         }), diagramL = [], usedElementL = [], abstractions = [], specializations = [], associationEnds = [], portL = [], connectorL = [], stateTransitionL = [];
         spD.id = CONFIG.prefixP + modDoc.getAttribute("xmi:id");
         spD.title = [{ text: modDoc.getAttribute("name") }];
@@ -403,7 +404,7 @@ function sysml2specif(xmi, options) {
                             case "uml:Realization":
                                 let sbjR = ch.getElementsByTagName('client')[0].getAttribute("xmi:idref"), objR = ch.getElementsByTagName('supplier')[0].getAttribute("xmi:idref"), staR = {
                                     id: ch.getAttribute("xmi:id"),
-                                    class: LIB.makeKey(terms.statementClassRealizes ?? terms.statementClassAssociatedWith),
+                                    class: LIB.makeKey(terms.statementClassRealizes || terms.statementClassAssociatedWith),
                                     subject: LIB.makeKey(sbjR),
                                     object: LIB.makeKey(objR),
                                     changedAt: opts.fileDate
@@ -651,7 +652,7 @@ function sysml2specif(xmi, options) {
                 if (aEnds.length == 1) {
                     spD.statements.push({
                         id: aId,
-                        class: LIB.makeKey(aEnds[0].associationType ?? (sC ? sC.id : undefined) ?? terms.statementClassAssociatedWith),
+                        class: LIB.makeKey(aEnds[0].associationType || (sC ? sC.id : undefined) || terms.statementClassAssociatedWith),
                         properties: prpL ? prpL : undefined,
                         subject: LIB.makeKey(aEnds[0].thisEnd),
                         object: LIB.makeKey(aEnds[0].otherEnd),
@@ -667,7 +668,7 @@ function sysml2specif(xmi, options) {
                             obj = aEnds[1].otherEnd;
                         }
                         else {
-                            cl = aEnds[0].associationType ?? (sC ? sC.id : undefined) ?? terms.statementClassAssociatedWith;
+                            cl = aEnds[0].associationType || (sC ? sC.id : undefined) || terms.statementClassAssociatedWith;
                             sbj = aEnds[0].thisEnd;
                             obj = aEnds[0].otherEnd;
                         }
@@ -918,7 +919,7 @@ function sysml2specif(xmi, options) {
                 class: pars && pars["class"] ? LIB.makeKey(pars["class"]) : undefined,
                 properties: [{
                         class: LIB.makeKey("PC-Name"),
-                        values: [[{ text: replaceSeparatorNS(pars && pars.name ? pars.name : (el.getAttribute("name")) ?? (el.getAttribute("xmi:type"))) }]]
+                        values: [[{ text: replaceSeparatorNS(pars && pars.name ? pars.name : (el.getAttribute("name")) || (el.getAttribute("xmi:type"))) }]]
                     }, {
                         class: LIB.makeKey("PC-Type"),
                         values: [[{ text: el.getAttribute("xmi:type") }]]

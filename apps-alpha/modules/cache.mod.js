@@ -183,7 +183,7 @@ class CCache {
             let ti = "";
             if (el.subject) {
                 ti = LIB.titleFromProperties(el.properties, self.propertyClasses, opts)
-                    ?? LIB.classTitleOf(el['class'], self.statementClasses, opts);
+                    || LIB.classTitleOf(el['class'], self.statementClasses, opts);
             }
             else {
                 let rC = LIB.itemByKey(self.resourceClasses, el['class']);
@@ -196,13 +196,13 @@ class CCache {
                         ti = LIB.addIcon(ti, rC.icon);
                 }
                 else {
-                    ti = (LIB.valueByTitle(el, CONFIG.propClassDesc, self) ?? '')
+                    ti = (LIB.valueByTitle(el, CONFIG.propClassDesc, self) || '')
                         .substring(0, CONFIG.maxTitleLengthTree);
                 }
             }
             ;
             return ti.stripHTML();
-        }(el, opts) ?? (opts.neverEmpty ? el.id : '');
+        }(el, opts) || (opts.neverEmpty ? el.id : '');
     }
     resourcesByTitle(ti, opts) {
         if (ti) {
@@ -319,7 +319,7 @@ class CProject {
             $schema: spD.$schema,
             title: spD.title,
             description: spD.description,
-            language: spD.language ?? browser.language,
+            language: spD.language || browser.language,
             generator: spD.generator,
             generatorVersion: spD.generatorVersion,
             createdAt: spD.createdAt,
@@ -673,7 +673,7 @@ class CProject {
                     let existR = LIB.itemByKey(dta.resources, newR);
                     if (existR && self.equalR(existR, newR))
                         return;
-                    let selOpts = Object.assign({}, opts, { targetLanguage: self.language ?? newD.language });
+                    let selOpts = Object.assign({}, opts, { targetLanguage: self.language || newD.language });
                     if (LIB.hasResClass(newR, app.ontology.modelElementClasses.concat(CONFIG.diagramClasses), newD)
                         && !LIB.hasType(newR, CONFIG.excludedFromDeduplication, newD, opts)) {
                         existR = self.cache.resourcesByTitle(LIB.titleFromProperties(newR.properties, newD.propertyClasses, selOpts), selOpts)[0];
@@ -932,7 +932,7 @@ class CProject {
                         vL = vL.map((v) => {
                             let inner = RE.contentInQuotes.exec(v);
                             if (inner && inner.length > 2)
-                                return inner[1] ?? inner[2];
+                                return inner[1] || inner[2];
                             else
                                 return v.trim();
                         });
@@ -965,7 +965,8 @@ class CProject {
             ;
             let tpl = app.ontology.generateSpecifClasses({
                 terms: statementClassesToAdd,
-                lifeCycles: ["SpecIF:LifecycleStatusEquivalent"]
+                lifeCycles: ["SpecIF:LifecycleStatusEquivalent"],
+                referencesWithoutRevision: true
             });
             tpl.statements = statementsToAdd.filter((s) => {
                 return LIB.indexBy(tpl.statementClasses, 'id', s['class'].id) > -1;
@@ -1078,7 +1079,7 @@ class CProject {
                                 .then(resolve, reject);
                         }
                         else {
-                            let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder] }), {
+                            let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder], referencesWithoutRevision: true }), {
                                 resources: Folders(r2c.folderNamePrefix + apx, CONFIG.resClassProcesses),
                                 nodes: Nodes(r2c, resL)
                             });
@@ -1102,7 +1103,7 @@ class CProject {
                                 values: [LIB.makeMultiLanguageValue(ti)]
                             }, {
                                 class: LIB.makeKey("PC-Type"),
-                                values: [LIB.makeMultiLanguageValue(ty ?? ti)]
+                                values: [LIB.makeMultiLanguageValue(ty || ti)]
                             }],
                         changedAt: tim
                     }];
@@ -1161,7 +1162,7 @@ class CProject {
                         .then(resolve)
                         .catch(reject);
                 else {
-                    let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder] }), {
+                    let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder], referencesWithoutRevision: true }), {
                         resources: Folders(),
                         nodes: Nodes(resL)
                     });
@@ -1241,7 +1242,7 @@ class CProject {
                     return self.deleteItems('resource', resL);
                 })
                     .then(() => {
-                    let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder] }), {
+                    let newD = Object.assign(app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder], referencesWithoutRevision: true }), {
                         resources: Folders(),
                         nodes: FolderNodes(lastContentH)
                     });
@@ -1453,7 +1454,7 @@ class CProject {
         app.busy.set();
         message.show(i18n.MsgBrowserSaving, { severity: 'success', duration: CONFIG.messageDisplayTimeShort });
         let prjN = textValue('&#x200b;' + i18n.LblProjectName);
-        this.exportParams.fileName = textValue('&#x200b;' + i18n.LblFileName) ?? prjN ?? this.id;
+        this.exportParams.fileName = textValue('&#x200b;' + i18n.LblFileName) || prjN || this.id;
         if (prjN)
             this.exportParams.projectName = prjN;
         let options = {
@@ -1470,7 +1471,7 @@ class CProject {
                     options.role = radioValue(app.ontology.localize("SpecIF:Permissions", { targetLanguage: browser.language }));
                 }
                 else
-                    options.role = window.role ?? "SpecIF:Supplier";
+                    options.role = window.role || "SpecIF:Supplier";
                 break;
             case 'specifClasses':
                 let chkDomains = checkboxValues(i18n.LblOptions);
@@ -1603,7 +1604,7 @@ class CProject {
                         break;
                     case 'reqif':
                         opts.lookupTitles = true;
-                        opts.targetLanguage = opts.targetLanguage ?? self.language;
+                        opts.targetLanguage = opts.targetLanguage || self.language;
                         opts.targetNamespaces = ["ReqIF."];
                         opts.makeHTML = true;
                         opts.linkifyURLs = true;
@@ -1626,7 +1627,7 @@ class CProject {
                         expD.language = opts.targetLanguage;
                     if (opts.format == 'html') {
                         opts.cdn = window.cdn
-                            ?? window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1);
+                            || window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1);
                         app.specif2html(expD, opts)
                             .then((dta) => {
                             let blob = new Blob([dta], { type: "text/html; charset=utf-8" });

@@ -30,7 +30,7 @@ function makeTextField(tag, val, opts) {
     }
     ;
     if (opts.typ && !['outer'].includes(opts.typ))
-        val = LIB.noCode(val ?? '');
+        val = LIB.noCode(val || '');
     switch (opts.typ) {
         case 'line':
             fG += '<div class="' + aC + '">'
@@ -57,7 +57,7 @@ function makeTextField(tag, val, opts) {
     return fG;
 }
 function setTextValue(tag, val) {
-    val = LIB.noCode(val ?? '');
+    val = LIB.noCode(val || '');
     let el = document.getElementById('field' + simpleHash(tag));
     if (el && el.nodeName && el.nodeName.toLowerCase() == 'div') {
         el.innerHTML = val;
@@ -101,7 +101,7 @@ function setTextState(tag, state) {
 }
 function textValue(tag) {
     try {
-        return LIB.noCode(document.getElementById('field' + simpleHash(tag)).value).escapeJSON() ?? '';
+        return LIB.noCode(document.getElementById('field' + simpleHash(tag)).value).escapeJSON() || '';
     }
     catch (e) {
         return '';
@@ -120,7 +120,7 @@ function makeSelectionField(tag, entries, opts) {
         throw Error("Kind of selection field must be either 'radio' or 'checkbox'");
     switch (opts.typ) {
         case 'display':
-            return '<div class="row attribute ' + (opts.classes ?? '') + '">'
+            return '<div class="row attribute ' + (opts.classes || '') + '">'
                 + '<div class="col-3 attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>'
                 + '<div class="col attribute-value" >'
                 + function () {
@@ -138,7 +138,7 @@ function makeSelectionField(tag, entries, opts) {
         opts.tagPos = 'left';
     if (typeof (opts.classes) != 'string')
         opts.classes = 'form-active';
-    let rB = '<div class="row attribute ' + (opts.classes ?? '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
+    let rB = '<div class="row attribute ' + (opts.classes || '') + '">', fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' onclick="' + opts.handle + '"' : '';
     switch (opts.tagPos) {
         case 'none':
             rB += '<div class="' + opts.kind + '" >';
@@ -163,7 +163,7 @@ function makeSelectionField(tag, entries, opts) {
     ;
     entries.forEach((e, i) => {
         rB += '<label>'
-            + '<input type="' + opts.kind + '" name="' + opts.kind + '' + simpleHash(tag) + '" value="' + (e.id ?? i) + '"' + (e.checked ? ' checked' : '') + fn + ' />'
+            + '<input type="' + opts.kind + '" name="' + opts.kind + '' + simpleHash(tag) + '" value="' + (e.id || i) + '"' + (e.checked ? ' checked' : '') + fn + ' />'
             + '<span ' + popOver(e.description) + '>'
             + '&#160;' + e.title
             + (e.type ? '&#160;(' + e.type + ')' : '')
@@ -181,7 +181,7 @@ function makeRadioField(tag, entries, opts) {
     return makeSelectionField(tag, entries, opts);
 }
 function radioValue(tag) {
-    return $('input[name="radio' + simpleHash(tag) + '"]:checked').attr('value') ?? '';
+    return $('input[name="radio' + simpleHash(tag) + '"]:checked').attr('value') || '';
 }
 function makeCheckboxField(tag, entries, opts) {
     if (!opts)
@@ -225,7 +225,7 @@ function booleanValue(tag) {
     return chd.length > 0;
 }
 function tagId(str) {
-    return 'X-' + simpleHash(str ?? '');
+    return 'X-' + simpleHash(str || '');
 }
 class CCheckDialogInput {
     constructor() {
@@ -276,7 +276,7 @@ class resultMsg {
         return ["0", "200", "201"].includes(this.status.toString());
     }
     asString() {
-        return this.statusText + " (" + this.status + (this.responseType == 'text' ? "): " + (this.response ?? this.responseText) : ")");
+        return this.statusText + " (" + this.status + (this.responseType == 'text' ? "): " + (this.response || this.responseText) : ")");
     }
     log() {
         console.log(this.asString());
@@ -288,7 +288,7 @@ class resultMsg {
     }
 }
 LIB.stdError = (xhr, cb) => {
-    let xhrCl = new resultMsg(xhr.status, xhr.statusText, xhr.responseType, xhr.responseType == 'text' ? (xhr.response ?? xhr.responseText) : '');
+    let xhrCl = new resultMsg(xhr.status, xhr.statusText, xhr.responseType, xhr.responseType == 'text' ? (xhr.response || xhr.responseText) : '');
     switch (xhr.status) {
         case 0:
         case 200:
@@ -348,9 +348,9 @@ class CMessage {
                 if (msg.status) {
                     if (!opts.severity)
                         opts.severity = msg.status < 202 ? 'success' : 'danger';
-                    msg = (msg.statusText ?? i18n.Error)
+                    msg = (msg.statusText || i18n.Error)
                         + " (" + msg.status
-                        + (msg.responseType == 'text' ? "): " + (msg.response ?? msg.responseText) : ")");
+                        + (msg.responseType == 'text' ? "): " + (msg.response || msg.responseText) : ")");
                     break;
                 }
                 ;
@@ -511,7 +511,7 @@ LIB.useRemotePath = () => {
     return window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html');
 };
 LIB.versionOf = (spD) => {
-    return spD.specifVersion ?? RE.versionFromPath.exec(spD['$schema'])[1];
+    return spD.specifVersion || RE.versionFromPath.exec(spD['$schema'])[1];
 };
 LIB.hasContent = (pV) => {
     if (typeof (pV) != "string"
@@ -1073,7 +1073,7 @@ String.prototype.toSpecifId = function () {
     return (/[^_a-zA-Z]/.test(this[0]) ? '_' : '') + this.replace(/[^_a-zA-Z\d.-]/g, '_');
 };
 String.prototype.stripHTML = function () {
-    return $("<dummy/>").html(this).text().trim() ?? '';
+    return $("<dummy/>").html(this).text().trim() || '';
 };
 String.prototype.stripCtrl = function () {
     return this.replace(/\n|\r|\t|\b|\f|\v/g, '');

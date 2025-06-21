@@ -658,7 +658,7 @@ class CSpecIF {
                 for (var i = this.nodes.length - 1; i > -1; i--) {
                     let r = LIB.itemByKey(this.resources, this.nodes[i].resource);
                     if (nodeIsNoRoot(r)) {
-                        let oC = app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder], referencesWithoutRevision: true, delta: true });
+                        let oC = app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder], referencesWithoutRevision: true, referencesWithoutRevision: true, delta: true });
                         ['dataTypes', 'propertyClasses', 'resourceClasses'].forEach((li) => { LIB.cacheL(spD[li], oC[li]); });
                         break;
                     }

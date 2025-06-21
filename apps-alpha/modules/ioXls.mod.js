@@ -458,7 +458,7 @@ moduleManager.construct({
         }
         let xDta = new Uint8Array(buf), wb = XLSX.read(xDta, { type: 'array', cellDates: true, cellStyles: true }), wsCnt = wb.SheetNames.length;
         console.info('SheetNames: ' + wb.SheetNames + ' (' + wsCnt + ')');
-        var xlsTerms = ["xs:string", "xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI", CONFIG.propClassId, CONFIG.propClassTitle, CONFIG.propClassDesc, CONFIG.propClassType, CONFIG.resClassFolder], specifData = app.ontology.generateSpecifClasses({ terms: xlsTerms });
+        var xlsTerms = ["xs:string", "xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI", CONFIG.propClassId, CONFIG.propClassTitle, CONFIG.propClassDesc, CONFIG.propClassType, CONFIG.resClassFolder], specifData = app.ontology.generateSpecifClasses({ terms: xlsTerms, referencesWithoutRevision: true });
         let ti = withoutContentInBracketsAtEnd(prjN), pid = ti.toSpecifId();
         specifData.id = CONFIG.prefixP + pid;
         specifData.title = LIB.makeMultiLanguageValue(ti);

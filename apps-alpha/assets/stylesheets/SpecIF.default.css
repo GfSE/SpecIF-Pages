@@ -159,7 +159,6 @@ div.attribute {
 }
 div.attribute-condensed {
 	font-size:90%;
-	padding: 0.2em 0;
 }
 div.attribute-condensed > div.attribute-value > p {
 	margin-bottom: 0;
