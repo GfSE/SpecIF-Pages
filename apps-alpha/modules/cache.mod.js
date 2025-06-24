@@ -912,16 +912,10 @@ class CProject {
                 return;
             }
             ;
-            if (opts.replacePropertiesWithStatements.length != 1) {
-                console.warn("Option 'replacePropertiesWithStatements' does not have an array with exactly one element.");
-                resolve();
-                return;
-            }
-            ;
             const ontologyStatementTerms = app.ontology.getTerms('statementClass', {
                 lifeCycles: ["SpecIF:LifecycleStatusReleased", "SpecIF:LifecycleStatusEquivalent"]
             });
-            let referencedResources = LIB.referencedResources(dta.resources, dta.nodes, opts), statementClassesToAdd = [], statementsToAdd = [];
+            let referencedResources = LIB.referencedResources(dta.resources, dta.nodes), statementClassesToAdd = [], statementsToAdd = [];
             referencedResources.forEach((r) => {
                 for (let i = r.properties.length - 1; i > -1; i--) {
                     let pTi = LIB.classTitleOf(r.properties[i]['class'], dta.propertyClasses), sCx = LIB.indexBy(ontologyStatementTerms, 'title', pTi);
@@ -939,9 +933,13 @@ class CProject {
                         referencedResources
                             .filter((r2) => {
                             let tVals = LIB.valuesByTitle(r2, opts.replacePropertiesWithStatements, dta);
-                            if (tVals.length > 1)
-                                console.warn('Resource ' + r.id + ' has more than one property with class ' + opts.replacePropertiesWithStatements[0]);
-                            return tVals.length > 0 && vL.includes(LIB.displayValueOf(tVals[0], { targetLanguage: 'default' }));
+                            return isTarget();
+                            function isTarget() {
+                                for (let tV of tVals)
+                                    if (vL.includes(LIB.displayValueOf(tV, { targetLanguage: 'default' })) && r2.id != r.id)
+                                        return true;
+                                return false;
+                            }
                         })
                             .forEach((r3) => {
                             LIB.cacheE(statementClassesToAdd, pTi);
@@ -1422,7 +1420,7 @@ class CProject {
                         { title: 'HTML with embedded SpecIF v' + CONFIG.specifVersion, id: 'html', checked: true },
                     ]);
         if (moduleManager.isReady('ioOntology') && this.hasOntology())
-            formats.splice(3, 0, { title: 'SpecIF Class Definitions', id: 'specifClasses' });
+            formats.splice(2, 0, { title: 'SpecIF Class Definitions', id: 'specifClasses' });
         let form = $('<div class="modal fade" id="exportFormat" tabindex="-1" >'
             + '<div class="modal-dialog modal-lg" >'
             + '<div class="modal-content" >'

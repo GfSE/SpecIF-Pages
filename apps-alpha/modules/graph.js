@@ -4,13 +4,14 @@ class CGraphOptions {
         this.index = 0;
         this.titleProperties = [];
         this.lineLength = 22;
-        this.focusColor = '#6ca0dc';
+        this.nodeColorFocus = '#6ca0dc';
         this.nodeColor = '#afcbef';
         this.edgeColor = 'black';
-        this.clusterColor = '#9FA6B2';
+        this.clusterColor = '#e9ecef';
         this.fontFace = 'Arial';
         this.fontSize = '14px';
-        this.fontColor = '#fff';
+        this.fontColorNode = '#000';
+        this.fontColorFocus = '#fff';
         if (typeof (opts.canvas) == 'string' && opts.canvas.length > 0) {
             for (var p in opts)
                 this[p] = opts[p];
@@ -260,7 +261,7 @@ class CGraph {
                 x: pos.x,
                 y: pos.y,
                 color: res.id ? opts.nodeColor : opts.clusterColor,
-                font: opts.fontSize + " " + opts.fontFace + " " + opts.fontColor,
+                font: opts.fontSize + " " + opts.fontFace + " " + opts.fontColorNode,
                 shape: res.id ? "box" : "circle"
             });
             let edge = {
@@ -280,8 +281,8 @@ class CGraph {
                 label: wrap(res.title, opts.lineLength),
                 x: 0,
                 y: 0,
-                color: opts.focusColor,
-                font: opts.fontSize + " " + opts.fontFace + " " + opts.fontColor,
+                color: opts.nodeColorFocus,
+                font: opts.fontSize + " " + opts.fontFace + " " + opts.fontColorFocus,
                 shape: "box"
             });
             return 1;

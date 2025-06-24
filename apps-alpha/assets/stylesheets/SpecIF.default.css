@@ -72,7 +72,7 @@ h5, h6, p, ul, ol {
 	margin: 0 0 0.3em;
 }
 .background-select {
-	background-color: #f5f5f5;
+	background-color: #e9ecef;
 }
 .font-size-90 {
 	font-size: 90%;
@@ -141,7 +141,7 @@ div.content {   /* width is 75% with wide screen, 100% otherwise */
 /*    padding: 0 0 0 4px;  */
 }
 div.pane-tree {
-	background-color: #f5f5f5;
+	background-color: #e9ecef;
 	overflow: auto;
 	padding: 0.5em 0 0 0;
 }

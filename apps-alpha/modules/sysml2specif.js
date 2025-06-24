@@ -16,13 +16,15 @@ function sysml2specif(xmi, options) {
     "use strict";
     const terms = {};
     [
+        { id: "resourceClassDefault", type: "resourceClass", term: CONFIG.resClassModelElement },
         { id: "resourceClassFolder", type: "resourceClass", term: CONFIG.resClassFolder },
         { id: "resourceClassDiagram", type: "resourceClass", term: CONFIG.resClassView },
         { id: "resourceClassActor", type: "resourceClass", term: CONFIG.resClassActor },
         { id: "resourceClassState", type: "resourceClass", term: CONFIG.resClassState },
         { id: "resourceClassEvent", type: "resourceClass", term: CONFIG.resClassEvent },
         { id: "resourceClassPackage", type: "resourceClass", term: "uml:Package" },
-        { id: "resourceClassDefault", type: "resourceClass", term: CONFIG.resClassModelElement },
+        { id: "resourceClassStereotype", type: "resourceClass", term: "uml:Stereotype" },
+        { id: "statementClassDefault", type: "statementClass", term: "SpecIF:relates" },
         { id: "statementClassControlFlow", type: "statementClass", term: "uml:ControlFlow" },
         { id: "statementClassTriggers", type: "statementClass", term: "uml:Trigger" },
         { id: "statementClassTransitionSource", type: "statementClass", term: "uml:TransitionSource" },
@@ -42,8 +44,17 @@ function sysml2specif(xmi, options) {
         let term = app.ontology.getClassId(t.type, t.term);
         if (term)
             terms[t.id] = term;
-        else
-            console.error("Cameo Import: Term '" + t.term + "' not found in the ontology");
+        else {
+            switch (t.type) {
+                case "resourceClass":
+                    terms[t.id] = terms.resourceClassDefault;
+                    break;
+                case "statementClass":
+                    terms[t.id] = terms.statementClassDefault;
+            }
+            ;
+            console.warn("Cameo Import: Term '" + t.term + "' not found in the ontology, using default term instead.");
+        }
     });
     terms.statementClassAggregates =
         terms.statementClassComprises = terms.statementClassHasPart;
@@ -78,7 +89,7 @@ function sysml2specif(xmi, options) {
             });
             return map;
         }
-        let classStereotypes = makeMap("base_Class"), abstractionStereotypes = makeMap("base_Abstraction"), propertyStereotypes = makeMap("base_Property"), flowProperties = new Map(), models = xmi.getElementsByTagName('uml:Model'), packgs = xmi.getElementsByTagName('uml:Package'), modDoc = models.length > 0 ? models[0] : packgs[0], spD = app.ontology.generateSpecifClasses({
+        let classStereotypes = makeMap("base_Class"), namedElementStereotypes = makeMap("base_NamedElement"), abstractionStereotypes = makeMap("base_Abstraction"), propertyStereotypes = makeMap("base_Property"), flowProperties = new Map(), models = xmi.getElementsByTagName('uml:Model'), packgs = xmi.getElementsByTagName('uml:Package'), profiles = xmi.getElementsByTagName('uml:Profile'), modDoc = models[0] ?? packgs[0] ?? profiles[0], spD = app.ontology.generateSpecifClasses({
             domains: [
                 "SpecIF:DomainBase",
                 "SpecIF:DomainSystemsEngineering",
@@ -90,6 +101,7 @@ function sysml2specif(xmi, options) {
             ],
             referencesWithoutRevision: true
         }), diagramL = [], usedElementL = [], abstractions = [], specializations = [], associationEnds = [], portL = [], connectorL = [], stateTransitionL = [];
+        console.debug('Cameo Import', models, packgs, profiles, modDoc);
         spD.id = CONFIG.prefixP + modDoc.getAttribute("xmi:id");
         spD.title = [{ text: modDoc.getAttribute("name") }];
         let r = {
@@ -119,7 +131,7 @@ function sysml2specif(xmi, options) {
                     console.info("Cameo Import: Re-assigning class " + rC.id + " to model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
                 }
                 ;
-                let sTy = classStereotypes.get(me.id);
+                let sTy = classStereotypes.get(me.id) || namedElementStereotypes.get(me.id);
                 if (sTy) {
                     if (sTy.tag == "sysml:InterfaceBlock") {
                         me["class"] = LIB.makeKey(terms.resourceClassState);
@@ -317,17 +329,29 @@ function sysml2specif(xmi, options) {
         console.debug('from SysML:', spD, opts);
         return spD;
         function parseElements(parent, params) {
+            function addResource(r) {
+                spD.resources.push(r);
+                if (opts.addElementsToHierarchy)
+                    params.nodes.push(makeNode(r, params.package));
+            }
             Array.from(parent.children, (ch) => {
-                let r;
                 switch (ch.tagName) {
                     case "packagedElement":
                         let ty = ch.getAttribute("xmi:type");
                         switch (ty) {
                             case "uml:DataType":
-                                r = makeResource(ch, { class: terms.resourceClassDefault });
-                                spD.resources.push(r);
-                                if (opts.addElementsToHierarchy)
-                                    params.nodes.push(makeNode(r, params.package));
+                                addResource(makeResource(ch, { class: terms.resourceClassDefault }));
+                                break;
+                            case "uml:Stereotype":
+                                let r = makeResource(ch, { class: terms.resourceClassStereotype });
+                                addResource(r);
+                                Array.from(ch.children, (ch2) => {
+                                    switch (ch2.tagName) {
+                                        case 'generalization':
+                                            parseGeneralization(ch2, { parent: r });
+                                    }
+                                    ;
+                                });
                         }
                         ;
                 }
@@ -341,6 +365,9 @@ function sysml2specif(xmi, options) {
                         break;
                     case "packagedElement":
                         switch (ch.getAttribute("xmi:type")) {
+                            case "uml:DataType":
+                            case "uml:Stereotype":
+                                break;
                             case 'uml:Package':
                                 r = makeResource(ch, { class: terms.resourceClassPackage });
                                 spD.resources.push(r);
@@ -357,8 +384,6 @@ function sysml2specif(xmi, options) {
                             case 'uml:SignalEvent':
                             case 'uml:TimeEvent':
                                 parseEvent(ch, params);
-                                break;
-                            case "uml:DataType":
                                 break;
                             case "uml:Association":
                             case "uml:Abstraction":
@@ -380,9 +405,10 @@ function sysml2specif(xmi, options) {
                     case "packagedElement":
                         let ty = ch.getAttribute("xmi:type");
                         switch (ty) {
+                            case "uml:DataType":
+                            case "uml:Stereotype":
                             case 'uml:Package':
                             case 'uml:Class':
-                            case "uml:DataType":
                             case 'uml:CallEvent':
                             case 'uml:ChangeEvent':
                             case 'uml:SignalEvent':
@@ -427,6 +453,19 @@ function sysml2specif(xmi, options) {
                 }
                 ;
             });
+            function parseGeneralization(el, params) {
+                let sid = el.getAttribute("xmi:id"), obj = el.getAttribute("general");
+                if (obj)
+                    specializations.push({
+                        id: sid,
+                        class: LIB.makeKey(terms.statementClassSpecializes),
+                        subject: LIB.makeKey(params.parent.id),
+                        object: LIB.makeKey(obj),
+                        changedAt: opts.fileDate
+                    });
+                else
+                    console.warn("Cameo Import: Skipped generalization with id '" + sid + "', because it has no attribute 'general'.");
+            }
             function parseClass(el, params) {
                 let r2 = makeResource(el, { class: terms.resourceClassDefault });
                 spD.resources.push(r2);
@@ -460,16 +499,10 @@ function sysml2specif(xmi, options) {
                             ;
                             break;
                         case 'generalization':
-                            specializations.push({
-                                id: ch.getAttribute("xmi:id"),
-                                class: LIB.makeKey(terms.statementClassSpecializes),
-                                subject: LIB.makeKey(r2.id),
-                                object: LIB.makeKey(ch.getAttribute("general")),
-                                changedAt: opts.fileDate
-                            });
+                            parseGeneralization(ch, pars);
                             break;
                         case 'ownedAttribute':
-                            parseOwnedAttribute(ch, { parent: r2, nodes: nd2.nodes });
+                            parseOwnedAttribute(ch, pars);
                             break;
                         case 'ownedOperation':
                             let oO = makeResource(ch, { class: terms.resourceClassActor });
@@ -991,10 +1024,6 @@ function sysml2specif(xmi, options) {
             return false;
         }
     }
-    function validateCameo(xmi) {
-        return xmi.getElementsByTagName('xmi:exporter')[0].innerHTML.includes("MagicDraw")
-            && xmi.getElementsByTagName('xmi:exporterVersion')[0].innerHTML.includes("19.0");
-    }
     function replaceSeparatorNS(name) {
         if (opts.replaceSeparatorNamespace) {
             let rx = new RegExp('^(.{1,9})\\' + opts.replaceSeparatorNamespace + '(.+)$');
@@ -1002,5 +1031,8 @@ function sysml2specif(xmi, options) {
         }
         ;
         return name;
+    }
+    function validateCameo(xmi) {
+        return xmi.getElementsByTagName('xmi:exporter')[0].innerHTML.includes("MagicDraw");
     }
 }

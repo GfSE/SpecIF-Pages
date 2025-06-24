@@ -1242,8 +1242,8 @@ moduleManager.construct({
                 if (typeof (evt.target.resource) == 'string')
                     app[myName].relatedItemClicked(evt.target.resource, evt.target.statement);
             },
-            focusColor: '#3B71CA',
-            nodeColor: modeStaDel ? '#DC4C64' : '#9FA6B2'
+            nodeColorFocus: '#3B71CA',
+            nodeColor: modeStaDel ? '#f8d7da' : '#bbd2f0'
         });
         net.show(graphOptions);
         $(self.view).prepend('<div style="position:absolute;left:1em;z-index:900">'

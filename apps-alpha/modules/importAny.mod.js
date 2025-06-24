@@ -107,7 +107,7 @@ moduleManager.construct({
                 desc: 'MS Excel® or LibreOffice Spreadsheet',
                 label: 'Excel®',
                 extensions: [".xlsx", ".xls", ".csv", ".ods", ".fods"],
-                opts: { replacePropertiesWithStatements: [CONFIG.propClassVisibleId] },
+                opts: { replacePropertiesWithStatements: [CONFIG.propClassVisibleId, CONFIG.propClassTitle] },
                 help: i18n.MsgImportXls
             }];
         let h = '<div class="container max-width-lg mt-4" >'

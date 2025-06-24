@@ -38,7 +38,7 @@ moduleManager.construct({
         return false;
     };
     self.toSpecif = function (buf) {
-        let sDO = $.Deferred(), modelL = [], packgL = [], resL = [], pend = 0, xOpts = {
+        let sDO = $.Deferred(), modelL = [], sharedL = [], resL = [], pend = 0, xOpts = {
             fileName: fName,
             fileDate: fDate,
             titleLength: CONFIG.maxTitleLength,
@@ -50,7 +50,7 @@ moduleManager.construct({
             new JSZip().loadAsync(buf)
                 .then((zip) => {
                 modelL = zip.filter((relPath, file) => { return file.name.endsWith('.uml_model.model'); });
-                packgL = zip.filter((relPath, file) => { return file.name.endsWith('.uml_model.shared_model'); });
+                sharedL = zip.filter((relPath, file) => { return file.name.endsWith('.uml_model.shared_model'); });
                 if (modelL.length < 1) {
                     sDO.reject(errNoXMIFile);
                     return;
@@ -60,10 +60,10 @@ moduleManager.construct({
                     console.warn("SysML Import: More than one model file found in container");
                 }
                 ;
-                pend = packgL.length + 1;
+                pend = sharedL.length + 1;
                 zip.file(modelL[0].name).async("string")
                     .then(xlate);
-                for (var p of packgL) {
+                for (var p of sharedL) {
                     zip.file(p.name).async("string")
                         .then(xlate);
                 }
