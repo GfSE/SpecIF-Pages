@@ -38,7 +38,7 @@ moduleManager.construct({
         return false;
     };
     self.toSpecif = function (buf) {
-        let sDO = $.Deferred(), modelL = [], sharedL = [], resL = [], pend = 0, xOpts = {
+        let sDO = $.Deferred(), modelL = [], sharedL = [], resL = [], xOpts = {
             fileName: fName,
             fileDate: fDate,
             titleLength: CONFIG.maxTitleLength,
@@ -48,9 +48,9 @@ moduleManager.construct({
         self.abortFlag = false;
         if (zipped) {
             new JSZip().loadAsync(buf)
-                .then((zip) => {
-                modelL = zip.filter((relPath, file) => { return file.name.endsWith('.uml_model.model'); });
-                sharedL = zip.filter((relPath, file) => { return file.name.endsWith('.uml_model.shared_model'); });
+                .then(async (zip) => {
+                modelL = zip.filter((relPath, file) => file.name.endsWith('.uml_model.model'));
+                sharedL = zip.filter((relPath, file) => file.name.endsWith('.uml_model.shared_model'));
                 if (modelL.length < 1) {
                     sDO.reject(errNoXMIFile);
                     return;
@@ -60,14 +60,35 @@ moduleManager.construct({
                     console.warn("SysML Import: More than one model file found in container");
                 }
                 ;
-                pend = sharedL.length + 1;
-                zip.file(modelL[0].name).async("string")
-                    .then(xlate);
-                for (var p of sharedL) {
-                    zip.file(p.name).async("string")
-                        .then(xlate);
+                async function processFilesSequentially(files) {
+                    for (const file of files) {
+                        const xmi = await zip.file(file.name).async("string");
+                        const ok = await new Promise((resolve, reject) => {
+                            xlateWithCallback(xmi, resolve, reject);
+                        });
+                        if (!ok)
+                            return;
+                    }
+                    sDO.resolve(resL);
                 }
-                ;
+                function xlateWithCallback(xmi, resolve, reject) {
+                    if (!LIB.validXML(xmi)) {
+                        sDO.reject(errInvalidXML);
+                        resolve(false);
+                        return;
+                    }
+                    let result = sysml2specif(xmi, xOpts);
+                    if (result.ok()) {
+                        resL.push(result.response);
+                        resolve(true);
+                    }
+                    else {
+                        sDO.reject(result);
+                        resolve(false);
+                    }
+                }
+                const allFiles = [modelL[0], ...sharedL];
+                processFilesSequentially(allFiles);
             });
         }
         else {
@@ -75,22 +96,6 @@ moduleManager.construct({
         }
         ;
         return sDO;
-        function xlate(xmi) {
-            if (!LIB.validXML(xmi)) {
-                sDO.reject(errInvalidXML);
-                return;
-            }
-            ;
-            let result = sysml2specif(xmi, xOpts);
-            if (result.ok()) {
-                resL.push(result.response);
-                if (--pend < 1)
-                    sDO.resolve(resL);
-                return;
-            }
-            ;
-            sDO.reject(result);
-        }
     };
     self.abort = function () {
         self.abortFlag = true;

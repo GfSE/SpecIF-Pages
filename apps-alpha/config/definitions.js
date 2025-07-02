@@ -1,7 +1,7 @@
 "use strict";
 const CONFIG = {};
 CONFIG.specifVersion = "1.2";
-CONFIG.appVersion = CONFIG.specifVersion + ".a.31";
+CONFIG.appVersion = CONFIG.specifVersion + ".a.34";
 CONFIG.imgURL = './assets/images';
 CONFIG.remotePath = 'https://specif.de/v' + CONFIG.specifVersion + '/';
 CONFIG.localPath = '../../../SpecIF/Pages/v' + CONFIG.specifVersion + '/';
@@ -154,12 +154,16 @@ CONFIG.excludedFromDeduplication = [
     CONFIG.resClassParagraph,
     CONFIG.resClassView,
     CONFIG.resClassCondition,
+    "uml:Package",
+    "uml:Diagram",
     "uml:Port",
     "uml:Pseudostate",
     "uml:Region",
     "uml:Transition",
     "uml:InitialNode",
     "uml:ActivityFinalNode",
+    "uml:ActivityParameterNode",
+    "uml:CallBehaviorAction",
     'bpmn:parallelGateway',
     'bpmn:exclusiveGateway',
     'bpmn:inclusiveGateway',

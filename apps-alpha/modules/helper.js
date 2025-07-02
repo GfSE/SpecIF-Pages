@@ -909,6 +909,8 @@ LIB.keepUsedClasses = (spD) => {
         do {
             prevLength = cL.length;
             cL = cL.filter((c) => {
+                if (c.keepEvenIfUnused)
+                    return true;
                 for (let i of iL) {
                     if (Array.isArray(i.propertyClasses))
                         for (let p of i.propertyClasses)
@@ -926,6 +928,8 @@ LIB.keepUsedClasses = (spD) => {
         do {
             prevLength = cL.length;
             cL = cL.filter((c) => {
+                if (c.keepEvenIfUnused)
+                    return true;
                 for (let c1 of cL)
                     if (LIB.references(c1.extends, c))
                         return true;
@@ -1257,6 +1261,7 @@ LIB.uriBack2slash = (str) => {
     });
 };
 LIB.noCode = (s) => {
+    let REstyle = /<style[^>]*>[\s\S]*<\/style[^>]*>/i;
     if (s) {
         if (/<[^>]+\son[a-z]+=[^>]+>/i.test(s)) {
             log(911);
@@ -1268,9 +1273,10 @@ LIB.noCode = (s) => {
             return '';
         }
         ;
-        if (/<style[^>]*>[\s\S]*<\/style[^>]*>/i.test(s)) {
-            log(913);
-            return '';
+        if (REstyle.test(s)) {
+            s = s.replace(REstyle, '');
+            console.warn("An inline style definition is considered harmful (913) and has been suppressed");
+            return s;
         }
         ;
         if (/<embed[^>]*>[\s\S]*<\/embed[^>]*>/i.test(s)) {
@@ -1294,7 +1300,13 @@ LIB.cleanValue = (o) => {
     if (typeof (o) == 'string')
         return LIB.noCode(o);
     if (Array.isArray(o))
-        return LIB.forAll(o, (val) => { val.text = LIB.noCode(val.text); return val; });
+        return LIB.forAll(o, (val) => {
+            let t = LIB.cleanValue(val.text);
+            if (t) {
+                val.text = t;
+                return val;
+            }
+        });
     throw Error('Unexpected input to LIB.cleanValue: Programming error with all likelihood');
 };
 LIB.attachment2mediaType = (fname) => {

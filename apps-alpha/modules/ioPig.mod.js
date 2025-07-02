@@ -121,7 +121,7 @@ moduleManager.construct({
                     return {
                         "@type": "pig:Property",
                         "pig:hasClass": self + p['class'].id,
-                        "@value": p.values.map(v => (Array.isArray(v) ? v[0].text : (v.id ? self + v.id : v)))
+                        "@value": p.values.map(v => (Array.isArray(v) && v[0] ? v[0].text : (v.id ? self + v.id : v)))
                     };
                 });
             }
