@@ -8,10 +8,11 @@ function makeTextField(tag, val, opts) {
         opts = {};
     if (typeof (opts.tagPos) != 'string')
         opts.tagPos = 'left';
-    if (typeof (opts.colsLabel) == 'number')
-        opts.colsLabel = 'col-' + opts.colsLabel;
+    let tagCols;
+    if (typeof (opts.tagCols) == 'number')
+        tagCols = 'col-' + opts.tagCols;
     else
-        opts.colsLabel = 'col-3';
+        tagCols = 'col-3';
     let fn = (typeof (opts.handle) == 'string' && opts.handle.length > 0) ? ' oninput="' + opts.handle + '"' : '', sH = simpleHash(tag), fG, cl = (typeof (opts.classes) == 'string' && opts.classes.length > 0) ? ' ' + opts.classes : '', aC;
     if (opts.typ && ['line', 'area', 'outer'].includes(opts.typ))
         fG = '<div id="' + sH + '" class="row attribute form-active' + cl + '" >';
@@ -22,7 +23,7 @@ function makeTextField(tag, val, opts) {
             aC = 'col-12';
             break;
         case 'left':
-            fG += '<div class="' + opts.colsLabel + ' attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>';
+            fG += '<div class="' + tagCols + ' attribute-label"' + popOver(opts.hint) + '>' + tag + '</div>';
             aC = 'col attribute-value';
             break;
         default:
@@ -231,32 +232,40 @@ class CCheckDialogInput {
     constructor() {
         this.list = [];
     }
-    addField(elementId, dT) {
-        this.list.push({ label: elementId, dataType: dT });
+    addField(elementId, dT, opts) {
+        this.list.push({ label: elementId, dataType: dT, options: opts });
     }
     ;
     check() {
-        let val, ok, allOk = true;
+        let val, ok = true, allOk = true, notReq = true;
         this.list.forEach((cPs) => {
+            notReq = !(cPs.options && cPs.options.required);
             val = textValue(cPs.label);
             switch (cPs.dataType.type) {
                 case XsDataType.String:
-                    ok = cPs.dataType.maxLength == undefined || val.length <= cPs.dataType.maxLength;
+                    ok = (cPs.dataType.maxLength == undefined) || (val.length <= cPs.dataType.maxLength);
                     break;
                 case XsDataType.Double:
-                    ok = val.length < 1
+                    ok = notReq && (val.length < 1)
                         || RE.Real(cPs.dataType.fractionDigits).test(val)
                             && !(typeof (cPs.dataType.minInclusive) == 'number' && parseFloat(val) < cPs.dataType.minInclusive)
                             && !(typeof (cPs.dataType.maxInclusive) == 'number' && parseFloat(val) > cPs.dataType.maxInclusive);
                     break;
                 case XsDataType.Integer:
-                    ok = val.length < 1
+                    ok = notReq && (val.length < 1)
                         || RE.Integer.test(val)
                             && !(typeof (cPs.dataType.minInclusive) == 'number' && parseFloat(val) < cPs.dataType.minInclusive)
                             && !(typeof (cPs.dataType.maxInclusive) == 'number' && parseFloat(val) > cPs.dataType.maxInclusive);
                     break;
                 case XsDataType.DateTime:
-                    ok = val.length < 1 || LIB.isIsoDateTime(val);
+                    ok = notReq && (val.length < 1) || LIB.isIsoDateTime(val);
+                    break;
+                case XsDataType.AnyURI:
+                    RE.URI.test('');
+                    ok = notReq && (val.length < 1) || RE.URI.test(val);
+                    break;
+                default:
+                    ok = true;
             }
             ;
             setTextState(cPs.label, ok ? 'is-valid' : 'is-invalid');

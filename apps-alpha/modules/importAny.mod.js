@@ -192,7 +192,7 @@ moduleManager.construct({
             if (self.importFormat && app[self.importFormat.name]) {
                 app[self.importFormat.name].init(self.importFormat.opts);
                 if (app[self.importFormat.name].verify({ name: urlP[CONFIG.keyImport] })) {
-                    let rF = makeTextField(i18n.LblFileName, self.file.name, { colsLabel: 2 });
+                    let rF = makeTextField(i18n.LblFileName, self.file.name, { tagCols: 2 });
                     $("#formNames").html(rF);
                     self.projectName = self.file.name.fileName();
                     setImporting(true);
@@ -254,9 +254,9 @@ moduleManager.construct({
         }
         ;
         app[self.importFormat.name].init(self.importFormat.opts);
-        let rF = makeTextField(i18n.LblFileName, '', { colsLabel: 2 });
+        let rF = makeTextField(i18n.LblFileName, '', { tagCols: 2 });
         if (fId == 'xls')
-            rF += makeTextField(i18n.LblProjectName, self.projectName, { typ: 'line', handle: myFullName + '.enableActions()', colsLabel: 2 });
+            rF += makeTextField(i18n.LblProjectName, self.projectName, { typ: 'line', handle: myFullName + '.enableActions()', tagCols: 2 });
         $('#helpImport').html(self.importFormat.help);
         $("#formNames").html(rF);
         $("#fileSelectBtn").html('<span>' + i18n.BtnFileSelect + '</span>'

@@ -40,35 +40,13 @@ class CPropertyToEdit extends CPropertyToShow {
         ;
         if (this.pC.permissionVector.U) {
             let self = this;
-            function makeInner() {
-                let str = '';
-                self.dT.sequence.forEach((d, i) => {
-                    if (opts && opts.dialogForm)
-                        opts.dialogForm.addField(d.title, LIB.itemByKey(app.projects.selected.cache.dataTypes, d.dataType));
-                    str += makeTextField(d.title, self.values[0][i], {
-                        typ: 'line',
-                        handle: opts.myFullName + '.check()',
-                        hint: d.description
-                    });
-                });
-                return str;
-            }
-            if (this.dT.type == XsDataType.ComplexType) {
-                return makeTextField(ti, makeInner(), {
-                    typ: 'outer',
-                    hint: this.pC.description
-                });
-            }
-            else {
-                if (opts && opts.dialogForm)
-                    opts.dialogForm.addField(ti, this.dT);
-                return makeTextField(ti, this.dT.type == XsDataType.String ? this.get(localOpts).escapeHTML() : this.get(localOpts), {
-                    typ: this.dT.type == XsDataType.String && app.ontology.propertyClassIsText(this.pC.title) ? 'area' : 'line',
-                    handle: opts.myFullName + '.check()',
-                    hint: this.pC.description
-                });
-            }
-            ;
+            if (opts && opts.dialogForm)
+                opts.dialogForm.addField(ti, this.dT, { required: this.pC.required });
+            return makeTextField(ti, this.dT.type == XsDataType.String ? this.get(localOpts).escapeHTML() : this.get(localOpts), {
+                typ: this.dT.type == XsDataType.String && app.ontology.propertyClassIsText(this.pC.title) ? 'area' : 'line',
+                handle: opts.myFullName + '.check()',
+                hint: this.pC.description
+            });
         }
         else {
             return makeTextField(ti, this.get(localOpts), {

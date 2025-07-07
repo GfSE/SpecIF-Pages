@@ -85,7 +85,7 @@ class COntology {
         this.headings = this.getHeadings();
         this.organizerClasses = this.getOrganizerClasses();
         this.modelElementClasses = this.getModelElementClasses();
-        if (!this.checkConstraintsOntology()) {
+        if (!this.checkConstraints()) {
             message.show("The Ontology has not been loaded, because one or more constraints are violated. Please see the browser log for details.", { severity: 'error' });
             this.data = undefined;
             return;
@@ -94,7 +94,7 @@ class COntology {
         this.options = {};
     }
     isValid() {
-        return this.data && this.data.id && this.data.nodes.length > 0 && this.checkConstraintsOntology();
+        return this.data && this.data.id && this.data.nodes.length > 0 && this.checkConstraints();
     }
     getTermResources(ctg, term, opts) {
         let nTerm = term.replace(/^dc:/, 'dcterms:');
@@ -118,10 +118,12 @@ class COntology {
             return resL[0];
     }
     getTerms(ctg, opts) {
+        if (!opts)
+            opts = {};
         if (Array.isArray(opts.lifeCycles))
             LIB.cacheE(opts.lifeCycles, "SpecIF:LifecycleStatusReleased");
         else
-            this.options.lifeCycles = ["SpecIF:LifecycleStatusReleased"];
+            opts.lifeCycles = ["SpecIF:LifecycleStatusReleased"];
         let ctgL = Array.from(this.termCategories.keys());
         if (ctgL.includes(ctg)) {
             return this.data.resources
@@ -324,7 +326,15 @@ class COntology {
                 this.options.lifeCycles = ["SpecIF:LifecycleStatusReleased"];
             let spId = "P-SpecifClasses", now = new Date().toISOString();
             if (Array.isArray(opts.domains)) {
-                opts.domains.forEach((d) => { spId += '-' + d.toCamelCase(); });
+                let tmp = '';
+                opts.domains.forEach((d) => { tmp += d; });
+                spId += '-' + simpleHash(tmp);
+            }
+            ;
+            if (Array.isArray(opts.terms)) {
+                let tmp = '';
+                opts.terms.forEach((t) => { tmp += t; });
+                spId += '-' + simpleHash(tmp);
             }
             ;
             this.required = {
@@ -722,7 +732,7 @@ class COntology {
         else
             console.warn("Ontology: No statementClass 'SpecIF:isNamespace' defined");
     }
-    checkConstraintsOntology() {
+    checkConstraints() {
         this.makeStatementsIsNamespace();
         for (var r of this.data.resources) {
             if (this.termClasses.includes(LIB.classTitleOf(r['class'], this.data.resourceClasses))) {
