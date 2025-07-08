@@ -601,6 +601,10 @@ LIB.displayValueOf = (val, opts) => {
             v = app.ontology.localize(v, opts);
         return opts && opts.stripHTML ? v.stripHTML() : v;
     }
+    if (!opts)
+        opts = { targetLanguage: 'default' };
+    else if (!opts.targetLanguage)
+        opts.targetLanguage = 'default';
     if (LIB.isMultiLanguageValue(val)) {
         return lookup(LIB.languageTextOf(val, opts));
     }

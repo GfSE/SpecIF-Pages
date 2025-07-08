@@ -101,7 +101,7 @@ class COntology {
         ctg = ctg.toLowerCase();
         return this.data.resources
             .filter((r) => {
-            let stat = this.valueByTitle(r, "SpecIF:TermStatus"), valL = LIB.valuesByTitle(r, [CONFIG.propClassTerm], this.data);
+            let stat = this.valueByTitle(r, COntology.propClassTermStatus), valL = LIB.valuesByTitle(r, [CONFIG.propClassTerm], this.data);
             if (valL.length > 1)
                 console.warn("Ontology: Term " + r.id + " has multiple values (" + valL.toString() + ")");
             return (valL.length > 0
@@ -157,12 +157,12 @@ class COntology {
             return term;
         let tR = this.getTermResource(ctg, term);
         if (tR) {
-            if (this.valueByTitle(tR, "SpecIF:TermStatus") == "SpecIF:LifecycleStatusReleased")
+            if (this.valueByTitle(tR, COntology.propClassTermStatus) == "SpecIF:LifecycleStatusReleased")
                 return term;
             let ctgV = this.termCategories.get(ctg), ctgL = ctgV ? [ctgV] : Array.from(this.termCategories.values()), staL = this.statementsByTitle(tR, ctgL.map(c => c.synonymStatement), { asSubject: true, asObject: true }), resL = staL.map((st) => {
                 return LIB.itemById(this.data.resources, (st.object.id == tR.id ? st.subject.id : st.object.id));
             }), synL = resL.filter((r) => {
-                return this.valueByTitle(r, "SpecIF:TermStatus") == "SpecIF:LifecycleStatusReleased";
+                return this.valueByTitle(r, COntology.propClassTermStatus) == "SpecIF:LifecycleStatusReleased";
             });
             if (synL.length < 1)
                 return term;
@@ -227,7 +227,7 @@ class COntology {
         if (termL.length > 0) {
             for (let status of this.eligibleLifecycles)
                 for (let t of termL) {
-                    if (this.valueByTitle(t, "SpecIF:TermStatus") == status) {
+                    if (this.valueByTitle(t, COntology.propClassTermStatus) == status) {
                         let newT = this.valueByTitle(t, CONFIG.propClassTerm);
                         console.info('Ontology: Global term assigned: ' + name + ' → ' + newT);
                         return newT;
@@ -294,12 +294,12 @@ class COntology {
             for (var ns of nsL) {
                 sL = rL.filter((r) => {
                     return self.valueByTitle(r, CONFIG.propClassTerm).startsWith(ns)
-                        && (opts.lifeCycles ?? self.eligibleLifecycles).includes(self.valueByTitle(r, "SpecIF:TermStatus"));
+                        && (opts.lifeCycles ?? self.eligibleLifecycles).includes(self.valueByTitle(r, COntology.propClassTermStatus));
                 });
                 if (sL.length > 1) {
                     for (let ls of opts.lifeCycles ?? self.eligibleLifecycles) {
                         sL = sL.filter((r) => {
-                            return self.valueByTitle(r, "SpecIF:TermStatus") == ls;
+                            return self.valueByTitle(r, COntology.propClassTermStatus) == ls;
                         });
                         if (sL.length < 1)
                             continue;
@@ -409,9 +409,9 @@ class COntology {
     hasSelectedStatus(el, opts) {
         if (!opts || !opts.lifeCycles || opts.lifeCycles.length < 1)
             return true;
-        let selStatus = LIB.valuesByTitle(el, ["SpecIF:TermStatus"], this.data);
+        let selStatus = LIB.valuesByTitle(el, [COntology.propClassTermStatus], this.data);
         for (let st of selStatus) {
-            if (opts.lifeCycles.includes(LIB.displayValueOf(st, { targetLanguage: 'default' })))
+            if (opts.lifeCycles.includes(LIB.displayValueOf(st)))
                 return true;
         }
         ;
@@ -434,7 +434,7 @@ class COntology {
                 if (Array.isArray(self.options.domains)) {
                     let elDomains = LIB.valuesByTitle(el, [CONFIG.propClassDomain], self.data);
                     for (let d of elDomains) {
-                        if (self.options.domains.includes(LIB.displayValueOf(d, { targetLanguage: 'default' })))
+                        if (self.options.domains.includes(LIB.displayValueOf(d)))
                             return true;
                     }
                 }
@@ -444,7 +444,7 @@ class COntology {
             function hasSelectedTerm(el) {
                 if (Array.isArray(self.options.terms)) {
                     let elTerms = LIB.valuesByTitle(el, [CONFIG.propClassTerm], self.data);
-                    if (elTerms.length > 0 && self.options.terms.includes(LIB.displayValueOf(elTerms[0], { targetLanguage: 'default' })))
+                    if (elTerms.length > 0 && self.options.terms.includes(LIB.displayValueOf(elTerms[0])))
                         return true;
                 }
                 ;
@@ -567,8 +567,8 @@ class COntology {
         return Object.assign(this.makeItem(r, CONFIG.prefixPC), {
             dataType: this.options.referencesWithoutRevision ? LIB.makeKey(dT.id) : LIB.makeKey(dT),
             format: this.valueByTitle(r, "SpecIF:TextFormat"),
-            required: this.valueByTitle(r, "SpecIF:isRequired"),
-            multiple: LIB.isTrue(this.valueByTitle(r, "SpecIF:multiple")) ? true : undefined,
+            required: LIB.isTrue(this.valueByTitle(r, "SpecIF:isRequired")) || undefined,
+            multiple: LIB.isTrue(this.valueByTitle(r, "SpecIF:multiple")) || undefined,
             values: (defaultVL.length > 0 && (dT.type != XsDataType.Boolean || defaultVL[0] == "true") ? defaultVL : undefined)
         });
     }
@@ -587,7 +587,7 @@ class COntology {
         ;
         return Object.assign(this.makeItem(r, CONFIG.prefixRC), {
             extends: eCk,
-            instantiation: iL.map((ins) => { return LIB.displayValueOf(ins, { targetLanguage: 'default' }); }),
+            instantiation: iL.map((ins) => { return LIB.displayValueOf(ins, { lookupValues: true }); }),
             isHeading: LIB.isTrue(this.valueByTitle(r, "SpecIF:isHeading")) ? true : undefined,
             icon: this.valueByTitle(r, "SpecIF:Icon"),
             propertyClasses: pCL.length > 0 ? pCL : undefined
@@ -608,7 +608,7 @@ class COntology {
         ;
         return Object.assign(this.makeItem(r, CONFIG.prefixSC), {
             extends: eCk,
-            instantiation: iL.map((ins) => { return LIB.displayValueOf(ins, { targetLanguage: 'default' }); }),
+            instantiation: iL.map((ins) => { return LIB.displayValueOf(ins, { lookupValues: true }); }),
             isUndirected: LIB.isTrue(this.valueByTitle(r, "SpecIF:isUndirected")) ? true : undefined,
             icon: this.valueByTitle(r, "SpecIF:Icon"),
             subjectClasses: sCL.length > 0 ? sCL : undefined,
@@ -744,7 +744,7 @@ class COntology {
                     console.error("Ontology: Term " + r.id + " has no namespace, so it is not a valid term name.");
                 }
                 ;
-                let dL = LIB.valuesByTitle(r, [CONFIG.propClassDomain], this.data), stat = this.valueByTitle(r, "SpecIF:TermStatus");
+                let dL = LIB.valuesByTitle(r, [CONFIG.propClassDomain], this.data), stat = this.valueByTitle(r, COntology.propClassTermStatus);
                 if (dL.length < 1 && this.eligibleLifecycles.includes(stat)) {
                     console.warn("Ontology: Term " + r.id + " has no domain, so the default domain 'SpecIF:DomainBase' is assigned.");
                     r.properties.push({
@@ -799,7 +799,7 @@ class COntology {
                 return LIB.itemByKey(this.data.resources, s.subject);
             })
                 .filter((r) => {
-                let stat = this.valueByTitle(r, "SpecIF:TermStatus");
+                let stat = this.valueByTitle(r, COntology.propClassTermStatus);
                 return this.eligibleLifecycles.includes(stat);
             })
                 .map((r) => {
@@ -838,6 +838,7 @@ class COntology {
         return m;
     }
 }
+COntology.propClassTermStatus = "SpecIF:TermStatus";
 function getOntology(urlO) {
     return new Promise((resolve, reject) => {
         LIB.httpGet({
