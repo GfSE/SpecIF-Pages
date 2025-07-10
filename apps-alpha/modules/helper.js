@@ -656,8 +656,10 @@ LIB.valuesByTitle = (itm, pNs, dta) => {
 };
 LIB.valueByTitle = (el, ti, dta, opts) => {
     if (el) {
-        let lOpts = Object.assign({ targetLanguage: 'default' }, opts), pVL = LIB.valuesByTitle(el, [ti], dta);
-        return pVL.length > 0 ? LIB.displayValueOf(pVL[0], lOpts) : undefined;
+        let pVL = LIB.valuesByTitle(el, [ti], dta);
+        if (pVL.length > 1)
+            console.warn("Multiple values for property with title '" + ti + "' found in " + el.id + ". Only the first one is returned.");
+        return pVL.length > 0 ? LIB.displayValueOf(pVL[0], opts) : undefined;
     }
     ;
 };
@@ -1149,7 +1151,7 @@ LIB.escapeInnerHtml = (str) => {
     return out;
 };
 String.prototype.escapeRE = function () {
-    return this.replace(/[.*+?^${}()|[\]\\]/g, '\$&');
+    return this.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 };
 String.prototype.escapeJSON = function () {
     return this.replace(/["\\]/g, '\$&')
@@ -1470,7 +1472,7 @@ LIB.hasType = (r, pNs, dta, opts) => {
     if (r) {
         let pVs = LIB.valuesByTitle(r, [CONFIG.propClassType], dta);
         if (pVs.length > 0) {
-            return pNs.includes(LIB.displayValueOf(pVs[0], Object.assign({ targetLanguage: 'default' }, opts)));
+            return pNs.includes(LIB.displayValueOf(pVs[0], opts));
         }
         ;
         return false;
@@ -1501,7 +1503,7 @@ LIB.titleFromProperties = (pL, pCs, opts) => {
 };
 LIB.typeOf = (rK, dta) => {
     let r = rK["class"] ? rK : LIB.itemByKey(dta.resources, rK), pVL = LIB.valuesByTitle(r, [CONFIG.propClassType], dta);
-    return pVL.length > 0 ? LIB.displayValueOf(pVL[0], { targetLanguage: 'default' }) : undefined;
+    return pVL.length > 0 ? LIB.displayValueOf(pVL[0]) : undefined;
 };
 function simpleHash(str) {
     for (var r = 0, i = 0; i < str.length; i++)

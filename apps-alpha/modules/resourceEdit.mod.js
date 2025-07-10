@@ -43,7 +43,7 @@ class CPropertyToEdit extends CPropertyToShow {
             if (opts && opts.dialogForm)
                 opts.dialogForm.addField(ti, this.dT, { required: this.pC.required });
             return makeTextField(ti, this.dT.type == XsDataType.String ? this.get(localOpts).escapeHTML() : this.get(localOpts), {
-                typ: this.dT.type == XsDataType.String && app.ontology.propertyClassIsText(this.pC.title) ? 'area' : 'line',
+                typ: ((this.dT.maxLength && this.dT.maxLength < CONFIG.textThreshold + 1) || CONFIG.titleProperties.includes(this.pC.title)) ? 'line' : 'area',
                 handle: opts.myFullName + '.check()',
                 hint: this.pC.description
             });

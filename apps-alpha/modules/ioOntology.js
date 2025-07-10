@@ -588,9 +588,10 @@ class COntology {
         return Object.assign(this.makeItem(r, CONFIG.prefixRC), {
             extends: eCk,
             instantiation: iL.map((ins) => { return LIB.displayValueOf(ins, { lookupValues: true }); }),
-            isHeading: LIB.isTrue(this.valueByTitle(r, "SpecIF:isHeading")) ? true : undefined,
+            isHeading: LIB.isTrue(this.valueByTitle(r, "SpecIF:isHeading")) || undefined,
             icon: this.valueByTitle(r, "SpecIF:Icon"),
-            propertyClasses: pCL.length > 0 ? pCL : undefined
+            propertyClasses: pCL.length > 0 ? pCL.map((pC) => { return { id: pC.id }; }) : undefined,
+            changedAt: this.latestOf([r.changedAt].concat(pCL.map(pC => pC.date)))
         });
     }
     makeSC(r) {
@@ -609,11 +610,12 @@ class COntology {
         return Object.assign(this.makeItem(r, CONFIG.prefixSC), {
             extends: eCk,
             instantiation: iL.map((ins) => { return LIB.displayValueOf(ins, { lookupValues: true }); }),
-            isUndirected: LIB.isTrue(this.valueByTitle(r, "SpecIF:isUndirected")) ? true : undefined,
+            isUndirected: LIB.isTrue(this.valueByTitle(r, "SpecIF:isUndirected")) || undefined,
             icon: this.valueByTitle(r, "SpecIF:Icon"),
-            subjectClasses: sCL.length > 0 ? sCL : undefined,
-            objectClasses: oCL.length > 0 ? oCL : undefined,
-            propertyClasses: pCL.length > 0 ? pCL : undefined
+            subjectClasses: sCL.length > 0 ? sCL.map((sC) => { return { id: sC.id }; }) : undefined,
+            objectClasses: oCL.length > 0 ? oCL.map((oC) => { return { id: oC.id }; }) : undefined,
+            propertyClasses: pCL.length > 0 ? pCL.map((pC) => { return { id: pC.id }; }) : undefined,
+            changedAt: this.latestOf([r.changedAt].concat(pCL.map(pC => pC.date)).concat(sCL.map(sC => sC.date)).concat(oCL.map(oC => oC.date)))
         });
     }
     extendingClassOf(el, pfx) {
@@ -647,7 +649,7 @@ class COntology {
         let pL = this.statementsByTitle(el, ["SpecIF:hasProperty"], { asSubject: true });
         for (let p of pL) {
             let term = LIB.itemByKey(this.data.resources, p.object), prep = this.makeIdAndTitle(term, CONFIG.prefixPC);
-            LIB.cacheE(pCL, { id: prep.id });
+            LIB.cacheE(pCL, { id: prep.id, date: p.changedAt });
             LIB.cacheE(this.generated.pCL, this.makePC(term));
         }
         ;
@@ -657,7 +659,7 @@ class COntology {
         let iCL = [], sL = this.statementsByTitle(el, clL, { asObject: true });
         for (let s of sL) {
             let term = LIB.itemByKey(this.data.resources, s.subject), prep = this.makeIdAndTitle(term, term['class'].id == CONFIG.prefixRC + "SpecifTermresourceclass" ? CONFIG.prefixRC : CONFIG.prefixSC);
-            LIB.cacheE(iCL, { id: prep.id });
+            LIB.cacheE(iCL, { id: prep.id, date: s.changedAt });
             if (!this.options.excludeEligibleSubjectClassesAndObjectClasses) {
                 if (term['class'].id == CONFIG.prefixRC + "SpecifTermresourceclass") {
                     if (LIB.indexById(this.generated.rCL, prep.id) < 0)
@@ -731,6 +733,14 @@ class COntology {
         }
         else
             console.warn("Ontology: No statementClass 'SpecIF:isNamespace' defined");
+    }
+    latestOf(dateL) {
+        if (!Array.isArray(dateL) || dateL.length < 1)
+            return undefined;
+        const validDates = dateL.filter(d => typeof d === "string" && RE.IsoDateTime.test(d));
+        if (validDates.length < 1)
+            return undefined;
+        return validDates.reduce((latest, current) => current > latest ? current : latest);
     }
     checkConstraints() {
         this.makeStatementsIsNamespace();
@@ -833,7 +843,7 @@ class COntology {
             return LIB.classTitleOf(r['class'], this.data.resourceClasses) == "SpecIF:Namespace";
         })
             .forEach((r) => {
-            m.set(this.valueByTitle(r, CONFIG.propClassTerm), { id: r.id, url: this.valueByTitle(r, "SpecIF:Origin") });
+            m.set(this.valueByTitle(r, CONFIG.propClassTerm), { id: r.id, url: this.valueByTitle(r, "SpecIF:Home") });
         });
         return m;
     }
