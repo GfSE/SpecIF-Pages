@@ -49,9 +49,12 @@ including motivation, examples with online demos and conference papers.
 
 ## Setup
 
-SpecIF data can be read with a web browser (preferably Firefox, Chrome or Edge) using the SpecIF viewer or SpecIF editor. 
-In contrast to a document, models in SpecIF format can be easily checked because they do not only contain the model elements, 
+SpecIF data can be read with a web browser (preferably Firefox, Chrome or Edge) using the SpecIF Viewer or the 
+SpecIF Model Integrator and Editor. 
+In contrast to a document, models in SpecIF format can be easily audited because they do not only contain the model elements, 
 but also their semantic relationships.
+
+To get an overview of the features and the acknowledgement of used open-source libraries, refer to <a href="https://specif.de/apps/index.html" target="_blank">About SpecIF Apps</a>.
 
 ### Install the SpecIF Viewer/Editor
 
@@ -180,16 +183,10 @@ When importing a workbook with one or more spreadsheets (Excel® *.xlsx, LibreOf
 a folder with the file name as title is created in the hierarchy of the ReqIF data-set. 
 For each spreadsheet a subfolder is created with its name as title. 
 
-### Sheets Become Folders
-
-When importing a workbook with one or more spreadsheets (Excel® *.xlsx, LibreOffice *.ods as well as *.csv), 
-a folder with the file name as title is created in the hierarchy of the ReqIF data-set. 
-For each spreadsheet a subfolder is created with its name as title. 
-
 #### Resource Classes and Resources
 
 If there is a term in curly brackets at the end of a *spreadsheet name*, a SpecIF resourceClass is selected
-having that term as a title (name). It serves as type for all resources/objects found on this spreadsheet. 
+having that term as a title (name). It serves as type for all resources/entities found on this spreadsheet. 
 Otherwise, a term in curly brackets at the end of the *file name* is used as a substitute. 
 In both cases a specific meaning is attributed to the resources/objects. 
 
@@ -199,9 +196,9 @@ Unfortunately, a global ontology term cannot be readily used in the filename,
 as certain characters (e.g. the colon) are not allowed in filenames. 
 However, local terms including “requirement”, “feature”, “annotation”, “user-story” and “pain-point“ 
 (as well as any other local term as defined by the ontology) are interpreted correctly 
-by the tool and normalized, thus replaced by the preferred ontology term.
+by the tool and normalized, thus the preferred ontology term is used instead of the local term.
 
-For example, if a  file has the file name "Project-name {Requirement}.xslx" and it contains two spreadsheets 
+For example, if a file has the file name "Project-name {Requirement}.xslx" and it contains two spreadsheets 
 named "Functions {User Story}" and "Constraints", 
 a resourceClass with the title "User-Story" normalized by 
 <a href="https://specif.de/apps/view.html#import=https://specif.de/v1.2/Ontology.specif;view=doc;node=N-QacIoFiQ3a268UVZO9mHsqqrwdo" target="_blank">_SpecIF:UserStory_</a> 
@@ -212,54 +209,72 @@ for the second spreadsheet.
 
 #### Properties
 
-Now for the contents of each worksheet. The property names (SpecIF property titles) are expected in the first table line of each worksheet and the resources ("instances") 
-follow from the second line. Defined vocabulary terms are best used as attribute names, e.g. dcterms:title and dcterms:description from 
+Now for the contents of each spreadsheet. The property names (SpecIF property titles) are expected in 
+the first table line of each spreadsheet and the resources ("instances") follow from the second line. 
+Defined ontology terms are best used as attribute names, e.g. dcterms:title and dcterms:description from 
 the <a href="https://www.dublincore.org/" target="_blank">Dublin Core Metadata Initiative</a>. 
-The use of agreed terms conveys the meaning of the respective attributes so that, just one of the potential benefits, the user interface knows how to display the properties. 
-For example, the title (denoted by dcterms:title) comes first in larger letters, underneath the description (denoted by dcterms:description) in the main column plus the 
-remaining attributes in a narrower column on the right. However, there are many more benefits in the entire product development.
+The use of agreed terms conveys the meaning of the respective attributes so that, just one of the potential benefits, 
+the user interface knows how to display the properties. 
+For example, the title (denoted by dcterms:title) comes first in larger letters, underneath the description (denoted by dcterms:description) 
+in the main column plus the remaining attributes in a narrower column on the right. 
+There are many more benefits to using defined ontology terms in the entire product development.
 
-By the way, formatting in text fields using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, 
-for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list.
+![Excel Column Headers](../assets/images/Manuals/04_Excel-column-headers_EN.png)
+
+In case a general term is used instead of a defined ontology term, a translation is made using the ontology: If declared as such, 
+a local term like _Beschreibung_ in German is normalized to _dcterms:description_. 
+If the term in the column header is not at all found in the ontology, it is preserved, but has no meaning for the software.
+
+Suitable property class terms are defined in the 
+&#x2197;&#xA0;<a href="https://specif.de/apps/view.html#import=https://specif.de/v1.1/Ontology.specif;view=doc;node=N-jjppr4nnS6XU1Hi711qS3mXA1Cc" target="_blank">SpecIF Ontology</a>.
+
+By the way, formatting in text fields using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list.
 
 #### Enumerated Values
 
 <img class="my-align-right size-60" src="../assets/images/Manuals/05_Excel_enumerations_EN.png" alt="Excel Enumerations"/>
 
-To define an attribute with enumerated values, a worksheet with name _{Enumerations}_ including the curly brackets is created. 
+To define an attribute with enumerated values, a spreadsheet with name _{Enumerations}_ including the curly brackets is created. 
 Here all values of a certain attribute are specified column by column. 
-Again, the first line specifies the attribute name and the values below that are taken over up to the next blank line. 
-In worksheets with user data, these values are provided for attributes with the same name; in the example given to the left, 
-these are the attributes named _IREB:RequirementType_ and _SpecIF:Priority_. 
-While spreadsheets also allows the specification of deviating values, this is not possible in case of SpecIF, therefore all values 
-that do not correspond to those in the worksheet _{Enumerations}_ are ignored during import.
+Again, the first line specifies the property name and the values below up to the next blank field define the enumerated values.
+In spreadsheets with user data, these values are provided for attributes with the same name; 
+in the example given to the left, these are the attributes named _IREB:RequirementType_ and _SpecIF:Priority_. 
+While Libreoffice and Excel® also allow the specification of deviating values, this is not possible in case of SpecIF, 
+therefore all values that are not listed in the spreadsheet _{Enumerations}_ are ignored during import.
 
 {: .highlight }
 _Note: LibreOffice and Excel® assist the user in entering values through a selection box when the values listed in the "(Enumerations)" 
-worksheet are selected for the column in question using the menu Data > Data Tools > Data Validation._
+spreadsheet are selected for the column in question using the menu Data > Data Tools > Data Validation._
 
-This <a href="https://specif.de/examples/Example%20Telephone-Connection-Request%20(Requirements).xlsx" target="_blank">example</a> 
-shows the described conventions. Here vocabulary terms have also been chosen for the enumerated attribute values. 
-These are replaced in SpecIF Editor/Viewer by terms of the active national language, 
-for example _SpecIF:priorityHigh_ is displayed as _hoch_ if German is selected in the browser. 
-Of course, any terms can be used in the worksheet, which will then be used directly in 
-SpecIF Editor/Viewer regardless of the active browser language (without a defined meaning).
+Suitable property value terms are defined in the 
+&#x2197;&#xA0;<a href="https://specif.de/apps/view.html#import=https://specif.de/v1.1/Ontology.specif;view=doc;node=N-GXf6xVO7XO5ciMypRwD5WDR6DHR" target="_blank">SpecIF Ontology</a>.
 
 #### Relations
 
-The same goes for the names of relationships (SpecIF statements); for example _oslc_rm:refinedBy_ between two requirements 
+Not only property values can be asserted as described above, but also relationships (SpecIF statements) can be created of the 
+current entity (SpecIF resource) to other ones. For example _oslc_rm:refinedBy_ between two requirements 
 or _oslc_rm:satisfies_ between a system component and a requirement. In order to successfully create relationships, 
-the user-defined IDs (_dcterms:identifier_) or titles (_dcterms:title_) of the respective elements must be given 
+the user-defined IDs (_dcterms:identifier_) or titles (_dcterms:title_) of the entity to be linked must be given 
 between double or single quotation marks. Multiple resources can be specified separated by commas. 
-See columns _IREB: refines_ and _oslc_rm:satisfiedBy_ in the following figure.
+See columns _IREB: refines_ and _oslc_rm:satisfiedBy_ in the following figure. 
+In a relationship, the current entity is always the subject and the entities in a cell are objects.
 
 ![Excel Column Headers](../assets/images/Manuals/04_Excel-column-headers_EN.png)
 
-By the way, the target of a relation like "DMS" in the figure does not have to be found in the same file. 
-The relation is also established to a resource that originates from a different source, as long as the title resp. ID are identical.
+By the way, the target of a relation like "Customer Portal" in the figure does not have to be found in the same file. 
+The relation is also established to a resource that originates from a different source, as long as the title resp. identifier match.
 
 Suitable terms are defined in the <a href="https://specif.de/apps/view.html#import=https://specif.de/v1.1/Ontology.specif" target="_blank">SpecIF Ontology</a>, 
 namely for <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-33z8X0jqbMdrd8PJDKyt2ke4yAB;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property names (propertyClasses)</a>, <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-GXf6xVO7XO5ciMypRwD5WDR6DHR;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property values (propertyValues)</a> and for <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-blM4lfyHM55YlbfBZ3NWj4SYwa3;import=https://specif.de/v1.1/Ontology.specif" target="_blank">statement names (statementClasses)</a>.
+
+### Example
+
+This &#x2913;&#xA0;<a href="./examples/Example%20Telephone-Connection-Request%20{Requirements}.xlsx" target="_blank">example</a> 
+shows the described conventions. Here, ontology terms have also been chosen for the enumerated property values, thus conveying a specific meaning.
+These are replaced in SpecIF Editor/Viewer by terms of the active national language, 
+for example _SpecIF:priorityHigh_ is displayed as _hoch_ if German is selected in the browser. 
+Of course, any terms can be used in the spreadsheet, which will then be imported unchanged by the
+SpecIF Editor/Viewer regardless of the active browser language, however without a defined meaning.
 
 ### Archi
 
@@ -312,14 +327,22 @@ It is recommended to use markdown instead of the HTML feature offered by the inp
 
 Both SpecIF as a format with schema and consistency checker as well as the SpecIF viewer/editor are open source and are subject to 
 the <a href="https://github.com/GfSE/SpecIF/blob/master/LICENSE" target="_blank">Apache 2.0 license</a>, 
-which also allows free use for commercial applications. If used in your own product, the source must be given.
+which also allows free use for commercial applications. If used in your own product, the origin must be referenced.
+
+### Support
+
+In case you discover a conceptual inconsistency, a software bug, a flaw in documentation or wish to request a feature,
+please open an <a href="https://github.com/enso-managers/SpecIF-Tools/issues" target="_blank">issue</a>
+with a concise description and ideally test-data.
+We are highly interested to supply high-quality concepts and useful software.
 
 ### No Guarantee and No Liability
 
 SpecIF and the SpecIF viewer are provided "as-is" and without guaranteed characteristics. 
 Use is always at your own risk. Any liability and guarantee are excluded. 
 The installation at <a href="http://specif.de/apps/" target="_blank">http://specif.de/apps/</a> and the code maintained 
-at <a href="https://github.com/GfSE" target="_blank">https://github.com/GfSE</a> is a reference implementation and not designed for high loads and high availability.
+at <a href="https://github.com/GfSE" target="_blank">https://github.com/enso-managers/</a> is a reference implementation 
+and not designed for high loads and high availability.
 
 
 <!-- link template <a href="" target="_blank"></a> -->
