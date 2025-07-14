@@ -217,7 +217,7 @@ The use of agreed terms conveys the meaning of the respective attributes so that
 the user interface knows how to display the properties. 
 For example, the title (denoted by dcterms:title) comes first in larger letters, underneath the description (denoted by dcterms:description) 
 in the main column plus the remaining attributes in a narrower column on the right. 
-There are many more benefits to using defined ontology terms in the entire product development.
+There are many more benefits to using defined ontology terms in the entire product lifecycle.
 
 ![Excel Column Headers](../assets/images/Manuals/04_Excel-column-headers_EN.png)
 
@@ -251,8 +251,8 @@ Suitable property value terms are defined in the
 
 #### Relations
 
-Not only property values can be asserted as described above, but also relationships (SpecIF statements) can be created of the 
-current entity (SpecIF resource) to other ones. For example _oslc_rm:refinedBy_ between two requirements 
+Not only property values can be asserted as described above, but also relationships (SpecIF statements) can be created between the 
+current entity (SpecIF resource) and other ones. For example _oslc_rm:refinedBy_ between two requirements 
 or _oslc_rm:satisfies_ between a system component and a requirement. In order to successfully create relationships, 
 the user-defined IDs (_dcterms:identifier_) or titles (_dcterms:title_) of the entity to be linked must be given 
 between double or single quotation marks. Multiple resources can be specified separated by commas. 
@@ -267,7 +267,7 @@ The relation is also established to a resource that originates from a different 
 Suitable terms are defined in the <a href="https://specif.de/apps/view.html#import=https://specif.de/v1.1/Ontology.specif" target="_blank">SpecIF Ontology</a>, 
 namely for <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-33z8X0jqbMdrd8PJDKyt2ke4yAB;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property names (propertyClasses)</a>, <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-GXf6xVO7XO5ciMypRwD5WDR6DHR;import=https://specif.de/v1.1/Ontology.specif" target="_blank">property values (propertyValues)</a> and for <a href="https://specif.de/apps/view.html#view=doc;project=P-SpecIF-Ontology;node=N-blM4lfyHM55YlbfBZ3NWj4SYwa3;import=https://specif.de/v1.1/Ontology.specif" target="_blank">statement names (statementClasses)</a>.
 
-### Example
+#### Example
 
 This &#x2913;&#xA0;<a href="./examples/Example%20Telephone-Connection-Request%20{Requirements}.xlsx" target="_blank">example</a> 
 shows the described conventions. Here, ontology terms have also been chosen for the enumerated property values, thus conveying a specific meaning.
