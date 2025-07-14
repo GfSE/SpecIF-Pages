@@ -1,11 +1,10 @@
 "use strict";
 /*!	ReqIF import and export
     Dependencies: -
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 
     Limitations:
     - It is assumed that all text values within the provided SpecIF data set have only a single language,
@@ -23,12 +22,13 @@ moduleManager.construct({
     name: 'ioReqif'
 }, (self) => {
     "use strict";
-    let mime, zipped, opts, errNoOptions = new xhrMessage(896, 'No options or no mediaTypes defined.'), errNoReqifFile = new xhrMessage(897, 'No ReqIF file in the reqifz container.'), errInvalidXML = new xhrMessage(898, 'ReqIF data is not valid XML.');
+    let mime, zipped, opts, errNoOptions = new resultMsg(896, 'No options or no mediaTypes defined.'), errNoReqifFile = new resultMsg(897, 'No ReqIF file found in the reqifz container.'), errInvalidXML = new resultMsg(898, 'ReqIF data is not valid XML.');
     self.init = (options) => {
         mime = undefined;
         opts = options;
         return true;
     };
+    self.abortFlag = false;
     self.verify = (f) => {
         function reqifFile2mediaType(fname) {
             if (fname.endsWith('.reqifz') || fname.endsWith('.reqif.zip')) {
@@ -57,7 +57,7 @@ moduleManager.construct({
                 fileL = zip.filter((relPath, file) => { return file.name.endsWith('.reqif'); });
                 if (fileL.length < 1) {
                     zDO.reject(errNoReqifFile);
-                    return zDO;
+                    return;
                 }
                 ;
                 pend = fileL.length;
@@ -66,13 +66,13 @@ moduleManager.construct({
                         .then((dta) => {
                         if (!LIB.validXML(dta)) {
                             zDO.reject(errInvalidXML);
-                            return zDO;
+                            return;
                         }
                         ;
                         let result = reqif2Specif(dta);
                         if (result.status != 0) {
                             zDO.reject(result);
-                            return zDO;
+                            return;
                         }
                         ;
                         resL.unshift(result.response);
@@ -167,10 +167,11 @@ moduleManager.construct({
             if (eC.propertyClasses) {
                 let eL = ctg == 'statementClass' ?
                     pr.statements.filter((sta) => { return LIB.references(sta['class'], eC); })
-                    : pr.resources.filter((res) => { return LIB.references(res['class'], eC); }), pC;
+                    : pr.resources.filter((res) => { return LIB.references(res['class'], eC); }), pC, dT;
                 eC.propertyClasses.forEach((pCk) => {
                     pC = LIB.itemByKey(pr.propertyClasses, pCk);
-                    if ((LIB.itemByKey(pr.dataTypes, pC.dataType).type == XsDataType.String) && withHtml(eL, pCk)) {
+                    dT = LIB.itemByKey(pr.dataTypes, pC.dataType);
+                    if ((!dT.enumeration && dT.type == XsDataType.String) && withHtml(eL, pCk)) {
                         console.info("Specializing data type to formatted text for propertyClass with id '" + pC.id + " and title '" + pC.title + "'");
                         pC.dataType = LIB.makeKey(dTFormattedText.id);
                         pC.format = "xhtml";
@@ -190,7 +191,7 @@ moduleManager.construct({
             + '<REQ-IF-TOOL-ID></REQ-IF-TOOL-ID>'
             + '<REQ-IF-VERSION>1.0</REQ-IF-VERSION>'
             + '<SOURCE-TOOL-ID>' + (pr.generator || '') + '</SOURCE-TOOL-ID>'
-            + '<TITLE>' + pr.title + '</TITLE>'
+            + '<TITLE>' + pr.title[0].text + '</TITLE>'
             + '</REQ-IF-HEADER>'
             + '</THE-HEADER>'
             + '<CORE-CONTENT>'
@@ -279,13 +280,13 @@ moduleManager.construct({
             if (LIB.indexById(separatedHC.objects, r.id) < 0)
                 separatedHC.objects.push(r);
         }
-        pr.hierarchies.forEach((h) => {
+        pr.nodes.forEach((h) => {
             if (h.nodes)
                 h.nodes.forEach((n) => {
                     iterate(n, prepObj);
                 });
         });
-        pr.hierarchies.forEach((h) => {
+        pr.nodes.forEach((h) => {
             let hR = LIB.itemByKey(pr.resources, h.resource), hC = LIB.itemByKey(pr.resourceClasses, hR['class']);
             if (LIB.referenceIndexBy(separatedHC.objects, 'class', hC) > -1) {
                 hC = simpleClone(hC);
@@ -339,7 +340,7 @@ moduleManager.construct({
         });
         xml += '</SPEC-RELATIONS>'
             + '<SPECIFICATIONS>';
-        pr.hierarchies.forEach((h) => {
+        pr.nodes.forEach((h) => {
             xml += '<SPECIFICATION ' + commonAttsOf(h) + '>'
                 + '<TYPE><SPECIFICATION-TYPE-REF>' + h['class'].id + '</SPECIFICATION-TYPE-REF></TYPE>'
                 + attsOf(h)
@@ -418,7 +419,7 @@ moduleManager.construct({
                         + '<DEFINITION><ATTRIBUTE-DEFINITION-ENUMERATION-REF>PC-' + adId + '</ATTRIBUTE-DEFINITION-ENUMERATION-REF></DEFINITION>'
                         + '<VALUES>';
                     prp.values.forEach((v) => {
-                        xml += '<ENUM-VALUE-REF>' + v + '</ENUM-VALUE-REF>';
+                        xml += '<ENUM-VALUE-REF>' + v.id + '</ENUM-VALUE-REF>';
                     });
                     xml += '</VALUES>'
                         + '</ATTRIBUTE-VALUE-ENUMERATION>';

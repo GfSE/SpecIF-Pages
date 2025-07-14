@@ -1,11 +1,10 @@
 "use strict";
 /*!	Transformation Library for SpecIF data for import to and export from the internal data structure.
     Dependencies: jQuery 3.5+
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 */
 class CSpecifItemNames {
     constructor(ver) {
@@ -57,6 +56,14 @@ class CSpecifItemNames {
             this.maxI = 'maxInclusive';
         }
         ;
+        let verL = ver.split('.').map(n => parseInt(n));
+        if (verL[0] < 1 || verL[0] == 1 && verL[1] < 2) {
+            this.nds = 'hierarchies';
+        }
+        else {
+            this.nds = 'nodes';
+        }
+        ;
     }
 }
 class CSpecIF {
@@ -68,7 +75,11 @@ class CSpecIF {
         this.files = [];
         this.resources = [];
         this.statements = [];
-        this.hierarchies = [];
+        this.nodes = [];
+        let tpl = app.standards.makeTemplate();
+        for (let p in tpl) {
+            this[p] = tpl[p];
+        }
     }
     isValid(spD) {
         if (!spD)
@@ -77,28 +88,37 @@ class CSpecIF {
             return typeof (spD.id) == 'string' && spD.id.length > 0;
         return false;
     }
+    isOntology(specifData) {
+        return (specifData.id.includes("Ontology")
+            && Array.isArray(specifData.title) && specifData.title[0] && specifData.title[0]['text']
+            && specifData.title[0]['text'].includes("Ontology"));
+    }
+    ;
     set(spD, opts) {
         return new Promise((resolve, reject) => {
+            let msg;
             if (this.isValid(spD)) {
-                if (opts && opts.noCheck) {
-                    this.toInt(spD, opts);
-                    resolve(this);
+                msg = this.toInt(spD, opts);
+                if (msg.status == 0) {
+                    if (opts && opts.noCheck) {
+                        resolve(this);
+                    }
+                    else {
+                        this.check(this, opts)
+                            .then(() => { resolve(this); }, reject);
+                    }
+                    ;
                 }
-                else {
-                    this.toInt(spD, opts);
-                    this.check(this, opts)
-                        .then(() => { resolve(this); }, reject);
-                }
+                else
+                    reject(msg);
             }
             else {
-                let msg = new xhrMessage(999, "SpecIF id is not defined or version is not supported.").warn();
+                msg = new resultMsg(999, "SpecIF input is not valid or version is not supported.").warn();
                 reject(msg);
             }
         });
     }
     get(opts) {
-        if (opts && opts.v10)
-            return this.toExt_v10(opts);
         return this.toExt(opts);
     }
     check(spD, opts) {
@@ -106,20 +126,19 @@ class CSpecIF {
             let checker;
             if (this.isValid(spD)) {
                 if (spD['$schema'] && !spD['$schema'].includes('v1.0')) {
-                    import(window.location.href.startsWith('file:/') ? '../../SpecIF-Schema/check/CCheck.mjs'
-                        : 'https://specif.de/v' + /\/(?:v|specif-)(\d+\.\d+)\//.exec(spD['$schema'])[1] + '/CCheck.mjs')
+                    import((LIB.useRemotePath() ? CONFIG.remotePath : CONFIG.localPath) + 'CCheck.mjs')
                         .then(modChk => {
                         getSchema();
                         checker = new modChk.CCheck();
                     })
-                        .catch(handleError);
+                        .catch((err) => { console.error(err); reject(new resultMsg(903, 'Schema- and constraint-check nof found.')); });
                 }
                 else {
-                    throw Error("Inexpected check of SpecIF data set < v1.1");
+                    throw "Programming Error: Inexpected check of SpecIF data set < v1.1";
                 }
             }
             else {
-                reject(new xhrMessage(999, 'No SpecIF data to check'));
+                reject(new resultMsg(999, 'No SpecIF data provided for checking'));
             }
             ;
             return;
@@ -136,42 +155,27 @@ class CSpecIF {
                         }
                     }
                     ;
+                    console.info("The invalid SpecIF data set: ", spD);
                     reject(rc);
                 }
                 else
                     throw Error('Standard routines checkSchema and/or checkConstraints are not available.');
             }
-            function handleError(xhr) {
-                switch (xhr.status) {
-                    case 404:
-                        let v = spD.specifVersion ? 'version ' + spD.specifVersion : 'with Schema ' + spD['$schema'];
-                        xhr = new xhrMessage(903, 'SpecIF ' + v + ' is not supported by the program!');
-                    default:
-                        reject(xhr);
-                }
-                ;
-            }
             function getSchema() {
                 LIB.httpGet({
-                    url: (spD['$schema'] || 'https://specif.de/v' + spD.specifVersion + '/schema'),
+                    url: (LIB.useRemotePath() ? CONFIG.remotePath : CONFIG.localPath) + 'schema',
                     responseType: 'arraybuffer',
                     withCredentials: false,
                     done: handleResult,
-                    fail: handleError
+                    fail: () => { reject(new resultMsg(903, 'Schema not found')); }
                 });
             }
         });
     }
-    isOntology(specifData) {
-        return (specifData.id.includes("Ontology")
-            && Array.isArray(specifData.title) && specifData.title[0] && specifData.title[0]['text']
-            && specifData.title[0]['text'].includes("Ontology"));
-    }
-    ;
     toInt(spD, opts) {
-        if (this.isOntology(spD) || spD.id == "P-DDP-Schema-V20")
+        if (this.isOntology(spD) || spD.id.startsWith("P-DDP-"))
             opts.normalizeTerms = false;
-        let self = this, names = new CSpecifItemNames(spD.specifVersion);
+        let self = this, names = new CSpecifItemNames(LIB.versionOf(spD));
         console.info("References are imported *without* revision to ascertain that updates of the referenced element do not break the link. "
             + "(References without revision always relate to the latest revision of the referenced element.)");
         try {
@@ -184,7 +188,7 @@ class CSpecIF {
             this.files = LIB.forAll(spD.files, f2int);
             this.resources = LIB.forAll(spD[names.rs], r2int);
             this.statements = LIB.forAll(spD[names.sts], s2int);
-            this.hierarchies = LIB.forAll(spD.hierarchies, h2int);
+            this.nodes = LIB.forAll(spD[names.nds], h2int);
             this.dataTypes = LIB.forAll(this.dataTypes, (dT) => {
                 switch (dT.type) {
                     case 'xs:enumeration':
@@ -196,10 +200,9 @@ class CSpecIF {
             });
         }
         catch (e) {
-            let txt = "Error when importing the project '" + LIB.displayValueOf(spD.title, { targetLanguage: spD.language || browser.language }) + "'.";
-            console.warn(txt);
-            message.show(new xhrMessage(999, txt), { severity: 'danger' });
-            return;
+            let txt = "Error when importing the project '" + LIB.displayValueOf(spD.title, { targetLanguage: spD.language || browser.language }) + "': " + e;
+            console.error(txt);
+            return new resultMsg(904, txt);
         }
         ;
         if (spD.rights)
@@ -221,8 +224,7 @@ class CSpecIF {
         if (spD.title)
             this.title = makeMultiLanguageText(spD.title);
         this.id = spD.id;
-        this.$schema = 'https://specif.de/v' + CONFIG.specifVersion + '/schema.json';
-        return;
+        return new resultMsg(0, 'SpecIF data has been successfully transformed!');
         function i2int(iE) {
             var oE = {
                 id: iE.id ? iE.id.toSpecifId() : undefined,
@@ -236,10 +238,6 @@ class CSpecIF {
                 oE.replaces = iE.replaces;
             if (iE.changedBy)
                 oE.changedBy = iE.changedBy;
-            if (iE.createdAt)
-                oE.createdAt = iE.createdAt;
-            if (iE.createdBy)
-                oE.createdBy = iE.createdBy;
             return oE;
         }
         function dT2int(iE) {
@@ -290,10 +288,20 @@ class CSpecIF {
             oE.title = makeTitle('propertyClass', iE.title);
             oE.dataType = LIB.makeKey(iE.dataType.id || iE.dataType);
             let dT = LIB.itemByKey(spD.dataTypes, oE.dataType);
-            if (typeof (iE.multiple) == 'boolean')
-                oE.multiple = iE.multiple;
-            else if (dT.multiple)
-                oE.multiple = true;
+            if (dT) {
+                if (typeof (iE.multiple) == 'boolean')
+                    oE.multiple = iE.multiple;
+                else if (dT.multiple)
+                    oE.multiple = true;
+            }
+            else
+                throw "The dataType " + oE.dataType.id + " for propertyClass " + oE.id + " has not been found.";
+            if (iE.required)
+                oE.required = true;
+            if (typeof (iE.multiLanguage) == 'boolean' && !iE.multiLanguage)
+                oE.singleLanguage = true;
+            if (iE.singleLanguage)
+                oE.singleLanguage = true;
             dT = LIB.itemByKey(self.dataTypes, oE.dataType);
             if (iE.value || iE.values) {
                 let vL = makeValues(iE, dT);
@@ -421,8 +429,8 @@ class CSpecIF {
                 { name: 'title', nativePrp: iE.title, tiL: CONFIG.titleProperties, cl: CONFIG.propClassTitle }
             ].forEach((pD) => {
                 if (pD.nativePrp && propertyMissing(pD.tiL, oE)) {
-                    LIB.addProp(oE, {
-                        class: { id: getPropertyClassId(pD, eCkey) },
+                    LIB.addProperty(oE, {
+                        class: { id: suitablePropertyClassId(pD, eCkey) },
                         values: [makeMultiLanguageText(pD.nativePrp)]
                     });
                     console.info("Added a " + pD.name + " property to element with id '" + oE.id + "'");
@@ -439,7 +447,7 @@ class CSpecIF {
                 ;
                 return true;
             }
-            function getPropertyClassId(pDef, eCk) {
+            function suitablePropertyClassId(pDef, eCk) {
                 let eC = LIB.itemByKey((iE.subject ? self.statementClasses : self.resourceClasses), eCk);
                 for (var pCk of eC.propertyClasses) {
                     let pC = LIB.itemByKey(self.propertyClasses, pCk);
@@ -544,10 +552,12 @@ class CSpecIF {
         function makeValues(prp, dT) {
             if (Array.isArray(prp.values)) {
                 return prp.values
-                    .map((val) => {
+                    .map(makeValue)
+                    .filter((p) => !!p);
+                function makeValue(val) {
                     if (val) {
                         if (dT.enumeration) {
-                            return val;
+                            return val.id ? val : { id: val };
                         }
                         ;
                         switch (dT.type) {
@@ -570,7 +580,10 @@ class CSpecIF {
                                 else
                                     return;
                             case XsDataType.DateTime:
-                                return makeISODate(LIB.cleanValue(val));
+                                if (typeof (val) == 'string')
+                                    return makeISODate(LIB.cleanValue(val));
+                                else
+                                    throw Error("Value of property " + prp.id + " with class " + prp['class'].id + " must be a string.");
                             case XsDataType.Boolean:
                                 if (CONFIG.valuesTrue.includes(LIB.cleanValue(val)))
                                     return "true";
@@ -578,12 +591,13 @@ class CSpecIF {
                                     return "false";
                                 console.warn('Unknown boolean value ' + LIB.cleanValue(val) + ' skipped.');
                                 break;
+                            case XsDataType.ComplexType:
+                                break;
                             default:
                                 return LIB.cleanValue(val);
                         }
                     }
-                })
-                    .filter((p) => !!p);
+                }
             }
             ;
             if (LIB.isString(prp.value) || LIB.isMultiLanguageValue(prp.value)) {
@@ -592,7 +606,7 @@ class CSpecIF {
                     case "xhtml":
                         if (dT.enumeration) {
                             let vL = LIB.cleanValue(prp.value).split(',');
-                            return vL.map((v) => { return v.trim(); });
+                            return vL.map((v) => { return { id: v.trim() }; });
                         }
                         ;
                         let vL = Array.isArray(prp.value) ?
@@ -616,7 +630,7 @@ class CSpecIF {
                 }
             }
             else
-                throw Error("Invalid property with class " + prp[names.pClass] + ".");
+                throw "Invalid property with class " + prp[names.pClass] + ".";
             function makeISODate(str) {
                 return LIB.addTimezoneIfMissing(str.replace(/(\d\+|\d-)(\d\d)(\d\d)$/, (match, $1, $2, $3) => {
                     return $1 + $2 + ':' + $3;
@@ -632,19 +646,19 @@ class CSpecIF {
     toExt(opts) {
         return new Promise((resolve, reject) => {
             let self = this, pend = 0;
-            let spD = Object.assign(app.ontology.makeTemplate(), {
+            let spD = Object.assign(app.standards.makeTemplate(), {
                 id: this.id,
                 title: LIB.selectTargetLanguage(this.title, opts)
             });
             function nodeIsNoRoot(r) {
                 let valL = LIB.valuesByTitle(r, [CONFIG.propClassType], self);
-                return valL.length < 1 || LIB.languageTextOf(valL[0], { targetLanguage: "default" }) != CONFIG.hierarchyRoot;
+                return valL.length < 1 || LIB.languageTextOf(valL[0], { targetLanguage: "default" }) != CONFIG.reqifHierarchyRoot;
             }
             if (opts && opts.createHierarchyRootIfMissing) {
-                for (var i = this.hierarchies.length - 1; i > -1; i--) {
-                    let r = LIB.itemByKey(this.resources, this.hierarchies[i].resource);
+                for (var i = this.nodes.length - 1; i > -1; i--) {
+                    let r = LIB.itemByKey(this.resources, this.nodes[i].resource);
                     if (nodeIsNoRoot(r)) {
-                        let oC = app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder], adoptOntologyDataTypes: true, referencesWithoutRevision: true, delta: true });
+                        let oC = app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder], referencesWithoutRevision: true, referencesWithoutRevision: true, delta: true });
                         ['dataTypes', 'propertyClasses', 'resourceClasses'].forEach((li) => { LIB.cacheL(spD[li], oC[li]); });
                         break;
                     }
@@ -695,7 +709,7 @@ class CSpecIF {
             ;
             LIB.cacheL(spD.resources, LIB.forAll((this.resources), r2ext));
             LIB.cacheL(spD.statements, LIB.forAll(this.statements, s2ext));
-            LIB.cacheL(spD.hierarchies, LIB.forAll(this.hierarchies, h2ext));
+            LIB.cacheL(spD.nodes, LIB.forAll(this.nodes, h2ext));
             if (pend < 1)
                 finalize();
             return;
@@ -717,10 +731,6 @@ class CSpecIF {
                     oE.replaces = iE.replaces;
                 if (iE.changedBy && iE.changedBy != CONFIG.userNameAnonymous)
                     oE.changedBy = iE.changedBy;
-                if (iE.createdAt)
-                    oE.createdAt = iE.createdAt;
-                if (iE.createdBy && iE.createdBy != CONFIG.userNameAnonymous)
-                    oE.createdBy = iE.createdBy;
                 return oE;
             }
             function dT2ext(iE) {
@@ -760,15 +770,16 @@ class CSpecIF {
                 if (iE.values)
                     oE.values = iE.values;
                 oE.dataType = iE.dataType;
-                let dT = LIB.itemByKey(self.dataTypes, iE.dataType);
-                if (typeof (iE.multiple) == 'boolean')
-                    oE.multiple = iE.multiple;
-                else if (dT.multiple)
+                if (iE.required)
+                    oE.required = true;
+                if (iE.multiple)
                     oE.multiple = true;
-                if (iE.values)
-                    oE.values = iE.values;
+                if (iE.singleLanguage)
+                    oE.singleLanguage = true;
                 if (iE.format)
                     oE.format = iE.format;
+                if (iE.values)
+                    oE.values = iE.values;
                 if (iE.unit)
                     oE.unit = iE.unit;
                 return oE;
@@ -803,7 +814,7 @@ class CSpecIF {
                     oE.objectClasses = iE.objectClasses;
                 return oE;
             }
-            function p2ext(iE) {
+            function p2ext(iE, opts) {
                 if (opts.showEmptyProperties || Array.isArray(iE.values) && iE.values.length > 0) {
                     let pC = LIB.itemByKey(spD.propertyClasses, iE['class']);
                     if (Array.isArray(opts.skipProperties)) {
@@ -825,22 +836,23 @@ class CSpecIF {
                             for (var v of iE.values) {
                                 txt = LIB.languageTextOf(v, opts);
                                 if (RE.vocabularyTerm.test(txt)) {
-                                    if (opts.lookupValues)
+                                    if (opts.lookupValues &&
+                                        (!opts.dontLookupHeadings
+                                            || !CONFIG.titleProperties
+                                                .map((e) => { return app.ontology.localize(e, opts); })
+                                                .includes(pC.title)))
                                         txt = app.ontology.localize(txt, opts);
                                 }
                                 else {
-                                    if (pC.format == SpecifTextFormat.Xhtml) {
-                                        txt = txt
-                                            .replace(/^\s+/, "")
-                                            .makeHTML(opts)
-                                            .replace(/<br ?\/>\n/g, "<br/>");
-                                        if (opts.allDiagramsAsImage)
-                                            txt = refDiagramsAsImg(txt);
-                                    }
-                                    else {
+                                    if (pC.format == SpecifTextFormat.Plain) {
                                         txt = txt
                                             .replace(/^\s+/, "")
                                             .stripHTML();
+                                    }
+                                    else {
+                                        txt = txt.makeHTML(opts);
+                                        if (opts.allDiagramsAsImage)
+                                            txt = replaceObjectRefs(txt);
                                     }
                                     ;
                                 }
@@ -856,12 +868,13 @@ class CSpecIF {
                             for (var v of iE.values) {
                                 lL = [];
                                 for (var l of v)
-                                    lL.push(l.language ? { text: refDiagramsAsImg(l.text), language: l.language } : { text: refDiagramsAsImg(l.text) });
+                                    lL.push(l.language ? { text: replaceObjectRefs(l.text), language: l.language } : { text: replaceObjectRefs(l.text) });
                                 oE.values.push(lL);
                             }
                             ;
                             return oE;
                         }
+                        ;
                     }
                     ;
                     oE.values = iE.values;
@@ -869,7 +882,7 @@ class CSpecIF {
                 }
                 ;
                 return;
-                function refDiagramsAsImg(val) {
+                function replaceObjectRefs(val) {
                     let replaced = false;
                     val = val.replace(RE.tagObject, ($0, $1, $2) => {
                         if ($1)
@@ -890,22 +903,22 @@ class CSpecIF {
                     return val;
                 }
             }
-            function a2ext(iE) {
+            function a2ext(iE, opts) {
                 var oE = i2ext(iE);
                 oE['class'] = iE['class'];
                 if (iE.alternativeIds)
                     oE.alternativeIds = iE.alternativeIds;
                 let pL = iE.properties;
                 if (pL && pL.length > 0)
-                    oE.properties = LIB.forAll(pL, p2ext);
+                    oE.properties = pL.map(p => p2ext(p, opts));
                 return oE;
             }
             function r2ext(iE) {
-                var oE = a2ext(iE);
+                var oE = a2ext(iE, Object.assign({}, opts, { dontLookupHeadings: true }));
                 return oE;
             }
             function s2ext(iE) {
-                var oE = a2ext(iE);
+                var oE = a2ext(iE, opts);
                 oE.subject = iE.subject;
                 oE.object = iE.object;
                 return oE;
@@ -935,7 +948,7 @@ class CSpecIF {
                                 values: [[{ text: "Root for " + iN.id }]]
                             }, {
                                 class: LIB.makeKey("PC-Type"),
-                                values: [[{ text: CONFIG.hierarchyRoot }]]
+                                values: [[{ text: CONFIG.reqifHierarchyRoot }]]
                             }],
                         changedAt: new Date().toISOString()
                     });
@@ -950,343 +963,40 @@ class CSpecIF {
                 return n2ext(iN);
             }
             function f2ext(iE) {
-                return new Promise((resolve, reject) => {
-                    if (!opts || !opts.allDiagramsAsImage || CONFIG.imgTypes.includes(iE.type)) {
-                        resolve(iE);
-                    }
-                    else {
+                return new Promise((resolve) => {
+                    if (opts && opts.preferPng) {
                         switch (iE.type) {
-                            case 'application/bpmn+xml':
-                                LIB.blob2text(iE, (txt) => {
-                                    bpmn2svg(txt).then((result) => {
-                                        let nFileName = iE.title.fileName() + '.svg';
-                                        resolve({
-                                            blob: new Blob([result.svg], { type: "image/svg+xml" }),
-                                            id: 'F-' + simpleHash(nFileName),
-                                            title: nFileName,
-                                            type: 'image/svg+xml',
-                                            changedAt: iE.changedAt
-                                        });
-                                    }, reject);
-                                });
-                                break;
-                            default:
-                                console.warn("Cannot transform file '" + iE.title + "' of type '" + iE.type + "' to an image.");
-                                resolve({
-                                    id: 'F-' + simpleHash(iE.title),
-                                    title: iE.title,
-                                    changedAt: iE.changedAt
-                                });
-                        }
-                    }
-                });
-            }
-        });
-    }
-    toExt_v10(opts) {
-        const myLang = { targetLanguage: opts.targetLanguage || this.language || 'en' };
-        return new Promise((resolve, reject) => {
-            var pend = 0, spD = {
-                id: this.id,
-                title: LIB.languageTextOf(this.title, myLang),
-                $schema: 'https://specif.de/v1.0/schema.json',
-                generator: app.title,
-                generatorVersion: CONFIG.appVersion,
-                createdAt: new Date().toISOString()
-            };
-            if (LIB.multiLanguageValueHasContent(this.description))
-                spD.description = LIB.languageTextOf(this.description, myLang);
-            if (this.language)
-                spD.language = this.language;
-            if (this.rights && this.rights.title && this.rights.url)
-                spD.rights = this.rights;
-            else
-                spD.rights = {
-                    title: "Creative Commons 4.0 CC BY-SA",
-                    url: "https://creativecommons.org/licenses/by-sa/4.0/"
-                };
-            if (app.me && app.me.email) {
-                spD.createdBy = {
-                    familyName: app.me.lastName,
-                    givenName: app.me.firstName,
-                    email: { value: app.me.email, type: "text/html" }
-                };
-                if (app.me.organization)
-                    spD.createdBy.org = { organizationName: app.me.organization };
-            }
-            else {
-                if (this.createdBy && this.createdBy.email) {
-                    spD.createdBy = {
-                        familyName: this.createdBy.familyName,
-                        givenName: this.createdBy.givenName,
-                        email: { value: this.createdBy.email, type: "text/html" }
-                    };
-                    if (this.createdBy.org && this.createdBy.org.organizationName)
-                        spD.createdBy.org = this.createdBy.org;
-                }
-                ;
-            }
-            ;
-            spD.dataTypes = LIB.forAll(this.dataTypes, dT2ext);
-            spD.propertyClasses = LIB.forAll(this.propertyClasses, pC2ext);
-            spD.resourceClasses = LIB.forAll(this.resourceClasses, rC2ext);
-            spD.statementClasses = LIB.forAll(this.statementClasses, sC2ext);
-            spD.files = [];
-            for (var f of this.files) {
-                pend++;
-                f2ext(f)
-                    .then((oF) => {
-                    spD.files.push(oF);
-                    if (--pend < 1)
-                        finalize();
-                }, reject);
-            }
-            ;
-            spD.resources = LIB.forAll((this.resources), r2ext);
-            spD.statements = LIB.forAll(this.statements, s2ext);
-            spD.hierarchies = LIB.forAll(this.hierarchies, n2ext);
-            if (pend < 1)
-                finalize();
-            return;
-            function finalize() {
-                resolve(spD);
-            }
-            function i2ext(iE) {
-                var oE = {
-                    id: iE.id,
-                    changedAt: iE.changedAt
-                };
-                if (iE.title)
-                    oE.title = LIB.titleOf(iE, opts);
-                if (LIB.multiLanguageValueHasContent(iE.description))
-                    oE.description = LIB.languageTextOf(iE.description, myLang);
-                if (iE.revision)
-                    oE.revision = iE.revision;
-                if (iE.replaces)
-                    oE.replaces = iE.replaces;
-                if (iE.changedBy)
-                    oE.changedBy = iE.changedBy;
-                if (iE.createdAt)
-                    oE.createdAt = iE.createdAt;
-                if (iE.createdBy)
-                    oE.createdBy = iE.createdBy;
-                return oE;
-            }
-            function dT2ext(iE) {
-                var oE = i2ext(iE);
-                switch (iE.type) {
-                    case XsDataType.Double:
-                        if (iE.fractionDigits)
-                            oE.fractionDigits = iE.fractionDigits;
-                    case XsDataType.Integer:
-                        if (typeof (iE.minInclusive) == 'number')
-                            oE.minInclusive = iE.minInclusive;
-                        if (typeof (iE.maxInclusive) == 'number')
-                            oE.maxInclusive = iE.maxInclusive;
-                        break;
-                    case XsDataType.String:
-                        if (iE.maxLength)
-                            oE.maxLength = iE.maxLength;
-                }
-                ;
-                if (iE.enumeration) {
-                    oE.values = LIB.forAll(iE.enumeration, (v) => {
-                        return { id: v.id, value: LIB.languageTextOf(v.value, myLang) };
-                    });
-                    oE.type = 'xs:enumeration';
-                }
-                else
-                    oE.type = iE.type;
-                if (iE.multiple)
-                    oE.multiple = true;
-                return oE;
-            }
-            function pC2ext(iE) {
-                var oE = i2ext(iE);
-                if (iE.values)
-                    oE.values = iE.values;
-                oE.dataType = iE.dataType;
-                let dT = LIB.itemByKey(spD.dataTypes, iE.dataType);
-                if (iE.multiple && !dT.multiple)
-                    oE.multiple = true;
-                if (iE.values) {
-                    oE.value = iE.values[0];
-                    if (iE.values.length > 1)
-                        console.warn('Upon exporting to v1.0, only the first default value of ' + iE.id + ' can be included in the result.');
-                }
-                ;
-                if (iE.format)
-                    oE.format = iE.format;
-                if (iE.unit)
-                    oE.unit = iE.unit;
-                return oE;
-            }
-            function aC2ext(iE) {
-                var oE = i2ext(iE);
-                if (iE.icon)
-                    oE.icon = iE.icon;
-                if (iE.instantiation)
-                    oE.instantiation = iE.instantiation;
-                if (iE['extends'])
-                    oE['extends'] = iE['extends'];
-                if (iE.propertyClasses && iE.propertyClasses.length > 0)
-                    oE.propertyClasses = iE.propertyClasses;
-                return oE;
-            }
-            function rC2ext(iE) {
-                var oE = aC2ext(iE);
-                if (iE.isHeading)
-                    oE.isHeading = true;
-                return oE;
-            }
-            function sC2ext(iE) {
-                var oE = aC2ext(iE);
-                if (iE.isUndirected)
-                    oE.isUndirected = iE.isUndirected;
-                if (iE.subjectClasses && iE.subjectClasses.length > 0)
-                    oE.subjectClasses = iE.subjectClasses;
-                if (iE.objectClasses && iE.objectClasses.length > 0)
-                    oE.objectClasses = iE.objectClasses;
-                return oE;
-            }
-            function p2ext(iE) {
-                if (!iE.values || iE.values.length < 1)
-                    return;
-                let pC = LIB.itemByKey(spD.propertyClasses, iE['class']);
-                if (Array.isArray(opts.skipProperties))
-                    for (var sP of opts.skipProperties) {
-                        if (sP.title == pC.title && (sP.value == undefined || sP.value == LIB.displayValueOf(iE.values[0], opts)))
-                            return;
-                    }
-                ;
-                var oE = {
-                    class: iE['class']
-                };
-                let dT = LIB.itemByKey(spD.dataTypes, pC.dataType);
-                if (dT.type == 'xs:enumeration') {
-                    oE.value = "";
-                    for (var v of iE.values) {
-                        oE.value += (oE.value.length > 0 ? ", " : "") + v;
-                    }
-                    ;
-                    return oE;
-                }
-                ;
-                if (iE.values.length > 1)
-                    console.warn('When transforming to SpecIF v1.0, only the first value of a property of class ' + iE['class'].id + ' has been taken.');
-                if (dT.type == XsDataType.String) {
-                    let v = iE.values[0];
-                    if (opts.targetLanguage) {
-                        let txt = LIB.languageTextOf(v, opts)
-                            .replace(/^\s+/, "");
-                        if (!RE.vocabularyTerm.test(txt)) {
-                            if (pC.format == SpecifTextFormat.Xhtml) {
-                                txt = txt
-                                    .makeHTML(opts)
-                                    .replace(/<br ?\/>\n/g, "<br/>");
-                                if (opts.allDiagramsAsImage)
-                                    txt = refDiagramsAsImg(txt);
-                            }
-                            else {
-                                txt = txt
-                                    .stripHTML();
-                            }
-                        }
-                        ;
-                        oE.value = opts.lookupValues ? app.ontology.localize(txt, opts) : txt;
-                    }
-                    else {
-                        oE.value = [];
-                        for (var l of v)
-                            oE.value.push(l.language ? { text: refDiagramsAsImg(l.text), language: l.language } : { text: refDiagramsAsImg(l.text) });
-                    }
-                    ;
-                    return oE;
-                }
-                ;
-                oE.value = iE.values[0];
-                return oE;
-                function refDiagramsAsImg(val) {
-                    if (!opts || !opts.allDiagramsAsImage)
-                        return val;
-                    let replaced = false;
-                    val = val.replace(RE.tagObject, ($0, $1, $2) => {
-                        if ($1)
-                            $1 = $1.replace(RE.attrType, ($4, $5) => {
-                                if (["application/bpmn+xml"].includes($5)) {
-                                    replaced = true;
-                                    return 'type="image/svg+xml"';
+                            case 'image/svg+xml':
+                                let pngN = f.title.fileName() + '.png';
+                                if (LIB.itemByTitle(self.files, pngN)) {
+                                    console.info("File '" + f.title + "' has a sibling of type PNG");
+                                    break;
                                 }
-                                else
-                                    return $4;
-                            });
-                        if (replaced)
-                            $1 = $1.replace(RE.attrData, ($6, $7) => {
-                                return 'data="' + $7.fileName() + '.svg"';
-                            });
-                        return '<object ' + $1 + $2;
-                    });
-                    return val;
-                }
-            }
-            function a2ext(iE) {
-                var oE = i2ext(iE);
-                oE['class'] = iE['class'];
-                if (iE.alternativeIds)
-                    oE.alternativeIds = iE.alternativeIds;
-                let pL = iE.properties;
-                if (pL && pL.length > 0)
-                    oE.properties = LIB.forAll(pL, p2ext);
-                return oE;
-            }
-            function r2ext(iE) {
-                var oE = a2ext(iE);
-                oE.title = '';
-                return oE;
-            }
-            function s2ext(iE) {
-                var oE = a2ext(iE);
-                oE.subject = iE.subject;
-                oE.object = iE.object;
-                return oE;
-            }
-            function n2ext(iN) {
-                let oN = {
-                    id: iN.id,
-                    resource: { id: iN.resource.id },
-                    changedAt: iN.changedAt
-                };
-                if (iN.nodes && iN.nodes.length > 0)
-                    oN.nodes = LIB.forAll(iN.nodes, n2ext);
-                if (iN.revision)
-                    oN.revision = iN.revision;
-                return oN;
-            }
-            function f2ext(iE) {
-                return new Promise((resolve, reject) => {
-                    if (!opts || !opts.allDiagramsAsImage || CONFIG.imgTypes.includes(iE.type)) {
-                        resolve(iE);
-                    }
-                    else {
-                        switch (iE.type) {
-                            case 'application/bpmn+xml':
-                                LIB.blob2text(iE, (txt) => {
-                                    bpmn2svg(txt).then((result) => {
-                                        let nFileName = iE.title.fileName() + '.svg';
-                                        resolve({
-                                            blob: new Blob([result.svg], { type: "image/svg+xml" }),
-                                            id: 'F-' + simpleHash(nFileName),
-                                            title: nFileName,
-                                            type: 'image/svg+xml',
-                                            changedAt: iE.changedAt
-                                        });
-                                    }, reject);
+                                ;
+                                function storeV() {
+                                    can.width = img.width;
+                                    can.height = img.height;
+                                    ctx.drawImage(img, 0, 0);
+                                    can.toBlob((b) => {
+                                        resolve({ id: f.id, title: pngN, type: 'image/png', h: img.height, w: img.width, blob: b });
+                                    }, 'image/png');
+                                }
+                                let can = document.createElement('canvas'), ctx = can.getContext('2d'), img = new Image();
+                                img.addEventListener('load', storeV, false);
+                                const reader = new FileReader();
+                                reader.addEventListener('loadend', (e) => {
+                                    img.src = 'data:image/svg+xml,' + encodeURIComponent(e.target.result);
                                 });
-                                break;
+                                reader.readAsText(f.blob);
+                                console.info("File '" + f.title + "' transformed to PNG");
+                                return;
                             default:
-                                reject(new xhrMessage(999, "Cannot transform file '" + iE.title + "' of type '" + iE.type + "' to an image."));
+                                if (!CONFIG.imgTypes.includes(iE.type))
+                                    console.warn("Cannot transform file '" + iE.title + "' of type '" + iE.type + "' to a raster image.");
                         }
                     }
+                    ;
+                    resolve(iE);
                 });
             }
         });

@@ -5,47 +5,47 @@
 	(C)copyright since 2010 enso managers gmbh (http://enso-managers.de)
 	Author: se@enso-managers.de, Berlin
 	License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-	We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de 
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+	We appreciate any correction, comment or contribution as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
 
 	Notes:
 	- #4A8C00 SpecIF dark green
 */
 
-@font-face {
-  font-family: "dejavusansmono";
-  src: url("../fonts/DejaVuSansMono.ttf");
-}
 body {
     height: 100%;
     overflow: hidden;
     margin: 0;
-	padding: 0 0 0 8px;
-	font-family: arial, "DejaVu Sans Mono", dejavusansmono, sans-serif;
-	font-size: 10.5pt;
+	padding: 0;
+	font-family: arial, sans-serif;
+	font-size: 11pt;
 }
 #pageHeader {
-	padding: 0.3em 0 0.3em 0;
+	/* padding: 0.3em calc(var(--bs-gutter-x) * .5);  /* like bootstrap 5.3 row */
+	padding: 0.4em 0.8em 0;
 }
 #logo {
-	width: 122px;
+	width: 132px;
 	height: 36px;
 	float: right;
-	margin-right: 16px;
-	background-image: url("../images/logo-navbar-right.svg");
+	background-image: url("../images/logo-navbar-right.png");
 	background-repeat: no-repeat;
-	background-size: 121px;
+	background-size: 132px;
 }
 #spinner {
 	font-size: 24px;
-	color: #3F3F3F;
+	color: var(--bs-gray);
 	float: right;
 	margin: 0px 16px 0 0;
 }
 #message {
- position:fixed;
- top:8px;
- z-index:990;
+  position:fixed;
+  top:1em;
+  left: 1em;
+  z-index:990;
+}
+#specsSelector {
+	/* padding: 0 calc(var(--bs-gutter-x) * .5); /* like bootstrap 5.3 row */
+	padding: 0.4em 0.8em 0;
 }
 .pageTitle {
 	font-size: 180%;
@@ -71,20 +71,26 @@ h4 {
 h5, h6, p, ul, ol {
 	margin: 0 0 0.3em;
 }
+.background-select {
+	background-color: #e9ecef;
+}
+.font-size-90 {
+	font-size: 90%;
+}
 .notice-default {
 	font-style:italic;
 }
 .notice-primary {
-	font-style:italic;
-	color: #337ab7;
+	font-style: italic;
+	color: var(--bs-primary);
 }
 .notice-success {
-	font-style:italic;
-	color: #3c763d;
+	font-style: italic;
+	color: var(--bs-success);
 }
 .notice-danger {
-	font-style:italic;
-	color: #a94442;
+	font-style: italic;
+	color: var(--bs-danger);
 }
 div.noOverflow {
     height: 100%;
@@ -95,7 +101,16 @@ div.pageActions {
     float: right;
 	margin-right: 16px;
 }
-div.contentCtrl {
+div.contentNotice {
+	display: inline-block;
+	box-sizing: border-box;
+	padding-left: 8px;
+}
+div.contentActions {
+	display: inline-block;
+	float: right;
+}
+/* div.contentCtrl {
 	position: fixed;
 	top: 120px;
 	display: inline-block;
@@ -104,19 +119,10 @@ div.contentCtrl {
 	width: 100%;
 	z-index: 900;
 }
-div.contentNotice {
-	display: inline-block;
-    box-sizing: border-box;
-	padding-left: 8px;
-}
-div.contentActions {
-	display: inline-block;
-	float: right;
-}
 div.doneBtns {
 	float: right;
-	padding: 0 15px 0 0;  /* 15px like Bootstrap form */
-}
+	padding: 0 15px 0 0;  /* 15px like Bootstrap form
+} */
 /* for views without selector on the left: */
 div.contentWide {
     /*height is set by script*/
@@ -132,100 +138,27 @@ div.content {   /* width is 75% with wide screen, 100% otherwise */
 	position: relative; /* create reference for inner absolute blocks */
     width: 100%;
     overflow: auto;
-    padding: 0 0 0 4px;
+/*    padding: 0 0 0 4px;  */
 }
-/* main column for title and description: */
-div.content-main {
-	clear: both;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0;
-}
-/* selector on the left: */
-div.paneLeft,
-/* column on the right for additional properties: */
-div.content-other {
-	display: none;
-}
-@media (min-width: 768px) {
-  div.paneLeft {
-	font-size: 90%;
-	display: inline-block;
-	margin-right: -4px;
-	vertical-align: top;
-    width: 25%;
-    /* height is set by script */
-    overflow: hidden;
-    box-sizing: border-box;
-    padding: 0 8px 0 0;
-  }
-  div.contentCtrl {
-	width: 75%;
-  }
-  div.content {
-	display: inline-block;
-	vertical-align: top;
-    width: 75%;
-  }
-  div.content-main {
-	display: inline-block;
-	margin-right: -4px;
-	vertical-align: top;
-	width: 67%;
-	padding-right: 8px;
-    overflow-x: hidden;
-  }
-  div.content-other {
-	display: inline-block;
-	vertical-align: top;
-	width: 33%;
-    overflow-x: hidden;
-  }
-}
-/* div.primaryFilters {
-    box-sizing: border-box;
-    overflow: auto;
-}
-#secondaryFilters {
-	font-size: 90%;
-}
-#secondaryFilters div.panel-filter {
-	display: inline-block;
-	vertical-align: top;
-} */
-div.pane-tree ,
-div.pane-filter {
-	background-color:#f5f5f5;
-    box-sizing: border-box;
-    overflow: auto;
-	padding: 8px 2px 2px 2px;
+div.pane-tree {
+	background-color: #e9ecef;
+	overflow: auto;
+	padding: 0.5em 0 0 0;
 }
 div.pane-details {
 	display: none;
-	background-color:#c8def0;
-	box-sizing: border-box;
+	background-color: #c8def0;
 	overflow: auto;
-	padding: 8px 2px 2px 2px;
-}
-div.panel-filter {
-	background-color:#f5f5f5;
-    box-sizing: border-box;
-	margin: 0 0 0.4em 0;
-	padding: 0.2em;
-}
-div.panel-options {
-    box-sizing: border-box;
-	padding: 0.2em;
+	padding: 0.5em 0 0 0;
 }
 .listEntry {
 	border-bottom:1px solid #ddd;
 }
 div.attribute {
-	padding: 0 0 0.6em;
+	padding: 0.3em 0;
 }
 div.attribute-condensed {
 	font-size:90%;
-	padding: 0 0 0.4em;
 }
 div.attribute-condensed > div.attribute-value > p {
 	margin-bottom: 0;
@@ -233,7 +166,7 @@ div.attribute-condensed > div.attribute-value > p {
 div.attribute-condensed > div.attribute-value > ul,
 div.attribute-condensed > div.attribute-value > ol {
 	margin-bottom: 0;
-	padding-left: 12px;
+	padding-left: 0.6em;
 }
 /* use total width to display the content: */
 div.attribute-wide {
@@ -241,24 +174,18 @@ div.attribute-wide {
 }
 /* or use two blocks for label and value: */
 div.attribute-label {
-	display: inline-block;
-	margin-right: -4px;
-	padding-right: 8px;
-	vertical-align: middle;
-    text-align: right;
-	width: 25%;
-	font-style:italic;
+	padding-right: 0.4em;
+/*	vertical-align: middle; */
+	text-align: right;
+	font-style: italic;
 	font-size: 90%;
-	color: #23527c; /* bootstrap brand-primary */
-	word-wrap:break-word;
+	color: var(--bs-primary);
+	word-wrap: break-word;
 }
 div.attribute-value {
-	display: inline-block;
-	margin-right: -4px;
-	padding-left: 8px;
-	vertical-align: middle;
-	width: 75%;
-	word-wrap:break-word;
+	padding-left: 0.4em;
+/*	vertical-align: middle; */
+	word-wrap: break-word;
 }
 div.attribute table {
 /*	width:100%;  */
@@ -298,29 +225,39 @@ div.forDeletion a:focus {
 div.form-active {
 	background-color: #ffffe0;
 }
-
+div.max-width-md {
+	max-width: 768px;
+	margin: auto;
+}
+div.max-width-lg {
+	max-width: 992px;
+	margin: auto;
+}
 /* for content generated by ARCWAY ReqIF export and for DOORS tables rendered by the ReqIF Server: */
 .inline-label {
 	margin: 12px 0 8px;
-	font-style:italic;
+	font-style: italic;
 	font-size: 90%;
-	color: #23527c; /* bootstrap brand-primary */
+	color: var(--bs-primary);
 }
-table.stdInlineWithBorder,
-table.doors-table {
-	width:100%;
+table {
+    width: 100%;
     border: 1px solid #DDDDDD;
-    border-collapse:collapse;
-	vertical-align:top;
-	margin: 0;
-}
-table.stdInlineWithBorder th,
-table.stdInlineWithBorder td,
-table.doors-table th,
-table.doors-table td {
-    border: 1px solid #DDDDDD;
+    border-collapse: collapse;
+    vertical-align: top;
     margin: 0;
-    padding: 2pt;
+    padding: 0;
+}
+table th {
+	background-color: #DDDDDD;
+	margin: 0;
+	padding: 0.2em 0;
+	font-size: 90%;
+}
+table td {
+	border: 1px solid #DDDDDD;
+	margin: 0;
+	padding: 0.2em 0;
 	font-size: 90%;
 }
 /*
@@ -334,62 +271,6 @@ td.doors-table-cell {
 }
 */
 
-/* override bootstrap.css */
-/*object[disabled] {
-	cursor: not-allowed;
-	pointer-events: none;
-}*/
-.font-sm { font-size: 90%; }
-.force_word_break{ word-wrap:break-word;word-break:break-all; }
-
-.row {
-	margin: 0;
-}
-ul.nav-tabs {
-	font-size: 90%;
-}
-.nav-tabs > li > a {
-	line-height: 1;
-}
-.nav > li.disabled,
-.nav > li.disabled > a {
-  color: #ccc;
-}
-.checkbox {
-	margin-top: 0;
-	margin-bottom: 0;
-}
-.form-group,
-.form-horizontal .form-group {
-	margin: 0 0 0.4em;
-}
-.form-control[disabled],
-.form-control[readonly],
-fieldset[disabled] .form-control {
-	background-color: #fff;
-}
-mark{
-	background: #ffffaa;
-}
-.table > thead > tr > td.selected,
-.table > tbody > tr > td.selected,
-.table > tfoot > tr > td.selected,
-.table > thead > tr > th.selected,
-.table > tbody > tr > th.selected,
-.table > tfoot > tr > th.selected,
-.table > thead > tr.selected > td,
-.table > tbody > tr.selected > td,
-.table > tfoot > tr.selected > td,
-.table > thead > tr.selected > th,
-.table > tbody > tr.selected > th,
-.table > tfoot > tr.selected > th {
-	color: #fff;
-	background-image: none;
-	background-color: #1690D8;
-}
-/*.panel-title {
-  font-size: 100%;
-}*/
 .btn-fileinput {
   position: relative;
   overflow: hidden;
@@ -400,21 +281,11 @@ mark{
   right: 0;
   margin: 0;
   opacity: 0;
-  -ms-filter: 'alpha(opacity=0)';
   font-size: 100%;
   cursor: pointer;
 }
 
 /* override jqtree.css */
-.jqtree-tree .jqtree-title {
-	display: block;
-}
-.jqtree-tree .jqtree-title.jqtree-title-folder {
-	display: inline;
-}  
-/* ul.jqtree-tree .jqtree-element {
-	display: unset;    for selection buttonLeft:false 
-} */
 ul.jqtree-tree li.jqtree-selected>.jqtree-element .jqtree-toggler,
 ul.jqtree-tree li.jqtree-selected>.jqtree-element .jqtree-title {
 	color: #ffffff;
@@ -422,6 +293,6 @@ ul.jqtree-tree li.jqtree-selected>.jqtree-element .jqtree-title {
 ul.jqtree-tree li.jqtree-selected > .jqtree-element,
 ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover {
 	background: none;
-	background-color: #1690D8;
+	background-color: var(--bs-gray);
 	text-shadow: none;
 }

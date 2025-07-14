@@ -1,11 +1,10 @@
 "use strict";
 /*!	iLaH: Open Exchange file import
     Dependencies: jQuery 3.0+
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 */
 moduleManager.construct({
     name: 'ioArchimate'
@@ -46,7 +45,7 @@ moduleManager.construct({
             if (typeof (data) == 'object' && data.id)
                 bDO.resolve(data);
             else
-                bDO.reject(new xhrMessage(999, 'Input file could not be transformed to SpecIF'));
+                bDO.reject(new resultMsg(999, 'Input file could not be transformed to SpecIF'));
             return bDO;
         };
     self.abort = function () {

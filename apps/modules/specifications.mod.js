@@ -1,11 +1,10 @@
 "use strict";
 /*!	Show SpecIF data
     Dependencies: jQuery, jqTree, bootstrap
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 
     ToDo: This module is lousy coding with lots of historical burden --> redo!
 */
@@ -20,8 +19,8 @@ class CPropertyToShow {
         this.dT = this.cData.get("dataType", [this.pC.dataType])[0];
         this.title = LIB.titleOf(this.pC, { targetLanguage: 'default' });
         if (this.dT.enumeration) {
-            this.enumIdL = [].concat(prp.values);
-            this.values = this.values.map((v) => LIB.itemById(this.dT.enumeration, v).value);
+            this.enumIdL = prp.values.map(v => v.id);
+            this.values = this.values.map((v) => LIB.itemById(this.dT.enumeration, v.id).value);
         }
         ;
         let iPrm = LIB.itemBy(this.selPrj.myPermissions, 'item', this.pC.id);
@@ -106,7 +105,7 @@ class CPropertyToShow {
                 replaced = true;
                 if ($1.length < CONFIG.titleLinkMinLength)
                     return $1 + $2;
-                let m = $1.toLowerCase(), cR, ti, rC, target;
+                let m = $1.toLowerCase(), cR, ti, target;
                 app.specs.tree.iterate((nd) => {
                     cR = LIB.itemByKey(this.cData.resources, nd.ref);
                     ti = this.cData.instanceTitleOf(cR, opts);
@@ -115,15 +114,14 @@ class CPropertyToShow {
                     target = cR;
                     return false;
                 });
-                if (target)
-                    return lnk(target, $1) + $2;
+                if (target) {
+                    return '<a class="link-primary" onclick="app[CONFIG.objectList].relatedItemClicked(\'' + target.id + '\')">' + $1 + '</a>' + $2;
+                }
+                ;
                 return '<span style="color:#D82020">' + $1 + '</span>' + $2;
             });
         } while (replaced);
         return str;
-        function lnk(r, t) {
-            return '<a onclick="app[CONFIG.objectList].relatedItemClicked(\'' + r.id + '\')">' + t + '</a>';
-        }
     }
     renderFile(txt, opts) {
         if (typeof (opts) != 'object')
@@ -169,7 +167,7 @@ class CPropertyToShow {
                     f1.renderDownloadLink('<div class="' + opts.imgClass + ' ' + tagId(u2) + '"'
                         + makeStyle(w2, h2)
                         + '></div>', opts);
-                    f2.renderImage($.extend({}, opts, { timelag: opts.timelag * 1.2 }));
+                    f2.renderImage(Object.assign({}, opts, { timelag: opts.timelag * 1.2 }));
                 }
                 else {
                     repStrings.push('<span class="' + tagId(u1) + '"></span>');
@@ -321,11 +319,11 @@ class CResourceToShow {
         return (!Array.isArray(this.rC.instantiation)
             || this.rC.instantiation.includes(SpecifInstantiation.User));
     }
-    renderAttr(lbl, val, cssCl) {
-        cssCl = cssCl ? ' ' + cssCl : '';
-        return '<div class="attribute' + cssCl + '">'
-            + (lbl ? '<div class="attribute-label" >' + lbl + '</div><div class="attribute-value" >'
-                : '<div class="attribute-wide" >')
+    renderAttr(lbl, val, opts) {
+        let cl = opts && opts.condensed ? "attribute-condensed" : "attribute";
+        return '<div class="row ' + cl + '">'
+            + (lbl ? '<div class="col-3 attribute-label" >' + lbl + '</div><div class="col-9 attribute-value" >'
+                : '<div class="col-12" >')
             + val
             + '</div>'
             + '</div>';
@@ -343,7 +341,7 @@ class CResourceToShow {
     listEntry() {
         if (!this.id)
             return '<div class="notice-default">' + i18n.MsgNoObject + '</div>';
-        const clickable = ['#' + CONFIG.objectList, '#' + CONFIG.objectDetails].includes(app.specs.selectedView()), opts = {
+        const clickable = [CONFIG.objectList, CONFIG.objectDetails].includes(app.specs.selectedView()), opts = {
             clickableElements: clickable,
             linkifyURLs: clickable,
             unescapeHTMLTags: true,
@@ -355,33 +353,27 @@ class CResourceToShow {
             localDateTime: true,
             rev: this.revision
         }, optsDesc = Object.assign({
-            titleLinking: clickable,
-            titleLinkTargets: app.standards.titleLinkTargets()
+            titleLinking: clickable
         }, opts);
-        var rO = '<div class="listEntry">'
-            + '<div class="content-main">';
-        switch (app.specs.selectedView()) {
-            case '#' + CONFIG.objectFilter:
-            case '#' + CONFIG.objectList:
-                rO += '<div onclick="app.specs.itemClicked(\'' + this.id + '\')">'
-                    + this.renderTitle(opts)
-                    + '</div>';
-                break;
-            default:
-                rO += this.renderTitle(opts);
-        }
-        ;
+        var rO = '<div class="row listEntry">'
+            + '<div class="col-xl-8">';
+        if ([CONFIG.objectList, CONFIG.objectFilter].includes(app.specs.selectedView()))
+            rO += '<div onclick="app.specs.itemClicked(\'' + this.id + '\')">'
+                + this.renderTitle(opts)
+                + '</div>';
+        else
+            rO += this.renderTitle(opts);
         this.descriptions.forEach((prp) => {
             if (prp.isVisible(opts)) {
                 rO += this.renderAttr('', prp.get(optsDesc));
             }
         });
         rO += '</div>'
-            + '<div class="content-other">';
-        rO += this.renderAttr(app.ontology.localize('SpecIF:Resource', opts), LIB.titleOf(this.rC, opts), 'attribute-condensed');
+            + '<div class="col-xl">';
+        rO += this.renderAttr(app.ontology.localize(CONFIG.resClassResource, opts), LIB.titleOf(this.rC, opts), { condensed: true });
         this.other.forEach((prp) => {
             if (prp.isVisible(opts)) {
-                rO += this.renderAttr(LIB.titleOf(prp, opts), prp.get(opts), 'attribute-condensed');
+                rO += this.renderAttr(LIB.titleOf(prp, opts), prp.get(opts), { condensed: true });
             }
         });
         rO += '</div>'
@@ -391,6 +383,9 @@ class CResourceToShow {
 }
 class CResourcesToShow {
     constructor() {
+        this.clear();
+    }
+    clear() {
         this.list = [];
     }
     push(r) {
@@ -464,7 +459,7 @@ class CFileWithContent {
         return this.title && this.title.length > 0 && (this.hasBlob() || this.hasDataURL());
     }
     canBeRenderedAsImage() {
-        return ['png', 'svg', 'bpmn', 'jpg', 'jpeg', 'gif'].includes(this.title.fileExt().toLowerCase());
+        return CONFIG.imgExtensions.includes(this.title.fileExt().toLowerCase());
     }
     canBeDownloaded() {
         return CONFIG.officeExtensions.concat(CONFIG.applExtensions).includes(this.title.fileExt().toLowerCase());
@@ -519,9 +514,6 @@ class CFileWithContent {
                 break;
             case 'image/svg+xml':
                 this.showSvg(opts);
-                break;
-            case 'application/bpmn+xml':
-                this.showBpmn(opts);
                 break;
             default:
                 console.warn('Cannot show diagram ' + this.title + ' of unknown type: ', this.type);
@@ -664,41 +656,40 @@ class CFileWithContent {
             }
         }
     }
-    showBpmn(opts) {
-        LIB.blob2text(this, (t, fTi) => {
-            bpmn2svg(t)
-                .then((result) => {
-                Array.from(document.getElementsByClassName(tagId(fTi)), (el) => { el.innerHTML = result.svg; });
-            }, (err) => {
-                console.error('BPMN-Viewer could not deliver SVG', err);
-            });
-        }, opts.timelag);
-    }
 }
 moduleManager.construct({
     name: CONFIG.specifications
 }, (self) => {
-    let myName = self.loadAs, myFullName = 'app.' + myName;
+    const myName = self.loadAs, myFullName = 'app.' + myName;
     self.selectedView = () => {
-        return self.ViewControl.selected.view;
+        return self.viewControl.selected.view.substring(1);
     };
     self.emptyTab = (tab) => {
         app.busy.reset();
         $(tab).empty();
     };
     self.init = () => {
-        let h = '<div id="specLeft" class="paneLeft" style="position:relative">'
-            + '<div id="navBtns" class="btn-group-vertical btn-group-sm" style="position:absolute;top:4px;right:12px;z-index:900">'
-            + '<button class="btn btn-default" onclick="' + myFullName + '.tree.moveUp()" data-toggle="popover" title="' + i18n.LblPrevious + '" >' + i18n.IcoPrevious + '</button>'
-            + '<button class="btn btn-default" onclick="' + myFullName + '.tree.moveDown()" data-toggle="popover" title="' + i18n.LblNext + '" >' + i18n.IcoNext + '</button>'
+        self.clear();
+        let h = '<div id="specContent" class="container-fluid"><div class="row">'
+            + '<div id="specLeft" class="col-lg-3 background-select" style="position:relative">'
+            + '<div id="navBtns" class="btn-group-vertical btn-group-sm" role="group" style="position:absolute;top:1em;right:1.2em;z-index:900">'
+            + '<button class="btn btn-light" onclick="' + myFullName + '.tree.moveUp()" data-toggle="popover" title="' + i18n.LblPrevious + '" >' + i18n.IcoPrevious + '</button>'
+            + '<button class="btn btn-light" onclick="' + myFullName + '.tree.moveDown()" data-toggle="popover" title="' + i18n.LblNext + '" >' + i18n.IcoNext + '</button>'
             + '</div>'
             + '<div id="hierarchy" class="pane-tree" ></div>'
             + '<div id="details" class="pane-details" ></div>'
-            + '</div>';
-        if (self.selector)
-            $(self.selector).after(h);
-        else
-            $(self.view).prepend(h);
+            + '</div>'
+            + '</div></div>';
+        $(self.selector).after(h);
+        $('#specLeft').after($('#' + CONFIG.objectList).addClass('col-lg'), $('#' + CONFIG.relations).addClass('col-lg'));
+        self.showLeft = new State({
+            showWhenSet: ['#specLeft'],
+            hideWhenSet: []
+        });
+        self.showTree = new State({
+            showWhenSet: ['#hierarchy', '#navBtns'],
+            hideWhenSet: ['#details']
+        });
         self.tree = new Tree({
             loc: '#hierarchy',
             dragAndDrop: app.title != i18n.LblReader,
@@ -709,11 +700,11 @@ moduleManager.construct({
                     self.refresh();
                 },
                 'open': () => {
-                    if (self.selectedView() == '#' + CONFIG.objectList)
+                    if (self.selectedView() == CONFIG.objectList)
                         self.refresh();
                 },
                 'close': () => {
-                    if (self.selectedView() == '#' + CONFIG.objectList)
+                    if (self.selectedView() == CONFIG.objectList)
                         self.refresh();
                 },
                 'move': (event) => {
@@ -758,21 +749,15 @@ moduleManager.construct({
                 }
             }
         });
-        self.showLeft = new State({
-            showWhenSet: ['#specLeft'],
-            hideWhenSet: []
-        });
-        self.showTree = new State({
-            showWhenSet: ['#hierarchy', '#navBtns'],
-            hideWhenSet: ['#details']
-        });
         refreshReqCnt = 0;
         return true;
     };
     self.clear = () => {
-        self.tree.clear();
+        if (self.tree) {
+            self.tree.clear();
+        }
+        ;
         refreshReqCnt = 0;
-        app.projects.clear();
         app.busy.reset();
     };
     self.hide = () => {
@@ -780,7 +765,7 @@ moduleManager.construct({
     };
     self.updateTree = (opts, spc) => {
         if (!spc)
-            spc = self.cData.hierarchies;
+            spc = self.cData.nodes;
         self.tree.saveState();
         self.tree.set(LIB.forAll(spc, toJqTreeWithoutRoot));
         self.tree.numberize();
@@ -788,7 +773,7 @@ moduleManager.construct({
         return;
         function toJqTreeWithoutRoot(iE) {
             let r = LIB.itemByKey(self.cData.resources, iE.resource), ty = LIB.valueByTitle(r, CONFIG.propClassType, self.cData);
-            if (ty == CONFIG.hierarchyRoot)
+            if ([CONFIG.resClassHierarchyRoot, CONFIG.reqifHierarchyRoot].includes(ty))
                 return LIB.forAll(iE.nodes, toJqTree);
             return toJqTree(iE);
         }
@@ -818,7 +803,7 @@ moduleManager.construct({
             || uP && uP[CONFIG.keyProject] && uP[CONFIG.keyProject] != self.selPrj.id)
             self.tree.clear();
         if (self.cData.length("hierarchy") > 0) {
-            self.selPrj.readItems('hierarchy', self.selPrj.hierarchies, { reload: true })
+            self.selPrj.readItems('hierarchy', self.selPrj.nodes, { reload: true })
                 .then((rsp) => {
                 let nd;
                 self.updateTree(opts, rsp);
@@ -848,7 +833,7 @@ moduleManager.construct({
         }, CONFIG.noMultipleRefreshWithin);
     };
     self.doRefresh = (parms) => {
-        self.ViewControl.selected.show(parms);
+        self.viewControl.selected.show(parms);
     };
     self.reworkTree = () => {
         self.selPrj.createFolderWithGlossary({ addGlossary: true })
@@ -857,6 +842,7 @@ moduleManager.construct({
         })
             .then(() => {
             self.updateTree({
+                lookupTitles: true,
                 targetLanguage: self.selPrj.language
             });
             self.doRefresh({ forced: true });
@@ -864,15 +850,16 @@ moduleManager.construct({
             .catch(LIB.stdError);
     };
     self.itemClicked = (rId) => {
-        if (['#' + CONFIG.objectRevisions, '#' + CONFIG.comments].includes(self.selectedView()))
+        if ([CONFIG.objectRevisions, CONFIG.comments].includes(self.selectedView()))
             return;
         if (self.tree.selectedNode.ref != rId) {
+            self.showTree.set();
             self.tree.selectNodeByRef(LIB.makeKey(rId));
             document.getElementById(CONFIG.objectList).scrollTop = 0;
             self.tree.openNode();
         }
         ;
-        if (self.selectedView() != '#' + CONFIG.objectList)
+        if (self.selectedView() != CONFIG.objectList)
             moduleManager.show({ view: '#' + CONFIG.objectList });
     };
     return self;
@@ -880,15 +867,16 @@ moduleManager.construct({
 moduleManager.construct({
     view: '#' + CONFIG.objectList
 }, (self) => {
-    var myName = self.loadAs, myFullName = 'app.' + myName, selPrj, selRes;
-    self.resCreClasses = [];
-    self.resCre = false;
-    self.resources = new CResourcesToShow();
+    const myName = self.loadAs, myFullName = 'app.' + myName;
+    var selPrj, selRes, modalDelNode;
     self.init = () => {
+        self.resCreClasses = [];
+        self.resCre = false;
+        self.resources = new CResourcesToShow();
         return true;
     };
     self.clear = () => {
-        self.resources.init();
+        self.resources.clear();
     };
     self.hide = () => {
         $(self.view).empty();
@@ -905,7 +893,7 @@ moduleManager.construct({
         if (!self.parent.tree.selectedNode)
             self.parent.tree.selectFirstNode();
         var nL;
-        getPermissionsPrj();
+        getPermissionsRes();
         getNextResources()
             .then(renderNextResources, (err) => {
             if (err.status == 744) {
@@ -924,7 +912,7 @@ moduleManager.construct({
             if (nd && !opts.urlParams)
                 setUrlParams({
                     project: selPrj.id,
-                    view: self.view.substring(1),
+                    view: self.view,
                     node: nd.id
                 });
             for (var i = CONFIG.objToGetCount - 1; nd && i > -1; i--) {
@@ -951,34 +939,34 @@ moduleManager.construct({
             app.busy.reset();
         }
         function actionBtns() {
-            var rB = '<div class="btn-group" style="position:absolute;top:4px;right:4px;z-index:900">';
+            var rB = '<div class="btn-group" role="group" style="position:absolute;top:1em;right:1em;z-index:900">';
             if (self.resCre && (!selRes || selRes.isUserInstantiated()))
                 rB += '<button class="btn btn-success" onclick="' + myFullName + '.editResource(\'create\')" '
                     + 'data-toggle="popover" title="' + i18n.LblAddObject + '" >' + i18n.IcoAdd + '</button>';
             else
-                rB += '<button disabled class="btn btn-default" >' + i18n.IcoAdd + '</button>';
+                rB += '<button disabled class="btn btn-light" >' + i18n.IcoAdd + '</button>';
             if (!selRes)
                 return rB + '</div>';
             if (self.resCre && selRes.isUserInstantiated())
                 rB += '<button class="btn btn-success" onclick="' + myFullName + '.editResource(\'clone\')" '
                     + 'data-toggle="popover" title="' + i18n.LblCloneObject + '" >' + i18n.IcoClone + '</button>';
             else
-                rB += '<button disabled class="btn btn-default" >' + i18n.IcoClone + '</button>';
+                rB += '<button disabled class="btn btn-light" >' + i18n.IcoClone + '</button>';
             if (selRes.hasPropertyWithUpdatePermission)
-                rB += '<button class="btn btn-default" onclick="' + myFullName + '.editResource(\'update\')" '
+                rB += '<button class="btn btn-primary" onclick="' + myFullName + '.editResource(\'update\')" '
                     + 'data-toggle="popover" title="' + i18n.LblUpdateObject + '" >' + i18n.IcoEdit + '</button>';
             else
-                rB += '<button disabled class="btn btn-default" >' + i18n.IcoEdit + '</button>';
-            rB += '<button disabled class="btn btn-default" >' + i18n.IcoComment + '</button>';
+                rB += '<button disabled class="btn btn-primary" >' + i18n.IcoEdit + '</button>';
+            rB += '<button disabled class="btn btn-light" >' + i18n.IcoComment + '</button>';
             if (selRes.rC.permissionVector.D && selRes.isUserInstantiated())
-                rB += '<button class="btn btn-danger" onclick="' + myFullName + '.deleteNode()" '
+                rB += '<button class="btn btn-danger" onclick="' + myFullName + '.confirmDeletion()" '
                     + 'data-toggle="popover" title="' + i18n.LblDeleteObject + '" >' + i18n.IcoDelete + '</button>';
             else
-                rB += '<button disabled class="btn btn-default" >' + i18n.IcoDelete + '</button>';
+                rB += '<button disabled class="btn btn-light" >' + i18n.IcoDelete + '</button>';
             return rB + '</div>';
         }
         ;
-        function getPermissionsPrj() {
+        function getPermissionsRes() {
             if (app.title != i18n.LblReader) {
                 self.resCreClasses.length = 0;
                 selPrj.cache.get('resourceClass', selPrj.resourceClasses)
@@ -1010,32 +998,37 @@ moduleManager.construct({
             throw Error("\'editResource\' clicked, but module '" + CONFIG.resourceEdit + "' is not ready.");
         }
     };
-    self.deleteNode = () => {
-        new BootstrapDialog({
-            title: i18n.MsgConfirm,
-            type: BootstrapDialog.TYPE_DANGER,
-            message: i18n.lookup('MsgConfirmObjectDeletion', self.parent.tree.selectedNode.name),
-            buttons: [{
-                    label: i18n.BtnCancel,
-                    action: (thisDlg) => {
-                        thisDlg.close();
-                    }
-                }, {
-                    label: i18n.BtnDeleteObjectRef,
-                    action: (thisDlg) => {
-                        delNd(self.parent.tree.selectedNode);
-                        thisDlg.close();
-                    }
-                }]
-        })
-            .open();
-        return;
-        function delNd(nd) {
-            console.info("Deleting tree object '" + nd.name + "'.");
-            self.parent.tree.selectNode(nd.getNextSibling());
-            app.projects.selected.deleteItems('node', [LIB.makeKey(nd)])
-                .then(self.parent.reworkTree, LIB.stdError);
-        }
+    self.confirmDeletion = () => {
+        const modalId = "delNode";
+        $('#' + modalId).remove();
+        $('body').append('<div class="modal fade" id="' + modalId + '" tabindex="-1" >'
+            + '<div class="modal-dialog" >'
+            + '<div class="modal-content">'
+            + '<div class="modal-header bg-danger text-white" >'
+            + '<h5 class="modal-title" >' + i18n.MsgConfirm + '</h5>'
+            + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" > </button>'
+            + '</div>'
+            + '<div class="modal-body" >'
+            + i18n.lookup('MsgConfirmObjectDeletion', self.parent.tree.selectedNode.name)
+            + '</div>'
+            + '<div class="modal-footer" >'
+            + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >' + i18n.BtnCancel + '</button>'
+            + '<button type="button" class="btn btn-danger" onclick="' + myFullName + '.deleteSelectedNode()">' + i18n.BtnDeleteObjectRef + '</button>'
+            + '</div>'
+            + '</div>'
+            + '</div>'
+            + '</div>');
+        const delNode = document.getElementById(modalId);
+        modalDelNode = new bootstrap.Modal(delNode);
+        modalDelNode.show();
+    };
+    self.deleteSelectedNode = () => {
+        const nd = self.parent.tree.selectedNode;
+        console.info("Deleting tree object '" + nd.name + "'.");
+        self.parent.tree.selectNode(nd.getNextSibling());
+        app.projects.selected.deleteItems('node', [LIB.makeKey(nd)])
+            .then(self.parent.reworkTree, LIB.stdError);
+        modalDelNode.hide();
     };
     self.relatedItemClicked = (rId) => {
         self.parent.tree.selectNodeByRef(LIB.makeKey(rId));
@@ -1046,12 +1039,16 @@ moduleManager.construct({
 moduleManager.construct({
     view: '#' + CONFIG.relations
 }, (self) => {
-    var myName = self.loadAs, myFullName = 'app.' + myName, selPrj, cacheData, selRes, net, modeStaDel = false;
+    const myName = self.loadAs, myFullName = 'app.' + myName;
+    var selPrj, cacheData, selRes, net, modeStaDel = false;
     self.staCreClasses = { subjectClasses: [], objectClasses: [] };
     self.staCre = false;
+    self.staDelClasses = [];
     self.staDel = false;
     self.init = () => {
         return true;
+    };
+    self.clear = () => {
     };
     self.hide = () => {
         $(self.view).empty();
@@ -1078,10 +1075,10 @@ moduleManager.construct({
         if (nd && !opts.urlParams)
             setUrlParams({
                 project: selPrj.id,
-                view: self.view.substring(1),
+                view: self.view,
                 node: nd.id
             });
-        selPrj.readStatementsOf(nd.ref, { dontCheckStatementVisibility: aDiagramWithoutShowsStatementsForEdges(), asSubject: true, asObject: true })
+        selPrj.readStatementsOf(nd.ref, { dontCheckStatementVisibility: selPrj.aDiagramWithoutShowsStatementsForEdges(), asSubject: true, asObject: true })
             .then((sL) => {
             net = new CGraph({ resources: [nd.ref] });
             sL.forEach(cacheNet);
@@ -1090,7 +1087,7 @@ moduleManager.construct({
             .then((rResL) => {
             rResL.forEach((r) => { cacheMinRes(net, r); });
             selRes = LIB.itemByKey(rResL, nd.ref);
-            getPermissions(selRes);
+            getPermissionsSta(selRes);
             return getMentionsRels(selRes, opts);
         })
             .then((stL) => {
@@ -1178,49 +1175,57 @@ moduleManager.construct({
             }
         }
         ;
-        function aDiagramWithoutShowsStatementsForEdges() {
-            let res, isNotADiagram, noDiagramFound = true;
-            return LIB.iterateNodes(cacheData.get('hierarchy', selPrj.hierarchies), (nd) => {
-                res = cacheData.get('resource', [nd.resource])[0];
-                isNotADiagram = !CONFIG.diagramClasses.includes(LIB.classTitleOf(res['class'], cacheData.resourceClasses));
-                noDiagramFound = noDiagramFound && isNotADiagram;
-                return (isNotADiagram
-                    || LIB.hasType(res, CONFIG.diagramTypesHavingShowsStatementsForEdges, cacheData));
-            }) || noDiagramFound;
-        }
     };
     function linkBtns() {
         if (!selRes)
             return '';
-        var rB = '<div id="linkBtns" class="btn-group" style="position:absolute;top:4px;right:4px;z-index:900">';
+        var rB = '<div id="linkBtns" class="btn-group" role="group" style="position:absolute;top:1em;right:1em;z-index:900">';
         if (modeStaDel)
-            return rB + '<button class="btn btn-default" onclick="' + myFullName + '.toggleModeStaDel()" >' + i18n.BtnCancel + '</button></div>';
-        if (app.title != i18n.LblReader && self.staCre)
+            return rB + '<button class="btn btn-light" onclick="' + myFullName + '.toggleModeStaDel()" >' + i18n.BtnTerminate + '</button></div>';
+        if (self.staCre)
             rB += '<button class="btn btn-success" onclick="' + myFullName + '.linkResource()" '
                 + 'data-toggle="popover" title="' + i18n.LblAddRelation + '" >' + i18n.IcoAdd + '</button>';
         else
-            rB += '<button disabled class="btn btn-default" >' + i18n.IcoAdd + '</button>';
-        if (app.title != i18n.LblReader && net.statements.length > 0)
+            rB += '<button disabled class="btn btn-light" >' + i18n.IcoAdd + '</button>';
+        if (self.staDel && net.statements.length > 0)
             rB += '<button class="btn btn-danger ' + (modeStaDel ? 'active' : '') + '" onclick="' + myFullName + '.toggleModeStaDel()" '
                 + 'data-toggle="popover" title="' + i18n.LblDeleteRelation + '" >' + i18n.IcoDelete + '</button>';
         else
-            rB += '<button disabled class="btn btn-default" >' + i18n.IcoDelete + '</button>';
+            rB += '<button disabled class="btn btn-light" >' + i18n.IcoDelete + '</button>';
         return rB + '</div>';
     }
-    function getPermissions(res) {
+    function getPermissionsSta(res) {
         if (app.title != i18n.LblReader && res) {
             self.staCreClasses.subjectClasses.length = 0;
             self.staCreClasses.objectClasses.length = 0;
-            selPrj.cache.statementClasses.forEach((sC) => {
+            selPrj.cache.get('statementClass', selPrj.statementClasses)
+                .forEach((sC) => {
+                let iPrm = LIB.itemBy(selPrj.myPermissions, 'item', sC.id);
+                if (iPrm)
+                    sC.permissionVector = iPrm.permissionVector;
+                else {
+                    iPrm = LIB.itemBy(selPrj.myPermissions, 'item', selPrj.id);
+                    if (iPrm)
+                        sC.permissionVector = iPrm.permissionVector;
+                    else
+                        sC.permissionVector = noPermission;
+                }
+                ;
                 if (!sC.instantiation || sC.instantiation.includes(SpecifInstantiation.User)) {
-                    if (!sC.subjectClasses || LIB.indexByKey(sC.subjectClasses, res['class']) > -1)
-                        self.staCreClasses.subjectClasses.push(LIB.keyOf(sC));
-                    if (!sC.objectClasses || LIB.indexByKey(sC.objectClasses, res['class']) > -1)
-                        self.staCreClasses.objectClasses.push(LIB.keyOf(sC));
+                    if (sC.permissionVector.C) {
+                        if (!sC.subjectClasses || LIB.indexByKey(sC.subjectClasses, res['class']) > -1)
+                            self.staCreClasses.subjectClasses.push(LIB.keyOf(sC));
+                        if (!sC.objectClasses || LIB.indexByKey(sC.objectClasses, res['class']) > -1)
+                            self.staCreClasses.objectClasses.push(LIB.keyOf(sC));
+                    }
+                    ;
+                    if (sC.permissionVector.D)
+                        self.staDelClasses.push(sC.id);
                 }
                 ;
             });
             self.staCre = self.staCreClasses.subjectClasses.length > 0 || self.staCreClasses.objectClasses.length > 0;
+            self.staDel = self.staDelClasses.length > 0;
         }
     }
     function renderStatements(net) {
@@ -1237,11 +1242,11 @@ moduleManager.construct({
                 if (typeof (evt.target.resource) == 'string')
                     app[myName].relatedItemClicked(evt.target.resource, evt.target.statement);
             },
-            focusColor: CONFIG.focusColor,
-            nodeColor: modeStaDel ? '#ef9a9a' : '#afcbef'
+            nodeColorFocus: '#3B71CA',
+            nodeColor: modeStaDel ? '#f8d7da' : '#bbd2f0'
         });
         net.show(graphOptions);
-        $(self.view).prepend('<div style="position:absolute;left:4px;z-index:900">'
+        $(self.view).prepend('<div style="position:absolute;left:1em;z-index:900">'
             + (modeStaDel ? '<span class="notice-danger" >' + i18n.MsgClickToDeleteRel
                 : '<span class="notice-default" >' + i18n.MsgClickToNavigate)
             + '</span></div>');

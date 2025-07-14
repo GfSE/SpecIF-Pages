@@ -174,22 +174,41 @@ The term authoring tool is used here to describe software that is used to create
 
 ### Spreadsheet
 
-#### Folder
+#### Sheets Become Folders
 
-When importing spreadsheets such as LibreOffice Calc or Excel® files, a folder with the file name as title is created in the hierarchy of the SpecIF data-set. For each worksheet a subfolder is created with its name as a title. 
+When importing a workbook with one or more spreadsheets (Excel® *.xlsx, LibreOffice *.ods as well as *.csv), 
+a folder with the file name as title is created in the hierarchy of the ReqIF data-set. 
+For each spreadsheet a subfolder is created with its name as title. 
 
-#### Resources
+### Sheets Become Folders
 
-If there is a term in curly brackets in the name of a worksheet, it is used as the title of the resource class (SpecIF resourceClass, type of all resources/objects found on this worksheet). 
-If the worksheet name does not contain a term in curly brackets, a term in curly brackets in the file name is used as a substitute. 
-If no type designation is found there either, a generic title without a particular meaning is used for the resource class of the worksheet.
+When importing a workbook with one or more spreadsheets (Excel® *.xlsx, LibreOffice *.ods as well as *.csv), 
+a folder with the file name as title is created in the hierarchy of the ReqIF data-set. 
+For each spreadsheet a subfolder is created with its name as title. 
 
-Unfortunately, no vocabulary term ready to be interpreted by the system can be used in the filename, as certain characters (e.g. the colon) may not appear in filenames. 
-However, the terms “requirement”, “feature”, “annotation”, “user-story” and “pain-point“ are interpreted correctly by the viewer or editor and replaced by a vocabulary term.
+#### Resource Classes and Resources
 
-For example, if a spreadsheet has the file name "Project-name (Requirement).xslx" and it contains two worksheets with the names "Functions (User Story)" and "Constraints", 
-a resource-class with the title "User-Story" replaced by "SpecIF:UserStory" for the first worksheet and a resource-class with the title "Requirement" replaced by "IREB:Requirement" 
-for the second worksheet are created.
+If there is a term in curly brackets at the end of a *spreadsheet name*, a SpecIF resourceClass is selected
+having that term as a title (name). It serves as type for all resources/objects found on this spreadsheet. 
+Otherwise, a term in curly brackets at the end of the *file name* is used as a substitute. 
+In both cases a specific meaning is attributed to the resources/objects. 
+
+If no type designation is found at all, a new resourceClass is defined with a generic title without a particular meaning.
+
+Unfortunately, a global ontology term cannot be readily used in the filename, 
+as certain characters (e.g. the colon) are not allowed in filenames. 
+However, local terms including “requirement”, “feature”, “annotation”, “user-story” and “pain-point“ 
+(as well as any other local term as defined by the ontology) are interpreted correctly 
+by the tool and normalized, thus replaced by the preferred ontology term.
+
+For example, if a  file has the file name "Project-name {Requirement}.xslx" and it contains two spreadsheets 
+named "Functions {User Story}" and "Constraints", 
+a resourceClass with the title "User-Story" normalized by 
+<a href="https://specif.de/apps/view.html#import=https://specif.de/v1.2/Ontology.specif;view=doc;node=N-QacIoFiQ3a268UVZO9mHsqqrwdo" target="_blank">_SpecIF:UserStory_</a> 
+is assumed for the first spreadsheet and 
+a resourceClass with the title "Requirement" normalized by 
+<a href="https://specif.de/apps/view.html#import=https://specif.de/v1.2/Ontology.specif;view=doc;node=N-JissrCtZ51CD04LeneSqolLFJpA" target="_blank">_IREB:Requirement_</a> 
+for the second spreadsheet.
 
 #### Properties
 

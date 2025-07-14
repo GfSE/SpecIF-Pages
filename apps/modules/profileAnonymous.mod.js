@@ -1,11 +1,10 @@
 "use strict";
 /*!	User profile - simple implementation without identity and permissions.
     Dependencies: -
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
     Author: se@enso-managers.de, Berlin
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 */
 moduleManager.construct({
     name: 'profileAnonymous'
@@ -20,7 +19,11 @@ moduleManager.construct({
         self.userName = CONFIG.userNameAnonymous;
         self.userPassword = CONFIG.passwordAnonymous;
         self.administrator = false;
-        self.roleAssignments = [new CRoleAssignment("any", app.title == i18n.LblEditor ? "SpecIF:Editor" : "SpecIF:Reader")];
+        self.roleAssignments = [
+            new CRoleAssignment("any", app.title == i18n.LblEditor ? "SpecIF:Editor" : "SpecIF:Reader"),
+            new CRoleAssignment("P-DDP-Classes-V20", "SpecIF:Editor"),
+            new CRoleAssignment("P-DDP-Ontology-V20", "SpecIF:Editor")
+        ];
     };
     self.login = function () {
         return new Promise((resolve) => {

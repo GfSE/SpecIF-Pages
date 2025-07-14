@@ -2,11 +2,10 @@
 /*!	A simple module loader and object (singleton) factory.
     When all registered modules are ready, a callback function is executed to start or continue the application.
     Dependencies: jQuery 3.1 and later.
-    (C)copyright enso managers gmbh (http://www.enso-managers.de)
+    (C)copyright enso managers gmbh (http://enso-managers.de)
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
-    We appreciate any correction, comment or contribution via e-mail to maintenance@specif.de
-    .. or even better as Github issue (https://github.com/GfSE/SpecIF-Viewer/issues)
+    We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
 */
 class ViewControl {
     constructor() {
@@ -21,7 +20,7 @@ class ViewControl {
     }
     show(params) {
         if (typeof (params) != 'object')
-            throw Error("moduleManager.show() needs a parameter.");
+            throw new Error("moduleManager.show() needs a parameter.");
         let v, s;
         this.list.forEach((le) => {
             v = $(le.view);
@@ -75,18 +74,15 @@ class Browser {
         this.supportsHtml5History = Boolean(window.history && window.history.pushState);
         if (!this.supportsHtml5History)
             console.info("Browser does not support HTML5 History");
-        this.supportsCORS = $.support.cors;
-        if (!this.supportsCORS)
-            console.info("Browser does not support CORS");
         this.supportsFileAPI = Boolean(window.File && window.FileReader && window.FileList && window.Blob);
     }
     isIE() {
         return /MSIE |rv:11.0/i.test(navigator.userAgent);
     }
 }
-var app, browser, i18n, message, moduleManager = function () {
+var app, browser, message, moduleManager = function () {
     var self = {};
-    let callWhenReady, loadPath = './';
+    let callWhenReady, loadPath = './', pend = 0;
     self.init = (opts) => {
         browser = new Browser();
         if (browser.isIE()) {
@@ -98,40 +94,36 @@ var app, browser, i18n, message, moduleManager = function () {
         ;
         if (opts && opts.path)
             loadPath = opts.path;
-        self.registered = [];
-        self.ready = [];
-        loadL(['bootstrap', 'font', 'types', 'i18n', 'tree'], { done: init2 });
+        self.registered = new Set();
+        self.ready = new Set();
+        let initL = ['bootstrap', 'font', 'types', 'standards', 'i18n', 'helper', "xSpecif", 'ioOntology'];
+        if (CONFIG.convertMarkdown)
+            initL.push('markdown');
+        loadL(initL, { done: createApp });
         return;
-        function init2() {
-            let modL = ['helper', 'helperTree', 'bootstrapDialog', 'mainCSS', 'ioOntology', 'standards', "xSpecif"];
-            if (CONFIG.convertMarkdown)
-                modL.push('markdown');
-            loadL(modL, {
-                done: () => {
-                    app = window['SpecifApp']();
-                    app.busy = new State({
-                        showWhenSet: ['#spinner'],
-                        hideWhenSet: ['.pageActions', '.contentActions']
-                    });
-                    bindResizer();
-                }
+        function createApp() {
+            app = window['SpecifApp']();
+            app.busy = new State({
+                showWhenSet: ['#spinner'],
+                hideWhenSet: ['.pageActions', '.contentActions']
             });
+            window.onresize = doResize;
         }
         function loadL(L, opts) {
             if (opts && typeof (opts.done) == "function")
                 callWhenReady = opts.done;
             else
-                callWhenReady = undefined;
+                throw new Error("No callback provided to continue after initializing.");
             L.forEach((e) => { loadModule(e); });
         }
     };
     function register(mod) {
-        if (self.registered.includes(mod)) {
+        if (self.registered.has(mod)) {
             console.warn("WARNING: Did not reload module '" + mod + "'.");
             return false;
         }
         ;
-        self.registered.push(mod);
+        self.registered.add(mod);
         return true;
     }
     self.load = (tr, opts) => {
@@ -142,7 +134,7 @@ var app, browser, i18n, message, moduleManager = function () {
         return;
         function ld(e) {
             if (e.view && e.parent) {
-                let c = e.viewClass ? 'class="' + e.viewClass + '" ' : '', d = '<div id="' + e.view.substring(1) + '" ' + c + ' style="display:none;"></div>';
+                let c = e.viewClass ? 'class="' + e.viewClass + '" ' : '', d = '<div id="' + e.view.substring(1) + '" ' + c + 'style="display:none;"></div>';
                 $(e.parent.view).append(d);
             }
             ;
@@ -157,7 +149,7 @@ var app, browser, i18n, message, moduleManager = function () {
             return;
             function loadChildren(e) {
                 if (e.selector) {
-                    e.ViewControl = new ViewControl();
+                    e.viewControl = new ViewControl();
                     if ($(e.selector).length < 1) {
                         let s = '';
                         switch (e.selectorType) {
@@ -175,35 +167,35 @@ var app, browser, i18n, message, moduleManager = function () {
                     e.children.forEach(function (ch) {
                         if (ch.view) {
                             if (!ch.selectedBy) {
-                                throw Error("Module '" + ch.name + "' must have both properties 'view' and 'selectedBy' or none.");
+                                throw new Error("Module '" + ch.name + "' must have both properties 'view' and 'selectedBy' or none.");
                             }
                             ;
-                            e.ViewControl.add(ch);
+                            e.viewControl.add(ch);
                             id = ch.selectedBy.substring(1);
                             lbl = ch.label || id;
                             switch (e.selectorType) {
                                 case 'btns':
-                                    $(e.selector).append('<button id="' + id + '" type="button" class="btn btn-default" onclick="moduleManager.show({view:\'' + ch.view + '\'})" >' + lbl + '</button>');
+                                    $(e.selector).append('<button id="' + id + '" type="button" class="btn btn-light" onclick="moduleManager.show({view:\'' + ch.view + '\'})" >' + lbl + '</button>');
                                     break;
                                 default:
-                                    $(e.selector).append('<li id="' + id + '" onclick="moduleManager.show({view:\'' + ch.view + '\'})"><a>' + lbl + '</a></li>');
+                                    $(e.selector).append('<li class="nav-item"><button class="nav-link" id="' + id + '"type = "button" role="tab" onclick="moduleManager.show({view:\'' + ch.view + '\'})">' + lbl + '</button></li>');
                             }
                             ;
                         }
                         ;
                         if (ch.action) {
                             if (!ch.selectedBy) {
-                                throw Error("Module '" + ch.name + "' must have both properties 'action' and 'selectedBy' or none.");
+                                throw new Error("Module '" + ch.name + "' must have both properties 'action' and 'selectedBy' or none.");
                             }
                             ;
                             id = ch.selectedBy.substring(1);
                             lbl = ch.label || id;
                             switch (e.selectorType) {
                                 case 'btns':
-                                    $(e.selector).append('<button id="' + id + '" type="button" class="btn btn-default" onclick="' + ch.action + '" >' + lbl + '</button>');
+                                    $(e.selector).append('<button id="' + id + '" type="button" class="btn btn-light" onclick="' + ch.action + '" >' + lbl + '</button>');
                                     break;
                                 default:
-                                    throw Error("Action'" + lbl + "' needs a parent selector of type 'btns'.");
+                                    throw new Error("Action'" + lbl + "' needs a parent selector of type 'btns'.");
                             }
                             ;
                         }
@@ -219,23 +211,23 @@ var app, browser, i18n, message, moduleManager = function () {
         }
     };
     self.construct = (defs, constructorFn) => {
-        let mo = findModule(self.tree, defs.name || defs.view);
+        let mo = findModule(self.tree, defs.name ?? defs.view);
         if (!mo)
-            throw Error(defs.name ? "'" + defs.name + "' is not a defined module name" : "'" + defs.view + "' is not a defined view");
-        $.extend(mo, defs);
+            throw new Error(defs.name ? "'" + defs.name + "' is not a defined module name" : "'" + defs.view + "' is not a defined view");
+        Object.assign(mo, defs);
         if (!mo.loadAs)
-            mo.loadAs = mo.name || mo.view.substring(1);
+            mo.loadAs = mo.name ?? mo.view.substring(1);
         constructorFn(mo);
         app[mo.loadAs] = mo;
-        if (defs.name && self.registered.includes(defs.name))
+        if (defs.name && self.registered.has(defs.name))
             setReady(defs.name);
     };
     self.show = (params) => {
         if (typeof (params) != 'object')
-            throw Error("Undefined target view.");
+            throw new Error("Undefined target view.");
         let mo = findModule(self.tree, params.view);
-        if (!mo || !mo.parent.ViewControl)
-            throw Error("'" + params.view + "' is not a defined view");
+        if (!mo || !mo.parent.viewControl)
+            throw new Error("'" + params.view + "' is not a defined view");
         setViewFromRoot(mo, params);
         setViewToLeaf(mo, params);
         return;
@@ -244,7 +236,7 @@ var app, browser, i18n, message, moduleManager = function () {
                 setViewFromRoot(le.parent, Object.assign({}, pars, { view: le.parent.view }));
             }
             ;
-            le.parent.ViewControl.show(pars);
+            le.parent.viewControl.show(pars);
         }
         function setViewToLeaf(le, pars) {
             function findDefault(vL) {
@@ -255,15 +247,18 @@ var app, browser, i18n, message, moduleManager = function () {
                 ;
                 return vL[0];
             }
-            if (le.ViewControl && le.ViewControl.list.length > 0) {
-                let ch = findDefault(le.ViewControl.list);
-                le.ViewControl.show(Object.assign({}, pars, { view: ch.view }));
+            if (le.viewControl && le.viewControl.list.length > 0) {
+                let ch = findDefault(le.viewControl.list);
+                le.viewControl.show(Object.assign({}, pars, { view: ch.view }));
                 setViewToLeaf(ch, pars);
             }
         }
     };
+    self.isRegistered = (mod) => {
+        return self.registered.has(mod);
+    };
     self.isReady = (mod) => {
-        return self.ready.includes(mod);
+        return self.ready.has(mod);
     };
     return self;
     function initModuleTree(h) {
@@ -273,9 +268,8 @@ var app, browser, i18n, message, moduleManager = function () {
             if (e.children)
                 e.children.forEach((c) => { it(c); });
         }
-        if (h) {
+        if (h)
             it(h);
-        }
     }
     function findModule(tr, token) {
         let m = undefined;
@@ -308,23 +302,20 @@ var app, browser, i18n, message, moduleManager = function () {
         ;
         return;
         function ldM(mod) {
+            pend++;
             switch (mod) {
                 case "font":
-                    getCss("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css");
+                    getStyle("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css");
                     setReady(mod);
                     return true;
                 case "bootstrap":
-                    getCss("https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css");
-                    getCss("https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap-theme.min.css");
-                    getScript('https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js');
-                    return true;
-                case "bootstrapDialog":
-                    getCss("https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.35.4/css/bootstrap-dialog.min.css");
-                    getScript('https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.35.4/js/bootstrap-dialog.min.js');
+                    getStyle("https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css");
+                    getScript("https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js");
                     return true;
                 case "tree":
-                    getCss("https://cdn.jsdelivr.net/npm/jqtree@1.8.4/jqtree.css");
-                    getScript('https://cdn.jsdelivr.net/npm/jqtree@1.8.4/tree.jquery.js');
+                    loadModule('helperTree');
+                    getStyle("https://cdn.jsdelivr.net/npm/jqtree@1.8.10/jqtree.css");
+                    getScript('https://cdn.jsdelivr.net/npm/jqtree@1.8.10/tree.jquery.js');
                     return true;
                 case "fileSaver":
                     getScript('https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js');
@@ -339,18 +330,17 @@ var app, browser, i18n, message, moduleManager = function () {
                     getScript('https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js');
                     return true;
                 case "bpmnViewer":
-                    getScript('https://unpkg.com/bpmn-js@17.9.1/dist/bpmn-viewer.production.min.js');
+                    getScript('https://unpkg.com/bpmn-js@17.9.2/dist/bpmn-viewer.production.min.js');
                     return true;
                 case "graphViz":
                     getScript('https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/standalone/umd/vis-network.min.js');
                     return true;
+                case "pouchDB":
+                    getScript('https://cdn.jsdelivr.net/npm/pouchdb@9.0.0/dist/pouchdb.min.js');
+                    return true;
                 case "markdown":
                     getScript('https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js')
                         .done(() => { window.markdown = window.markdownit({ html: true, xhtmlOut: true, breaks: true, linkify: false }); });
-                    return true;
-                case "mainCSS":
-                    getCss(loadPath + 'assets/stylesheets/SpecIF.default.css');
-                    setReady(mod);
                     return true;
                 case "types":
                     getScript(loadPath + 'types/specif.types.js');
@@ -358,15 +348,12 @@ var app, browser, i18n, message, moduleManager = function () {
                 case "i18n":
                     switch (browser.language.slice(0, 2)) {
                         case 'de':
-                            getScript(loadPath + 'config/locales/iLaH-de.i18n.js')
-                                .done(() => { i18n = LanguageTextsDe(); });
+                            getScript(loadPath + 'config/locales/iLaH-de.i18n.js');
                             break;
                         case 'fr':
-                            getScript(loadPath + 'config/locales/iLaH-fr.i18n.js')
-                                .done(() => { i18n = LanguageTextsFr(); });
+                            getScript(loadPath + 'config/locales/iLaH-fr.i18n.js');
                             break;
-                        default: getScript(loadPath + 'config/locales/iLaH-en.i18n.js')
-                            .done(() => { i18n = LanguageTextsEn(); });
+                        default: getScript(loadPath + 'config/locales/iLaH-en.i18n.js');
                     }
                     ;
                     return true;
@@ -380,32 +367,34 @@ var app, browser, i18n, message, moduleManager = function () {
                 case 'ioOntology':
                     getScript(loadPath + 'modules/ioOntology.js');
                     return true;
-                case "Ontology":
-                    getOntology();
-                    return true;
                 case "helperTree":
                     getScript(loadPath + 'modules/helperTree.js');
                     return true;
                 case "xSpecif":
                     getScript(loadPath + 'modules/xSpecif.js');
                     return true;
-                case "cache":
-                    loadModule("Ontology");
+                case "projects":
+                    loadModule('fileSaver');
                     getScript(loadPath + 'modules/cache.mod.js');
                     return true;
                 case "profileAnonymous":
                     getScript(loadPath + 'modules/profileAnonymous.mod.js');
                     return true;
                 case 'toHtml':
-                    loadModule('fileSaver');
                     getScript(loadPath + 'modules/specif2html.js');
                     return true;
-                case "toXhtml":
-                    getScript(loadPath + 'assets/javascripts/toXhtml.js');
+                case 'toXhtml':
+                    if (!self.isRegistered('makeXhtml'))
+                        loadModule('makeXhtml');
+                    getScript(loadPath + 'modules/specif2xhtml.js');
                     return true;
                 case "toEpub":
-                    loadModule('toXhtml');
+                    if (!self.isRegistered('makeXhtml'))
+                        loadModule('makeXhtml');
                     getScript(loadPath + 'assets/javascripts/toEpub.js');
+                    return true;
+                case "makeXhtml":
+                    getScript(loadPath + 'assets/javascripts/makeXhtml.js');
                     return true;
                 case "toOxml":
                     getScript(loadPath + 'assets/javascripts/toOxml.js');
@@ -429,31 +418,28 @@ var app, browser, i18n, message, moduleManager = function () {
                     loadModule('graphViz');
                     getScript(loadPath + 'modules/graph.js');
                     return true;
-                case "about":
-                    getScript(loadPath + 'modules/about.mod.js');
+                case "serverPouch":
+                    loadModule('pouchDB');
+                    getScript(loadPath + 'modules/serverPouch.mod.js');
                     return true;
+                case 'sheet2reqif':
                 case 'importAny':
                     loadModule('zip');
                     loadModule('jsonSchema');
-                    getScript(loadPath + 'modules/importAny.mod.js');
-                    return true;
+                case "about":
                 case 'ioSpecif':
-                    getScript(loadPath + 'modules/ioSpecif.mod.js');
-                    return true;
                 case 'ioDdpSchema':
-                    getScript(loadPath + 'modules/ioDdpSchema.mod.js');
-                    return true;
                 case 'ioReqif':
-                    loadModule('reqif2specif');
-                    getScript(loadPath + 'modules/ioReqif.mod.js');
+                case 'ioPig':
+                    getScript(loadPath + 'modules/' + mod + '.mod.js');
                     return true;
                 case 'ioXls':
                     loadModule('excel');
                     getScript(loadPath + 'modules/ioXls.mod.js');
                     return true;
                 case 'ioBpmn':
-                    loadModule('bpmn2specif');
                     loadModule('bpmnViewer');
+                    loadModule('bpmn2specif');
                     getScript(loadPath + 'modules/ioBpmn.mod.js');
                     return true;
                 case 'ioArchimate':
@@ -465,6 +451,7 @@ var app, browser, i18n, message, moduleManager = function () {
                     getScript(loadPath + 'modules/ioSysml.mod.js');
                     return true;
                 case CONFIG.specifications:
+                    loadModule('tree');
                     getScript(loadPath + 'modules/specifications.mod.js');
                     return true;
                 case CONFIG.reports:
@@ -484,14 +471,8 @@ var app, browser, i18n, message, moduleManager = function () {
                     return false;
             }
         }
-        function bust(url) {
-            return url + (url.startsWith(loadPath) ? "?" + CONFIG.appVersion : "");
-        }
-        function getCss(url) {
-            $('head').append('<link rel="stylesheet" type="text/css" href="' + bust(url) + '" />');
-        }
         function getScript(url, options) {
-            let settings = $.extend(options || {}, {
+            let settings = Object.assign(options ?? {}, {
                 dataType: "script",
                 cache: true,
                 url: bust(url)
@@ -502,44 +483,41 @@ var app, browser, i18n, message, moduleManager = function () {
                 return $.ajax(settings)
                     .done(() => { setReady(module.name); });
         }
-        function getOntology() {
-            LIB.httpGet({
-                url: (window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html') ?
-                    CONFIG.ontologyURL
-                    : '../../SpecIF/vocabulary/Ontology.specif') + "?" + new Date().toISOString(),
-                responseType: 'arraybuffer',
-                withCredentials: false,
-                done: (xhr) => {
-                    let ont = JSON.parse(LIB.ab2str(xhr.response));
-                    app.ontology = new COntology(ont);
-                    setReady(module.name);
-                },
-                fail: LIB.stdError
-            });
-        }
         function loadAfterRequiredModules(mod, fn) {
-            if (!Array.isArray(mod.requires) || LIB.containsAllStrings(self.ready, mod.requires))
+            if ((!Array.isArray(mod.requires) || new Set(mod.requires).isSubsetOf(self.ready))
+                && pend < 9)
                 fn(mod.name);
             else
                 setTimeout(function () { loadAfterRequiredModules(mod, fn); }, 33);
         }
     }
+    function bust(url) {
+        return url + (url.startsWith(loadPath) ? "?" + CONFIG.appVersion : "");
+    }
+    function getStyle(url) {
+        $('head').append('<link rel="stylesheet" type="text/css" href="' + bust(url) + '" />');
+    }
     function setReady(mod) {
-        if (self.ready.indexOf(mod) < 0) {
-            self.ready.push(mod);
-            console.info(mod + " loaded (" + self.ready.length + "/" + self.registered.length + ")");
-        }
+        if (self.ready.has(mod))
+            throw new Error("Module '" + mod + "' cannot be set 'ready' more than once");
         else {
-            throw Error("Module '" + mod + "' cannot be set 'ready' more than once");
+            pend--;
+            self.ready.add(mod);
+            console.info("Loaded module '" + mod + "' (" + self.ready.length + " of " + self.registered.size + ").");
         }
         ;
-        if (self.registered.length === self.ready.length) {
-            initModuleTree(self.tree);
-            console.info("All " + self.ready.length + " modules loaded --> ready!");
+        if (self.registered.size === self.ready.size) {
+            if (self.tree) {
+                getStyle(loadPath + 'assets/stylesheets/SpecIF.default.css');
+                initModuleTree(self.tree);
+                console.info("All " + self.ready.size + " modules loaded --> ready!");
+            }
+            else
+                console.info("Initialization completed!");
             if (typeof (callWhenReady) == 'function')
                 callWhenReady();
             else
-                throw Error("No callback provided to continue after module loading.");
+                throw new Error("No callback provided to continue after module loading.");
         }
         ;
     }
@@ -583,18 +561,10 @@ class State {
 function doResize() {
     let wH = window.innerHeight
         || document.documentElement.clientHeight
-        || document.body.clientHeight, hH = $('#pageHeader').outerHeight(true)
-        + $('.nav-tabs').outerHeight(true), pH = wH - hH;
+        || document.body.clientHeight, hH = LIB.getHeight('#pageHeader') + LIB.getHeight('.nav-tabs'), pH = wH - hH;
     $('.content').outerHeight(pH);
     $('.contentWide').outerHeight(pH);
-    $('.pane-tree').outerHeight(pH);
-    $('.pane-details').outerHeight(pH);
-    $('.pane-filter').outerHeight(pH);
-    $('.contentCtrl').css("top", hH);
+    $('.pane-tree').css('max-height', pH);
+    $('.pane-details').css('max-height', pH);
     $('#aboutFrame').outerHeight(pH - 8);
-}
-function bindResizer() {
-    $(window).resize(() => {
-        doResize();
-    });
 }

@@ -1,5 +1,5 @@
 "use strict";
-function LanguageTextsEn() {
+var i18n = function () {
     var self = {};
     self.lookup = function (lb, pA) {
         if (lb) {
@@ -31,6 +31,7 @@ function LanguageTextsEn() {
     self.IcoReport = '<i class="bi-bar-chart-line" ></i>';
     self.LblAll = "All";
     self.LblAllObjects = "All resources";
+    self.LblOntology = "Ontology";
     self.LblImport = 'Import';
     self.LblExport = 'Export';
     self.LblExportReqif = 'Export ReqIF-file';
@@ -113,6 +114,7 @@ function LanguageTextsEn() {
     self.LblSpecType = "Type";
     self.LblResourceClass = 'Resource-class';
     self.LblStatementClass = 'Statement-class';
+    self.LblResource = 'Resource';
     self.LblSpecificationTypes = 'Outline-types';
     self.hierarchyType =
         self.LblSpecificationType = 'Outline-type';
@@ -125,14 +127,15 @@ function LanguageTextsEn() {
     self.LblOptions = 'Options';
     self.LblFileFormat = 'File format';
     self.modelElements = 'Model-Elements';
-    self.withOtherProperties = 'with other Properties';
-    self.showEmptyProperties = 'show empty Properties';
-    self.withStatements = 'with Statements';
+    self.withOtherProperties = 'with other properties';
+    self.showEmptyProperties = 'show empty properties';
+    self.withStatements = 'with statements';
+    self.elementsWithIcons = 'with icons';
+    self.elementsWithOrdernumbers = 'with order numbers';
     self.LblStringMatch = 'String <mark>Match</mark>';
     self.LblWordBeginnings = 'Word beginnings only';
     self.LblWholeWords = 'Whole words only';
     self.LblCaseSensitive = 'Case sensitive';
-    self.LblExcludeEnums = 'Exclude enumerated values';
     self.LblNotAssigned = '(not assigned)';
     self.LblPrevious = 'Previous';
     self.LblNext = 'Next';
@@ -162,6 +165,7 @@ function LanguageTextsEn() {
     self.LblDirectLink = "Direct link";
     self.BtnProfile = 'Profile';
     self.BtnBack = self.LblPreviousStep;
+    self.BtnTerminate = 'Terminate';
     self.BtnCancel = 'Cancel';
     self.BtnCancelImport = 'Abort';
     self.BtnApply = 'Apply';
@@ -231,7 +235,7 @@ function LanguageTextsEn() {
     self.MsgImportReqif = 'Permissible filetypes are *.reqif or *.reqifz. The content must conform with the ReqIF 1.0+ schemata. The import may take several minutes for very large files.';
     self.MsgImportSpecif = 'Permissible filetypes are *.specif, *.specif.zip and *.specifz. The content must conform with the SpecIF 0.10.4+ schemata. In case of large files, the import may take a couple of minutes.';
     self.MsgImportBpmn = 'Permissible filetype is *.bpmn. The content must conform with the schema BPMN 2.0 XML. The import may take a couple of minutes.';
-    self.MsgImportXls = "Permissible filetypes are *.xls, *.xlsx and *.csv. The import may take a couple of minutes for very large files.";
+    self.MsgImportXls = "Permissible filetypes are *.xls, *.xlsx, *.csv, *.ods and *.fods. The import may take a couple of minutes for very large files.";
     self.MsgExport = 'A file of the chosen format will be created. The export may take several minutes up for very large files; your web-browser will save the file according to its settings.';
     self.MsgLoading = 'Still loading ...';
     self.MsgSearching = 'Still searching ...';
@@ -250,6 +254,7 @@ function LanguageTextsEn() {
     self.MsgCredentialsUnknown = 'Credentials are unknown to the system.';
     self.MsgUserMgmtNeedsAdminRole = 'Please ask an administrator to manage the users and roles.';
     self.MsgProjectMgmtNeedsAdminRole = 'Please ask an administrator to manage the project characteristics, roles and permissios.';
+    self.MsgExportSuccessful = "Successfully exported '~A'.";
     self.MsgImportSuccessful = "Successfully imported '~A'.";
     self.MsgImportDenied = "Import of '~A' denied: The project is owned by another organization or the schema is violated.";
     self.MsgImportFailed = "Import of '~A' failed: The import has been aborted.";
@@ -270,8 +275,9 @@ function LanguageTextsEn() {
     self.MsgImgWidth = "Image width [px]";
     self.MsgSelectResClass = "Choose a " + self.LblResourceClass;
     self.MsgSelectStaClass = "Choose a " + self.LblStatementClass;
+    self.MsgSelectResource = "Select a " + self.LblResource;
     self.MsgNoEligibleRelTypes = "No statement-type defined for this resource-type.";
-    self.MsgClickToNavigate = "Double-click a resource to navigate:";
+    self.MsgClickToNavigate = "Double-click a diamond to expand or a resource to navigate:";
     self.MsgClickToDeleteRel = "Double-click a resource to delete the respective statement:";
     self.MsgNoSpec = "No outline found.";
     self.MsgTypesCommentCreated = 'The types for comments have been created.';
@@ -280,7 +286,7 @@ function LanguageTextsEn() {
     self.MsgLoadingFiles = 'Loading images and files';
     self.MsgLoadingObjects = 'Loading resources';
     self.MsgLoadingRelations = 'Loading statements';
-    self.MsgLoadingHierarchies = 'Loading hierarchies';
+    self.MsgLoadingHierarchies = 'Loading nodes';
     self.MsgProjectCreated = 'Project successfully created';
     self.MsgProjectUpdated = 'Project successfully updated';
     self.MsgNoneSpecified = 'empty';
@@ -317,6 +323,6 @@ function LanguageTextsEn() {
     self.LblReader = 'SpecIF Reader';
     self.LblReviewer = 'SpecIF Supplier-Review';
     self.LblEditor = 'SpecIF Model-Integrator and Editor';
+    self.LblSheet2reqif = 'Sheet → ReqIF';
     return self;
-}
-;
+}();

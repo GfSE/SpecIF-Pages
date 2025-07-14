@@ -1,5 +1,5 @@
 "use strict";
-function LanguageTextsDe() {
+var i18n = function () {
     var self = {};
     self.lookup = function (lb, pA) {
         if (lb) {
@@ -31,6 +31,7 @@ function LanguageTextsDe() {
     self.IcoReport = '<i class="bi-bar-chart-line" ></i>';
     self.LblAll = "Alle";
     self.LblAllObjects = "Alle Ressourcen";
+    self.LblOntology = "Ontologie";
     self.LblImport = 'Importieren';
     self.LblExport = 'Exportieren';
     self.LblExportReqif = 'ReqIF-Datei exportieren';
@@ -113,6 +114,7 @@ function LanguageTextsDe() {
     self.LblSpecType = 'Typ';
     self.LblResourceClass = 'Ressource-Klasse';
     self.LblStatementClass = 'Aussage-Klasse';
+    self.LblResource = 'Ressource';
     self.LblSpecificationTypes = 'Gliederungs-Typen';
     self.hierarchyType =
         self.LblSpecificationType = 'Gliederungs-Typ';
@@ -126,13 +128,14 @@ function LanguageTextsDe() {
     self.LblFileFormat = 'Dateiformat';
     self.modelElements = 'Modell-Elemente';
     self.withOtherProperties = 'mit weiteren Eigenschaften';
-    self.showEmptyProperties = 'leere Eigenschaften zeigen';
+    self.showEmptyProperties = 'einschließlich leerer Eigenschaften';
     self.withStatements = 'mit Relationen (Aussagen)';
+    self.elementsWithIcons = 'mit Symbolen';
+    self.elementsWithOrdernumbers = 'mit Gliederungsnummern';
     self.LblStringMatch = 'Text<mark>such</mark>e';
     self.LblWordBeginnings = 'Nur Wortanfänge berücksichtigen';
     self.LblWholeWords = 'Nur ganze Worte berücksichtigen';
     self.LblCaseSensitive = 'Groß/Kleinschreibung beachten';
-    self.LblExcludeEnums = 'Nur Textfelder durchsuchen';
     self.LblNotAssigned = '(ohne zugewiesenen Wert)';
     self.LblPrevious = 'Voriges';
     self.LblNext = 'Nächstes';
@@ -162,6 +165,7 @@ function LanguageTextsDe() {
     self.LblDirectLink = "Direktverweis";
     self.BtnProfile = 'Profil';
     self.BtnBack = self.LblPreviousStep;
+    self.BtnTerminate = 'Beenden';
     self.BtnCancel =
         self.BtnCancelImport = 'Abbrechen';
     self.BtnApply = 'Anwenden';
@@ -231,7 +235,7 @@ function LanguageTextsDe() {
     self.MsgImportReqif = 'Zulässige Dateitypen sind *.reqif oder *.reqifz. Inhalte müssen den Schemata für ReqIF 1.0+ entsprechen. Der Import dauert meist einige Sekunden und bei sehr großen Dateien mehrere Minuten.';
     self.MsgImportSpecif = 'Zulässige Dateitypen sind *.specif, *.specif.zip und *.specifz. Inhalte müssen den Schemata für SpecIF 0.10.4+ entsprechen. Bei großen Dateien kann der Import einige Minuten dauern.';
     self.MsgImportBpmn = 'Zulässiger Dateityp *.bpmn. Inhalte müssen den Schemata für BPMN 2.0 XML entsprechen. Der Import kann bis zu einigen Minuten dauern.';
-    self.MsgImportXls = 'Zulässige Dateitypen sind *.xls, *.xlsx und *.csv. Der Import kann bei sehr großen Dateien mehrere Minuten dauern.';
+    self.MsgImportXls = 'Zulässige Dateitypen sind *.xls, *.xlsx, *.csv, *.ods and *.fods. Der Import kann bei sehr großen Dateien mehrere Minuten dauern.';
     self.MsgExport = 'Es wird eine Datei im gewählten Format erzeugt. Der Export dauert meist einige Sekunden und im Falle sehr großer Dateien mehrere Minuten; Ihr Web-Browser speichert die Datei gemäß Voreinstellungen.';
     self.MsgLoading = 'Lade soeben ...';
     self.MsgSearching = 'Suche weiter ...';
@@ -241,7 +245,7 @@ function LanguageTextsDe() {
     self.MsgNoRelatedObjects = 'Zu dieser Ressource gibt es keine Relationen (Aussagen).';
     self.MsgNoComments = 'Zu dieser Ressource gibt es keine Kommentare.';
     self.MsgNoFiles = 'Keine Datei gefunden.';
-    self.MsgAnalyzing = 'Setze Analyse fort ...';
+    self.MsgAnalyzing = 'Führe Analyse durch ...';
     self.MsgNoReports = 'Keine Auswertungen für dieses Projekt.';
     self.MsgTypeNoObjectType = "Mindestens eine Ressource-Klasse anlegen, sonst können keine Ressourcen erzeugt werden.";
     self.MsgTypeNoAttribute = "Mindestens ein Attribut anlegen, sonst ist der Typ nicht brauchbar.";
@@ -250,6 +254,7 @@ function LanguageTextsDe() {
     self.MsgCredentialsUnknown = 'Anmeldeinformation ist unbekannt.';
     self.MsgUserMgmtNeedsAdminRole = 'Bitten Sie einen Administrator die Nutzer und Rollen zu verwalten.';
     self.MsgProjectMgmtNeedsAdminRole = 'Bitten Sie einen Administrator die Projekteigenschaften, Rollen und Rechte zu verwalten.';
+    self.MsgExportSuccessful = "'~A' wurde erfolgreich exportiert.";
     self.MsgImportSuccessful = "'~A' wurde erfolgreich importiert.";
     self.MsgImportDenied = "'~A' wurde nicht importiert: Das Projekt wird von einer anderen Organisation bearbeitet oder das Schema wird nicht eingehalten.";
     self.MsgImportFailed = "Der Import von '~A' wurde wegen eines Fehlers abgebrochen.";
@@ -270,9 +275,10 @@ function LanguageTextsDe() {
     self.MsgImgWidth = "Bildbreite [px]";
     self.MsgSelectResClass = self.LblResourceClass + " auswählen";
     self.MsgSelectStaClass = self.LblStatementClass + " auswählen";
+    self.MsgSelectResource = "Eine " + self.LblResource + " auswählen";
     self.MsgNoEligibleRelTypes = "Keine Relation-Klassen für diesen Ressource-Typ definiert.";
-    self.MsgClickToNavigate = "Eine Ressource doppelt klicken, um dorthin zu navigieren:";
-    self.MsgClickToDeleteRel = "Eine Ressource doppelt klicken, um die betreffende Relation zu löschen:";
+    self.MsgClickToNavigate = "Doppel-Klick: Eine Raute, um sie zu expandieren, oder eine Ressource, um dorthin zu navigieren.";
+    self.MsgClickToDeleteRel = "Eine Ressource doppelt klicken, um die betreffende Relation zu löschen.";
     self.MsgNoSpec = "Keine Gliederung gefunden.";
     self.MsgTypesCommentCreated = 'Die Typen für Kommentare wurden angelegt.';
     self.MsgOutlineAdded = 'Gliederung wurde oben hinzu gefügt - bitte konsolidieren Sie die bestehende und die neue manuell.';
@@ -317,6 +323,6 @@ function LanguageTextsDe() {
     self.LblReader = 'SpecIF Leser';
     self.LblReviewer = 'SpecIF Lieferanten-Abstimmung';
     self.LblEditor = 'SpecIF Modellintegrator und Editor';
+    self.LblSheet2reqif = 'Sheet → ReqIF';
     return self;
-}
-;
+}();
