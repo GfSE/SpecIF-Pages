@@ -1,7 +1,7 @@
 "use strict";
 const CONFIG = {};
-CONFIG.appVersion = "1.1.r.27",
-    CONFIG.specifVersion = "1.1";
+CONFIG.appVersion = "1.1.r.30";
+CONFIG.specifVersion = "1.1";
 CONFIG.imgURL = './assets/images';
 CONFIG.ontologyURL = 'https://specif.de/v1.1/Ontology.specif';
 CONFIG.QuickStartGuideDe = "https://specif.de/downloads/SpecIF-Einfuehrung.pdf";
@@ -90,9 +90,8 @@ RE.attrData = /data="([^"]+)"/;
 const tagSO = '<object ([^>]+?)(/>|>(.*?)</object>)', tagNO = '<object ([^>]+?)>[\\s]*' + tagSO + '([\\s\\S]*?)</object>';
 RE.tagSingleObject = new RegExp(tagSO, 'g');
 RE.tagNestedObjects = new RegExp(tagNO, 'g');
-const inBr = "\\((\\S[^\\)]*?\\S)\\)|\\[(\\S[^\\]]*?\\S)\\]";
-RE.inBracketsAtEnd = new RegExp(inBr + "$", 'i');
-RE.withoutBracketsAtEnd = /^(.*?)\s+(\(\S[^\)]*?\S\)|\[\S[^\]]*?\S\])$/i;
+RE.inBracketsAtEnd = /{(\S[^}]*?\S)}$/;  // empty space in the middle allowed, but not as first and last character
+RE.withoutBracketsAtEnd = /^\s*([^{]+[^{\s])\s*(?:\s{1}{\S.*?\S})?$/;
 RE.inQuotes = /"(\S[^"]*?\S)"|'(\S[^']*?\S)'/i;
 RE.isolatePrefix = /^([A-Z]{1,2}-)?(\S+)/;
 RE.isolateNamespace = /^([A-Z]+(?:\.|:))(\S+)/i;
