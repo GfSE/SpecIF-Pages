@@ -557,7 +557,11 @@ class CSpecIF {
                 function makeValue(val) {
                     if (val) {
                         if (dT.enumeration) {
-                            return val.id ? val : { id: val };
+                            if (typeof (val.id) == 'string')
+                                return val;
+                            if (typeof (val) == 'string')
+                                return { id: val };
+                            throw new Error('Property value with an enumerated data type must reference a valid value id.');
                         }
                         ;
                         switch (dT.type) {
@@ -582,16 +586,44 @@ class CSpecIF {
                             case XsDataType.DateTime:
                                 if (typeof (val) == 'string')
                                     return makeISODate(LIB.cleanValue(val));
-                                else
-                                    throw Error("Value of property " + prp.id + " with class " + prp['class'].id + " must be a string.");
+                                console.warn('Datetime value ', val, ' of property with class ' + prp['class'].id + ' must be a string.');
+                                break;
                             case XsDataType.Boolean:
-                                if (CONFIG.valuesTrue.includes(LIB.cleanValue(val)))
-                                    return "true";
-                                if (CONFIG.valuesFalse.includes(LIB.cleanValue(val)))
-                                    return "false";
-                                console.warn('Unknown boolean value ' + LIB.cleanValue(val) + ' skipped.');
+                                switch (typeof (val)) {
+                                    case 'string':
+                                        if (CONFIG.valuesTrue.includes(val))
+                                            return "true";
+                                        if (CONFIG.valuesFalse.includes(val))
+                                            return "false";
+                                        break;
+                                    case 'number':
+                                        console.warn('Boolean value ', val, ' of property with class ' + prp['class'].id + ' is not a string, but will be transformed to a string.');
+                                        if (val == 0)
+                                            return "false";
+                                        if (val == 1)
+                                            return "true";
+                                        break;
+                                    case 'boolean':
+                                        console.warn('Boolean value ', val, ' of property with class ' + prp['class'].id + ' is not a string, but will be transformed to a string.');
+                                        return val ? "true" : "false";
+                                }
+                                ;
+                                console.warn('Unknown boolean value ', val, ' of property with class ' + prp['class'].id + ' skipped.');
+                                break;
+                            case XsDataType.Integer:
+                            case XsDataType.Double:
+                                switch (typeof (val)) {
+                                    case 'string':
+                                        return LIB.cleanValue(val);
+                                    case 'number':
+                                        console.warn('Number value ', val, ' of property with class ' + prp['class'].id + ' is not a string, but will be transformed to a string.');
+                                        return val.toString();
+                                }
+                                ;
+                                console.warn('Unknown number value ', val, ' of property with class ' + prp['class'].id + ' skipped.');
                                 break;
                             case XsDataType.ComplexType:
+                                console.warn('Complex types not yet supported;', val, 'skipped.');
                                 break;
                             default:
                                 return LIB.cleanValue(val);

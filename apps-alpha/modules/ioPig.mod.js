@@ -1,5 +1,5 @@
 "use strict";
-/*!	Product Information Graph (PIG) import and export
+/*!	Product Information Graph (PIG) import and export in JSON-LD format
 *	Dependencies: -
 *	(C)copyright enso managers gmbh (http://enso-managers.de)
 *	Author: se@enso-managers.de, Berlin
@@ -28,6 +28,11 @@ moduleManager.construct({
     };
     self.abortFlag = false;
     self.fromSpecif = (spD, opts) => {
+        opts = {
+            includeContext: true,
+            includeClasses: true,
+            ...opts
+        };
         if (typeof (opts) != 'object')
             opts = {};
         const self = "#", sourceURI = encodeURI((opts.sourceFileName.startsWith('http') ? opts.sourceFileName : opts.baseURI + opts.sourceFileName)), date = new Date().toISOString();
@@ -41,11 +46,11 @@ moduleManager.construct({
             "@graph": []
         };
         [
+            { fn: makeEntity, iL: spD.resources },
+            { fn: makeRelationship, iL: spD.statements },
             { fn: makePropertyClass, iL: spD.propertyClasses },
             { fn: makeEntityClass, iL: spD.resourceClasses },
-            { fn: makeRelationshipClass, iL: spD.statementClasses },
-            { fn: makeEntity, iL: spD.resources },
-            { fn: makeRelationship, iL: spD.statements }
+            { fn: makeRelationshipClass, iL: spD.statementClasses }
         ].forEach((dsc) => {
             for (let itm of dsc.iL) {
                 pig['@graph'] = pig['@graph'].concat(dsc.fn(itm));
@@ -129,22 +134,25 @@ moduleManager.construct({
             return el;
         }
         function makeEntity(r) {
-            let e = makeElement(r, "pig:Entity");
+            let e = makeElement(r, PigProperty.Entity);
             return [e];
         }
         function makeRelationship(s) {
-            let rs = makeElement(s, "pig:Relationship");
-            rs['pig:hasSubject'] = self + s.subject.id;
-            rs['pig:hasObject'] = self + s.object.id;
+            let rs = makeElement(s, PigProperty.hasRelationship);
+            rs[PigProperty.hasSubject] = self + s.subject.id;
+            rs[PigProperty.hasObject] = self + s.object.id;
             return [rs];
         }
         function makeHierarchy(n) {
             let h = {
-                "@id": self + "N-HierarchyRoot",
-                "@type": "pig:Organizer"
+                "@id": self + "HierarchyRoot",
+                "@type": "pig:HierarchyRoot",
+                "pig:itemType": {
+                    "@id": "pig:Organizer"
+                }
             };
             if (n.nodes && n.nodes.length > 0) {
-                h['pig:hasChild'] = n.nodes.map(c => makeHierarchyItem(c));
+                h[PigProperty.hasChild] = n.nodes.map(c => makeHierarchyItem(c));
             }
             ;
             return [h];
@@ -152,7 +160,7 @@ moduleManager.construct({
                 let h = makeItem(n, "pig:Organizer");
                 h['pig:hasElement'] = self + n.resource.id;
                 if (n.nodes && n.nodes.length > 0) {
-                    h['pig:hasChild'] = n.nodes.map(c => makeHierarchyItem(c));
+                    h[PigProperty.hasChild] = n.nodes.map(c => makeHierarchyItem(c));
                 }
                 ;
                 return h;

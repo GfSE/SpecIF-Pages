@@ -11,4 +11,1161 @@
 
     References:
     [1] S.Friedenthal et al: A Practical Guide to SysML, The MK/OMG Press, Third Edition
-*/function sysml2specif(e,t){const s={};if([{id:"rcDefault",type:"resourceClass",term:CONFIG.resClassModelElement},{id:"rcFolder",type:"resourceClass",term:CONFIG.resClassFolder},{id:"rcDiagram",type:"resourceClass",term:CONFIG.resClassView},{id:"rcModelElement",type:"resourceClass",term:CONFIG.resClassModelElement},{id:"rcActor",type:"resourceClass",term:CONFIG.resClassActor},{id:"rcState",type:"resourceClass",term:CONFIG.resClassState},{id:"rcEvent",type:"resourceClass",term:CONFIG.resClassEvent},{id:"rcPackage",type:"resourceClass",term:"uml:Package"},{id:"rcStereotype",type:"resourceClass",term:"uml:Stereotype"},{id:"scDefault",type:"statementClass",term:"SpecIF:relates"},{id:"scControlFlow",type:"statementClass",term:"uml:ControlFlow"},{id:"scTriggers",type:"statementClass",term:"uml:Trigger"},{id:"scTransitionSource",type:"statementClass",term:"uml:TransitionSource"},{id:"scTransitionTarget",type:"statementClass",term:"uml:TransitionTarget"},{id:"scContains",type:"statementClass",term:"SpecIF:contains"},{id:"scHasDiagram",type:"statementClass",term:"uml:ownedDiagram"},{id:"scHasBehavior",type:"statementClass",term:"uml:ownedBehavior"},{id:"scHasPart",type:"statementClass",term:"dcterms:hasPart"},{id:"scSpecializes",type:"statementClass",term:"SpecIF:isSpecializationOf"},{id:"scRealizes",type:"statementClass",term:"uml:Realization"},{id:"scServes",type:"statementClass",term:"SpecIF:serves"},{id:"scAssociatedWith",type:"statementClass",term:"SpecIF:isAssociatedWith"},{id:"scHandles",type:"statementClass",term:"SpecIF:handles"},{id:"scProvides",type:"statementClass",term:"SpecIF:provides"},{id:"scConsumes",type:"statementClass",term:"SpecIF:consumes"},{id:"scShows",type:"statementClass",term:"SpecIF:shows"}].forEach((e=>{let t=app.ontology.getClassId(e.type,e.term);if(t)s[e.id]=t;else{switch(e.type){case"resourceClass":s[e.id]=s.rcDefault;break;case"statementClass":s[e.id]=s.scDefault}console.warn("Cameo Import: Term '"+e.term+"' not found in the ontology, using default term instead.")}})),s.scAggregates=s.scComprises=s.scHasPart,s.scDefault=s.scAssociatedWith,"object"!=typeof t||!t.fileName)throw Error("Programming Error: Cameo import gets no 'options'");let a=Object.assign({mimeType:"application/vnd.xmi+xml",fileDate:(new Date).toISOString(),addElementsToHierarchy:!0,replaceSeparatorNamespace:"*"},t);var i=(new DOMParser).parseFromString(e,"text/xml");return function(e){return e.getElementsByTagName("xmi:exporter")[0].innerHTML.includes("MagicDraw")}(i)?new resultMsg(0,"Cameo Import done","json",function(e,t){function a(t){let s=e.getElementsByTagName("xmi:XMI")[0],a=new Map;return Array.from(s.children,(e=>{let s=e.getAttribute(t);if(s){let i=e.getAttribute("Text");"base_Property"==t?a.set(s,{tag:e.tagName,dir:e.getAttribute("direction")}):i?a.set(s,{tag:e.tagName,text:i}):a.set(s,{tag:e.tagName})}})),a}const i=a("base_Class"),n=a("base_NamedElement"),o=a("base_Abstraction"),l=a("base_Property"),m=new Map,d=Array.from(e.getElementsByTagName("uml:Model")),u=Array.from(e.getElementsByTagName("packagedElement")).filter((e=>"uml:Model"==e.getAttribute("xmi:type"))),p=Array.from(e.getElementsByTagName("uml:Package")),g=Array.from(e.getElementsByTagName("uml:Profile")),y=d.concat(p).concat(u).concat(g);let I,h=app.ontology.generateSpecifClasses({domains:["SpecIF:DomainBase","SpecIF:DomainSystemsEngineering","SpecIF:DomainSystemModelIntegration"],lifeCycles:["SpecIF:LifecycleStatusReleased","SpecIF:LifecycleStatusEquivalent"],referencesWithoutRevision:!0}),f=[],B=[],b=[],k=[],C=[],L=[],A=[],K=[];console.debug("Cameo Import - Models, Packages and Profiles:",d,p,u,g,y);for(let e of y){"uml:Model"==e.tagName&&(h.id=CONFIG.prefixP+e.getAttribute("xmi:id"),h.title=[{text:e.getAttribute("name")}]);let a=e.getAttribute("xmi:id"),i={id:a,class:LIB.makeKey(s.rcFolder),properties:[{class:LIB.makeKey("PC-Name"),values:[[{text:r(e.getAttribute("name"))}]]},{class:LIB.makeKey("PC-Description"),values:[[{text:N(e,{parent:a})}]]},{class:LIB.makeKey("PC-Type"),values:[[{text:e.getAttribute("xmi:type")}]]}],changedAt:t.fileDate},c=S(i,h.id);h.resources.push(i),h.nodes.push(c),x(e,{packageId:"",nodes:c.nodes})}k=k.filter(E),h.resources.forEach((e=>{if(e.class.id==s.rcDefault){let t;t=function t(s){let a=k.filter((e=>e.subject.id==s.id));a.length>1&&console.warn("Cameo Import: Model-elment with id "+e.id+" specializes "+a.length+" classes");for(var i of a){let e=LIB.itemByKey(h.resources,i.object),s=LIB.titleFromProperties(e.properties,h.propertyClasses,{targetLanguage:"default"}),a=LIB.itemByTitle(h.resourceClasses,s);if(a)return a;if(a=t(e),a)return a}}(e),t&&t.id!=s.rcDefault&&(e.class=LIB.makeKey(t.id),console.info("Cameo Import: Re-assigning class "+t.id+" to model-element "+e.id+" with title "+LIB.valueByTitle(e,CONFIG.propClassTitle,h)));let a=i.get(e.id)||n.get(e.id);if(a){if("sysml:InterfaceBlock"==a.tag)return e.class=LIB.makeKey(s.rcState),void console.info("Cameo Import: Reassigning class '"+s.rcState+"' to  model-element "+e.id+" with title "+LIB.valueByTitle(e,CONFIG.propClassTitle,h));if(t=LIB.itemByTitle(h.resourceClasses,a.tag),t){if(e.class=LIB.makeKey(t.id),console.info("Cameo Import: Reassigning class '"+t.id+"' to  model-element "+e.id+" with title "+LIB.valueByTitle(e,CONFIG.propClassTitle,h)),"sysml:Requirement"==a.tag){let t=LIB.propByTitle(e,CONFIG.propClassDesc,h);t&&(t.values=[[{text:a.text}]])}return}let i=LIB.propByTitle(e,CONFIG.propClassType,h);i&&(i.values=[[{text:a.tag}]],console.info("Cameo Import: Assigning stereotype '"+a.tag+"' to  model-element "+e.id+" with title "+LIB.valueByTitle(e,CONFIG.propClassTitle,h)))}}return})),b=b.filter(E).map((e=>{let t=o.get(e.id);if(t){let s=LIB.itemByTitle(h.statementClasses,t.tag);if(s)e.class=LIB.makeKey(s.id),console.info("Cameo Import: Re-assigning class "+s.id+" with title "+t.tag+" to statement "+e.id);else{let s={class:LIB.makeKey("PC-Type"),values:[[{text:t.tag}]]};LIB.addProperty(e,s),console.info("Cameo Import: Assigning stereotype "+t.tag+" to statement "+e.id)}}return e})),L.forEach((e=>{let a,i=e.interfaceBlock;switch(m.get(i)){case"in":e.resource.properties.push({class:"PC-UmlFlowdirection",values:[[{text:e.isConjugated?"out":"in"}]]}),a=e.isConjugated?s.scProvides:s.scConsumes,h.statements.push({id:CONFIG.prefixS+(e.isConjugated?"provides-":"consumes-")+simpleHash(e.resource.id+a+i),class:LIB.makeKey(a),subject:LIB.makeKey(e.resource.id),object:LIB.makeKey(i),changedAt:t.fileDate});break;case"out":e.resource.properties.push({class:"PC-UmlFlowdirection",values:[[{text:e.isConjugated?"in":"out"}]]}),a=e.isConjugated?s.scConsumes:s.scProvides,h.statements.push({id:CONFIG.prefixS+(e.isConjugated?"consumes-":"provides-")+simpleHash(e.resource.id+a+i),class:LIB.makeKey(a),subject:LIB.makeKey(e.resource.id),object:LIB.makeKey(i),changedAt:t.fileDate});break;case"inout":e.resource.properties.push({class:"PC-UmlFlowdirection",values:[[{text:"inout"}]]}),h.statements.push({id:CONFIG.prefixS+"handles-"+simpleHash(e.resource.id+s.scHandles+i),class:LIB.makeKey(s.scHandles),subject:LIB.makeKey(e.resource.id),object:LIB.makeKey(i),changedAt:t.fileDate})}})),A.forEach((e=>{let a=LIB.itemById(L,e.ends[0]),i=LIB.itemById(L,e.ends[1]),r="true"==LIB.valueByTitle(a.resource,"uml:is_Service",h),c="true"==LIB.valueByTitle(i.resource,"uml:is_Service",h);!r||c?r||!c?h.statements.forEach((n=>{if(n.class.id==s.scComprises){if(n.subject.id==a.parent.id&&n.object.id==i.parent.id)return void h.statements.push({id:e.id,class:LIB.makeKey(s.scServes),subject:LIB.makeKey(r&&c?i.id:a.id),object:LIB.makeKey(r&&c?a.id:i.id),changedAt:t.fileDate});n.subject.id==i.parent.id&&n.object.id==a.parent.id&&h.statements.push({id:e.id,class:LIB.makeKey(s.scServes),subject:LIB.makeKey(r&&c?a.id:i.id),object:LIB.makeKey(r&&c?i.id:a.id),changedAt:t.fileDate})}})):h.statements.push({id:e.id,class:LIB.makeKey(s.scServes),subject:LIB.makeKey(i.id),object:LIB.makeKey(a.id),changedAt:t.fileDate}):h.statements.push({id:e.id,class:LIB.makeKey(s.scServes),subject:LIB.makeKey(a.id),object:LIB.makeKey(i.id),changedAt:t.fileDate})})),K.forEach((e=>{let t=LIB.itemById(h.resources,e.id),s=LIB.valueByTitle(t,"dcterms:title",h),a=LIB.valueByTitle(t,"dcterms:type",h),i=LIB.itemById(h.resources,e.source),r=LIB.valueByTitle(i,"dcterms:title",h),c=LIB.valueByTitle(i,"dcterms:type",h),n=LIB.itemById(h.resources,e.target),o=LIB.valueByTitle(n,"dcterms:title",h);"uml:Pseudostate"==c&&r.includes("unnamed")&&(r="entry",LIB.updatePropertyByTitle(i,"dcterms:title",(()=>[[{text:r}]]),h)),"uml:Transition"==a&&s.includes("unnamed")&&LIB.updatePropertyByTitle(t,"dcterms:title",(()=>[[{text:r+"→"+o}]]),h)})),h.statements=h.statements.concat(b).concat(k).concat(B);do{I=h.statements.length,h.statements=h.statements.filter(E)}while(I>h.statements.length);return h=LIB.keepUsedClasses(h),console.debug("from SysML:",h,t),h;function x(e,a){function n(e){let t=[];return Array.from(e.children,(e=>{"ownedLiteral"==e.tagName&&t.push({id:e.getAttribute("xmi:id"),txt:e.getAttribute("name")})})),t}function o(e){let t=e.getAttribute("general");if(!t){let s=e.getElementsByTagName("referenceExtension")[0];if(s&&(t=s.getAttribute("referentPath"),t&&t.indexOf("::")>0)){let e=t.toLowerCase().includes("sysml")?"sysml:":"uml:";t=e+t.split("::").pop(),console.debug("Cameo Import: Generalization found in referenceExtension: "+t)}}return t}function d(e,a){let n=T(e,{class:s.rcDefault});h.resources.push(n);let u=S(n,a.packageId),p={packageId:a.packageId,parent:n,nodes:u.nodes};t.addElementsToHierarchy&&a.nodes.push(u),a.packageId&&h.statements.push({id:CONFIG.prefixS+"contains-"+simpleHash(a.packageId+s.scContains+n.id),class:LIB.makeKey(s.scContains),subject:LIB.makeKey(a.packageId),object:LIB.makeKey(n.id),changedAt:t.fileDate}),Array.from(e.children,(e=>{switch(e.tagName){case"ownedComment":break;case"nestedClassifier":d(e,p);break;case"xmi:Extension":j(e,p);break;case"ownedBehavior":switch(e.getAttribute("xmi:type")){case"uml:StateMachine":!function(e,a){let i=T(e,{class:s.rcActor});h.resources.push(i),h.statements.push({id:CONFIG.prefixS+"ownedBehavior-"+simpleHash(a.parent.id+s.scHasBehavior+i.id),class:LIB.makeKey(s.scHasBehavior),subject:LIB.makeKey(a.parent.id),object:LIB.makeKey(i.id),changedAt:t.fileDate}),a.packageId&&h.statements.push({id:CONFIG.prefixS+"contains-"+simpleHash(a.packageId+s.scContains+i.id),class:LIB.makeKey(s.scContains),subject:LIB.makeKey(a.packageId),object:LIB.makeKey(i.id),changedAt:t.fileDate});return void Array.from(e.children,(e=>{switch(e.tagName){case"ownedComment":break;case"xmi:Extension":j(e,Object.assign({},a,{parent:i}));break;case"region":let t=f[f.length-1];D(t.id,e.getAttribute("xmi:id")),r(e,Object.assign({},a,{parent:i,diagram:t}));break;default:c(e)}}));function r(e,a){let i=T(e,{class:s.rcActor});h.resources.push(i),h.statements.push({id:CONFIG.prefixS+"contains-"+simpleHash(a.parent.id+s.scContains+i.id),class:LIB.makeKey(s.scContains),subject:LIB.makeKey(a.parent.id),object:LIB.makeKey(i.id),changedAt:t.fileDate}),Array.from(e.children,(e=>{let n;switch(e.tagName){case"ownedComment":break;case"subvertex":n=T(e,{class:s.rcState}),h.statements.push({id:CONFIG.prefixS+"contains-"+simpleHash(i.id+s.scContains+n.id),class:LIB.makeKey(s.scContains),subject:LIB.makeKey(i.id),object:LIB.makeKey(n.id),changedAt:t.fileDate}),Array.from(e.children,(e=>{if("region"===e.tagName)r(e,Object.assign({},a,{parent:n}))}));break;case"transition":n=T(e,{class:s.rcActor});let o=e.getAttribute("source"),l=e.getAttribute("target"),m={id:n.id,source:o,target:l};h.statements.push({id:CONFIG.prefixS+"startsFrom-"+simpleHash(o+s.scTransitionSource+n.id),class:LIB.makeKey(s.scTransitionSource),subject:LIB.makeKey(n.id),object:LIB.makeKey(o),changedAt:t.fileDate}),h.statements.push({id:CONFIG.prefixS+"endsAt-"+simpleHash(l+s.scTransitionTarget+n.id),class:LIB.makeKey(s.scTransitionTarget),subject:LIB.makeKey(n.id),object:LIB.makeKey(l),changedAt:t.fileDate}),Array.from(e.children,(e=>{switch(e.tagName){case"ownedComment":break;case"trigger":let i=e.getAttribute("event");m.event=i,h.statements.push({id:CONFIG.prefixS+"triggers-"+simpleHash(i+s.scTriggers+n.id),class:LIB.makeKey(s.scTriggers),subject:LIB.makeKey(i),object:LIB.makeKey(n.id),changedAt:t.fileDate}),D(a.diagram.id,i);break;case"effect":v(e,Object.assign({},a,{parent:n}));break;default:c(e)}})),K.push(m);break;default:c(e)}n&&h.resources.push(n)}))}}(e,p);break;case"uml:Activity":v(e,p)}break;case"generalization":!function(e,a){let i=e.getAttribute("xmi:id"),r=o(e);r?k.push({id:i,class:LIB.makeKey(s.scSpecializes),subject:LIB.makeKey(a.parent.id),object:LIB.makeKey(r),changedAt:t.fileDate}):console.warn("Cameo Import: Skipped generalization with id '"+i+"', because it has no attribute 'general'.")}(e,p);break;case"ownedAttribute":!function(e,a){let c,n,o,d,p,g,y;switch(e.getAttribute("xmi:type")){case"uml:Property":if(c=e.getAttribute("xmi:id"),n=e.getAttribute("association"),o=e.getAttribute("type"),d=e.getAttribute("aggregation"),n&&o)y="composite"==d?s.scComprises:"shared"==d?s.scAggregates:void 0,g=e.getAttribute("name"),g&&(h.resources.push({id:c,class:LIB.makeKey(s.rcDefault),properties:[{class:LIB.makeKey("PC-Name"),values:[[{text:r(g)}]]},{class:LIB.makeKey("PC-Type"),values:[[{text:"uml:Class"}]]}],changedAt:t.fileDate}),t.addElementsToHierarchy&&a.nodes.push(S(LIB.makeKey(c),a.parent.id)),k.push({id:CONFIG.prefixS+"specializes-"+simpleHash(c+s.scSpecializes+o),class:LIB.makeKey(s.scSpecializes),subject:LIB.makeKey(c),object:LIB.makeKey(o),changedAt:t.fileDate}),o=c),C.push({associationId:e.getAttribute("association"),associationType:y,thisEnd:LIB.makeKey(a.parent.id),otherEnd:LIB.makeKey(o)}),B.filter((e=>e.object.id==c)).forEach((e=>{D(e.subject.id,o)}));else if("sysml:InterfaceBlock"==i.get(a.parent.id)){o&&h.statements.push({id:c,class:LIB.makeKey(s.scDefault),subject:LIB.makeKey(a.parent.id),object:LIB.makeKey(o),properties:[{class:LIB.makeKey("PC-Type"),values:[[{text:"has data type"}]]}],changedAt:t.fileDate});let e=l.get(c);e&&e.dir&&m.set(a.parent.id,e.dir)}else{let i=T(e,{class:s.rcState});h.resources.push(i),t.addElementsToHierarchy&&u.nodes.push(S(i,a.parent.id)),h.statements.push({id:CONFIG.prefixS+"comprises-"+simpleHash(a.parent.id+s.scComprises+i.id),class:LIB.makeKey(s.scComprises),subject:LIB.makeKey(a.parent.id),object:LIB.makeKey(i.id),changedAt:t.fileDate})}break;case"uml:Port":c=e.getAttribute("xmi:id"),o=e.getAttribute("type"),g=r(e.getAttribute("name")),p=LIB.titleFromProperties(a.parent.properties,h.propertyClasses,{targetLanguage:"default"});let I={id:c,class:LIB.makeKey("RC-UmlPort"),properties:[{class:LIB.makeKey("PC-Name"),values:[[{text:p?p+" Port "+g:g}]]},{class:LIB.makeKey("PC-Type"),values:[[{text:"uml:Port"}]]},{class:LIB.makeKey("PC-UmlIsservice"),values:[e.getAttribute("isService")??"true"]}],changedAt:t.fileDate};h.resources.push(I),h.statements.push({id:CONFIG.prefixS+"hasPart-"+simpleHash(a.parent.id+s.scHasPart+c),class:LIB.makeKey(s.scHasPart),subject:LIB.makeKey(a.parent.id),object:LIB.makeKey(c),changedAt:t.fileDate}),L.push({id:I.id,resource:I,interfaceBlock:o,isConjugated:"true"==e.getAttribute("isConjugated"),parent:a.parent})}}(e,p);break;case"ownedOperation":let a=T(e,{class:s.rcActor});h.resources.push(a),t.addElementsToHierarchy&&u.nodes.push(S(a,n.id)),h.statements.push({id:CONFIG.prefixS+"comprises-"+simpleHash(n.id+s.scComprises+a.id),class:LIB.makeKey(s.scComprises),subject:LIB.makeKey(n.id),object:LIB.makeKey(a.id),changedAt:t.fileDate});break;case"ownedConnector":let g=e.getAttribute("xmi:id"),y=Array.from(e.getElementsByTagName("end"),(e=>e.getAttribute("role")));if(y.length<2)return void console.error("uml:Connector "+g+" has too few ends");if(y.length>2)return void console.error("uml:Connector "+g+" has too many ends");A.push({id:g,ends:[y[0],y[1]]});break;default:c(e)}}))}Array.from(e.children,(e=>{switch(e.tagName){case"ownedComment":break;case"packagedElement":switch(e.getAttribute("xmi:type")){case"uml:DataType":i=T(e,{class:s.rcDefault}),h.resources.push(i),t.addElementsToHierarchy&&a.nodes.push(S(i,a.packageId));break;case"uml:Stereotype":let r=function(e,s){let a=e.getAttribute("xmi:id"),i=N(e,{parent:a}),r={id:CONFIG.prefixRC+a,title:e.getAttribute("name"),description:i?[{text:i}]:void 0,keepEvenIfUnused:!0,changedAt:t.fileDate};return r}(e),c=o(e),l=LIB.itemByTitle(h.resourceClasses,c);r.extends=l?LIB.makeKey(l.id):LIB.makeKey(s.rcDefault),h.resourceClasses.push(r);break;case"uml:Enumeration":let m=e.getAttribute("xmi:id"),d=e.getAttribute("name"),u={id:CONFIG.prefixDT+m,title:d,type:XsDataType.String,enumeration:n(e).map((e=>({id:CONFIG.prefixV+e.id,value:[{text:e.txt}]}))),changedAt:t.fileDate},p=N(e,{parent:m}),g={id:CONFIG.prefixPC+m,title:d,description:p?[{text:p}]:void 0,dataType:LIB.makeKey(u.id),keepEvenIfUnused:!0,changedAt:t.fileDate};h.dataTypes.push(u),h.propertyClasses.push(g)}}var i})),Array.from(e.children,(e=>{let i,r;switch(e.tagName){case"ownedComment":break;case"xmi:Extension":j(e,a);break;case"packagedElement":switch(e.getAttribute("xmi:type")){case"uml:DataType":case"uml:Stereotype":case"uml:Enumeration":case"uml:Association":case"uml:Abstraction":case"uml:Realization":case"uml:Profile":case"uml:Usage":break;case"uml:Package":i=T(e,{class:s.rcPackage}),h.resources.push(i),r=S(i,a.packageId),t.addElementsToHierarchy&&a.nodes.push(r),x(e,{packageId:i.id,nodes:r.nodes});break;case"uml:UseCase":case"uml:Actor":case"uml:Class":d(e,a);break;case"uml:Activity":v(e,a);break;case"uml:CallEvent":case"uml:ChangeEvent":case"uml:SignalEvent":case"uml:TimeEvent":!function(e,a){let i=T(e,{class:s.rcEvent});h.resources.push(i),t.addElementsToHierarchy&&a.nodes.push(S(i,a.packageId));a.packageId&&h.statements.push({id:CONFIG.prefixS+"contains-"+simpleHash(a.packageId+s.scContains+i.id),class:LIB.makeKey(s.scContains),subject:LIB.makeKey(a.packageId),object:LIB.makeKey(i.id),changedAt:t.fileDate})}(e,a)}}})),Array.from(e.children,(e=>{switch(e.tagName){case"ownedComment":case"xmi:Extension":case"profileApplication":break;case"packagedElement":let a=e.getAttribute("xmi:type");switch(a){case"uml:DataType":case"uml:Stereotype":case"uml:Enumeration":case"uml:Package":case"uml:UseCase":case"uml:Actor":case"uml:Class":case"uml:CallEvent":case"uml:ChangeEvent":case"uml:SignalEvent":case"uml:TimeEvent":case"uml:Profile":case"uml:Usage":break;case"uml:Association":!function(e){let a,i,c=e.getAttribute("name"),n=e.getAttribute("xmi:id"),o=C.filter((e=>e.associationId==n));c&&(a=LIB.itemByTitle(h.statementClasses,c),a||(i=[{class:LIB.makeKey("PC-Type"),values:[[{text:r(c)}]]}]));if(1==o.length)h.statements.push({id:n,class:LIB.makeKey(o[0].associationType||(a?a.id:void 0)||s.scAssociatedWith),properties:i||void 0,subject:LIB.makeKey(o[0].thisEnd),object:LIB.makeKey(o[0].otherEnd),changedAt:t.fileDate});else if(2==o.length){let e,r,c;o[0].associationType||o[1].associationType?(o[1].associationType?(e=o[1].associationType,r=o[1].thisEnd,c=o[1].otherEnd):(e=o[0].associationType||(a?a.id:void 0)||s.scAssociatedWith,r=o[0].thisEnd,c=o[0].otherEnd),h.statements.push({id:n,class:LIB.makeKey(e),properties:i||void 0,subject:LIB.makeKey(r),object:LIB.makeKey(c),changedAt:t.fileDate})):console.warn("Cameo Import: Skipping the uml:Association with id "+n+", because it has no direction in RDF terms.")}else if(o.length<1){let a={id:n,properties:i||void 0,changedAt:t.fileDate};Array.from(e.getElementsByTagName("ownedEnd"),(e=>{let t=e.getAttribute("aggregation");t&&["composite","shared"].includes(t)?(a.class=LIB.makeKey("composite"==t?s.scComprises:s.scAggregates),a.object=LIB.makeKey(e.getAttribute("type"))):a.subject=LIB.makeKey(e.getAttribute("type"))})),LIB.isKey(a.class)&&LIB.isKey(a.subject)&&LIB.isKey(a.object)?h.statements.push(a):console.warn("Cameo Import: Skipping the uml:Association with id "+n+", because it has no direction in RDF terms.")}else o.length>2&&(console.error("Cameo Import: Too many association ends found; must be 0, 1 or 2 and is "+o.length),console.info("Cameo Import: Skipping the uml:Association with id "+n+", because it is not referenced by a uml:Class."))}(e);break;case"uml:Abstraction":let i=e.getElementsByTagName("client")[0].getAttribute("xmi:idref"),c=e.getElementsByTagName("supplier")[0].getAttribute("xmi:idref");b.push({id:e.getAttribute("xmi:id"),class:LIB.makeKey(s.scDefault),subject:LIB.makeKey(i),object:LIB.makeKey(c),changedAt:t.fileDate});break;case"uml:Realization":let n=e.getElementsByTagName("client")[0].getAttribute("xmi:idref"),o=e.getElementsByTagName("supplier")[0].getAttribute("xmi:idref"),l={id:e.getAttribute("xmi:id"),class:LIB.makeKey(s.scRealizes||s.scAssociatedWith),subject:LIB.makeKey(n),object:LIB.makeKey(o),changedAt:t.fileDate};h.statements.push(l);break;default:console.info("Cameo Import: Skipping the packagedElement",e,"with name",e.getAttribute("name"),"and type",a,".")}break;default:c(e)}}))}function j(e,a){Array.from(e.getElementsByTagName("ownedDiagram"),(e=>{let i=e.getElementsByTagName("diagram:DiagramRepresentationObject")[0],c=i.getAttribute("type"),n=r(e.getAttribute("name")),o={id:e.getAttribute("xmi:id"),class:LIB.makeKey(s.rcDiagram),properties:[{class:LIB.makeKey("PC-Name"),values:[[{text:n}]]},{class:LIB.makeKey("PC-Type"),values:[[{text:e.getAttribute("xmi:type")}]]},{class:LIB.makeKey("PC-Notation"),values:[[{text:(c.startsWith("SysML")?"":"UML ")+c}]]}],changedAt:t.fileDate};w(o,e),f.push({id:o.id,name:n,type:c}),a.packageId&&h.statements.push({id:CONFIG.prefixS+"contains-"+simpleHash(a.packageId+s.scContains+o.id),class:LIB.makeKey(s.scContains),subject:LIB.makeKey(a.packageId),object:LIB.makeKey(o.id),changedAt:t.fileDate}),Array.from(i.getElementsByTagName("usedElements"),(e=>D(o.id,e.innerHTML))),a.parent&&(D(o.id,a.parent),h.statements.push({id:CONFIG.prefixS+"ownedDiagram-"+simpleHash(a.parent.id+s.scHasDiagram+o.id),class:LIB.makeKey(s.scHasDiagram),subject:LIB.makeKey(a.parent.id),object:LIB.makeKey(o.id),changedAt:t.fileDate})),h.resources.push(o),a.nodes.push({id:CONFIG.prefixN+simpleHash(a.packageId+o.id),resource:LIB.makeKey(o.id),changedAt:t.fileDate})}))}function v(e,a){let i=T(e,{class:s.rcActor});h.resources.push(i),a.packageId&&h.statements.push({id:CONFIG.prefixS+"contains-"+simpleHash(a.packageId+s.scContains+i.id),class:LIB.makeKey(s.scContains),subject:LIB.makeKey(a.packageId),object:LIB.makeKey(i.id),changedAt:t.fileDate}),a.parent&&h.statements.push({id:CONFIG.prefixS+"ownedBehavior-"+simpleHash(a.parent.id+s.scHasBehavior+i.id),class:LIB.makeKey(s.scHasBehavior),subject:LIB.makeKey(a.parent.id),object:LIB.makeKey(i.id),changedAt:t.fileDate}),Array.from(e.children,(e=>{switch(e.tagName){case"xmi:Extension":j(e,Object.assign({},a,{parent:i}));break;case"node":let r=T(e,{class:s.rcActor});h.resources.push(r),h.statements.push({id:CONFIG.prefixS+"contains-"+simpleHash(i.id+s.scContains+r.id),class:LIB.makeKey(s.scContains),subject:LIB.makeKey(i.id),object:LIB.makeKey(r.id),changedAt:t.fileDate})}})),Array.from(e.children,(e=>{switch(e.tagName){case"ownedComment":case"xmi:Extension":case"node":break;case"edge":h.statements.push({id:e.getAttribute("xmi:id"),class:LIB.makeKey(s.scControlFlow),subject:LIB.makeKey(e.getAttribute("source")),object:LIB.makeKey(e.getAttribute("target")),changedAt:t.fileDate});break;default:c(e)}}))}function T(e,s){let a={id:e.getAttribute("xmi:id"),class:s&&s.class?LIB.makeKey(s.class):void 0,properties:[{class:LIB.makeKey("PC-Name"),values:[[{text:s&&s.name?s.name:r(e.getAttribute("name"))||"unnamed "+e.getAttribute("xmi:type")}]]},{class:LIB.makeKey("PC-Type"),values:[[{text:e.getAttribute("xmi:type")}]]}],changedAt:t.fileDate};return w(a,e),a}function S(e,s){return{id:CONFIG.prefixN+simpleHash(s+e.id),resource:LIB.makeKey(e.id),nodes:[],changedAt:t.fileDate}}function N(e,t){let s=[];if(Array.from(e.children,(e=>{if("ownedComment"===e.tagName){let t=e.getAttribute("body");t&&s.push(t)}})),s.length>1&&console.warn("Element "+t.parent+" has more than one comment/description."),s.length>0)return s[0]}function w(e,t){let s=N(t,{parent:e.id});s&&e.properties.push({class:LIB.makeKey("PC-Description"),values:[[{text:s}]]})}function D(e,a){if(e&&a){let i=CONFIG.prefixS+"shows-"+simpleHash(e+s.scShows+a);LIB.indexById(B,i)<0&&B.push({id:i,class:LIB.makeKey(s.scShows),subject:LIB.makeKey(e),object:LIB.makeKey(a),changedAt:t.fileDate})}else console.error("When creating 'shows' statement, the subject or object is undefined",e,a)}function E(e,t,s){if(LIB.isKey(e.subject)&&LIB.isKey(e.object)&&LIB.isKey(e.class)){let t=LIB.itemByKey(h.statementClasses,e.class),a=h.resources.concat(s),i=LIB.itemByKey(a,e.subject),r=LIB.itemByKey(a,e.object),c=i&&r;return t?(c?(c=(!t.subjectClasses||LIB.referenceIndex(t.subjectClasses,i.class)>-1)&&(!t.objectClasses||LIB.referenceIndex(t.objectClasses,r.class)>-1),c||console.info("Cameo Import: Skipping",t.title,"statement "+e.id+" with subject",i," and object",r,", because they violate the statementClass.")):console.info("Cameo Import: Skipping",t.title,"statement "+e.id+", because "+(i?"object "+e.object.id:"subject "+e.subject.id)+" isn't listed as resource resp. statement."),c):(console.warn("Cameo Import: Class "+e.class.id+" for statement "+e.id+" not found."),!1)}return console.warn("Cameo Import: Skipping statement, because class, subject or object is undefined: "+e),!1}}(i,a)):new resultMsg(899,"Cameo Import: Input file is not supported.");function r(e){if(e&&a.replaceSeparatorNamespace){let t=new RegExp("^(.{1,9})\\"+a.replaceSeparatorNamespace+"(.+)$");return e.replace(t,((e,t,s)=>t+":"+s))}return e}function c(e){let t=e.getAttribute("name"),s=" with "+(t?"name '"+t+"' and ":"")+"id '"+e.getAttribute("xmi:id")+"'.";console.info("Cameo Import: Skipping tag '"+e.tagName+"'"+s)}}
+*/
+function sysml2specif(xmi, options) {
+    "use strict";
+    const terms = {};
+    [
+        { id: "rcDefault", type: "resourceClass", term: CONFIG.resClassModelElement },
+        { id: "rcFolder", type: "resourceClass", term: CONFIG.resClassFolder },
+        { id: "rcDiagram", type: "resourceClass", term: CONFIG.resClassView },
+        { id: "rcModelElement", type: "resourceClass", term: CONFIG.resClassModelElement },
+        { id: "rcActor", type: "resourceClass", term: CONFIG.resClassActor },
+        { id: "rcState", type: "resourceClass", term: CONFIG.resClassState },
+        { id: "rcEvent", type: "resourceClass", term: CONFIG.resClassEvent },
+        { id: "rcPackage", type: "resourceClass", term: "uml:Package" },
+        { id: "rcStereotype", type: "resourceClass", term: "uml:Stereotype" },
+        { id: "scDefault", type: "statementClass", term: "SpecIF:relates" },
+        { id: "scControlFlow", type: "statementClass", term: "uml:ControlFlow" },
+        { id: "scTriggers", type: "statementClass", term: "uml:Trigger" },
+        { id: "scTransitionSource", type: "statementClass", term: "uml:TransitionSource" },
+        { id: "scTransitionTarget", type: "statementClass", term: "uml:TransitionTarget" },
+        { id: "scContains", type: "statementClass", term: "SpecIF:contains" },
+        { id: "scHasDiagram", type: "statementClass", term: "uml:ownedDiagram" },
+        { id: "scHasBehavior", type: "statementClass", term: "uml:ownedBehavior" },
+        { id: "scHasPart", type: "statementClass", term: "dcterms:hasPart" },
+        { id: "scSpecializes", type: "statementClass", term: "SpecIF:isSpecializationOf" },
+        { id: "scRealizes", type: "statementClass", term: "uml:Realization" },
+        { id: "scServes", type: "statementClass", term: "SpecIF:serves" },
+        { id: "scAssociatedWith", type: "statementClass", term: "SpecIF:isAssociatedWith" },
+        { id: "scHandles", type: "statementClass", term: "SpecIF:handles" },
+        { id: "scProvides", type: "statementClass", term: "SpecIF:provides" },
+        { id: "scConsumes", type: "statementClass", term: "SpecIF:consumes" },
+        { id: "scShows", type: "statementClass", term: "SpecIF:shows" }
+    ].forEach((t) => {
+        let tId = app.ontology.getClassId(t.type, t.term);
+        if (tId)
+            terms[t.id] = tId;
+        else {
+            switch (t.type) {
+                case "resourceClass":
+                    terms[t.id] = terms.rcDefault;
+                    break;
+                case "statementClass":
+                    terms[t.id] = terms.scDefault;
+            }
+            ;
+            console.warn("Cameo Import: Term '" + t.term + "' not found in the ontology, using default term instead.");
+        }
+    });
+    terms.scAggregates =
+        terms.scComprises = terms.scHasPart;
+    terms.scDefault = terms.scAssociatedWith;
+    if (typeof (options) != 'object' || !options.fileName)
+        throw Error("Programming Error: Cameo import gets no 'options'");
+    let opts = Object.assign({
+        mimeType: "application/vnd.xmi+xml",
+        fileDate: new Date().toISOString(),
+        addElementsToHierarchy: true,
+        replaceSeparatorNamespace: '*'
+    }, options);
+    var parser = new DOMParser(), xmiDoc = parser.parseFromString(xmi, "text/xml");
+    if (validateCameo(xmiDoc))
+        return new resultMsg(0, 'Cameo Import done', 'json', cameo2specif(xmiDoc, opts));
+    return new resultMsg(899, 'Cameo Import: Input file is not supported.');
+    function cameo2specif(xmi, opts) {
+        function makeMap(att) {
+            let top = xmi.getElementsByTagName('xmi:XMI')[0], map = new Map();
+            Array.from(top.children, (ch) => {
+                let base = ch.getAttribute(att);
+                if (base) {
+                    let txt = ch.getAttribute("Text");
+                    if (att == "base_Property")
+                        map.set(base, { tag: ch.tagName, dir: ch.getAttribute("direction") });
+                    else if (txt)
+                        map.set(base, { tag: ch.tagName, text: txt });
+                    else
+                        map.set(base, { tag: ch.tagName });
+                }
+                ;
+            });
+            return map;
+        }
+        const classStereotypes = makeMap("base_Class"), namedElementStereotypes = makeMap("base_NamedElement"), abstractionStereotypes = makeMap("base_Abstraction"), propertyStereotypes = makeMap("base_Property"), flowProperties = new Map(), models = Array.from(xmi.getElementsByTagName('uml:Model')), packEls = Array.from(xmi.getElementsByTagName('packagedElement'))
+            .filter((el) => {
+            return el.getAttribute("xmi:type") == "uml:Model";
+        }), packgs = Array.from(xmi.getElementsByTagName('uml:Package')), profiles = Array.from(xmi.getElementsByTagName('uml:Profile')), modL = models.concat(packgs).concat(packEls).concat(profiles);
+        let spD = app.ontology.generateSpecifClasses({
+            domains: [
+                "SpecIF:DomainBase",
+                "SpecIF:DomainSystemsEngineering",
+                "SpecIF:DomainSystemModelIntegration"
+            ],
+            lifeCycles: [
+                "SpecIF:LifecycleStatusReleased",
+                "SpecIF:LifecycleStatusEquivalent"
+            ],
+            referencesWithoutRevision: true
+        }), diagramL = [], usedElementL = [], abstractions = [], specializations = [], associationEnds = [], portL = [], connectorL = [], stateTransitionL = [];
+        console.debug('Cameo Import - Models, Packages and Profiles:', models, packgs, packEls, profiles, modL);
+        for (let modDoc of modL) {
+            if (modDoc.tagName == 'uml:Model') {
+                spD.id = CONFIG.prefixP + modDoc.getAttribute("xmi:id");
+                spD.title = [{ text: modDoc.getAttribute("name") }];
+            }
+            ;
+            let rId = modDoc.getAttribute("xmi:id"), r = {
+                id: rId,
+                class: LIB.makeKey(terms.rcFolder),
+                properties: [{
+                        class: LIB.makeKey("PC-Name"),
+                        values: [[{ text: replaceSeparatorNS(modDoc.getAttribute("name")) }]]
+                    }, {
+                        class: LIB.makeKey("PC-Description"),
+                        values: [[{ text: parseDesc(modDoc, { parent: rId }) }]]
+                    }, {
+                        class: LIB.makeKey("PC-Type"),
+                        values: [[{ text: modDoc.getAttribute("xmi:type") }]]
+                    }],
+                changedAt: opts.fileDate
+            }, nd = makeNode(r, spD.id);
+            spD.resources.push(r);
+            spD.nodes.push(nd);
+            parseElements(modDoc, { packageId: '', nodes: nd.nodes });
+        }
+        ;
+        specializations = specializations
+            .filter(validateStatement);
+        spD.resources
+            .forEach((me) => {
+            if (me["class"].id == terms.rcDefault) {
+                let rC;
+                rC = makeGeneralizingResourceClass(me);
+                if (rC && rC.id != terms.rcDefault) {
+                    me["class"] = LIB.makeKey(rC.id);
+                    console.info("Cameo Import: Re-assigning class " + rC.id + " to model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
+                }
+                ;
+                let sTy = classStereotypes.get(me.id) || namedElementStereotypes.get(me.id);
+                if (sTy) {
+                    if (sTy.tag == "sysml:InterfaceBlock") {
+                        me["class"] = LIB.makeKey(terms.rcState);
+                        console.info("Cameo Import: Reassigning class '" + terms.rcState + "' to  model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
+                        return;
+                    }
+                    ;
+                    rC = LIB.itemByTitle(spD.resourceClasses, sTy.tag);
+                    if (rC) {
+                        me["class"] = LIB.makeKey(rC.id);
+                        console.info("Cameo Import: Reassigning class '" + rC.id + "' to  model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
+                        if (sTy.tag == "sysml:Requirement") {
+                            let prp = LIB.propByTitle(me, CONFIG.propClassDesc, spD);
+                            if (prp) {
+                                prp.values = [[{ text: sTy.text }]];
+                            }
+                            ;
+                        }
+                        ;
+                        return;
+                    }
+                    ;
+                    let prp = LIB.propByTitle(me, CONFIG.propClassType, spD);
+                    if (prp) {
+                        prp.values = [[{ text: sTy.tag }]];
+                        console.info("Cameo Import: Assigning stereotype '" + sTy.tag + "' to  model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
+                    }
+                    ;
+                }
+                ;
+            }
+            ;
+            return;
+            function makeGeneralizingResourceClass(r) {
+                let spL = specializations.filter((sp) => {
+                    return sp.subject.id == r.id;
+                });
+                if (spL.length > 1)
+                    console.warn("Cameo Import: Model-elment with id " + me.id + " specializes " + spL.length + " classes");
+                for (var sp of spL) {
+                    let gE = LIB.itemByKey(spD.resources, sp.object), ti = LIB.titleFromProperties(gE.properties, spD.propertyClasses, { targetLanguage: "default" }), rC = LIB.itemByTitle(spD.resourceClasses, ti);
+                    if (rC)
+                        return rC;
+                    rC = makeGeneralizingResourceClass(gE);
+                    if (rC)
+                        return rC;
+                }
+                ;
+            }
+        });
+        abstractions = abstractions
+            .filter(validateStatement)
+            .map((a) => {
+            let sTy = abstractionStereotypes.get(a.id);
+            if (sTy) {
+                let sC = LIB.itemByTitle(spD.statementClasses, sTy.tag);
+                if (sC) {
+                    a['class'] = LIB.makeKey(sC.id);
+                    console.info("Cameo Import: Re-assigning class " + sC.id + " with title " + sTy.tag + " to statement " + a.id);
+                }
+                else {
+                    let prp = {
+                        class: LIB.makeKey("PC-Type"),
+                        values: [[{ text: sTy.tag }]]
+                    };
+                    LIB.addProperty(a, prp);
+                    console.info("Cameo Import: Assigning stereotype " + sTy.tag + " to statement " + a.id);
+                }
+                ;
+            }
+            ;
+            return a;
+        });
+        portL.forEach((p) => {
+            let ibId = p.interfaceBlock, dir = flowProperties.get(ibId), acc;
+            switch (dir) {
+                case 'in':
+                    p.resource.properties.push({
+                        class: "PC-UmlFlowdirection",
+                        values: [[{ text: p.isConjugated ? 'out' : 'in' }]]
+                    });
+                    acc = p.isConjugated ? terms.scProvides : terms.scConsumes;
+                    spD.statements.push({
+                        id: CONFIG.prefixS + (p.isConjugated ? 'provides-' : 'consumes-') + simpleHash(p.resource.id + acc + ibId),
+                        class: LIB.makeKey(acc),
+                        subject: LIB.makeKey(p.resource.id),
+                        object: LIB.makeKey(ibId),
+                        changedAt: opts.fileDate
+                    });
+                    break;
+                case 'out':
+                    p.resource.properties.push({
+                        class: "PC-UmlFlowdirection",
+                        values: [[{ text: p.isConjugated ? 'in' : 'out' }]]
+                    });
+                    acc = p.isConjugated ? terms.scConsumes : terms.scProvides;
+                    spD.statements.push({
+                        id: CONFIG.prefixS + (p.isConjugated ? 'consumes-' : 'provides-') + simpleHash(p.resource.id + acc + ibId),
+                        class: LIB.makeKey(acc),
+                        subject: LIB.makeKey(p.resource.id),
+                        object: LIB.makeKey(ibId),
+                        changedAt: opts.fileDate
+                    });
+                    break;
+                case 'inout':
+                    p.resource.properties.push({
+                        class: "PC-UmlFlowdirection",
+                        values: [[{ text: 'inout' }]]
+                    });
+                    spD.statements.push({
+                        id: CONFIG.prefixS + 'handles-' + simpleHash(p.resource.id + terms.scHandles + ibId),
+                        class: LIB.makeKey(terms.scHandles),
+                        subject: LIB.makeKey(p.resource.id),
+                        object: LIB.makeKey(ibId),
+                        changedAt: opts.fileDate
+                    });
+            }
+            ;
+        });
+        connectorL.forEach((co) => {
+            let port0 = LIB.itemById(portL, co.ends[0]), port1 = LIB.itemById(portL, co.ends[1]), p0serves = LIB.valueByTitle(port0.resource, 'uml:is_Service', spD) == 'true', p1serves = LIB.valueByTitle(port1.resource, 'uml:is_Service', spD) == 'true';
+            if (p0serves && !p1serves) {
+                spD.statements.push({
+                    id: co.id,
+                    class: LIB.makeKey(terms.scServes),
+                    subject: LIB.makeKey(port0.id),
+                    object: LIB.makeKey(port1.id),
+                    changedAt: opts.fileDate
+                });
+                return;
+            }
+            ;
+            if (!p0serves && p1serves) {
+                spD.statements.push({
+                    id: co.id,
+                    class: LIB.makeKey(terms.scServes),
+                    subject: LIB.makeKey(port1.id),
+                    object: LIB.makeKey(port0.id),
+                    changedAt: opts.fileDate
+                });
+                return;
+            }
+            ;
+            spD.statements.forEach((st) => {
+                if (st['class'].id == terms.scComprises) {
+                    if (st.subject.id == port0.parent.id && st.object.id == port1.parent.id) {
+                        spD.statements.push({
+                            id: co.id,
+                            class: LIB.makeKey(terms.scServes),
+                            subject: LIB.makeKey(p0serves && p1serves ? port1.id : port0.id),
+                            object: LIB.makeKey(p0serves && p1serves ? port0.id : port1.id),
+                            changedAt: opts.fileDate
+                        });
+                        return;
+                    }
+                    ;
+                    if (st.subject.id == port1.parent.id && st.object.id == port0.parent.id) {
+                        spD.statements.push({
+                            id: co.id,
+                            class: LIB.makeKey(terms.scServes),
+                            subject: LIB.makeKey(p0serves && p1serves ? port0.id : port1.id),
+                            object: LIB.makeKey(p0serves && p1serves ? port1.id : port0.id),
+                            changedAt: opts.fileDate
+                        });
+                    }
+                    ;
+                }
+                ;
+            });
+        });
+        stateTransitionL.forEach((stT) => {
+            let tr = LIB.itemById(spD.resources, stT.id), trTi = LIB.valueByTitle(tr, 'dcterms:title', spD), trTy = LIB.valueByTitle(tr, 'dcterms:type', spD), src = LIB.itemById(spD.resources, stT.source), sTi = LIB.valueByTitle(src, 'dcterms:title', spD), sTy = LIB.valueByTitle(src, 'dcterms:type', spD), tgt = LIB.itemById(spD.resources, stT.target), tTi = LIB.valueByTitle(tgt, 'dcterms:title', spD);
+            if (sTy == 'uml:Pseudostate' && sTi.includes('unnamed')) {
+                sTi = 'entry';
+                LIB.updatePropertyByTitle(src, 'dcterms:title', () => { return [[{ text: sTi }]]; }, spD);
+            }
+            ;
+            if (trTy == 'uml:Transition' && trTi.includes('unnamed'))
+                LIB.updatePropertyByTitle(tr, 'dcterms:title', () => { return [[{ text: sTi + '→' + tTi }]]; }, spD);
+        });
+        spD.statements = spD.statements
+            .concat(abstractions)
+            .concat(specializations)
+            .concat(usedElementL);
+        let prevLength;
+        do {
+            prevLength = spD.statements.length;
+            spD.statements = spD.statements
+                .filter(validateStatement);
+        } while (prevLength > spD.statements.length);
+        spD = LIB.keepUsedClasses(spD);
+        console.debug('from SysML:', spD, opts);
+        return spD;
+        function parseElements(elem, params) {
+            function addResource(r) {
+                spD.resources.push(r);
+                if (opts.addElementsToHierarchy)
+                    params.nodes.push(makeNode(r, params.packageId));
+            }
+            function parseEnum(ch) {
+                let enumL = [];
+                Array.from(ch.children, (e) => {
+                    if (e.tagName == "ownedLiteral") {
+                        enumL.push({
+                            id: e.getAttribute("xmi:id"),
+                            txt: e.getAttribute("name")
+                        });
+                    }
+                });
+                return enumL;
+            }
+            Array.from(elem.children, (ch) => {
+                switch (ch.tagName) {
+                    case "ownedComment":
+                        break;
+                    case "packagedElement":
+                        let ty = ch.getAttribute("xmi:type");
+                        switch (ty) {
+                            case "uml:DataType":
+                                addResource(makeResource(ch, { class: terms.rcDefault }));
+                                break;
+                            case "uml:Stereotype":
+                                let rc = makeResourceClass(ch), gen = parseGeneralization(ch), parent = LIB.itemByTitle(spD.resourceClasses, gen);
+                                if (parent)
+                                    rc.extends = LIB.makeKey(parent.id);
+                                else
+                                    rc.extends = LIB.makeKey(terms.rcDefault);
+                                spD.resourceClasses.push(rc);
+                                break;
+                            case "uml:Enumeration":
+                                let pId = ch.getAttribute("xmi:id"), ti = ch.getAttribute("name"), dT = {
+                                    id: CONFIG.prefixDT + pId,
+                                    title: ti,
+                                    type: XsDataType.String,
+                                    enumeration: parseEnum(ch).map((e) => {
+                                        return {
+                                            id: CONFIG.prefixV + e.id,
+                                            value: [{ text: e.txt }]
+                                        };
+                                    }),
+                                    changedAt: opts.fileDate
+                                }, desc = parseDesc(ch, { parent: pId }), pC = {
+                                    id: CONFIG.prefixPC + pId,
+                                    title: ti,
+                                    description: desc ? [{ text: desc }] : undefined,
+                                    dataType: LIB.makeKey(dT.id),
+                                    keepEvenIfUnused: true,
+                                    changedAt: opts.fileDate
+                                };
+                                spD.dataTypes.push(dT);
+                                spD.propertyClasses.push(pC);
+                        }
+                        ;
+                }
+                ;
+            });
+            Array.from(elem.children, (ch) => {
+                let r, nd;
+                switch (ch.tagName) {
+                    case "ownedComment":
+                        break;
+                    case "xmi:Extension":
+                        makeDiagrams(ch, params);
+                        break;
+                    case "packagedElement":
+                        switch (ch.getAttribute("xmi:type")) {
+                            case "uml:DataType":
+                            case "uml:Stereotype":
+                            case "uml:Enumeration":
+                                break;
+                            case 'uml:Package':
+                                r = makeResource(ch, { class: terms.rcPackage });
+                                spD.resources.push(r);
+                                nd = makeNode(r, params.packageId);
+                                if (opts.addElementsToHierarchy)
+                                    params.nodes.push(nd);
+                                parseElements(ch, { packageId: r.id, nodes: nd.nodes });
+                                break;
+                            case 'uml:UseCase':
+                            case 'uml:Actor':
+                            case 'uml:Class':
+                                xClass(ch, params);
+                                break;
+                            case 'uml:Activity':
+                                makeActivity(ch, params);
+                                break;
+                            case 'uml:CallEvent':
+                            case 'uml:ChangeEvent':
+                            case 'uml:SignalEvent':
+                            case 'uml:TimeEvent':
+                                xEvent(ch, params);
+                                break;
+                            case "uml:Association":
+                            case "uml:Abstraction":
+                            case "uml:Realization":
+                                break;
+                            case "uml:Profile":
+                                break;
+                            case "uml:Usage":
+                                break;
+                        }
+                        ;
+                }
+                ;
+            });
+            Array.from(elem.children, (ch) => {
+                switch (ch.tagName) {
+                    case "ownedComment":
+                    case "xmi:Extension":
+                        break;
+                    case "packagedElement":
+                        let ty = ch.getAttribute("xmi:type");
+                        switch (ty) {
+                            case "uml:DataType":
+                            case "uml:Stereotype":
+                            case "uml:Enumeration":
+                            case 'uml:Package':
+                            case 'uml:UseCase':
+                            case 'uml:Actor':
+                            case 'uml:Class':
+                            case 'uml:CallEvent':
+                            case 'uml:ChangeEvent':
+                            case 'uml:SignalEvent':
+                            case 'uml:TimeEvent':
+                                break;
+                            case "uml:Association":
+                                xAssociation(ch);
+                                break;
+                            case "uml:Abstraction":
+                                let sbj = ch.getElementsByTagName('client')[0].getAttribute("xmi:idref"), obj = ch.getElementsByTagName('supplier')[0].getAttribute("xmi:idref");
+                                abstractions.push({
+                                    id: ch.getAttribute("xmi:id"),
+                                    class: LIB.makeKey(terms.scDefault),
+                                    subject: LIB.makeKey(sbj),
+                                    object: LIB.makeKey(obj),
+                                    changedAt: opts.fileDate
+                                });
+                                break;
+                            case "uml:Realization":
+                                let sbjR = ch.getElementsByTagName('client')[0].getAttribute("xmi:idref"), objR = ch.getElementsByTagName('supplier')[0].getAttribute("xmi:idref"), staR = {
+                                    id: ch.getAttribute("xmi:id"),
+                                    class: LIB.makeKey(terms.scRealizes || terms.scAssociatedWith),
+                                    subject: LIB.makeKey(sbjR),
+                                    object: LIB.makeKey(objR),
+                                    changedAt: opts.fileDate
+                                };
+                                spD.statements.push(staR);
+                                break;
+                            case "uml:Profile":
+                                break;
+                            case "uml:Usage":
+                                break;
+                            default:
+                                console.info("Cameo Import: Skipping the packagedElement", ch, "with name", ch.getAttribute("name"), "and type", ty, ".");
+                        }
+                        ;
+                        break;
+                    case 'profileApplication':
+                        break;
+                    default:
+                        infoSkip(ch);
+                }
+                ;
+            });
+            function parseGeneralization(el) {
+                let gen = el.getAttribute("general");
+                if (!gen) {
+                    let ref = el.getElementsByTagName('referenceExtension')[0];
+                    if (ref) {
+                        gen = ref.getAttribute("referentPath");
+                        if (gen && gen.indexOf("::") > 0) {
+                            let ns = gen.toLowerCase().includes("sysml") ? "sysml:" : "uml:";
+                            gen = ns + gen.split("::").pop();
+                            console.debug("Cameo Import: Generalization found in referenceExtension: " + gen);
+                        }
+                    }
+                }
+                ;
+                return gen;
+            }
+            function xGeneralization(el, params) {
+                let sid = el.getAttribute("xmi:id"), obj = parseGeneralization(el);
+                if (obj)
+                    specializations.push({
+                        id: sid,
+                        class: LIB.makeKey(terms.scSpecializes),
+                        subject: LIB.makeKey(params.parent.id),
+                        object: LIB.makeKey(obj),
+                        changedAt: opts.fileDate
+                    });
+                else
+                    console.warn("Cameo Import: Skipped generalization with id '" + sid + "', because it has no attribute 'general'.");
+            }
+            function xClass(el, params) {
+                let r2 = makeResource(el, { class: terms.rcDefault });
+                spD.resources.push(r2);
+                let nd2 = makeNode(r2, params.packageId), pars = { packageId: params.packageId, parent: r2, nodes: nd2.nodes };
+                if (opts.addElementsToHierarchy)
+                    params.nodes.push(nd2);
+                if (params.packageId)
+                    spD.statements.push({
+                        id: CONFIG.prefixS + 'contains-' + simpleHash(params.packageId + terms.scContains + r2.id),
+                        class: LIB.makeKey(terms.scContains),
+                        subject: LIB.makeKey(params.packageId),
+                        object: LIB.makeKey(r2.id),
+                        changedAt: opts.fileDate
+                    });
+                Array.from(el.children, (ch) => {
+                    switch (ch.tagName) {
+                        case "ownedComment":
+                            break;
+                        case 'nestedClassifier':
+                            xClass(ch, pars);
+                            break;
+                        case "xmi:Extension":
+                            makeDiagrams(ch, pars);
+                            break;
+                        case 'ownedBehavior':
+                            switch (ch.getAttribute("xmi:type")) {
+                                case 'uml:StateMachine':
+                                    makeStateMachine(ch, pars);
+                                    break;
+                                case 'uml:Activity':
+                                    makeActivity(ch, pars);
+                            }
+                            ;
+                            break;
+                        case 'generalization':
+                            xGeneralization(ch, pars);
+                            break;
+                        case 'ownedAttribute':
+                            xOwnedAttribute(ch, pars);
+                            break;
+                        case 'ownedOperation':
+                            let oO = makeResource(ch, { class: terms.rcActor });
+                            spD.resources.push(oO);
+                            if (opts.addElementsToHierarchy)
+                                nd2.nodes.push(makeNode(oO, r2.id));
+                            spD.statements.push({
+                                id: CONFIG.prefixS + 'comprises-' + simpleHash(r2.id + terms.scComprises + oO.id),
+                                class: LIB.makeKey(terms.scComprises),
+                                subject: LIB.makeKey(r2.id),
+                                object: LIB.makeKey(oO.id),
+                                changedAt: opts.fileDate
+                            });
+                            break;
+                        case 'ownedConnector':
+                            let cId = ch.getAttribute("xmi:id"), ports = Array.from(ch.getElementsByTagName("end"), (ch3) => {
+                                return ch3.getAttribute("role");
+                            });
+                            if (ports.length < 2) {
+                                console.error("uml:Connector " + cId + " has too few ends");
+                                return;
+                            }
+                            ;
+                            if (ports.length > 2) {
+                                console.error("uml:Connector " + cId + " has too many ends");
+                                return;
+                            }
+                            ;
+                            connectorL.push({ id: cId, ends: [ports[0], ports[1]] });
+                            break;
+                        default:
+                            infoSkip(ch);
+                    }
+                });
+                function xOwnedAttribute(oA, params) {
+                    let pId, ac, ty, ag, ti, nm, cl;
+                    switch (oA.getAttribute("xmi:type")) {
+                        case "uml:Property":
+                            pId = oA.getAttribute("xmi:id");
+                            ac = oA.getAttribute("association");
+                            ty = oA.getAttribute("type");
+                            ag = oA.getAttribute("aggregation");
+                            if (ac && ty) {
+                                cl = ag == "composite" ? terms.scComprises : (ag == "shared" ? terms.scAggregates : undefined);
+                                nm = oA.getAttribute("name");
+                                if (nm) {
+                                    spD.resources.push({
+                                        id: pId,
+                                        class: LIB.makeKey(terms.rcDefault),
+                                        properties: [{
+                                                class: LIB.makeKey("PC-Name"),
+                                                values: [[{ text: replaceSeparatorNS(nm) }]]
+                                            }, {
+                                                class: LIB.makeKey("PC-Type"),
+                                                values: [[{ text: "uml:Class" }]]
+                                            }],
+                                        changedAt: opts.fileDate
+                                    });
+                                    if (opts.addElementsToHierarchy)
+                                        params.nodes.push(makeNode(LIB.makeKey(pId), params.parent.id));
+                                    specializations.push({
+                                        id: CONFIG.prefixS + 'specializes-' + simpleHash(pId + terms.scSpecializes + ty),
+                                        class: LIB.makeKey(terms.scSpecializes),
+                                        subject: LIB.makeKey(pId),
+                                        object: LIB.makeKey(ty),
+                                        changedAt: opts.fileDate
+                                    });
+                                    ty = pId;
+                                }
+                                ;
+                                associationEnds.push({
+                                    associationId: oA.getAttribute("association"),
+                                    associationType: cl,
+                                    thisEnd: LIB.makeKey(params.parent.id),
+                                    otherEnd: LIB.makeKey(ty)
+                                });
+                                usedElementL
+                                    .filter((e) => {
+                                    return e.object.id == pId;
+                                })
+                                    .forEach((e) => {
+                                    makeStatementShows(e.subject.id, ty);
+                                });
+                            }
+                            else if (classStereotypes.get(params.parent.id) == "sysml:InterfaceBlock") {
+                                if (ty) {
+                                    spD.statements.push({
+                                        id: pId,
+                                        class: LIB.makeKey(terms.scDefault),
+                                        subject: LIB.makeKey(params.parent.id),
+                                        object: LIB.makeKey(ty),
+                                        properties: [{
+                                                class: LIB.makeKey("PC-Type"),
+                                                values: [[{ text: "has data type" }]]
+                                            }],
+                                        changedAt: opts.fileDate
+                                    });
+                                }
+                                else {
+                                }
+                                ;
+                                let stT = propertyStereotypes.get(pId);
+                                if (stT && stT.dir)
+                                    flowProperties.set(params.parent.id, stT.dir);
+                            }
+                            else {
+                                let r = makeResource(oA, { class: terms.rcState });
+                                spD.resources.push(r);
+                                if (opts.addElementsToHierarchy)
+                                    nd2.nodes.push(makeNode(r, params.parent.id));
+                                spD.statements.push({
+                                    id: CONFIG.prefixS + 'comprises-' + simpleHash(params.parent.id + terms.scComprises + r.id),
+                                    class: LIB.makeKey(terms.scComprises),
+                                    subject: LIB.makeKey(params.parent.id),
+                                    object: LIB.makeKey(r.id),
+                                    changedAt: opts.fileDate
+                                });
+                            }
+                            ;
+                            break;
+                        case "uml:Port":
+                            pId = oA.getAttribute("xmi:id");
+                            ty = oA.getAttribute("type");
+                            nm = replaceSeparatorNS(oA.getAttribute("name"));
+                            ti = LIB.titleFromProperties(params.parent.properties, spD.propertyClasses, { targetLanguage: "default" });
+                            let prt = {
+                                id: pId,
+                                class: LIB.makeKey("RC-UmlPort"),
+                                properties: [{
+                                        class: LIB.makeKey("PC-Name"),
+                                        values: [[{ text: (ti ? ti + " Port " + nm : nm) }]]
+                                    }, {
+                                        class: LIB.makeKey("PC-Type"),
+                                        values: [[{ text: "uml:Port" }]]
+                                    }, {
+                                        class: LIB.makeKey("PC-UmlIsservice"),
+                                        values: [oA.getAttribute("isService") ?? "true"]
+                                    }],
+                                changedAt: opts.fileDate
+                            };
+                            spD.resources.push(prt);
+                            spD.statements.push({
+                                id: CONFIG.prefixS + 'hasPart-' + simpleHash(params.parent.id + terms.scHasPart + pId),
+                                class: LIB.makeKey(terms.scHasPart),
+                                subject: LIB.makeKey(params.parent.id),
+                                object: LIB.makeKey(pId),
+                                changedAt: opts.fileDate
+                            });
+                            portL.push({ id: prt.id, resource: prt, interfaceBlock: ty, isConjugated: oA.getAttribute("isConjugated") == 'true', parent: params.parent });
+                    }
+                    ;
+                }
+                ;
+            }
+            function xEvent(el, params) {
+                let r = makeResource(el, { class: terms.rcEvent });
+                spD.resources.push(r);
+                if (opts.addElementsToHierarchy)
+                    params.nodes.push(makeNode(r, params.packageId));
+                if (params.packageId)
+                    spD.statements.push({
+                        id: CONFIG.prefixS + 'contains-' + simpleHash(params.packageId + terms.scContains + r.id),
+                        class: LIB.makeKey(terms.scContains),
+                        subject: LIB.makeKey(params.packageId),
+                        object: LIB.makeKey(r.id),
+                        changedAt: opts.fileDate
+                    });
+            }
+            function xAssociation(el) {
+                let nm = el.getAttribute("name"), sC, prpL, aId = el.getAttribute("xmi:id"), aEnds = associationEnds.filter(aE => aE.associationId == aId);
+                if (nm) {
+                    sC = LIB.itemByTitle(spD.statementClasses, nm);
+                    if (!sC)
+                        prpL = [{
+                                class: LIB.makeKey("PC-Type"),
+                                values: [[{ text: replaceSeparatorNS(nm) }]]
+                            }];
+                }
+                ;
+                if (aEnds.length == 1) {
+                    spD.statements.push({
+                        id: aId,
+                        class: LIB.makeKey(aEnds[0].associationType || (sC ? sC.id : undefined) || terms.scAssociatedWith),
+                        properties: prpL ? prpL : undefined,
+                        subject: LIB.makeKey(aEnds[0].thisEnd),
+                        object: LIB.makeKey(aEnds[0].otherEnd),
+                        changedAt: opts.fileDate
+                    });
+                }
+                else if (aEnds.length == 2) {
+                    let cl, sbj, obj;
+                    if (aEnds[0].associationType || aEnds[1].associationType) {
+                        if (aEnds[1].associationType) {
+                            cl = aEnds[1].associationType;
+                            sbj = aEnds[1].thisEnd;
+                            obj = aEnds[1].otherEnd;
+                        }
+                        else {
+                            cl = aEnds[0].associationType || (sC ? sC.id : undefined) || terms.scAssociatedWith;
+                            sbj = aEnds[0].thisEnd;
+                            obj = aEnds[0].otherEnd;
+                        }
+                        ;
+                        spD.statements.push({
+                            id: aId,
+                            class: LIB.makeKey(cl),
+                            properties: prpL ? prpL : undefined,
+                            subject: LIB.makeKey(sbj),
+                            object: LIB.makeKey(obj),
+                            changedAt: opts.fileDate
+                        });
+                    }
+                    else
+                        console.warn("Cameo Import: Skipping the uml:Association with id " + aId + ", because it has no direction in RDF terms.");
+                }
+                else if (aEnds.length < 1) {
+                    let st = {
+                        id: aId,
+                        properties: prpL ? prpL : undefined,
+                        changedAt: opts.fileDate
+                    };
+                    Array.from(el.getElementsByTagName('ownedEnd'), (oE) => {
+                        let ag = oE.getAttribute("aggregation");
+                        if (ag && ['composite', 'shared'].includes(ag)) {
+                            st['class'] = LIB.makeKey(ag == 'composite' ? terms.scComprises : terms.scAggregates);
+                            st.object = LIB.makeKey(oE.getAttribute("type"));
+                        }
+                        else {
+                            st.subject = LIB.makeKey(oE.getAttribute("type"));
+                        }
+                        ;
+                    });
+                    if (LIB.isKey(st['class']) && LIB.isKey(st.subject) && LIB.isKey(st.object))
+                        spD.statements.push(st);
+                    else
+                        console.warn("Cameo Import: Skipping the uml:Association with id " + aId + ", because it has no direction in RDF terms.");
+                }
+                else if (aEnds.length > 2) {
+                    console.error("Cameo Import: Too many association ends found; must be 0, 1 or 2 and is " + aEnds.length);
+                    console.info("Cameo Import: Skipping the uml:Association with id " + aId + ", because it is not referenced by a uml:Class.");
+                }
+                ;
+            }
+        }
+        function makeDiagrams(el, params) {
+            Array.from(el.getElementsByTagName('ownedDiagram'), (oD) => {
+                let dg = oD.getElementsByTagName('diagram:DiagramRepresentationObject')[0], ty = dg.getAttribute("type"), nm = replaceSeparatorNS(oD.getAttribute("name"));
+                let r = {
+                    id: oD.getAttribute("xmi:id"),
+                    class: LIB.makeKey(terms.rcDiagram),
+                    properties: [{
+                            class: LIB.makeKey("PC-Name"),
+                            values: [[{ text: nm }]]
+                        }, {
+                            class: LIB.makeKey("PC-Type"),
+                            values: [[{ text: oD.getAttribute("xmi:type") }]]
+                        }, {
+                            class: LIB.makeKey("PC-Notation"),
+                            values: [[{ text: (ty.startsWith("SysML") ? "" : "UML ") + ty }]]
+                        }],
+                    changedAt: opts.fileDate
+                };
+                addDesc(r, oD);
+                diagramL.push({
+                    id: r.id,
+                    name: nm,
+                    type: ty
+                });
+                if (params.packageId)
+                    spD.statements.push({
+                        id: CONFIG.prefixS + 'contains-' + simpleHash(params.packageId + terms.scContains + r.id),
+                        class: LIB.makeKey(terms.scContains),
+                        subject: LIB.makeKey(params.packageId),
+                        object: LIB.makeKey(r.id),
+                        changedAt: opts.fileDate
+                    });
+                Array.from(dg.getElementsByTagName('usedElements'), uE => makeStatementShows(r.id, uE.innerHTML));
+                if (params.parent) {
+                    makeStatementShows(r.id, params.parent);
+                    spD.statements.push({
+                        id: CONFIG.prefixS + 'ownedDiagram-' + simpleHash(params.parent.id + terms.scHasDiagram + r.id),
+                        class: LIB.makeKey(terms.scHasDiagram),
+                        subject: LIB.makeKey(params.parent.id),
+                        object: LIB.makeKey(r.id),
+                        changedAt: opts.fileDate
+                    });
+                }
+                ;
+                spD.resources.push(r);
+                params.nodes.push({
+                    id: CONFIG.prefixN + simpleHash(params.packageId + r.id),
+                    resource: LIB.makeKey(r.id),
+                    changedAt: opts.fileDate
+                });
+            });
+        }
+        function makeStateMachine(el, params) {
+            let r = makeResource(el, { class: terms.rcActor });
+            spD.resources.push(r);
+            spD.statements.push({
+                id: CONFIG.prefixS + 'ownedBehavior-' + simpleHash(params.parent.id + terms.scHasBehavior + r.id),
+                class: LIB.makeKey(terms.scHasBehavior),
+                subject: LIB.makeKey(params.parent.id),
+                object: LIB.makeKey(r.id),
+                changedAt: opts.fileDate
+            });
+            if (params.packageId)
+                spD.statements.push({
+                    id: CONFIG.prefixS + 'contains-' + simpleHash(params.packageId + terms.scContains + r.id),
+                    class: LIB.makeKey(terms.scContains),
+                    subject: LIB.makeKey(params.packageId),
+                    object: LIB.makeKey(r.id),
+                    changedAt: opts.fileDate
+                });
+            Array.from(el.children, (ch) => {
+                switch (ch.tagName) {
+                    case "ownedComment":
+                        break;
+                    case "xmi:Extension":
+                        makeDiagrams(ch, Object.assign({}, params, { parent: r }));
+                        break;
+                    case "region":
+                        let stm = diagramL[diagramL.length - 1];
+                        makeStatementShows(stm.id, ch.getAttribute("xmi:id"));
+                        makeRegion(ch, Object.assign({}, params, { parent: r, diagram: stm }));
+                        break;
+                    default:
+                        infoSkip(ch);
+                }
+                ;
+            });
+            return;
+            function makeRegion(rg, params) {
+                let reg = makeResource(rg, { class: terms.rcActor });
+                spD.resources.push(reg);
+                spD.statements.push({
+                    id: CONFIG.prefixS + 'contains-' + simpleHash(params.parent.id + terms.scContains + reg.id),
+                    class: LIB.makeKey(terms.scContains),
+                    subject: LIB.makeKey(params.parent.id),
+                    object: LIB.makeKey(reg.id),
+                    changedAt: opts.fileDate
+                });
+                Array.from(rg.children, (ch) => {
+                    let r;
+                    switch (ch.tagName) {
+                        case "ownedComment":
+                            break;
+                        case "subvertex":
+                            r = makeResource(ch, { class: terms.rcState });
+                            spD.statements.push({
+                                id: CONFIG.prefixS + 'contains-' + simpleHash(reg.id + terms.scContains + r.id),
+                                class: LIB.makeKey(terms.scContains),
+                                subject: LIB.makeKey(reg.id),
+                                object: LIB.makeKey(r.id),
+                                changedAt: opts.fileDate
+                            });
+                            Array.from(ch.children, (ch) => {
+                                switch (ch.tagName) {
+                                    case "region":
+                                        makeRegion(ch, Object.assign({}, params, { parent: r }));
+                                }
+                                ;
+                            });
+                            break;
+                        case "transition":
+                            r = makeResource(ch, { class: terms.rcActor });
+                            let src = ch.getAttribute("source"), tgt = ch.getAttribute("target"), stTransition = { id: r.id, source: src, target: tgt };
+                            spD.statements.push({
+                                id: CONFIG.prefixS + 'startsFrom-' + simpleHash(src + terms.scTransitionSource + r.id),
+                                class: LIB.makeKey(terms.scTransitionSource),
+                                subject: LIB.makeKey(r.id),
+                                object: LIB.makeKey(src),
+                                changedAt: opts.fileDate
+                            });
+                            spD.statements.push({
+                                id: CONFIG.prefixS + 'endsAt-' + simpleHash(tgt + terms.scTransitionTarget + r.id),
+                                class: LIB.makeKey(terms.scTransitionTarget),
+                                subject: LIB.makeKey(r.id),
+                                object: LIB.makeKey(tgt),
+                                changedAt: opts.fileDate
+                            });
+                            Array.from(ch.children, (ch) => {
+                                switch (ch.tagName) {
+                                    case "ownedComment":
+                                        break;
+                                    case "trigger":
+                                        let evId = ch.getAttribute("event");
+                                        stTransition.event = evId;
+                                        spD.statements.push({
+                                            id: CONFIG.prefixS + 'triggers-' + simpleHash(evId + terms.scTriggers + r.id),
+                                            class: LIB.makeKey(terms.scTriggers),
+                                            subject: LIB.makeKey(evId),
+                                            object: LIB.makeKey(r.id),
+                                            changedAt: opts.fileDate
+                                        });
+                                        makeStatementShows(params.diagram.id, evId);
+                                        break;
+                                    case "effect":
+                                        makeActivity(ch, Object.assign({}, params, { parent: r }));
+                                        break;
+                                    default:
+                                        infoSkip(ch);
+                                }
+                                ;
+                            });
+                            stateTransitionL.push(stTransition);
+                            break;
+                        default:
+                            infoSkip(ch);
+                    }
+                    ;
+                    if (r)
+                        spD.resources.push(r);
+                });
+            }
+        }
+        function makeActivity(el, params) {
+            let r = makeResource(el, { class: terms.rcActor });
+            spD.resources.push(r);
+            if (params.packageId)
+                spD.statements.push({
+                    id: CONFIG.prefixS + 'contains-' + simpleHash(params.packageId + terms.scContains + r.id),
+                    class: LIB.makeKey(terms.scContains),
+                    subject: LIB.makeKey(params.packageId),
+                    object: LIB.makeKey(r.id),
+                    changedAt: opts.fileDate
+                });
+            if (params.parent)
+                spD.statements.push({
+                    id: CONFIG.prefixS + 'ownedBehavior-' + simpleHash(params.parent.id + terms.scHasBehavior + r.id),
+                    class: LIB.makeKey(terms.scHasBehavior),
+                    subject: LIB.makeKey(params.parent.id),
+                    object: LIB.makeKey(r.id),
+                    changedAt: opts.fileDate
+                });
+            Array.from(el.children, (ch) => {
+                switch (ch.tagName) {
+                    case "xmi:Extension":
+                        makeDiagrams(ch, Object.assign({}, params, { parent: r }));
+                        break;
+                    case "node":
+                        let act = makeResource(ch, { class: terms.rcActor });
+                        spD.resources.push(act);
+                        spD.statements.push({
+                            id: CONFIG.prefixS + 'contains-' + simpleHash(r.id + terms.scContains + act.id),
+                            class: LIB.makeKey(terms.scContains),
+                            subject: LIB.makeKey(r.id),
+                            object: LIB.makeKey(act.id),
+                            changedAt: opts.fileDate
+                        });
+                        break;
+                }
+                ;
+            });
+            Array.from(el.children, (ch) => {
+                switch (ch.tagName) {
+                    case "ownedComment":
+                        break;
+                    case "xmi:Extension":
+                    case "node":
+                        break;
+                    case "edge":
+                        spD.statements.push({
+                            id: ch.getAttribute('xmi:id'),
+                            class: LIB.makeKey(terms.scControlFlow),
+                            subject: LIB.makeKey(ch.getAttribute('source')),
+                            object: LIB.makeKey(ch.getAttribute('target')),
+                            changedAt: opts.fileDate
+                        });
+                        break;
+                    default:
+                        infoSkip(ch);
+                }
+                ;
+            });
+        }
+        function makeResourceClass(el, pars) {
+            let rcId = el.getAttribute("xmi:id"), desc = parseDesc(el, { parent: rcId }), rc = {
+                id: CONFIG.prefixRC + rcId,
+                title: el.getAttribute("name"),
+                description: desc ? [{ text: desc }] : undefined,
+                keepEvenIfUnused: true,
+                changedAt: opts.fileDate
+            };
+            return rc;
+        }
+        function makeResource(el, pars) {
+            let r = {
+                id: el.getAttribute("xmi:id"),
+                class: pars && pars["class"] ? LIB.makeKey(pars["class"]) : undefined,
+                properties: [{
+                        class: LIB.makeKey("PC-Name"),
+                        values: [[{ text: (pars && pars.name ? pars.name : replaceSeparatorNS(el.getAttribute("name")) || ('unnamed ' + el.getAttribute("xmi:type"))) }]]
+                    }, {
+                        class: LIB.makeKey("PC-Type"),
+                        values: [[{ text: el.getAttribute("xmi:type") }]]
+                    }],
+                changedAt: opts.fileDate
+            };
+            addDesc(r, el);
+            return r;
+        }
+        function makeNode(r, pck) {
+            let nd = {
+                id: CONFIG.prefixN + simpleHash(pck + r.id),
+                resource: LIB.makeKey(r.id),
+                nodes: [],
+                changedAt: opts.fileDate
+            };
+            return nd;
+        }
+        function parseDesc(el, opts) {
+            let dscL = [];
+            Array.from(el.children, (ch) => {
+                switch (ch.tagName) {
+                    case 'ownedComment':
+                        let desc = ch.getAttribute("body");
+                        if (desc)
+                            dscL.push(desc);
+                }
+                ;
+            });
+            if (dscL.length > 1)
+                console.warn("Element " + opts.parent + " has more than one comment/description.");
+            if (dscL.length > 0)
+                return dscL[0];
+        }
+        function addDesc(r, el) {
+            let desc = parseDesc(el, { parent: r.id });
+            if (desc)
+                r.properties.push({
+                    class: LIB.makeKey("PC-Description"),
+                    values: [[{ text: desc }]]
+                });
+        }
+        function makeStatementShows(sbj, obj) {
+            if (sbj && obj) {
+                let stId = CONFIG.prefixS + 'shows-' + simpleHash(sbj + terms.scShows + obj);
+                if (LIB.indexById(usedElementL, stId) < 0)
+                    usedElementL.push({
+                        id: stId,
+                        class: LIB.makeKey(terms.scShows),
+                        subject: LIB.makeKey(sbj),
+                        object: LIB.makeKey(obj),
+                        changedAt: opts.fileDate
+                    });
+            }
+            else
+                console.error("When creating 'shows' statement, the subject or object is undefined", sbj, obj);
+        }
+        function validateStatement(st, idx, stL) {
+            if (LIB.isKey(st.subject) && LIB.isKey(st.object) && LIB.isKey(st["class"])) {
+                let stC = LIB.itemByKey(spD.statementClasses, st["class"]), list = spD.resources.concat(stL), sbj = LIB.itemByKey(list, st.subject), obj = LIB.itemByKey(list, st.object), valid = sbj && obj;
+                if (!stC) {
+                    console.warn("Cameo Import: Class " + st["class"].id + " for statement " + st.id + " not found.");
+                    return false;
+                }
+                ;
+                if (!valid)
+                    console.info("Cameo Import: Skipping", stC.title, "statement " + st.id + ", because " + (sbj ? ("object " + st.object.id) : ("subject " + st.subject.id)) + " isn't listed as resource resp. statement.");
+                else {
+                    valid = ((!stC.subjectClasses || LIB.referenceIndex(stC.subjectClasses, sbj["class"]) > -1)
+                        && (!stC.objectClasses || LIB.referenceIndex(stC.objectClasses, obj["class"]) > -1));
+                    if (!valid)
+                        console.info("Cameo Import: Skipping", stC.title, "statement " + st.id + " with subject", sbj, " and object", obj, ", because they violate the statementClass.");
+                }
+                ;
+                return valid;
+            }
+            ;
+            console.warn("Cameo Import: Skipping statement, because class, subject or object is undefined: " + st);
+            return false;
+        }
+    }
+    function replaceSeparatorNS(name) {
+        if (name && opts.replaceSeparatorNamespace) {
+            let rx = new RegExp('^(.{1,9})\\' + opts.replaceSeparatorNamespace + '(.+)$');
+            return name.replace(rx, (match, $2, $3) => { return $2 + ':' + $3; });
+        }
+        ;
+        return name;
+    }
+    function infoSkip(el) {
+        let nm = el.getAttribute("name"), ex = " with " + (nm ? "name '" + nm + "' and " : "") + "id '" + el.getAttribute("xmi:id") + "'.";
+        console.info("Cameo Import: Skipping tag '" + el.tagName + "'" + ex);
+    }
+    function validateCameo(xmi) {
+        return xmi.getElementsByTagName('xmi:exporter')[0].innerHTML.includes("MagicDraw");
+    }
+}

@@ -14,7 +14,7 @@ moduleManager.construct({
     name: 'ioDdpSchema'
 }, (self) => {
     "use strict";
-    const errInvalidXML = new resultMsg(898, 'DDP Schema is not valid XML.'), errTransformationCancelled = new resultMsg(999, 'Transformation cancelled on user request.'), errTransformationFailed = new resultMsg(999, 'Input file could not be transformed to SpecIF.'), domainOfDDPElements = "V-Domain-20";
+    const errInvalidXML = new resultMsg(898, 'DDP Schema is not valid XML.'), errTransformationCancelled = new resultMsg(999, 'Transformation cancelled on user request.'), errTransformationFailed = new resultMsg(999, 'Input file could not be transformed to SpecIF.'), domainOfDDPElements = "V-Domain-20", ns = "DDP:";
     self.init = () => {
         return true;
     };
@@ -101,7 +101,7 @@ moduleManager.construct({
         Array.from(dictionaryEntities[0].children[0].children, (d) => {
             let dE = d.children[0].children[0].children[0];
             let ti = dE.getAttribute("name") || "", rC = {
-                id: CONFIG.prefixRC + ti.toJsId(),
+                id: ns + ti.toJsId(),
                 title: ti,
                 description: getDesc(dE),
                 instantiation: ["auto", "user"],
@@ -111,7 +111,7 @@ moduleManager.construct({
             let attC = dE.getElementsByTagName('xs:complexContent'), atts = attC[0].children[0].children;
             let prpL = (atts && atts.length == 1) ? Array.from(atts[0].getElementsByTagName('xs:element')) : [];
             prpL.forEach((prp) => {
-                let ti = prp.getAttribute("ref") || prp.getAttribute("name") || "", id = CONFIG.prefixPC + ti.toJsId(), ty = prp.getAttribute("type") || "xs:string", dT = LIB.itemBy(spD.dataTypes, "type", ty);
+                let ti = prp.getAttribute("ref") || prp.getAttribute("name") || "", id = LIB.makeIdWithNamespace(ns, ti), ty = prp.getAttribute("type") || "xs:string", dT = LIB.itemBy(spD.dataTypes, "type", ty);
                 if (dT) {
                     let pC = {
                         id: id,
@@ -124,7 +124,7 @@ moduleManager.construct({
                     LIB.cacheE(rC.propertyClasses, { id: id });
                 }
                 else
-                    console.warn('Property with title ' + ti + ' has unknown data type ' + ty);
+                    console.error('Property with title ' + ti + ' has unknown data type ' + ty);
             });
             LIB.cacheE(spD.resourceClasses, rC);
         });
@@ -134,7 +134,7 @@ moduleManager.construct({
         Array.from(dictionaryRelations[0].children[0].children, (rel) => {
             if (rel.tagName == "xs:element") {
                 let ti = rel.getAttribute("name") || "", sC = {
-                    id: CONFIG.prefixSC + ti.toJsId(),
+                    id: ns + ti.toJsId(),
                     title: ti,
                     description: getDesc(rel),
                     subjectClasses: [],
@@ -148,10 +148,10 @@ moduleManager.construct({
                 });
                 let sTi = sbj[0].getAttribute("name").substring(7), oTi = obj[0].getAttribute("name").substring(6);
                 sC.subjectClasses.push({
-                    id: CONFIG.prefixRC + sTi.toJsId()
+                    id: ns + sTi.toJsId()
                 });
                 sC.objectClasses.push({
-                    id: CONFIG.prefixRC + oTi.toJsId()
+                    id: ns + oTi.toJsId()
                 });
                 LIB.cacheE(spD.statementClasses, sC);
             }
@@ -184,7 +184,7 @@ moduleManager.construct({
                 properties: []
             };
             if (!RE.isolateNamespace.test(ti))
-                ti = "DDP:" + ti;
+                ti = ns + ti;
             rT.properties.push({ "class": { "id": "PC-SpecifTerm" }, "values": [[{ "text": ti }]] }, { "class": { "id": "PC-Description" }, "values": [getDesc(dE)] }, { "class": { "id": "PC-TermStatus" }, "values": ["V-TermStatus-50"] }, { "class": { "id": "PC-Domain" }, "values": [domainOfDDPElements] }, { "class": { "id": "PC-Instantiation" }, "values": ["V-Instantiation-10", "V-Instantiation-20"] });
             LIB.cacheE(spD.resources, rT);
             add2Hierarchy(rT.id, "N-FolderTermsResourceClass");
@@ -202,7 +202,7 @@ moduleManager.construct({
                         properties: []
                     };
                     if (!RE.isolateNamespace.test(ti))
-                        ti = "DDP:" + ti;
+                        ti = ns + ti;
                     pT.properties.push({ "class": { "id": "PC-SpecifTerm" }, "values": [[{ "text": ti }]] }, { "class": { "id": "PC-Description" }, "values": [getDesc(dE)] }, { "class": { "id": "PC-TermStatus" }, "values": ["V-TermStatus-50"] }, { "class": { "id": "PC-Domain" }, "values": [domainOfDDPElements] });
                     LIB.cacheE(spD.resources, pT);
                     add2Hierarchy(pT.id, "N-FolderTermsPropertyClass");
@@ -232,7 +232,7 @@ moduleManager.construct({
                     properties: []
                 };
                 if (!RE.isolateNamespace.test(ti))
-                    ti = "DDP:" + ti;
+                    ti = ns + ti;
                 sT.properties.push({ "class": { "id": "PC-SpecifTerm" }, "values": [[{ "text": ti }]] }, { "class": { "id": "PC-Description" }, "values": [getDesc(rel)] }, { "class": { "id": "PC-TermStatus" }, "values": ["V-TermStatus-50"] }, { "class": { "id": "PC-Domain" }, "values": [domainOfDDPElements] }, { "class": { "id": "PC-Instantiation" }, "values": ["V-Instantiation-10", "V-Instantiation-20"] });
                 LIB.cacheE(spD.resources, sT);
                 add2Hierarchy(sT.id, "N-FolderTermsStatementClass");

@@ -44,10 +44,17 @@ class CPropertyToShow {
         if (this.dT.type == XsDataType.String) {
             let lV;
             if (opts && opts.targetLanguage) {
-                this.values.forEach((v, i) => {
-                    lV = LIB.languageTextOf(v, opts);
-                    str += (i < 1 ? '' : ', ') + (opts.lookupValues ? app.ontology.localize(lV, opts) : lV);
-                });
+                if (opts.allValues) {
+                    this.values.forEach((v, i) => {
+                        lV = LIB.languageTextOf(v, opts);
+                        str += (i < 1 ? '' : ', ') + (opts.lookupValues ? app.ontology.localize(lV, opts) : lV);
+                    });
+                }
+                else {
+                    lV = LIB.languageTextOf(this.values[0], opts);
+                    str = opts.lookupValues ? app.ontology.localize(lV, opts) : lV;
+                }
+                ;
                 return str.replace(/^\s+/, "");
             }
             ;
@@ -65,6 +72,7 @@ class CPropertyToShow {
         let opts = Object.assign({
             titleLinking: false,
             lookupValues: false,
+            allValues: true,
             targetLanguage: this.selPrj.language,
             clickableElements: false,
             linkifyURLs: false,

@@ -1,7 +1,7 @@
 "use strict";
 const CONFIG = {};
 CONFIG.specifVersion = "1.2";
-CONFIG.appVersion = CONFIG.specifVersion + ".a.38";
+CONFIG.appVersion = CONFIG.specifVersion + ".b.1";
 CONFIG.imgURL = './assets/images';
 CONFIG.remotePath = 'https://specif.de/v' + CONFIG.specifVersion + '/';
 CONFIG.localPath = '../../../SpecIF/Pages/v' + CONFIG.specifVersion + '/';
@@ -208,7 +208,8 @@ CONFIG.nativeProperties = new Map([
 CONFIG.valuesTrue = ['true', 'yes', 'wahr', 'ja', 'vrai', 'oui', '1', 'True'];
 CONFIG.valuesFalse = ['false', 'no', 'falsch', 'nein', 'faux', 'non', '0', 'False'];
 const RE = {};
-RE.Id = /^[_a-zA-Z]{1}[_a-zA-Z\d.-]*$/;
+RE.ReqifId = /^[_a-zA-Z]{1}[_a-zA-Z\d.-]*$/;
+RE.SpecifId = /^[_a-zA-Z]{1}[_a-zA-Z\d.:#\/-]*$/;
 RE.Email = /^[A-Z\d._%+-]+@[A-Z\d.-]+\.[A-Z]{2,4}$/i;
 RE.URI = /(^|\s|>)((https?:\/\/|www\.)([^\s\/.$?#=]+\.)*([^\s\/.$?#=]+\.[\w]{2,4})((?:\/[^\s#?\/]*?){0,9})(\?[^\s#?]+?)?(#[^\s#]*?)?)(\s|,|:|<|\.\s|\.?$)/gm;
 RE.IsoDateTime = /^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2]\d|30|31)(?:T([0-1]\d|2[0-4]):([0-5]\d):([0-5]\d(?:\.\d{1,3})?)(\+(0\d|11|12):([0-5]\d)|-(0\d|11|12):([0-5]\d)|Z)?)?$/;
@@ -238,7 +239,7 @@ RE.innerTag = new RegExp("([\\s\\S]*?)" + tagStr, 'g');
 const tagsHtml = "(p|div|object|img|a|br|b|i|em|span|ul|ol|li|table|thead|tbody|tfoot|th|td)";
 RE.escapedHtmlTag = new RegExp("&(?:lt|#60);(\\/?)" + tagsHtml + "(.*?\\/?)&(?:gt|#62);", "g");
 RE.innerHtmlTag = new RegExp("([\\s\\S]*?)(<\\/?)" + tagsHtml + "((?: [^<>]+)?\\/?>)", 'g');
-RE.Namespace = /^([\w-]+)[.:](\w)/;
+RE.Namespace = /^([\w-]+)[.:](\w*)/;
 RE.vocabularyTerm = /^[\w-]+(?:\:|\.)[\w\.:-]+$/;
 RE.splitVocabularyTerm = /^([\w-]+:|[\w-]+\.)?([\w\.:-]+)$/;
 RE.AmpersandPlus = new RegExp('&(.{0,8})', 'g');

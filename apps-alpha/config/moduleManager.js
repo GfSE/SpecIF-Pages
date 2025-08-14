@@ -6,6 +6,8 @@
     Author: se@enso-managers.de, Berlin
     License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
     We appreciate any correction, comment or contribution as Github issue (https://github.com/enso-managers/SpecIF-Tools/issues)
+
+    See: https://developer.mozilla.org/de/docs/Web/JavaScript/Guide/Modules
 */
 class ViewControl {
     constructor() {
