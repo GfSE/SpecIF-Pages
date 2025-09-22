@@ -51,14 +51,8 @@ As we have discussed all concepts before, let's right away discuss the full exam
       "id": "V-Prio-0",
       "value": "SpecIF:priorityHigh"
     },{
-      "id": "V-Prio-1",
-      "value": "SpecIF:priorityRatherHigh"
-    },{
       "id": "V-Prio-2",
       "value": "SpecIF:priorityMedium"
-    },{
-      "id": "V-Prio-3",
-      "value": "SpecIF:priorityRatherLow"
     },{
       "id": "V-Prio-4",
       "value": "SpecIF:priorityLow"
@@ -241,6 +235,9 @@ As we have discussed all concepts before, let's right away discuss the full exam
     },{
       "class": "PC-Description",
       "value": "<p>The data store MUST be consistent at all times.</p>"
+    },{
+      "class": "PC-Priority",
+      "value": "V-Prio-0"
     }],
     "changedAt": "2020-10-17T10:00:00+01:00"
   },{
@@ -253,6 +250,9 @@ As we have discussed all concepts before, let's right away discuss the full exam
     },{
       "class": "PC-Description",
       "value": "<p>The data store MUST support a total volume up to 850 GB.</p>"
+    },{
+      "class": "PC-Priority",
+      "value": "V-Prio-0"
     }],
     "changedAt": "2020-10-17T10:00:00+01:00"
   },{
@@ -265,6 +265,9 @@ As we have discussed all concepts before, let's right away discuss the full exam
     },{
       "class": "PC-Description",
       "value": "<p>The system SHOULD respond on user queries within 300 ms.</p>"
+    },{
+      "class": "PC-Priority",
+      "value": "V-Prio-2"
     }],
     "changedAt": "2020-10-17T10:00:00+01:00"
   }],
