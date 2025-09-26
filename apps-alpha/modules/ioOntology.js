@@ -175,6 +175,14 @@ class COntology {
         ;
         return term;
     }
+    getLocalTerms(term) {
+        let vL = LIB.valuesByTitle(term, [CONFIG.propClassLocalTerm], this.data);
+        return Array.isArray(vL) && vL.length > 0 ? vL[0] : undefined;
+    }
+    getDescriptions(term) {
+        let vL = LIB.valuesByTitle(term, [CONFIG.propClassDesc], this.data);
+        return Array.isArray(vL) && vL.length > 0 ? vL[0] : undefined;
+    }
     localize(term, opts) {
         if (RE.vocabularyTerm.test(term)) {
             let tR = this.getTermResource('all', term, { eligibleOnly: true });
@@ -612,10 +620,10 @@ class COntology {
             instantiation: iL.map((ins) => { return LIB.displayValueOf(ins, { lookupValues: true }); }),
             isUndirected: LIB.isTrue(this.valueByTitle(r, "SpecIF:isUndirected")) || undefined,
             icon: this.valueByTitle(r, "SpecIF:Icon"),
-            subjectClasses: sCL.length > 0 ? sCL.map((sC) => { return { id: sC.id }; }) : undefined,
-            objectClasses: oCL.length > 0 ? oCL.map((oC) => { return { id: oC.id }; }) : undefined,
+            subjectClasses: sCL,
+            objectClasses: oCL,
             propertyClasses: pCL.length > 0 ? pCL.map((pC) => { return { id: pC.id }; }) : undefined,
-            changedAt: this.latestOf([r.changedAt].concat(pCL.map(pC => pC.date)).concat(sCL.map(sC => sC.date)).concat(oCL.map(oC => oC.date)))
+            changedAt: this.latestOf([r.changedAt].concat(pCL.map(pC => pC.date)))
         });
     }
     extendingClassOf(el, pfx) {
@@ -659,8 +667,8 @@ class COntology {
         let iCL = [], sL = this.statementsByTitle(el, clL, { asObject: true });
         for (let s of sL) {
             let term = LIB.itemByKey(this.data.resources, s.subject), prep = this.makeIdAndTitle(term, term['class'].id == CONFIG.prefixRC + "SpecifTermresourceclass" ? CONFIG.prefixRC : CONFIG.prefixSC);
-            LIB.cacheE(iCL, { id: prep.id, date: s.changedAt });
-            if (!this.options.excludeEligibleSubjectClassesAndObjectClasses) {
+            if (this.hasSelectedStatus(term, this.options)) {
+                LIB.cacheE(iCL, { id: prep.id });
                 if (term['class'].id == CONFIG.prefixRC + "SpecifTermresourceclass") {
                     if (LIB.indexById(this.generated.rCL, prep.id) < 0)
                         LIB.cacheE(this.generated.rCL, this.makeRC(term));
@@ -669,10 +677,15 @@ class COntology {
                     if (LIB.indexById(this.generated.sCL, prep.id) < 0)
                         LIB.cacheE(this.required.sTL, term);
                 }
+                ;
             }
+            ;
         }
         ;
-        return iCL;
+        if (iCL.length > 0)
+            return iCL;
+        if (sL.length > 0)
+            console.warn("Ontology: All classes of " + el.id + " with type " + clL.join() + " have insufficient lifecycle status");
     }
     makeItem(r, prefix) {
         let prep = this.makeIdAndTitle(r, prefix), dscL = LIB.valuesByTitle(r, [CONFIG.propClassDesc], this.data), dsc;
@@ -821,7 +834,7 @@ class COntology {
         return spL;
     }
     getOrganizerClasses() {
-        return [CONFIG.resClassOrganizer].concat(this.getSpecializationsOf('resourceClass', CONFIG.resClassOrganizer));
+        return [CONFIG.resClassOrganizerClass].concat(this.getSpecializationsOf('resourceClass', CONFIG.resClassOrganizerClass));
     }
     getModelElementClasses() {
         return [CONFIG.resClassModelElement].concat(this.getSpecializationsOf('resourceClass', CONFIG.resClassModelElement));

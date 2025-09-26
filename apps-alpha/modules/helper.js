@@ -398,7 +398,7 @@ LIB.makeIdWithNamespace = (ns, ti) => {
         return ti.replace(RE.Namespace, (match, $1, $2) => {
             return $1 + ':' + $2.toJsId();
         });
-    return ns + ti.toJsId();
+    return (ns ?? '') + ti.toJsId();
 };
 LIB.replacePrefix = (newPrefix, id) => {
     return id.replace(RE.isolatePrefix, (match, $1, $2) => {

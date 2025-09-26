@@ -89,7 +89,7 @@ moduleManager.construct({
     return self;
     function ddpSchema2specifClasses(xsd) {
         "use strict";
-        var xsTerms = ["xs:string", "xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI"], spD = app.ontology.generateSpecifClasses({ terms: xsTerms });
+        var spD = app.standards.makeTemplate();
         spD.title = [{ text: "SpecIF Classes for prostep iViP DDP (Data Model)" }];
         spD.description = [{ text: "SpecIF Classes derived from DDP Schema Version 2.0 created 10.03.2023 08:09:28 by Michael Kirsch, :em engineering methods AG on behalf of prostep iViP Association" }];
         spD.id = "P-DDP-Classes-V20";
@@ -111,11 +111,17 @@ moduleManager.construct({
             let attC = dE.getElementsByTagName('xs:complexContent'), atts = attC[0].children[0].children;
             let prpL = (atts && atts.length == 1) ? Array.from(atts[0].getElementsByTagName('xs:element')) : [];
             prpL.forEach((prp) => {
-                let ti = prp.getAttribute("ref") || prp.getAttribute("name") || "", id = LIB.makeIdWithNamespace(ns, ti), ty = prp.getAttribute("type") || "xs:string", dT = LIB.itemBy(spD.dataTypes, "type", ty);
-                if (dT) {
+                let nm = prp.getAttribute("ref") || prp.getAttribute("name") || "", id = LIB.makeIdWithNamespace(ns, nm), ty = prp.getAttribute("type") || "xs:string", ti = ty.split(':').pop();
+                let dT = {
+                    id: CONFIG.prefixDT + ty.toJsId(),
+                    title: ti,
+                    type: ty
+                };
+                if (["xs:string", "xs:dateTime", "xs:anyURI", "xs:boolean", "xs:integer", "xs:double"].includes(dT.type)) {
+                    LIB.cacheE(spD.dataTypes, dT);
                     let pC = {
                         id: id,
-                        title: ti,
+                        title: nm,
                         description: getDesc(prp),
                         dataType: { id: dT.id },
                         changedAt: spD.createdAt
@@ -124,7 +130,7 @@ moduleManager.construct({
                     LIB.cacheE(rC.propertyClasses, { id: id });
                 }
                 else
-                    console.error('Property with title ' + ti + ' has unknown data type ' + ty);
+                    console.error('Property with title ' + nm + ' has unknown data type ' + ty);
             });
             LIB.cacheE(spD.resourceClasses, rC);
         });
@@ -133,26 +139,19 @@ moduleManager.construct({
             .filter((ch) => { return ch.getAttribute("name") == "DictionaryRelationsCollection"; });
         Array.from(dictionaryRelations[0].children[0].children, (rel) => {
             if (rel.tagName == "xs:element") {
-                let ti = rel.getAttribute("name") || "", sC = {
-                    id: ns + ti.toJsId(),
-                    title: ti,
-                    description: getDesc(rel),
-                    subjectClasses: [],
-                    objectClasses: [],
-                    changedAt: spD.createdAt
-                };
                 let entities = Array.from(rel.getElementsByTagName('xs:element')), sbj = entities.filter((en) => {
                     return en.getAttribute("name").includes("subject");
                 }), obj = entities.filter((en) => {
                     return en.getAttribute("name").includes("object");
                 });
-                let sTi = sbj[0].getAttribute("name").substring(7), oTi = obj[0].getAttribute("name").substring(6);
-                sC.subjectClasses.push({
-                    id: ns + sTi.toJsId()
-                });
-                sC.objectClasses.push({
-                    id: ns + oTi.toJsId()
-                });
+                let sTi = sbj[0].getAttribute("name").substring(7), oTi = obj[0].getAttribute("name").substring(6), ti = rel.getAttribute("name") || "", sC = {
+                    id: ns + ti.toJsId(),
+                    title: '(' + sTi + ') ' + ti.substring(sTi.length, ti.length - oTi.length) + ' (' + oTi + ')',
+                    description: getDesc(rel),
+                    subjectClasses: [{ id: ns + sTi.toJsId() }],
+                    objectClasses: [{ id: ns + oTi.toJsId() }],
+                    changedAt: spD.createdAt
+                };
                 LIB.cacheE(spD.statementClasses, sC);
             }
         });
@@ -183,9 +182,7 @@ moduleManager.construct({
                 },
                 properties: []
             };
-            if (!RE.isolateNamespace.test(ti))
-                ti = ns + ti;
-            rT.properties.push({ "class": { "id": "PC-SpecifTerm" }, "values": [[{ "text": ti }]] }, { "class": { "id": "PC-Description" }, "values": [getDesc(dE)] }, { "class": { "id": "PC-TermStatus" }, "values": ["V-TermStatus-50"] }, { "class": { "id": "PC-Domain" }, "values": [domainOfDDPElements] }, { "class": { "id": "PC-Instantiation" }, "values": ["V-Instantiation-10", "V-Instantiation-20"] });
+            rT.properties.push({ "class": { "id": "PC-SpecifTerm" }, "values": [[{ "text": RE.isolateNamespace.test(ti) ? ti : ns + ti }]] }, { "class": { "id": "PC-Description" }, "values": [getDesc(dE)] }, { "class": { "id": "PC-SpecifLocalterm" }, "values": [[{ "text": ti }]] }, { "class": { "id": "PC-TermStatus" }, "values": ["V-TermStatus-50"] }, { "class": { "id": "PC-Domain" }, "values": [domainOfDDPElements] }, { "class": { "id": "PC-Instantiation" }, "values": ["V-Instantiation-10", "V-Instantiation-20"] });
             LIB.cacheE(spD.resources, rT);
             add2Hierarchy(rT.id, "N-FolderTermsResourceClass");
             let attC = dE.getElementsByTagName('xs:complexContent'), atts = attC[0].children[0].children;
@@ -201,9 +198,7 @@ moduleManager.construct({
                         },
                         properties: []
                     };
-                    if (!RE.isolateNamespace.test(ti))
-                        ti = ns + ti;
-                    pT.properties.push({ "class": { "id": "PC-SpecifTerm" }, "values": [[{ "text": ti }]] }, { "class": { "id": "PC-Description" }, "values": [getDesc(dE)] }, { "class": { "id": "PC-TermStatus" }, "values": ["V-TermStatus-50"] }, { "class": { "id": "PC-Domain" }, "values": [domainOfDDPElements] });
+                    pT.properties.push({ "class": { "id": "PC-SpecifTerm" }, "values": [[{ "text": RE.isolateNamespace.test(ti) ? ti : ns + ti }]] }, { "class": { "id": "PC-Description" }, "values": [getDesc(dE)] }, { "class": { "id": "PC-SpecifLocalterm" }, "values": [[{ "text": ti }]] }, { "class": { "id": "PC-TermStatus" }, "values": ["V-TermStatus-50"] }, { "class": { "id": "PC-Domain" }, "values": [domainOfDDPElements] });
                     LIB.cacheE(spD.resources, pT);
                     add2Hierarchy(pT.id, "N-FolderTermsPropertyClass");
                     spD.statements.push({
@@ -231,17 +226,15 @@ moduleManager.construct({
                     },
                     properties: []
                 };
-                if (!RE.isolateNamespace.test(ti))
-                    ti = ns + ti;
-                sT.properties.push({ "class": { "id": "PC-SpecifTerm" }, "values": [[{ "text": ti }]] }, { "class": { "id": "PC-Description" }, "values": [getDesc(rel)] }, { "class": { "id": "PC-TermStatus" }, "values": ["V-TermStatus-50"] }, { "class": { "id": "PC-Domain" }, "values": [domainOfDDPElements] }, { "class": { "id": "PC-Instantiation" }, "values": ["V-Instantiation-10", "V-Instantiation-20"] });
-                LIB.cacheE(spD.resources, sT);
-                add2Hierarchy(sT.id, "N-FolderTermsStatementClass");
                 let entities = Array.from(rel.getElementsByTagName('xs:element')), sbj = entities.filter((en) => {
                     return en.getAttribute("name").includes("subject");
                 }), obj = entities.filter((en) => {
                     return en.getAttribute("name").includes("object");
                 });
                 let sTi = sbj[0].getAttribute("name").substring(7), oTi = obj[0].getAttribute("name").substring(6), sbjId = CONFIG.prefixR + sTi.toJsId(), objId = CONFIG.prefixR + oTi.toJsId();
+                sT.properties.push({ "class": { "id": "PC-SpecifTerm" }, "values": [[{ "text": RE.isolateNamespace.test(ti) ? ti : ns + ti }]] }, { "class": { "id": "PC-Description" }, "values": [getDesc(rel)] }, { "class": { "id": "PC-SpecifLocalterm" }, "values": [[{ "text": '(' + sTi + ') ' + ti.substring(sTi.length, ti.length - oTi.length) + ' (' + oTi + ')' }]] }, { "class": { "id": "PC-TermStatus" }, "values": ["V-TermStatus-50"] }, { "class": { "id": "PC-Domain" }, "values": [domainOfDDPElements] }, { "class": { "id": "PC-Instantiation" }, "values": ["V-Instantiation-10", "V-Instantiation-20"] });
+                LIB.cacheE(spD.resources, sT);
+                add2Hierarchy(sT.id, "N-FolderTermsStatementClass");
                 spD.statements.push({
                     id: CONFIG.prefixS + (sT.id + 'subject' + sbjId).toJsId(),
                     class: { id: "SC-isEligibleAsSubject" },

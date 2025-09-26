@@ -368,14 +368,11 @@ class CProject {
             if (app.server) {
                 app.server.get('project', meta)
                     .then((msg) => {
-                    console.debug('get meta 1a:', msg);
                     return app.server.put('project', Object.assign({}, meta, { revision: msg.response.revision }));
                 }, (msg) => {
-                    console.debug('get meta 1b:', msg);
                     return app.server.put('project', meta);
                 })
                     .then((msg) => {
-                    console.debug('get meta 2:', msg);
                     Object.assign(this, meta);
                     resolve(msg);
                 })
@@ -907,32 +904,50 @@ class CProject {
     updateWithOntology(dta, opts) {
         if (opts && opts.noUpdateWithOntology)
             return;
+        let updatedIds = [];
         const ty = { ctg: 'enumeratedValue', oCtg: 'propertyValue', list: dta.dataTypes, fn: this.substituteEnum.bind(this) };
         ty.list.forEach((el) => {
             el.enumeration?.forEach((v) => {
-                let oT = app.ontology.getTermResource(ty.oCtg, v.title, { lifeCycles: ["SpecIF:LifecycleStatusReleased", "SpecIF:LifecycleStatusEquivalent"] });
+                let dV = LIB.displayValueOf(v.value), oT = app.ontology.getTermResource(ty.oCtg, dV, { lifeCycles: ["SpecIF:LifecycleStatusReleased", "SpecIF:LifecycleStatusEquivalent"] });
                 if (oT) {
-                    console.info('Replacing ' + ty.ctg + ' ' + v.id + ' with ontology term ' + v.title);
-                    ty.fn(dta, LIB.makeKey(v.title), v);
-                    v.id = v.title;
+                    console.info('Replacing ' + ty.ctg + ' id ' + v.id + ' with ontology term ' + dV);
+                    if (updatedIds.includes(dV)) {
+                        console.warn('The ontology term ' + dV + ' has already been used to update another identifier. No replacement to avoid duplicates.');
+                        return;
+                    }
+                    ;
+                    updatedIds.push(dV);
+                    ty.fn(dta, LIB.makeKey(dV), v);
+                    v.id = dV;
+                    v.value = app.ontology.getLocalTerms(oT);
                 }
             });
         });
         [
-            { ctg: 'dataType', oCtg: 'propertyClass', list: dta.dataTypes, fn: this.substituteDT.bind(this) },
-            { ctg: 'propertyClass', oCtg: 'propertyClass', list: dta.propertyClasses, fn: this.substitutePC.bind(this) },
-            { ctg: 'resourceClass', oCtg: 'resourceClass', list: dta.resourceClasses, fn: this.substituteRC.bind(this) },
-            { ctg: 'statementClass', oCtg: 'statementClass', list: dta.statementClasses, fn: this.substituteSC.bind(this) }
+            { ctg: 'dataType', oCtg: 'propertyClass', list: dta.dataTypes, postfix: '-Value', fn: this.substituteDT.bind(this) },
+            { ctg: 'propertyClass', oCtg: 'propertyClass', list: dta.propertyClasses, postfix: '', fn: this.substitutePC.bind(this) },
+            { ctg: 'resourceClass', oCtg: 'resourceClass', list: dta.resourceClasses, postfix: '', fn: this.substituteRC.bind(this) },
+            { ctg: 'statementClass', oCtg: 'statementClass', list: dta.statementClasses, postfix: '', fn: this.substituteSC.bind(this) }
         ].forEach((ty) => {
             ty.list.forEach((el) => {
-                let oT = app.ontology.getTermResource(ty.oCtg, el.title, { lifeCycles: ["SpecIF:LifecycleStatusReleased", "SpecIF:LifecycleStatusEquivalent"] });
+                let dV = el.title, oT = app.ontology.getTermResource(ty.oCtg, dV, { lifeCycles: ["SpecIF:LifecycleStatusReleased", "SpecIF:LifecycleStatusEquivalent"] });
                 if (oT) {
-                    console.info('Replacing ' + ty.ctg + ' ' + el.id + ' with ontology term ' + el.title);
-                    ty.fn(dta, LIB.makeKey(el.title), LIB.keyOf(el));
-                    el.id = el.title;
+                    dV = dV + ty.postfix;
+                    console.info('Replacing ' + ty.ctg + ' ' + el.id + ' with ontology term ' + dV);
+                    if (updatedIds.includes(dV)) {
+                        console.warn('The ontology term ' + dV + ' has already been used to update another identifier. No replacement to avoid duplicates.');
+                        return;
+                    }
+                    ;
+                    updatedIds.push(dV);
+                    ty.fn(dta, LIB.makeKey(dV), LIB.keyOf(el));
+                    el.id = dV;
+                    el.title = app.ontology.getLocalTerms(oT);
+                    el.description = app.ontology.getDescriptions(oT);
                 }
             });
         });
+        return;
     }
     replacePropertiesWithStatements(opts) {
         let self = this, dta = this.cache;
@@ -1916,9 +1931,12 @@ class CProject {
     }
     substituteEnum(prj, replacingE, replacedE) {
         prj.resources.concat(prj.statements).forEach((el) => {
-            el.properties?.map((p) => {
-                if (p.id == replacedE.id)
-                    p.id = replacingE.id;
+            el.properties?.forEach((p) => {
+                p.values.map((v) => {
+                    if (v.id == replacedE.id)
+                        v.id = replacingE.id;
+                    return p;
+                });
             });
         });
         replacedE.id = replacingE.id;

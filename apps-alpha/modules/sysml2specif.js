@@ -341,10 +341,10 @@ function sysml2specif(xmi, options) {
         console.debug('from SysML:', spD, opts);
         return spD;
         function parseElements(elem, params) {
-            function addResource(r) {
+            function addResource(r, prms) {
                 spD.resources.push(r);
                 if (opts.addElementsToHierarchy)
-                    params.nodes.push(makeNode(r, params.packageId));
+                    prms.nodes.push(makeNode(r, prms.packageId));
             }
             function parseEnum(ch) {
                 let enumL = [];
@@ -366,7 +366,7 @@ function sysml2specif(xmi, options) {
                         let ty = ch.getAttribute("xmi:type");
                         switch (ty) {
                             case "uml:DataType":
-                                addResource(makeResource(ch, { class: terms.rcDefault }));
+                                addResource(makeResource(ch, { class: terms.rcDefault }), params);
                                 break;
                             case "uml:Stereotype":
                                 let rc = makeResourceClass(ch), gen = parseGeneralization(ch), parent = LIB.itemByTitle(spD.resourceClasses, gen);
@@ -734,6 +734,7 @@ function sysml2specif(xmi, options) {
                 ;
             }
             function xEvent(el, params) {
+				console.debug('xEvent',el,params);
                 let r = makeResource(el, { class: terms.rcEvent });
                 spD.resources.push(r);
                 if (opts.addElementsToHierarchy)
@@ -990,8 +991,13 @@ function sysml2specif(xmi, options) {
                             infoSkip(ch);
                     }
                     ;
-                    if (r)
+                    if (r) {
+                        console.debug('state/transition', simpleClone(r), params);
                         spD.resources.push(r);
+                        if (opts.addElementsToHierarchy)
+                            params.nodes.push(makeNode(r, params.packageId));
+                    }
+                    ;
                 });
             }
         }

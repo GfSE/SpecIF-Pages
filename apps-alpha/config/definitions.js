@@ -1,7 +1,7 @@
 "use strict";
 const CONFIG = {};
 CONFIG.specifVersion = "1.2";
-CONFIG.appVersion = CONFIG.specifVersion + ".b.1";
+CONFIG.appVersion = CONFIG.specifVersion + ".b.2";
 CONFIG.imgURL = './assets/images';
 CONFIG.remotePath = 'https://specif.de/v' + CONFIG.specifVersion + '/';
 CONFIG.localPath = '../../../SpecIF/Pages/v' + CONFIG.specifVersion + '/';
@@ -80,7 +80,7 @@ CONFIG.resClassResource = "SpecIF:Resource";
 CONFIG.resClassStatement = "SpecIF:Statement";
 CONFIG.resClassView = "SpecIF:View";
 CONFIG.resClassXlsRow = 'XLS:Resource';
-CONFIG.resClassOrganizer = 'pig:Organizer';
+CONFIG.resClassOrganizerClass = 'pig:OrganizerClass';
 CONFIG.resClassUnreferencedResources = "SpecIF:UnreferencedResources";
 CONFIG.resClassHierarchyRoot = 'SpecIF:HierarchyRoot';
 CONFIG.resClassOutline = 'SpecIF:Outline';

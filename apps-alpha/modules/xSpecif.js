@@ -730,13 +730,16 @@ class CSpecIF {
             LIB.cacheL(spD.resourceClasses, LIB.forAll(this.resourceClasses, rC2ext));
             LIB.cacheL(spD.statementClasses, LIB.forAll(this.statementClasses, sC2ext));
             for (var f of this.files) {
-                pend++;
-                f2ext(f)
-                    .then((oF) => {
-                    spD.files.push(oF);
-                    if (--pend < 1)
-                        finalize();
-                }, reject);
+                if (f.blob) {
+                    pend++;
+                    f2ext(f)
+                        .then((oF) => {
+                        spD.files.push(oF);
+                        if (--pend < 1)
+                            finalize();
+                    }, reject);
+                }
+                ;
             }
             ;
             LIB.cacheL(spD.resources, LIB.forAll((this.resources), r2ext));
@@ -999,9 +1002,9 @@ class CSpecIF {
                     if (opts && opts.preferPng) {
                         switch (iE.type) {
                             case 'image/svg+xml':
-                                let pngN = f.title.fileName() + '.png';
+                                let pngN = iE.title.fileName() + '.png';
                                 if (LIB.itemByTitle(self.files, pngN)) {
-                                    console.info("File '" + f.title + "' has a sibling of type PNG");
+                                    console.info("File '" + iE.title + "' has a sibling of type PNG");
                                     break;
                                 }
                                 ;
@@ -1010,7 +1013,7 @@ class CSpecIF {
                                     can.height = img.height;
                                     ctx.drawImage(img, 0, 0);
                                     can.toBlob((b) => {
-                                        resolve({ id: f.id, title: pngN, type: 'image/png', h: img.height, w: img.width, blob: b });
+                                        resolve({ id: iE.id, title: pngN, type: 'image/png', h: img.height, w: img.width, blob: b });
                                     }, 'image/png');
                                 }
                                 let can = document.createElement('canvas'), ctx = can.getContext('2d'), img = new Image();
@@ -1019,8 +1022,8 @@ class CSpecIF {
                                 reader.addEventListener('loadend', (e) => {
                                     img.src = 'data:image/svg+xml,' + encodeURIComponent(e.target.result);
                                 });
-                                reader.readAsText(f.blob);
-                                console.info("File '" + f.title + "' transformed to PNG");
+                                reader.readAsText(iE.blob);
+                                console.info("File '" + iE.title + "' transformed to PNG");
                                 return;
                             default:
                                 if (!CONFIG.imgTypes.includes(iE.type))

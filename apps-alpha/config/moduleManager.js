@@ -505,7 +505,7 @@ var app, browser, message, moduleManager = function () {
         else {
             pend--;
             self.ready.add(mod);
-            console.info("Loaded module '" + mod + "' (" + self.ready.length + " of " + self.registered.size + ").");
+            console.info("Loaded module '" + mod + "' (" + self.ready.size + " of " + self.registered.size + ").");
         }
         ;
         if (self.registered.size === self.ready.size) {
