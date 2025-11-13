@@ -67,7 +67,7 @@ moduleManager.construct({
                 desc: 'Specification Integration Facility',
                 label: 'SpecIF',
                 extensions: [".specif", ".specifz", ".specif.zip"],
-                opts: { mediaTypeOf: LIB.attachment2mediaType, doCheck: ['statementClass.subjectClasses', 'statementClass.objectClasses'] },
+                opts: { mediaTypeOf: LIB.attachment2mediaType },
                 help: i18n.MsgImportSpecif
             }, {
                 id: 'archimate',
