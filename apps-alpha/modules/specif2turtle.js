@@ -19,12 +19,16 @@
 *       and: https://archive.topquadrant.com/technology/shacl/tutorial/
 *       and: https://shacl.dev/article/Top_10_SHACL_rules_for_RDF_validation.html
 *       and: https://www.w3.org/TR/shacl/
+*
+*   Andreas M�ller: Don't mix class and instance level in RDF triples!
 */
 var PigItemType;
 (function (PigItemType) {
+    PigItemType["Element"] = "pig:Element";
     PigItemType["Organizer"] = "pig:Organizer";
     PigItemType["Entity"] = "pig:Entity";
     PigItemType["Relationship"] = "pig:Relationship";
+    PigItemType["HierarchyRoot"] = "pig:HierarchyRoot";
     PigItemType["Outline"] = "pig:Outline";
     PigItemType["View"] = "pig:View";
 })(PigItemType || (PigItemType = {}));
@@ -36,18 +40,19 @@ var PigProperty;
     PigProperty["lists"] = "pig:lists";
     PigProperty["shows"] = "pig:shows";
     PigProperty["depicts"] = "pig:depicts";
-    PigProperty["icon"] = "pig:Icon";
+    PigProperty["icon"] = "pig:icon";
+    PigProperty["category"] = "pig:category";
 })(PigProperty || (PigProperty = {}));
-var RdfsProperty;
-(function (RdfsProperty) {
-    RdfsProperty["type"] = "rdf:type";
-    RdfsProperty["label"] = "rdfs:label";
-    RdfsProperty["comment"] = "rdfs:comment";
-    RdfsProperty["subClassOf"] = "rdfs:subClassOf";
-    RdfsProperty["subPropertyOf"] = "rdfs:subPropertyOf";
-    RdfsProperty["domain"] = "rdfs:domain";
-    RdfsProperty["range"] = "rdfs:range";
-})(RdfsProperty || (RdfsProperty = {}));
+var RdfProperty;
+(function (RdfProperty) {
+    RdfProperty["type"] = "rdf:type";
+    RdfProperty["label"] = "rdfs:label";
+    RdfProperty["comment"] = "rdfs:comment";
+    RdfProperty["subClassOf"] = "rdfs:subClassOf";
+    RdfProperty["subPropertyOf"] = "rdfs:subPropertyOf";
+    RdfProperty["domain"] = "rdfs:domain";
+    RdfProperty["range"] = "rdfs:range";
+})(RdfProperty || (RdfProperty = {}));
 var ShaclProperty;
 (function (ShaclProperty) {
     ShaclProperty["nodeShape"] = "sh:NodeShape";
@@ -63,10 +68,39 @@ var ShaclProperty;
     ShaclProperty["minCount"] = "sh:minCount";
     ShaclProperty["maxCount"] = "sh:maxCount";
     ShaclProperty["pattern"] = "sh:pattern";
+    ShaclProperty["or"] = "sh:or";
 })(ShaclProperty || (ShaclProperty = {}));
+const nsData = 'd:', nsOnto = "o:", suffixHasSrc = "-hasSource", suffixHasTrg = "-hasTarget", pfx_datatype = 'xsd:', pfx_shape = "pigShapes_", sfx_shape = "_shape", pigOnto = 'https://product-information-graph.org/v0.2/ontology', nsShapes = ['dcterms:', 'rdfs:', 'uml:', 'sysml:', 'FMC:', 'RFLP:', 'IREB:', 'oslc_rm:', 'oslc_cm:', 'ReqIF:', 'ReqIF-WF:', 'SpecIF:', 'pig:'], pigElements = [
+    [PigItemType.Entity, 'owl:Class', 'Entity', 'A PIG meta-model element used for entities (aka resources or artifacts).', [RdfProperty.label, RdfProperty.comment, PigProperty.category, PigProperty.icon]],
+    [PigItemType.Relationship, 'owl:Class', 'Relationship', 'A PIG meta-model element used for reified relationships (aka predicates).', [RdfProperty.label, RdfProperty.comment, PigProperty.category, PigProperty.icon, PigProperty.eligibleSource, PigProperty.eligibleTarget]],
+    [PigItemType.Organizer, 'owl:Class', 'Organizer', 'An element organizing model elements. An example is a list of requirements or a diagram using a certain notation which depicts selected model elements.', [RdfProperty.label, RdfProperty.comment, PigProperty.category, PigProperty.eligibleElement]],
+    [PigItemType.HierarchyRoot, PigItemType.Organizer, 'Hierarchy Root', 'A subclass of PIG organizer serving as a root for hierarchically organized graph elements.', [RdfProperty.label, RdfProperty.comment, PigProperty.lists]],
+    [PigItemType.Outline, PigItemType.Organizer, 'Outline', 'A subclass of PIG organizer comprising all information items of a human-readable document. As usual, the outline is hierarchically organized.', [RdfProperty.label, RdfProperty.comment, PigProperty.category, PigProperty.lists]]
+], pigProperties = [
+    [PigProperty.eligibleSource, 'owl:ObjectProperty', [PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'has source', 'Connects the source of a reified relationship.'],
+    [PigProperty.eligibleTarget, 'owl:ObjectProperty', [PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'has target', 'Connects the target of a reified relationship.'],
+    [PigProperty.eligibleElement, 'owl:ObjectProperty', [PigItemType.Organizer], [PigItemType.Entity, PigItemType.Relationship, PigItemType.Organizer], 'has element', 'References an entity, a relationship or a subordinated organizer.'],
+    [PigProperty.lists, PigProperty.eligibleElement, ["pig:HierarchyRoot", PigItemType.Outline], [PigItemType.Entity, PigItemType.Relationship, PigItemType.Organizer], 'lists', 'Lists (references) an entity, a relationship or a subordinated organizer.'],
+    [PigProperty.shows, PigProperty.eligibleElement, [PigItemType.View], [PigItemType.Entity, PigItemType.Relationship], 'shows', 'Shows (references) an entity or a relationship.'],
+    [PigProperty.depicts, PigProperty.eligibleElement, [PigItemType.View], [PigItemType.Entity], 'depicts', 'Depicts an entity; inverse of uml:ownedDiagram.'],
+    [PigProperty.icon, 'owl:DatatypeProperty', [PigItemType.Entity, PigItemType.Relationship], [pfx_datatype + 'string'], 'has icon', 'Specifies an icon for a model element (entity or relationship).'],
+    [PigProperty.category, 'dcterms:type', [PigItemType.Entity, PigItemType.Relationship], [pfx_datatype + 'string'], 'has category', 'Specifies a category for an element (entity, relationship or organizer).']
+], rdfImplicit = ['rdf', 'rdfs', 'owl', 'xs', 'xsd'], diagramRels = ['SpecIF:shows', 'uml:ownedDiagram'], hierarchyItems = [CONFIG.resClassFolder, CONFIG.resClassOutline, CONFIG.resClassGlossary], excludeEntities = [PigItemType.Element].concat(pigElements.map(en => en[0])), excludeProperties = pigProperties.map(pr => pr[0]);
+function isRdfImplicit(id) {
+    return rdfImplicit.includes(id.split(':')[0]);
+}
+function makeShapeId(id) {
+    return id.startsWith(nsOnto) ? id + sfx_shape : pfx_shape + id;
+}
 class CToRdf {
     constructor() {
         this.lastTab = -1;
+    }
+    heading(str) {
+        return this.newLine()
+            + this.newLine('#################################################################')
+            + this.newLine('# ' + str)
+            + this.newLine('#################################################################');
     }
     newLine(str) {
         if (this.lastTab == 0)
@@ -85,62 +119,95 @@ class CToRdf {
         this.lastTab = 0;
         return ending + `\n${subject}`;
     }
-    tab1(predicate, object, quote) {
+    tab1(predicate, object) {
         if (this.lastTab < 0)
             throw Error("Subject is missing");
         if (object != undefined) {
             let ending = this.lastTab < 1 ? "" : " ;";
             this.lastTab = 1;
-            return this.makeLines(ending + `\n\t${predicate} `, object, quote);
+            return this.makeLines(ending + `\n\t${predicate} `, object);
         }
         ;
         return "";
     }
-    tab2(object, quote) {
+    tab2(object) {
         if (this.lastTab < 1)
             throw Error("Predicate is missing");
         if (object != undefined) {
             let ending = " ,";
             this.lastTab = 2;
-            return this.makeLines(ending + `\n\t\t`, object, quote);
+            return this.makeLines(ending + `\n\t\t`, object);
         }
         ;
         return "";
     }
-    makeLines(prefix, object, quote) {
+    makeLines(prefix, object) {
         switch (typeof (object)) {
+            case 'undefined':
+                return "";
             case 'number':
             case 'boolean':
                 object = object.toString();
             case 'string':
-                return object.length > 0 ? prefix + `${quote || ''}${this.escapeTtl(object)}${quote || ''}` : "";
+                if (object.length > 0) {
+                    if (this.isNotLiteral(object))
+                        return prefix + object;
+                    else
+                        return prefix + `"${this.escapeTtl(object)}"`;
+                }
+                ;
+                return "";
             default:
-                if (!quote)
-                    throw Error("Multilanguage text must be quoted");
-                if (object.length < 2) {
-                    let v = object[0];
-                    return prefix + `"${this.escapeTtl(v['text'])}"${v.language ? "@" + v.language : ""}`;
+                if (!LIB.isArrayWithContent(object)) {
+                    console.error("specif2turtle: Expecting an array with items");
+                    return "";
                 }
                 ;
-                let str = "";
-                for (let v of object) {
-                    if (!v.language)
-                        console.error("Multilanguage text must have a language specified if there are multiple language versions:", v);
-                    str += prefix + `"${this.escapeTtl(v['text'])}"@${v.language}`;
+                if (LIB.isMultiLanguageValue(object)) {
+                    if (object.length < 2) {
+                        let t = object[0].text, l = object[0].language;
+                        if (this.isNotLiteral(t))
+                            return prefix + `${t}`;
+                        let languageTag = l ? `@${l}` : '';
+                        return prefix + `"${this.escapeTtl(t)}"` + languageTag;
+                    }
+                    ;
+                    let str = "";
+                    for (let v of object) {
+                        if (!v.language)
+                            console.error("specif2turtle: Multilanguage text must have a language specified if there are multiple language versions:", v);
+                        str += prefix + `"${this.escapeTtl(v['text'])}"@${v.language}`;
+                    }
+                    ;
+                    return str;
+                }
+                else {
+                    let str = '';
+                    object.forEach((v, i) => {
+                        str += (i == 0 ? prefix : " ,\n\t\t") + (this.isNotLiteral(v) ? v : `"${v}"`);
+                    });
+                    return str;
                 }
                 ;
-                return str;
         }
-        ;
     }
-    escapeTtl(str) {
-        if (str)
-            return str.replace("\\", "\\\\").replace(/\u000a|\u000d/g, '').replace(/"/g, '\\$&');
-    }
-    makeShaclList(pred, L) {
+    makeRdflList(ont, L) {
         let str = "";
         if (Array.isArray(L) && L.length > 0) {
-            str = this.tab1(pred, '[ ');
+            str = '(';
+            for (let l of L) {
+                str += '\n\t\t\t' + LIB.makeIdWithNamespace(ont, l.id ?? l);
+            }
+            ;
+            str += '\n\t\t)';
+        }
+        ;
+        return str;
+    }
+    makeShaclList(L) {
+        let str = "";
+        if (Array.isArray(L) && L.length > 0) {
+            str = '[ ';
             for (let i = 0; i < L.length; i++) {
                 if (L[i].obj)
                     str += '\n\t\t' + L[i].prd + ' ' + L[i].obj + (i < L.length - 1 ? ' ;' : '');
@@ -151,18 +218,24 @@ class CToRdf {
         ;
         return str;
     }
-    makeObjectUnion(ont, L) {
+    makeShaclOr(ont, predicate, L) {
+        if (LIB.isArrayWithContent(L)) {
+            let str = "(";
+            L.forEach((l) => {
+                str += '\n\t\t\t[ ' + predicate + ' ' + LIB.makeIdWithNamespace(ont, l.id ?? l) + ' ]';
+            });
+            return str + '\n\t\t)';
+        }
+        else
+            console.error("specif2turtle: Expecting an array of property shapes for 'sh:or'");
+    }
+    makeOwlUnion(ont, L) {
         let str = "";
-        if (Array.isArray(L) && L.length > 0) {
+        if (LIB.isArrayWithContent(L)) {
             if (L.length > 1) {
                 if (L.length > 10)
-                    console.warn("Many elements in a union: " + L.length + ", beware of performance issues with RDF processors.");
-                str = '[ owl:unionOf(';
-                for (let i = 0; i < L.length; i++) {
-                    str += " " + LIB.makeIdWithNamespace(ont, L[i].id ?? L[i]);
-                }
-                ;
-                str += " )]";
+                    console.warn("specif2turtle: Many elements in a union: " + L.length + ", beware of performance issues with RDF processors.");
+                str = '[ owl:unionOf' + this.makeRdflList(ont, L) + "]";
             }
             else
                 str += LIB.makeIdWithNamespace(ont, L[0].id ?? L[0]);
@@ -170,155 +243,93 @@ class CToRdf {
         ;
         return str;
     }
+    escapeTtl(str) {
+        if (str)
+            return str.replace("\\", "\\\\").replace(/"/g, '\\$&').replace(/\u000a/g, '\\n').replace(/\u000d/g, '');
+    }
+    isNotLiteral(str) {
+        return RE.Namespace.test(str) || str.startsWith('<http') || RE.contentInRoundBrackets.test(str) || RE.contentInSquareBrackets.test(str);
+    }
 }
 app.specif2turtle = (specifData, opts) => {
-    const self = 'd:', sourceURI = encodeURI((opts.sourceFileName.startsWith('http') ? opts.sourceFileName : opts.baseURI + opts.sourceFileName) + '#'), ont = "o:", ontURI = opts.baseURI + "ontology#", suffixShape = "-Shape", suffixHasSrc = "-hasSource", suffixHasTrg = "-hasTarget", extendedClasses = LIB.getExtendedClasses(specifData.resourceClasses, 'all')
+    const sourceURI = encodeURI((opts.sourceFileName.startsWith('http') ? opts.sourceFileName : opts.baseURI + opts.sourceFileName) + '#'), ontURI = pigOnto + '#', extendedClasses = LIB.getExtendedClasses(specifData.resourceClasses, 'all')
         .concat(LIB.getExtendedClasses(specifData.statementClasses, 'all'));
     let toRdf = new CToRdf();
-    let result = defineNamespaces()
-        + transformProjectMetadata(specifData)
-        + definePigClasses()
-        + transformDatatypes(specifData.dataTypes)
-        + transformPropertyClasses(specifData.propertyClasses)
-        + transformResourceClasses(specifData.resourceClasses)
-        + transformStatementClasses(specifData.statementClasses)
-        + transformResources(specifData.resources)
-        + transformStatements(specifData.statements)
-        + transformHierarchies(specifData.nodes)
+    let pig = defineNamespaces()
+        + xProjectMetadata(specifData)
+        + declarePigClasses()
+        + xDatatypes(specifData.dataTypes)
+        + xPropertyClasses(specifData.propertyClasses)
+        + xResourceClasses(specifData.resourceClasses)
+        + xStatementClasses(specifData.statementClasses)
+        + xResources(specifData.resources)
+        + xStatements(specifData.statements)
+        + xHierarchies(specifData.nodes)
         + toRdf.newLine();
-    return result;
-    function isOntologyTerm(id) {
-        return !['pig-ol', 'rdf', 'rdfs', 'owl', 'xs', 'xsd'].includes(id.split(':')[0]);
-    }
+    return pig;
     function defineNamespaces() {
         let pfxL = '';
-        for (var [key, val] of app.ontology.namespaces) {
-            pfxL += toRdf.prefix(key.replace('.', ':'), val.url);
+        for (var [tag, val] of app.ontology.namespaces) {
+            pfxL += toRdf.prefix(tag.replace('.', ':'), val.url);
         }
         ;
-        pfxL += toRdf.prefix('sh:', 'http://www.w3.org/ns/shacl#')
-            + toRdf.newLine()
-            + toRdf.prefix(ont, ontURI)
-            + toRdf.prefix(self, sourceURI);
+        if (LIB.isArrayWithContent(nsShapes))
+            for (var ns of nsShapes) {
+                if (!ns.endsWith(':')) {
+                    ns += ':';
+                    console.warn('specif2turtle: Added a colon to namespace prefix:', ns);
+                }
+                ;
+                pfxL += toRdf.prefix(pfx_shape + ns, pigOnto + '/shapes/' + ns + '#');
+            }
+        ;
+        pfxL += toRdf.newLine()
+            + toRdf.prefix(nsOnto, ontURI)
+            + toRdf.prefix(nsData, sourceURI);
         return pfxL;
     }
     ;
-    function transformProjectMetadata(project) {
+    function xProjectMetadata(project) {
         let { id, title, description, $schema, generator, generatorVersion, rights, createdAt, createdBy } = project;
-        let ttlStr = toRdf.newLine()
-            + toRdf.newLine('#################################################################')
-            + toRdf.newLine('# Project Metadata')
-            + toRdf.newLine('#################################################################')
+        let ttlStr = toRdf.heading('Project Metadata')
             + toRdf.newLine()
-            + toRdf.tab0(self)
-            + toRdf.tab1(RdfsProperty.type, 'owl:Ontology')
-            + toRdf.tab1(RdfsProperty.label, title, '"')
-            + toRdf.tab1(RdfsProperty.comment, description, '"')
+            + toRdf.tab0(nsData)
+            + toRdf.tab1(RdfProperty.type, 'owl:Ontology')
+            + toRdf.tab1(RdfProperty.label, title)
+            + toRdf.tab1(RdfProperty.comment, description)
             + toRdf.tab1('owl:imports', '<http://www.w3.org/1999/02/22-rdf-syntax-ns#>')
             + toRdf.tab2('<http://www.w3.org/2000/01/rdf-schema#>')
             + (rights ? (toRdf.tab1('dcterms:license', '<' + rights.url + '>')) : '')
             + (createdBy ? (toRdf.tab1('dcterms:creator', '<mailto:' + createdBy.email + '>')) : '')
-            + toRdf.tab1('dcterms:createdAt', createdAt, '"');
+            + toRdf.tab1('dcterms:modified', createdAt);
         return ttlStr;
     }
     ;
-    function definePigClasses() {
-        let ttlStr = toRdf.newLine()
-            + toRdf.newLine('#################################################################')
-            + toRdf.newLine('### META-ONTOLOGY = PIG Metamodel (pig:)')
-            + toRdf.newLine('#################################################################')
-            + toRdf.newLine()
-            + toRdf.tab0(PigItemType.Organizer)
-            + toRdf.tab1(RdfsProperty.type, 'owl:Class')
-            + toRdf.tab1(RdfsProperty.label, 'Organizer', '"')
-            + toRdf.tab1(RdfsProperty.comment, 'A PIG meta-model element used for organizing model-elements.', '"')
-            + toRdf.newLine()
-            + toRdf.tab0(PigItemType.Entity)
-            + toRdf.tab1(RdfsProperty.type, 'owl:Class')
-            + toRdf.tab1(RdfsProperty.label, 'Entity', '"')
-            + toRdf.tab1(RdfsProperty.comment, 'A PIG meta-model element used for entities (aka resources or artifacts).', '"')
-            + toRdf.newLine()
-            + toRdf.tab0(PigItemType.Relationship)
-            + toRdf.tab1(RdfsProperty.type, 'owl:Class')
-            + toRdf.tab1(RdfsProperty.label, 'Relationship', '"')
-            + toRdf.tab1(RdfsProperty.comment, 'A PIG meta-model element used for reified relationships (aka predicates).', '"')
-            + toRdf.newLine()
-            + toRdf.tab0(PigProperty.eligibleSource)
-            + toRdf.tab1(RdfsProperty.type, 'owl:ObjectProperty')
-            + toRdf.tab1(RdfsProperty.domain, PigItemType.Relationship)
-            + toRdf.tab1(RdfsProperty.range, PigItemType.Entity)
-            + toRdf.tab1(RdfsProperty.label, 'has source', '"')
-            + toRdf.tab1(RdfsProperty.comment, 'Connects the source of a reified relationship.', '"')
-            + toRdf.newLine()
-            + toRdf.tab0(PigProperty.eligibleTarget)
-            + toRdf.tab1(RdfsProperty.type, 'owl:ObjectProperty')
-            + toRdf.tab1(RdfsProperty.domain, PigItemType.Relationship)
-            + toRdf.tab1(RdfsProperty.range, PigItemType.Entity)
-            + toRdf.tab1(RdfsProperty.label, 'has target', '"')
-            + toRdf.tab1(RdfsProperty.comment, 'Connects the target of a reified relationship.', '"')
-            + toRdf.newLine()
-            + toRdf.tab0(PigProperty.eligibleElement)
-            + toRdf.tab1(RdfsProperty.type, 'owl:ObjectProperty')
-            + toRdf.tab1(RdfsProperty.domain, PigItemType.Organizer)
-            + toRdf.tab1(RdfsProperty.range, toRdf.makeObjectUnion(ont, [PigItemType.Entity, PigItemType.Relationship, PigItemType.Organizer]))
-            + toRdf.tab1(RdfsProperty.label, 'has element', '"')
-            + toRdf.tab1(RdfsProperty.comment, 'References an entity, a relationship or a subordinated organizer.', '"')
-            + toRdf.newLine()
-            + toRdf.tab0(PigProperty.lists)
-            + toRdf.tab1(RdfsProperty.subPropertyOf, PigProperty.eligibleElement)
-            + toRdf.tab1(RdfsProperty.domain, PigItemType.Outline)
-            + toRdf.tab1(RdfsProperty.label, 'lists', '"')
-            + toRdf.tab1(RdfsProperty.comment, 'Lists (references) an entity, a relationship or a subordinated organizer.', '"')
-            + toRdf.newLine()
-            + toRdf.tab0(PigProperty.shows)
-            + toRdf.tab1(RdfsProperty.subPropertyOf, PigProperty.eligibleElement)
-            + toRdf.tab1(RdfsProperty.domain, PigItemType.View)
-            + toRdf.tab1(RdfsProperty.range, toRdf.makeObjectUnion(ont, [PigItemType.Entity, PigItemType.Relationship]))
-            + toRdf.tab1(RdfsProperty.label, 'shows', '"')
-            + toRdf.tab1(RdfsProperty.comment, 'Shows (references) an entity or a relationship.', '"')
-            + toRdf.newLine()
-            + toRdf.tab0(PigProperty.depicts)
-            + toRdf.tab1(RdfsProperty.subPropertyOf, PigProperty.eligibleElement)
-            + toRdf.tab1(RdfsProperty.domain, PigItemType.View)
-            + toRdf.tab1(RdfsProperty.range, PigItemType.Entity)
-            + toRdf.tab1(RdfsProperty.label, 'depicts', '"')
-            + toRdf.tab1(RdfsProperty.comment, 'Depicts an entity; inverse of uml:ownedDiagram.', '"');
-        return ttlStr;
-    }
-    function transformDatatypes(dTs) {
-        if (!isArrayWithContent(dTs))
+    function xDatatypes(dTs) {
+        if (!LIB.isArrayWithContent(dTs))
             return '';
         function hasDatatypeWithEnumeration() {
             for (let dT of dTs)
-                if (isArrayWithContent(dT.enumeration))
+                if (LIB.isArrayWithContent(dT.enumeration))
                     return true;
         }
         if (!hasDatatypeWithEnumeration())
             return '';
-        let ttlStr = toRdf.newLine()
-            + toRdf.newLine('#################################################################')
-            + toRdf.newLine('# Data Types with Enumerated Values')
-            + toRdf.newLine('#################################################################');
+        let ttlStr = toRdf.heading('Data Types with Enumerated Values');
         dTs.forEach(dT => {
-            const ti = dT.title, dtId = LIB.makeIdWithNamespace(ont, dT.id);
-            if (isArrayWithContent(dT.enumeration)) {
+            const dtId = LIB.makeIdWithNamespace(nsOnto, dT.id);
+            if (LIB.isArrayWithContent(dT.enumeration)) {
                 ttlStr += toRdf.newLine()
                     + toRdf.tab0(dtId)
-                    + toRdf.tab1(RdfsProperty.type, 'owl:Class')
-                    + toRdf.tab1(RdfsProperty.label, ti, '"')
-                    + toRdf.tab1(RdfsProperty.comment, 'Enumerated Values for ' + LIB.displayValueOf(ti, { targetLanguage: 'default', lookupValues: true }), '"')
-                    + toRdf.tab1('dcterms:modified', dT.changedAt, '"')
-                    + toRdf.tab1('owl:oneOf', '(');
+                    + toRdf.tab1(RdfProperty.type, 'owl:Class')
+                    + toRdf.tab1(RdfProperty.label, dT.title)
+                    + toRdf.tab1(RdfProperty.comment, dT.description)
+                    + toRdf.tab1('owl:oneOf', toRdf.makeRdflList(nsOnto, dT.enumeration.map(itm => itm.id)));
                 dT.enumeration.forEach(item => {
-                    ttlStr += ' ' + LIB.makeIdWithNamespace(ont, item.id);
-                });
-                ttlStr += ' )';
-                dT.enumeration.forEach(item => {
-                    let vId = LIB.makeIdWithNamespace(ont, item.id), termR = app.ontology.getTermResource('propertyValue', vId);
+                    const vId = LIB.makeIdWithNamespace(nsOnto, item.id);
                     ttlStr += toRdf.tab0(vId)
-                        + toRdf.tab1(RdfsProperty.type, dtId)
-                        + toRdf.tab1(RdfsProperty.label, item.value, '"')
-                        + toRdf.tab1(RdfsProperty.comment, termR ? app.ontology.getDescriptions(termR) : undefined, '"');
+                        + toRdf.tab1(RdfProperty.type, dtId)
+                        + toRdf.tab1(RdfProperty.label, item.value);
                 });
             }
             ;
@@ -326,41 +337,39 @@ app.specif2turtle = (specifData, opts) => {
         return ttlStr;
     }
     ;
-    function transformPropertyClasses(pCs) {
-        if (!isArrayWithContent(pCs))
+    function xPropertyClasses(pCs) {
+        if (!LIB.isArrayWithContent(pCs))
             return '';
-        let ttlStr = toRdf.newLine()
-            + toRdf.newLine('#################################################################')
-            + toRdf.newLine('# Ontology - Property Classes')
-            + toRdf.newLine('#################################################################');
+        let ttlStr = toRdf.heading('Ontology - Property Classes');
         pCs.forEach(pC => {
-            const dT = LIB.itemByKey(specifData.dataTypes, pC.dataType), ty = dT.enumeration ? 'owl:ObjectProperty' : 'owl:DatatypeProperty', pcId = LIB.makeIdWithNamespace(ont, pC.id);
-            if (isOntologyTerm(pcId)) {
+            const dT = LIB.itemByKey(specifData.dataTypes, pC.dataType), pcId = LIB.makeIdWithNamespace(nsOnto, pC.id);
+            if (excludeProperties.includes(pcId) || isRdfImplicit(pcId))
+                ttlStr += toRdf.newLine()
+                    + toRdf.newLine('# Skipping implicit property: ' + pcId);
+            else {
                 ttlStr += toRdf.newLine()
                     + toRdf.tab0(pcId)
-                    + toRdf.tab1(RdfsProperty.type, ty)
-                    + toRdf.tab1(RdfsProperty.subClassOf, PigItemType.PropertyClass)
-                    + toRdf.tab1(RdfsProperty.label, pC.title, '"')
-                    + toRdf.tab1(RdfsProperty.comment, pC.description, '"')
-                    + toRdf.tab1(RdfsProperty.range, dT.enumeration ? LIB.makeIdWithNamespace(ont, dT.id) : undefined);
-                +toRdf.tab1('dcterms:modified', pC.changedAt, '"');
-                const dt = dT.type.replace('xs:', 'xsd:');
-                ttlStr += toRdf.newLine()
-                    + toRdf.tab0(pcId + suffixShape)
-                    + toRdf.tab1(RdfsProperty.type, ShaclProperty.propertyShape)
-                    + toRdf.tab1(ShaclProperty.path, pcId)
-                    + toRdf.tab1(ShaclProperty.minCount, pC.required ? '1' : undefined, '"')
-                    + toRdf.tab1(ShaclProperty.maxCount, pC.multiple ? undefined : '1', '"');
-                if (dT.enumeration)
-                    ttlStr += toRdf.tab1(ShaclProperty.class, LIB.makeIdWithNamespace(ont, dT.id));
-                else {
-                    ttlStr += toRdf.tab1(ShaclProperty.datatype, dt)
-                        + toRdf.tab1(ShaclProperty.maxLength, dT.maxLength, '"')
-                        + toRdf.tab1(ShaclProperty.minInclusive, dT.minInclusive, '"')
-                        + toRdf.tab1(ShaclProperty.maxInclusive, dT.maxInclusive, '"')
-                        + toRdf.tab1(ShaclProperty.pattern, dT.fractionDigits ? `^\\d+(\\\\.\\\\d{0,${dT.fractionDigits}})?$` : undefined, '"');
-                }
-                ;
+                    + toRdf.tab1(RdfProperty.type, dT.enumeration ? "owl:ObjectProperty" : "owl:DatatypeProperty")
+                    + toRdf.tab1(RdfProperty.label, pC.title)
+                    + toRdf.tab1(RdfProperty.comment, pC.description)
+                    + toRdf.tab1(RdfProperty.range, dT.enumeration ? LIB.makeIdWithNamespace(nsOnto, dT.id) : undefined);
+            }
+            ;
+            const dt = dT.type;
+            ttlStr += toRdf.newLine()
+                + toRdf.tab0(makeShapeId(pcId))
+                + toRdf.tab1(RdfProperty.type, ShaclProperty.propertyShape)
+                + toRdf.tab1(ShaclProperty.path, pcId)
+                + toRdf.tab1(ShaclProperty.minCount, pC.required ? '1' : undefined)
+                + toRdf.tab1(ShaclProperty.maxCount, pC.multiple ? undefined : '1');
+            if (dT.enumeration)
+                ttlStr += toRdf.tab1(ShaclProperty.class, LIB.makeIdWithNamespace(nsOnto, dT.id));
+            else {
+                ttlStr += toRdf.tab1(ShaclProperty.datatype, dt)
+                    + toRdf.tab1(ShaclProperty.maxLength, dT.maxLength)
+                    + toRdf.tab1(ShaclProperty.minInclusive, dT.minInclusive)
+                    + toRdf.tab1(ShaclProperty.maxInclusive, dT.maxInclusive)
+                    + toRdf.tab1(ShaclProperty.pattern, dT.fractionDigits ? `^\\d+(\\\\.\\\\d{0,${dT.fractionDigits}})?$` : undefined);
             }
             ;
         });
@@ -368,128 +377,149 @@ app.specif2turtle = (specifData, opts) => {
     }
     ;
     function makeClassShape(eC) {
-        const ecId = LIB.makeIdWithNamespace(ont, eC.id);
+        const ecId = LIB.makeIdWithNamespace(nsOnto, eC.id);
         let ttlStr = toRdf.newLine()
-            + toRdf.tab0(ecId + suffixShape)
-            + toRdf.tab1(RdfsProperty.type, ShaclProperty.NodeShape)
+            + toRdf.tab0(makeShapeId(ecId))
+            + toRdf.tab1(RdfProperty.type, ShaclProperty.nodeShape)
             + toRdf.tab1(ShaclProperty.targetClass, ecId);
-        if (isArrayWithContent(eC.propertyClasses)) {
-            eC.propertyClasses.forEach((pC) => {
-                ttlStr += toRdf.tab1(ShaclProperty.property, LIB.makeIdWithNamespace(ont, pC.id) + suffixShape);
+        if (LIB.isArrayWithContent(eC.propertyClasses)) {
+            eC.propertyClasses.forEach((pC, i) => {
+                ttlStr += i < 1 ?
+                    toRdf.tab1(ShaclProperty.property, makeShapeId(LIB.makeIdWithNamespace(nsOnto, pC.id)))
+                    : toRdf.tab2(makeShapeId(LIB.makeIdWithNamespace(nsOnto, pC.id)));
             });
         }
         ;
         return ttlStr;
     }
-    function transformResourceClasses(rCL) {
-        if (!isArrayWithContent(rCL))
+    function xResourceClasses(rCL) {
+        if (!LIB.isArrayWithContent(rCL))
             return '';
-        let ttlStr = toRdf.newLine()
-            + toRdf.newLine('#################################################################')
-            + toRdf.newLine('# Ontology - Entity Classes')
-            + toRdf.newLine('#################################################################');
+        let ttlStr = toRdf.heading('Ontology - Entity Classes');
         rCL.forEach(rC => {
-            const exC = LIB.itemByKey(extendedClasses, LIB.keyOf(rC)), entId = LIB.makeIdWithNamespace(ont, rC.id), ity = app.ontology.organizerClasses.includes(entId) ? PigItemType.Organizer : PigItemType.Entity;
-            if (['pig:Element', 'pig:Entity', 'pig:Relationship', 'pig:Organizer'].includes(entId))
+            if (excludeEntities.includes(rC.id) || isRdfImplicit(rC.id)) {
                 return;
-            if (isOntologyTerm(entId)) {
-                ttlStr += toRdf.newLine()
-                    + toRdf.tab0(entId)
-                    + toRdf.tab1(RdfsProperty.subClassOf, (rC.extends ? LIB.makeIdWithNamespace(ont, rC.extends.id) : ity))
-                    + toRdf.tab1(RdfsProperty.label, rC.title, '"')
-                    + toRdf.tab1(RdfsProperty.comment, rC.description, '"')
-                    + toRdf.tab1(PigProperty.icon, rC.icon, '"')
-                    + toRdf.tab1('dcterms:modified', rC.changedAt, '"');
-                ttlStr += makeClassShape(exC);
             }
             ;
+            const exC = LIB.itemByKey(extendedClasses, LIB.keyOf(rC)), entId = LIB.makeIdWithNamespace(nsOnto, rC.id), ity = app.ontology.organizerClasses.includes(entId) ? PigItemType.Organizer : PigItemType.Entity;
+            ttlStr += toRdf.newLine()
+                + toRdf.tab0(entId)
+                + toRdf.tab1(RdfProperty.subClassOf, (rC.extends ? LIB.makeIdWithNamespace(nsOnto, rC.extends.id) : ity))
+                + toRdf.tab1(RdfProperty.label, rC.title)
+                + toRdf.tab1(RdfProperty.comment, rC.description)
+                + toRdf.tab1(PigProperty.icon, rC.icon);
+            ttlStr += makeClassShape(exC);
         });
         return ttlStr;
     }
     ;
-    function transformStatementClasses(sCL) {
-        if (!isArrayWithContent(sCL))
+    function xStatementClasses(sCL) {
+        if (!LIB.isArrayWithContent(sCL))
             return '';
-        let ttlStr = toRdf.newLine()
-            + toRdf.newLine('#################################################################')
-            + toRdf.newLine('# Ontology - Relationship Classes')
-            + toRdf.newLine('#################################################################');
+        let ttlStr = toRdf.heading('Ontology - Relationship Classes');
         sCL.forEach(sC => {
-            const exC = LIB.itemByKey(extendedClasses, LIB.keyOf(sC)), relId = LIB.makeIdWithNamespace(ont, sC.id);
-            if (['SpecIF:shows', 'uml:ownedDiagram'].includes(relId))
+            if (diagramRels.includes(sC.id) || isRdfImplicit(sC.id)) {
                 return;
-            if (isOntologyTerm(relId)) {
-                ttlStr += toRdf.newLine()
-                    + toRdf.tab0(relId)
-                    + toRdf.tab1(RdfsProperty.subClassOf, (sC.extends ? LIB.makeIdWithNamespace(ont, sC.extends.id) : PigItemType.Relationship))
-                    + toRdf.tab1(RdfsProperty.label, sC.title, '"')
-                    + toRdf.tab1(RdfsProperty.comment, sC.description, '"')
-                    + toRdf.tab1(PigProperty.icon, sC.icon, '"')
-                    + toRdf.tab1('dcterms:modified', sC.changedAt, '"')
-                    + toRdf.newLine()
-                    + toRdf.tab0(relId + suffixHasSrc)
-                    + toRdf.tab1(RdfsProperty.subPropertyOf, PigProperty.eligibleSource)
-                    + toRdf.tab1(RdfsProperty.label, "Connects the source of " + relId, '"')
-                    + toRdf.tab1(RdfsProperty.domain, relId)
-                    + toRdf.tab1(RdfsProperty.range, toRdf.makeObjectUnion(ont, sC.subjectClasses))
-                    + toRdf.tab1('dcterms:modified', sC.changedAt, '"')
-                    + toRdf.newLine()
-                    + toRdf.tab0(relId + suffixHasTrg)
-                    + toRdf.tab1(RdfsProperty.subPropertyOf, PigProperty.eligibleTarget)
-                    + toRdf.tab1(RdfsProperty.label, "Connects the target of " + relId, '"')
-                    + toRdf.tab1(RdfsProperty.domain, relId)
-                    + toRdf.tab1(RdfsProperty.range, toRdf.makeObjectUnion(ont, sC.objectClasses))
-                    + toRdf.tab1('dcterms:modified', sC.changedAt, '"')
-                    + makeClassShape(exC)
-                    + toRdf.makeShaclList(ShaclProperty.property, [
-                        { prd: ShaclProperty.path, obj: relId + suffixHasSrc },
-                        { prd: ShaclProperty.class, obj: toRdf.makeObjectUnion(ont, sC.subjectClasses) },
-                        { prd: ShaclProperty.minCount, obj: '1' },
-                        { prd: ShaclProperty.maxCount, obj: '1' }
-                    ])
-                    + toRdf.makeShaclList(ShaclProperty.property, [
-                        { prd: ShaclProperty.path, obj: relId + suffixHasTrg },
-                        { prd: ShaclProperty.class, obj: toRdf.makeObjectUnion(ont, sC.objectClasses) },
-                        { prd: ShaclProperty.minCount, obj: '1' },
-                        { prd: ShaclProperty.maxCount, obj: '1' }
-                    ]);
             }
-            ;
+            const exC = LIB.itemByKey(extendedClasses, LIB.keyOf(sC)), relId = LIB.makeIdWithNamespace(nsOnto, sC.id);
+            ttlStr += toRdf.newLine()
+                + toRdf.tab0(relId)
+                + toRdf.tab1(RdfProperty.subClassOf, (sC.extends ? LIB.makeIdWithNamespace(nsOnto, sC.extends.id) : PigItemType.Relationship))
+                + toRdf.tab1(RdfProperty.label, sC.title)
+                + toRdf.tab1(RdfProperty.comment, sC.description)
+                + toRdf.tab1(PigProperty.icon, sC.icon)
+                + toRdf.newLine()
+                + toRdf.tab0(relId + suffixHasSrc)
+                + toRdf.tab1(RdfProperty.subPropertyOf, PigProperty.eligibleSource)
+                + toRdf.tab1(RdfProperty.comment, "Connects the source of " + relId)
+                + toRdf.tab1(RdfProperty.domain, relId)
+                + toRdf.tab1(RdfProperty.range, toRdf.makeOwlUnion(nsOnto, sC.subjectClasses))
+                + toRdf.newLine()
+                + toRdf.tab0(relId + suffixHasTrg)
+                + toRdf.tab1(RdfProperty.subPropertyOf, PigProperty.eligibleTarget)
+                + toRdf.tab1(RdfProperty.comment, "Connects the target of " + relId)
+                + toRdf.tab1(RdfProperty.domain, relId)
+                + toRdf.tab1(RdfProperty.range, toRdf.makeOwlUnion(nsOnto, sC.objectClasses))
+                + makeClassShape(exC)
+                + toRdf.tab1(ShaclProperty.property, toRdf.makeShaclList([
+                    { prd: ShaclProperty.path, obj: relId + suffixHasSrc },
+                    { prd: ShaclProperty.or, obj: toRdf.makeShaclOr(nsOnto, ShaclProperty.class, sC.subjectClasses) },
+                    { prd: ShaclProperty.minCount, obj: '1' },
+                    { prd: ShaclProperty.maxCount, obj: '1' }
+                ]))
+                + toRdf.tab1(ShaclProperty.property, toRdf.makeShaclList([
+                    { prd: ShaclProperty.path, obj: relId + suffixHasTrg },
+                    { prd: ShaclProperty.or, obj: toRdf.makeShaclOr(nsOnto, ShaclProperty.class, sC.objectClasses) },
+                    { prd: ShaclProperty.minCount, obj: '1' },
+                    { prd: ShaclProperty.maxCount, obj: '1' }
+                ]));
         });
         return ttlStr;
     }
     ;
-    function transformProperties(el) {
+    function xProperties(el) {
         let ttlStr = '';
-        if (isArrayWithContent(el.properties)) {
+        if (LIB.isArrayWithContent(el.properties)) {
             el.properties.forEach(p => {
                 if (p.values.length > 0) {
-                    let pred = LIB.makeIdWithNamespace(ont, p['class'].id);
+                    let pred = LIB.makeIdWithNamespace(nsOnto, p['class'].id);
                     if (p.values[0].id) {
-                        const pC = LIB.itemByKey(specifData.propertyClasses, LIB.makeKey(p['class'].id));
-                        ttlStr += toRdf.tab1(pred, LIB.makeIdWithNamespace(ont, p.values[0].id));
+                        ttlStr += toRdf.tab1(pred, p.values.map(v => LIB.makeIdWithNamespace(nsOnto, v.id)));
                     }
-                    else
-                        ttlStr += toRdf.tab1(pred, LIB.displayValueOf(p.values[0], { targetLanguage: 'default', lookupValues: true }), '"');
+                    else {
+                        if (p.values.length > 1) {
+                            console.warn('specif2turtle: Only the first value of a property is transformed:', p);
+                        }
+                        ;
+                        ttlStr += toRdf.tab1(pred, p.values[0]);
+                    }
+                    ;
                 }
+                ;
             });
         }
         ;
         return ttlStr;
     }
     ;
-    function transformResources(rL) {
-        if (isArrayWithContent(rL)) {
-            let ttlStr = toRdf.newLine()
-                + toRdf.newLine('#################################################################')
-                + toRdf.newLine('# Entities')
-                + toRdf.newLine('#################################################################');
+    function xAnElement(r) {
+        return toRdf.newLine()
+            + toRdf.tab0(nsData + r.id)
+            + toRdf.tab1(RdfProperty.type, LIB.makeIdWithNamespace(nsOnto, r['class'].id))
+            + xProperties(r)
+            + toRdf.tab1("pig:revision", r.revision)
+            + toRdf.tab1("pig:priorRevision", r.replaces)
+            + toRdf.tab1('dcterms:modified', r.changedAt)
+            + toRdf.tab1('dcterms:creator', r.changedBy);
+    }
+    function xResources(rL) {
+        if (LIB.isArrayWithContent(rL)) {
+            let ttlStr = toRdf.heading('Entities');
             rL.forEach(r => {
-                ttlStr += toRdf.newLine()
-                    + toRdf.tab0(self + r.id)
-                    + toRdf.tab1(RdfsProperty.type, LIB.makeIdWithNamespace(ont, r['class'].id))
-                    + transformProperties(r)
-                    + toRdf.tab1('dcterms:modified', r.changedAt, '"');
+                if (!hierarchyItems.includes(r['class'].id)) {
+                    ttlStr += xAnElement(r);
+                    switch (r['class'].id) {
+                        case 'pig:View':
+                            let sL = specifData.statements.filter(s => {
+                                return s['class'].id.includes(':shows') && s.subject.id == r.id;
+                            });
+                            if (sL.length > 0) {
+                                let L = sL.map(s => LIB.makeIdWithNamespace(nsData, s.object.id));
+                                ttlStr += toRdf.tab1(PigProperty.shows, toRdf.makeRdflList(nsData, L));
+                            }
+                            ;
+                            sL = specifData.statements.filter(s => {
+                                return s['class'].id.includes(':ownedDiagram') && s.object.id == r.id;
+                            });
+                            if (sL.length > 0) {
+                                let L = sL.map(s => LIB.makeIdWithNamespace(nsData, s.subject.id));
+                                ttlStr += toRdf.tab1(PigProperty.depicts, toRdf.makeRdflList(nsData, L));
+                            }
+                            ;
+                    }
+                    ;
+                }
+                ;
             });
             return ttlStr;
         }
@@ -497,33 +527,24 @@ app.specif2turtle = (specifData, opts) => {
         return '';
     }
     ;
-    function transformStatements(sL) {
-        if (isArrayWithContent(sL)) {
-            let ttlStr = toRdf.newLine()
-                + toRdf.newLine('#################################################################')
-                + toRdf.newLine('# Relationships')
-                + toRdf.newLine('#################################################################');
+    function xStatements(sL) {
+        if (LIB.isArrayWithContent(sL)) {
+            let ttlStr = toRdf.heading('Relationships');
             sL.forEach(s => {
-                let sCId = LIB.makeIdWithNamespace(ont, s['class'].id);
+                let sCId = LIB.makeIdWithNamespace(nsOnto, s['class'].id);
                 switch (sCId) {
                     case 'SpecIF:shows':
-                        ttlStr += toRdf.newLine()
-                            + toRdf.tab0(self + s.subject.id)
-                            + toRdf.tab1(PigProperty.shows, self + s.object.id);
-                        break;
                     case 'uml:ownedDiagram':
-                        ttlStr += toRdf.newLine()
-                            + toRdf.tab0(self + s.object.id)
-                            + toRdf.tab1(PigProperty.depicts, self + s.subject.id);
                         break;
                     default:
                         ttlStr += toRdf.newLine()
-                            + toRdf.tab0(self + s.id)
-                            + toRdf.tab1(RdfsProperty.type, sCId)
-                            + toRdf.tab1(sCId + suffixHasSrc, self + s.subject.id)
-                            + toRdf.tab1(sCId + suffixHasTrg, self + s.object.id)
-                            + transformProperties(s)
-                            + toRdf.tab1('dcterms:modified', s.changedAt, '"');
+                            + toRdf.tab0(nsData + s.id)
+                            + toRdf.tab1(RdfProperty.type, sCId)
+                            + toRdf.tab1(sCId + suffixHasSrc, nsData + s.subject.id)
+                            + toRdf.tab1(sCId + suffixHasTrg, nsData + s.object.id)
+                            + xProperties(s)
+                            + toRdf.tab1('dcterms:modified', s.changedAt)
+                            + toRdf.tab1('dcterms:creator', s.changedBy);
                 }
                 ;
             });
@@ -533,42 +554,25 @@ app.specif2turtle = (specifData, opts) => {
         return '';
     }
     ;
-    function transformHierarchies(nodes) {
-        if (isArrayWithContent(nodes)) {
-            let usedFolders = [], ttlStr = toRdf.newLine()
-                + toRdf.newLine('#################################################################')
-                + toRdf.newLine('# Hierarchies')
-                + toRdf.newLine('#################################################################')
+    function xHierarchies(nodes) {
+        if (LIB.isArrayWithContent(nodes)) {
+            let ttlStr = toRdf.heading('Hierarchy')
                 + toRdf.newLine()
-                + toRdf.tab0(self + 'HierarchyRoot')
-                + toRdf.tab1(RdfsProperty.type, 'pig:HierarchyRoot')
-                + toRdf.tab1(RdfsProperty.label, 'Hierarchy Root', '"')
-                + toRdf.tab1(RdfsProperty.comment, '... anchoring all hierarchies of this graph (project)', '"');
-            nodes.forEach((nd, idx) => {
-                if (idx == 0)
-                    ttlStr += toRdf.tab1(PigProperty.lists, self + nd.id);
-                else
-                    ttlStr += toRdf.tab2(self + nd.id);
-            });
+                + toRdf.tab0(nsData + 'HierarchyRoot')
+                + toRdf.tab1(RdfProperty.type, PigItemType.HierarchyRoot)
+                + toRdf.tab1(RdfProperty.label, 'Hierarchy Root')
+                + toRdf.tab1(RdfProperty.comment, '... anchoring all hierarchies of this graph (package)');
+            ttlStr += toRdf.tab1(PigProperty.lists, toRdf.makeRdflList(nsData, nodes.map(nd => nd.resource.id)));
             LIB.iterateSpecifNodes(nodes, (tree) => {
-                if (isArrayWithContent(tree.nodes)) {
-                    if (usedFolders.includes(tree.id))
-                        console.warn("RDF/Turtle Export: Hierarchy Node " + tree.id + " with children appears more than once.");
-                    else
-                        usedFolders.push(tree.id);
+                const r = LIB.itemById(specifData.resources, tree.resource.id);
+                if (hierarchyItems.includes(r['class'].id)) {
+                    ttlStr += xAnElement(r);
+                    if (LIB.isArrayWithContent(tree.nodes)) {
+                        ttlStr += toRdf.tab1(PigProperty.lists, toRdf.makeRdflList(nsData, tree.nodes.map(nd => nd.resource.id)));
+                    }
+                    ;
                 }
                 ;
-                ttlStr += toRdf.newLine()
-                    + toRdf.tab0(self + tree.id)
-                    + toRdf.tab1('dcterms:modified', tree.changedAt, '"')
-                    + toRdf.tab1(PigProperty.lists, self + tree.resource.id);
-                if (Array.isArray(tree.nodes))
-                    tree.nodes.forEach((nd, i) => {
-                        if (i == 0)
-                            ttlStr += toRdf.tab1(PigProperty.lists, self + nd.id);
-                        else
-                            ttlStr += toRdf.tab2(self + nd.id);
-                    });
                 return true;
             });
             return ttlStr;
@@ -576,7 +580,36 @@ app.specif2turtle = (specifData, opts) => {
         return '';
     }
     ;
-    function isArrayWithContent(array) {
-        return (Array.isArray(array) && array.length > 0);
+    function declarePigClasses() {
+        let ttlStr = toRdf.heading('PIG Metamodel (pig:)');
+        pigElements.forEach(c => {
+            ttlStr += toRdf.newLine()
+                + toRdf.tab0(c[0])
+                + toRdf.tab1(c[1].startsWith("owl:") ? RdfProperty.type : RdfProperty.subClassOf, c[1])
+                + toRdf.tab1(RdfProperty.label, c[2])
+                + toRdf.tab1(RdfProperty.comment, c[3])
+                + toRdf.newLine()
+                + toRdf.tab0(pfx_shape + c[0])
+                + toRdf.tab1(RdfProperty.type, ShaclProperty.nodeShape)
+                + toRdf.tab1(ShaclProperty.property, LIB.isArrayWithContent(c[4]) ? c[4].map(p => pfx_shape + p) : undefined)
+                + toRdf.tab1(ShaclProperty.targetClass, c[0]);
+        });
+        pigProperties.forEach(c => {
+            ttlStr += toRdf.newLine()
+                + toRdf.tab0(c[0])
+                + toRdf.tab1(c[1].startsWith("owl:") || c[1].startsWith("rdf:") ? RdfProperty.type : RdfProperty.subPropertyOf, c[1])
+                + toRdf.tab1(RdfProperty.range, toRdf.makeOwlUnion(nsOnto, c[3]))
+                + toRdf.tab1(RdfProperty.label, c[4])
+                + toRdf.tab1(RdfProperty.comment, c[5])
+                + toRdf.newLine()
+                + toRdf.tab0(pfx_shape + c[0])
+                + toRdf.tab1(RdfProperty.type, ShaclProperty.propertyShape)
+                + toRdf.tab1(ShaclProperty.path, c[0]);
+            if (Array.isArray(c[3]) && c[3].length > 0 && c[3][0].startsWith(pfx_datatype))
+                ttlStr += toRdf.tab1(ShaclProperty.datatype, c[3][0]);
+            else
+                ttlStr += toRdf.tab1(ShaclProperty.or, toRdf.makeShaclOr(nsOnto, ShaclProperty.class, c[3]));
+        });
+        return ttlStr;
     }
 };

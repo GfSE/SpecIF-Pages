@@ -11,6 +11,9 @@
 
     References:
     [1] S.Friedenthal et al: A Practical Guide to SysML, The MK/OMG Press, Third Edition
+
+    ToDo:
+    - The events of state machines should be listed below the state machine in the hierarchy (one level lower); see xEvent.
 */
 function sysml2specif(xmi, options) {
     "use strict";
@@ -18,7 +21,7 @@ function sysml2specif(xmi, options) {
     [
         { id: "rcDefault", type: "resourceClass", term: CONFIG.resClassModelElement },
         { id: "rcFolder", type: "resourceClass", term: CONFIG.resClassFolder },
-        { id: "rcDiagram", type: "resourceClass", term: CONFIG.resClassView },
+        { id: "rcDiagram", type: "resourceClass", term: "uml:Diagram" },
         { id: "rcModelElement", type: "resourceClass", term: CONFIG.resClassModelElement },
         { id: "rcActor", type: "resourceClass", term: CONFIG.resClassActor },
         { id: "rcState", type: "resourceClass", term: CONFIG.resClassState },
@@ -107,7 +110,6 @@ function sysml2specif(xmi, options) {
             ],
             referencesWithoutRevision: true
         }), diagramL = [], usedElementL = [], abstractions = [], specializations = [], associationEnds = [], portL = [], connectorL = [], stateTransitionL = [];
-        console.debug('Cameo Import - Models, Packages and Profiles:', models, packgs, packEls, profiles, modL);
         for (let modDoc of modL) {
             if (modDoc.tagName == 'uml:Model') {
                 spD.id = CONFIG.prefixP + modDoc.getAttribute("xmi:id");
@@ -143,21 +145,21 @@ function sysml2specif(xmi, options) {
                 rC = makeGeneralizingResourceClass(me);
                 if (rC && rC.id != terms.rcDefault) {
                     me["class"] = LIB.makeKey(rC.id);
-                    console.info("Cameo Import: Re-assigning class " + rC.id + " to model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
+                    console.info("Cameo Import: Adopting superclass " + rC.id + " as class of model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
                 }
                 ;
                 let sTy = classStereotypes.get(me.id) || namedElementStereotypes.get(me.id);
                 if (sTy) {
                     if (sTy.tag == "sysml:InterfaceBlock") {
                         me["class"] = LIB.makeKey(terms.rcState);
-                        console.info("Cameo Import: Reassigning class '" + terms.rcState + "' to  model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
+                        console.info("Cameo Import: Assigning class '" + terms.rcState + "' to interface-block " + me.id + " with title '" + LIB.valueByTitle(me, CONFIG.propClassTitle, spD) + "'");
                         return;
                     }
                     ;
                     rC = LIB.itemByTitle(spD.resourceClasses, sTy.tag);
                     if (rC) {
                         me["class"] = LIB.makeKey(rC.id);
-                        console.info("Cameo Import: Reassigning class '" + rC.id + "' to  model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
+                        console.info("Cameo Import: Adopting stereotype equalling an ontology term '" + rC.id + " with title '" + sTy.tag + "' as class of model-element " + me.id + " with title '" + LIB.valueByTitle(me, CONFIG.propClassTitle, spD) + "'");
                         if (sTy.tag == "sysml:Requirement") {
                             let prp = LIB.propByTitle(me, CONFIG.propClassDesc, spD);
                             if (prp) {
@@ -172,7 +174,7 @@ function sysml2specif(xmi, options) {
                     let prp = LIB.propByTitle(me, CONFIG.propClassType, spD);
                     if (prp) {
                         prp.values = [[{ text: sTy.tag }]];
-                        console.info("Cameo Import: Assigning stereotype '" + sTy.tag + "' to  model-element " + me.id + " with title " + LIB.valueByTitle(me, CONFIG.propClassTitle, spD));
+                        console.info("Cameo Import: Adding a type property with value '" + sTy.tag + "' to  model-element " + me.id + " with title '" + LIB.valueByTitle(me, CONFIG.propClassTitle, spD) + "'");
                     }
                     ;
                 }
@@ -205,7 +207,7 @@ function sysml2specif(xmi, options) {
                 let sC = LIB.itemByTitle(spD.statementClasses, sTy.tag);
                 if (sC) {
                     a['class'] = LIB.makeKey(sC.id);
-                    console.info("Cameo Import: Re-assigning class " + sC.id + " with title " + sTy.tag + " to statement " + a.id);
+                    console.info("Cameo Import: Adopting stereotype equalling an ontology term " + sC.id + " with title '" + sTy.tag + "' as class of statement " + a.id);
                 }
                 else {
                     let prp = {
@@ -213,7 +215,7 @@ function sysml2specif(xmi, options) {
                         values: [[{ text: sTy.tag }]]
                     };
                     LIB.addProperty(a, prp);
-                    console.info("Cameo Import: Assigning stereotype " + sTy.tag + " to statement " + a.id);
+                    console.info("Cameo Import: Adding a type property with value '" + sTy.tag + "' to statement " + a.id);
                 }
                 ;
             }
@@ -538,7 +540,7 @@ function sysml2specif(xmi, options) {
                         changedAt: opts.fileDate
                     });
                 else
-                    console.warn("Cameo Import: Skipped generalization with id '" + sid + "', because it has no attribute 'general'.");
+                    console.warn("Cameo Import: Skipping generalization with id '" + sid + "', because it has no attribute 'general'.");
             }
             function xClass(el, params) {
                 let r2 = makeResource(el, { class: terms.rcDefault });
@@ -733,17 +735,16 @@ function sysml2specif(xmi, options) {
                 }
                 ;
             }
-            function xEvent(el, params) {
-				console.debug('xEvent',el,params);
+            function xEvent(el, pars) {
                 let r = makeResource(el, { class: terms.rcEvent });
                 spD.resources.push(r);
                 if (opts.addElementsToHierarchy)
-                    params.nodes.push(makeNode(r, params.packageId));
-                if (params.packageId)
+                    pars.nodes.push(makeNode(r, pars.packageId));
+                if (pars.packageId)
                     spD.statements.push({
-                        id: CONFIG.prefixS + 'contains-' + simpleHash(params.packageId + terms.scContains + r.id),
+                        id: CONFIG.prefixS + 'contains-' + simpleHash(pars.packageId + terms.scContains + r.id),
                         class: LIB.makeKey(terms.scContains),
-                        subject: LIB.makeKey(params.packageId),
+                        subject: LIB.makeKey(pars.packageId),
                         object: LIB.makeKey(r.id),
                         changedAt: opts.fileDate
                     });
@@ -992,7 +993,6 @@ function sysml2specif(xmi, options) {
                     }
                     ;
                     if (r) {
-                        console.debug('state/transition', simpleClone(r), params);
                         spD.resources.push(r);
                         if (opts.addElementsToHierarchy)
                             params.nodes.push(makeNode(r, params.packageId));

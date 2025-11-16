@@ -88,10 +88,10 @@ class CSpecIF {
             return typeof (spD.id) == 'string' && spD.id.length > 0;
         return false;
     }
-    isOntology(specifData) {
-        return (specifData.id.includes("Ontology")
-            && Array.isArray(specifData.title) && specifData.title[0] && specifData.title[0]['text']
-            && specifData.title[0]['text'].includes("Ontology"));
+    isOntology(spD) {
+        return (spD.id.includes("Ontology")
+            && Array.isArray(spD.title) && spD.title[0] && spD.title[0]['text']
+            && spD.title[0]['text'].includes("Ontology"));
     }
     ;
     set(spD, opts) {
@@ -201,7 +201,7 @@ class CSpecIF {
         }
         catch (e) {
             let txt = "Error when importing the project '" + LIB.displayValueOf(spD.title, { targetLanguage: spD.language || browser.language }) + "': " + e;
-            console.error(txt);
+            console.error("Rejected input: ", spD);
             return new resultMsg(904, txt);
         }
         ;
@@ -682,11 +682,38 @@ class CSpecIF {
                 id: this.id,
                 title: LIB.selectTargetLanguage(this.title, opts)
             });
+            if (opts && opts.addNodeWithProjectData) {
+                let res = {
+                    id: CONFIG.prefixO + this.id,
+                    class: LIB.makeKey("RC-Folder"),
+                    properties: [{
+                            class: LIB.makeKey("PC-Name"),
+                            values: [this.title]
+                        }, {
+                            class: LIB.makeKey("PC-Type"),
+                            values: [LIB.makeMultiLanguageValue(CONFIG.resClassFolder)]
+                        }],
+                    changedAt: this.createdAt || new Date().toISOString()
+                }, nd = {
+                    id: CONFIG.prefixN + res.id,
+                    resource: LIB.keyOf(res),
+                    nodes: [].concat(this.nodes),
+                    changedAt: this.createdAt || new Date().toISOString()
+                };
+                if (LIB.multiLanguageValueHasContent(this.description))
+                    res.properties.splice(1, 0, {
+                        class: LIB.makeKey("PC-Description"),
+                        values: [this.description]
+                    });
+                this.resources.push(res);
+                this.nodes = [nd];
+            }
+            ;
             function nodeIsNoRoot(r) {
                 let valL = LIB.valuesByTitle(r, [CONFIG.propClassType], self);
                 return valL.length < 1 || LIB.languageTextOf(valL[0], { targetLanguage: "default" }) != CONFIG.reqifHierarchyRoot;
             }
-            if (opts && opts.createHierarchyRootIfMissing) {
+            if (opts && opts.createHierarchyRootIfMissing && !opts.addNodeWithProjectData) {
                 for (var i = this.nodes.length - 1; i > -1; i--) {
                     let r = LIB.itemByKey(this.resources, this.nodes[i].resource);
                     if (nodeIsNoRoot(r)) {

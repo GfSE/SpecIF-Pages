@@ -907,15 +907,16 @@ class CProject {
         let updatedIds = [];
         const ty = { ctg: 'enumeratedValue', oCtg: 'propertyValue', list: dta.dataTypes, fn: this.substituteEnum.bind(this) };
         ty.list.forEach((el) => {
+            el.type = el.type.replace(/^xs:/, 'xsd:');
             el.enumeration?.forEach((v) => {
                 let dV = LIB.displayValueOf(v.value), oT = app.ontology.getTermResource(ty.oCtg, dV, { lifeCycles: ["SpecIF:LifecycleStatusReleased", "SpecIF:LifecycleStatusEquivalent"] });
                 if (oT) {
-                    console.info('Replacing ' + ty.ctg + ' id ' + v.id + ' with ontology term ' + dV);
                     if (updatedIds.includes(dV)) {
-                        console.warn('The ontology term ' + dV + ' has already been used to update another identifier. No replacement to avoid duplicates.');
+                        console.warn('The ontology term ' + dV + ' has already been used to update another identifier; ' + el.id + ' is not replaced to avoid duplicates.');
                         return;
                     }
                     ;
+                    console.info('Replacing ' + ty.ctg + ' id ' + v.id + ' with ontology term ' + dV);
                     updatedIds.push(dV);
                     ty.fn(dta, LIB.makeKey(dV), v);
                     v.id = dV;
@@ -933,18 +934,19 @@ class CProject {
                 let dV = el.title, oT = app.ontology.getTermResource(ty.oCtg, dV, { lifeCycles: ["SpecIF:LifecycleStatusReleased", "SpecIF:LifecycleStatusEquivalent"] });
                 if (oT) {
                     dV = dV + ty.postfix;
-                    console.info('Replacing ' + ty.ctg + ' ' + el.id + ' with ontology term ' + dV);
                     if (updatedIds.includes(dV)) {
-                        console.warn('The ontology term ' + dV + ' has already been used to update another identifier. No replacement to avoid duplicates.');
+                        console.warn('The ontology term ' + dV + ' has already been used to update another identifier; ' + el.id + ' is not replaced to avoid duplicates.');
                         return;
                     }
                     ;
+                    console.info('Replacing ' + ty.ctg + ' ' + el.id + ' with ontology term ' + dV);
                     updatedIds.push(dV);
                     ty.fn(dta, LIB.makeKey(dV), LIB.keyOf(el));
                     el.id = dV;
                     el.title = app.ontology.getLocalTerms(oT);
                     el.description = app.ontology.getDescriptions(oT);
                 }
+                ;
             });
         });
         return;
@@ -1624,8 +1626,8 @@ class CProject {
                 }, reject);
             }
             function storeAs(opts) {
-                opts.allDiagramsAsImage = ["html", "pig-ttl", "reqif", "pig-jsonld"].includes(opts.format);
-                opts.preferPng = ["pig-ttl", "reqif"].includes(opts.format);
+                opts.allDiagramsAsImage = ["html", "pig-ttl", "pig-jsonld", "reqif"].includes(opts.format);
+                opts.preferPng = ["reqif"].includes(opts.format);
                 switch (opts.format) {
                     case 'specif':
                     case 'html':
@@ -1633,17 +1635,13 @@ class CProject {
                         opts.lookupValues = false;
                         break;
                     case 'pig-jsonld':
-                        opts.lookupTitles = true;
-                        opts.lookupValues = false;
-                        opts.targetNamespaces = ["pig:", "rdf:", "rdfs:"];
-                        opts.revisionDate = new Date().toISOString();
-                        break;
                     case 'pig-ttl':
                         opts.lookupTitles = true;
                         opts.lookupValues = false;
                         opts.targetNamespaces = ["pig:", "rdf:", "rdfs:"];
                         opts.makeHTML = true;
                         opts.linkifyURLs = true;
+                        opts.addNodeWithProjectData = true;
                         opts.revisionDate = new Date().toISOString();
                         break;
                     case 'reqif':
@@ -1712,7 +1710,8 @@ class CProject {
                             opts.baseURI = "https://product-information-graph.org/examples/";
                             fName += ".jsonld";
                             zName = fName + '.zip';
-                            expStr = app.ioPig.fromSpecif(expD, opts);
+                            self.updateWithOntology(expD, opts);
+                            expStr = app.ioJsonld.fromSpecif(expD, opts);
                             break;
                         case 'pig-ttl':
                             opts.baseURI = "https://product-information-graph.org/examples/";

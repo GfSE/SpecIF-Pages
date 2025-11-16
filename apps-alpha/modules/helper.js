@@ -394,11 +394,14 @@ LIB.makeKey = (el) => {
     return el ? (typeof (el) == 'string' ? { id: el } : LIB.keyOf(el)) : undefined;
 };
 LIB.makeIdWithNamespace = (ns, ti) => {
-    if (RE.Namespace.test(ti))
-        return ti.replace(RE.Namespace, (match, $1, $2) => {
-            return $1 + ':' + $2.toJsId();
-        });
-    return (ns ?? '') + ti.toJsId();
+    if (ti) {
+        if (RE.Namespace.test(ti))
+            return ti.replace(RE.Namespace, (match, $1, $2) => {
+                return $1 + ':' + $2;
+            });
+        return (ns ?? '') + ti;
+    }
+    ;
 };
 LIB.replacePrefix = (newPrefix, id) => {
     return id.replace(RE.isolatePrefix, (match, $1, $2) => {
@@ -421,7 +424,7 @@ LIB.equalKey = (refE, newE) => {
     return refE.id == newE.id && refE.revision == newE.revision;
 };
 LIB.equalKeyL = (refL, newL) => {
-    let rArr = Array.isArray(refL) && refL.length > 0, nArr = Array.isArray(newL) && newL.length > 0;
+    let rArr = LIB.isArrayWithContent(refL), nArr = LIB.isArrayWithContent(newL);
     if (!rArr && !nArr)
         return true;
     if (!rArr && nArr
@@ -511,7 +514,7 @@ LIB.isIsoDateTime = (val) => {
     return RE.IsoDateTime.test(val);
 };
 LIB.isEqualStringL = (refL, newL) => {
-    let rArr = Array.isArray(refL) && refL.length > 0, nArr = Array.isArray(newL) && newL.length > 0;
+    let rArr = LIB.isArrayWithContent(refL), nArr = LIB.isArrayWithContent(newL);
     if (!rArr && !nArr)
         return true;
     if (!rArr && nArr
@@ -958,17 +961,6 @@ LIB.keepUsedClasses = (spD) => {
                 for (let i of iL) {
                     if (LIB.references(i['class'], c))
                         return true;
-                }
-                ;
-                for (let sC of sCL) {
-                    if (sC.subjectClasses)
-                        for (let sbjC of sC.subjectClasses)
-                            if (LIB.references(sbjC, c))
-                                return true;
-                    if (sC.objectClasses)
-                        for (let objC of sC.objectClasses)
-                            if (LIB.references(objC, c))
-                                return true;
                 }
                 ;
                 console.info("Deleting unused ", c.id);
@@ -1488,7 +1480,7 @@ LIB.hasType = (r, pNs, dta, opts) => {
     throw Error("Programming Error: No resource or statement specified");
 };
 LIB.titleIdx = (pL, pCs) => {
-    if (Array.isArray(pL) && pL.length > 0) {
+    if (LIB.isArrayWithContent(pL)) {
         for (var a = 0, A = pL.length; a < A; a++) {
             let pt = LIB.classTitleOf(pL[a]['class'], pCs);
             if (CONFIG.titleProperties.includes(pt))
@@ -1511,6 +1503,9 @@ LIB.titleFromProperties = (pL, pCs, opts) => {
 LIB.typeOf = (rK, dta) => {
     let r = rK["class"] ? rK : LIB.itemByKey(dta.resources, rK), pVL = LIB.valuesByTitle(r, [CONFIG.propClassType], dta);
     return pVL.length > 0 ? LIB.displayValueOf(pVL[0]) : undefined;
+};
+LIB.isArrayWithContent = (L) => {
+    return (Array.isArray(L) && L.length > 0);
 };
 function simpleHash(str) {
     for (var r = 0, i = 0; i < str.length; i++)

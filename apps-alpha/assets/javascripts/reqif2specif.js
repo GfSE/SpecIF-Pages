@@ -16,9 +16,15 @@
 function reqif2Specif(reqifDoc,options) {
 	const RE_NS_LINK = /\sxmlns:(.*?)=\".*?\"/;
 	
-    if (typeof (options) != 'object') options = {};
-    if (!options.propType) options.propType = "ReqIF.Category";  // the type/category of a resource, e.g. folder or diagram.
-    if (!options.prefixN) options.prefixN = "N-";
+    options = Object.assign(
+        {
+            propType: "dcterms:type", // the type/category of a resource, e.g. folder or diagram.
+            // propType: "ReqIF.Category", ... may get in conflict with ReqIF content having an incompatible dataType
+            prefixN: "N-",
+            errInvalidReqif: { status: 899, statusText: "ReqIF data is invalid" }
+        },
+        options
+    );
 
     const xmlDoc = parse(reqifDoc);
 
@@ -26,7 +32,7 @@ function reqif2Specif(reqifDoc,options) {
     if (validateReqif(xmlDoc))
         xhr = { status: 0, statusText: "ReqIF data is valid", responseType: 'object' };
     else
-        return options.errInvalidReqif || { status: 899, statusText: "ReqIF data is invalid" };
+        return options.errInvalidReqif;
 
     // Transform ReqIF data provided as an XML string to SpecIF data.
     xhr.response = extractMetaData(xmlDoc.getElementsByTagName("REQ-IF-HEADER"));
@@ -378,6 +384,42 @@ function reqif2Specif(reqifDoc,options) {
                 id: options.prefixN + hId,
                 resource: hId,
                 changedAt: xmlSpecification.getAttribute("LAST-CHANGE"),
+                nodes: extractNodes(xmlSpecification.children)
+            };
+
+            function extractNodes(L) {
+                let ch1 = getNodeswithTag(L, 'CHILDREN')[0];
+                if (ch1) {
+                    console.debug('#2', ch1);
+
+                    let L = [];
+                    Array.from(ch1.children, (ch) => {
+                        let obj = getNodeswithTag(ch.children, 'OBJECT')[0],
+                            ref = obj.getElementsByTagName('SPEC-OBJECT-REF')[0],
+                            oId = ref.innerHTML;
+                        // console.debug('#5', obj, ref, oId);
+                        L.push({
+                            id: options.prefixN + oId,
+                            resource: oId,
+                            changedAt: ch.getAttribute("LAST-CHANGE"),
+                            nodes: extractNodes(ch.children)
+                        });
+                    });
+                    return L;
+                };
+            };
+            function getNodeswithTag(chL, tag) {
+                let a = Array.from(chL);
+                //	console.debug('#3',a);
+                return a.filter(el => { return el.nodeName == tag });
+            }
+        }
+    /*    function extractHierarchy(xmlSpecification) {
+            let hId = xmlSpecification.getAttribute("IDENTIFIER");
+            return {
+                id: options.prefixN + hId,
+                resource: hId,
+                changedAt: xmlSpecification.getAttribute("LAST-CHANGE"),
                 nodes: extractNodes(xmlSpecification)
             };
 
@@ -406,13 +448,26 @@ function reqif2Specif(reqifDoc,options) {
                     return specifHierarchy;
                 }
             }
-        }
+        } */
     }
-    function parse(string) {
+/*    function parse(string) {
         const parser = new DOMParser();
         return parser.parseFromString(string,"text/xml");
+    } */
+    function parse(input) {
+        if (typeof input !== 'string') {
+            // already a Document / XMLDocument
+            return input;
+        }
+        // browser DOMParser
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(input, 'application/xml');
+        // basic parse error detection (works in major browsers)
+        if (doc.getElementsByTagName('parsererror').length > 0) {
+            throw new Error('XML parse error: invalid XML document');
+        }
+        return doc;
     }
-
 
 /* 
 ########################## Tools #########################################  
