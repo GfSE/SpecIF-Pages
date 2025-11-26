@@ -194,16 +194,16 @@ If no type designation is found at all, a new resourceClass is defined with a ge
 
 Unfortunately, a global ontology term cannot be readily used in the filename, 
 as certain characters (e.g. the colon) are not allowed in filenames. 
-However, local terms including “requirement”, “feature”, “annotation”, “user-story” and “pain-point“ 
+However, local terms including “Requirement”, “Feature”, “Annotation”, “User Story” and “Pain Point“ 
 (as well as any other local term as defined by the ontology) are interpreted correctly 
 by the tool and normalized, thus the preferred ontology term is used instead of the local term.
 
 For example, if a file has the file name "Project-name {Requirement}.xslx" and it contains two spreadsheets 
 named "Functions {User Story}" and "Constraints", 
-a resourceClass with the title "User-Story" normalized by 
+a resourceClass with the local term "User Story" normalized by 
 <a href="https://specif.de/apps/view.html#import=https://specif.de/v1.2/Ontology.specif;view=doc;node=N-QacIoFiQ3a268UVZO9mHsqqrwdo" target="_blank">_SpecIF:UserStory_</a> 
 is assumed for the first spreadsheet and 
-a resourceClass with the title "Requirement" normalized by 
+a resourceClass with the local term "Requirement" normalized by 
 <a href="https://specif.de/apps/view.html#import=https://specif.de/v1.2/Ontology.specif;view=doc;node=N-JissrCtZ51CD04LeneSqolLFJpA" target="_blank">_IREB:Requirement_</a> 
 for the second spreadsheet.
 
