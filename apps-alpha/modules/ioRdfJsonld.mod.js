@@ -1,6 +1,6 @@
 "use strict";
-/*!	Product Information Graph (PIG) import and export in JSON-LD format
-*	Dependencies: -
+/*!	Product Information Graph (PIG) import and export in RDF/JSON-LD format
+*	Dependencies: specif2turtle.mod.ts
 *	(C)copyright enso managers gmbh (http://enso-managers.de)
 *	Author: se@enso-managers.de, Berlin
 *	License and terms of use: Apache 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
@@ -19,7 +19,7 @@
 *	- Ordering for streaming JSON-LD: https://w3c.github.io/json-ld-streaming/#streaming-document-form
 */
 moduleManager.construct({
-    name: 'ioJsonld'
+    name: 'ioRdfJsonld'
 }, (self) => {
     "use strict";
     let mime, opts;
@@ -43,23 +43,23 @@ moduleManager.construct({
             "@type": "pig:Package",
             [RdfProperty.label]: xMultilanguageText(specifData.title),
             [RdfProperty.comment]: xMultilanguageText(specifData.description),
-            "dcterms:creator": specifData.createdBy ? specifData.createdBy.email : undefined,
-            "dcterms:modified": specifData.createdAt,
+            [DcProperty.creator]: specifData.createdBy ? specifData.createdBy.email : undefined,
+            [DcProperty.modified]: specifData.createdAt,
             "@graph": declareOntology().concat(declarePigClasses()),
         };
         [
             { fn: xDatatype, iL: specifData.dataTypes },
-            { fn: xProperty, iL: specifData.propertyClasses },
-            { fn: xEntity, iL: specifData.resourceClasses },
-            { fn: xRelationship, iL: specifData.statementClasses },
-            { fn: xAnEntity, iL: specifData.resources },
-            { fn: xARelationship, iL: specifData.statements }
+            { fn: xPropertyClass, iL: specifData.propertyClasses },
+            { fn: xResourceClass, iL: specifData.resourceClasses },
+            { fn: xStatementClass, iL: specifData.statementClasses },
+            { fn: xResource, iL: specifData.resources },
+            { fn: xStatement, iL: specifData.statements }
         ].forEach((dtr) => {
             for (let itm of dtr.iL)
                 pig['@graph'] = pig['@graph'].concat(dtr.fn(itm));
         });
         pig['@graph'] = pig['@graph'].concat(xAHierarchy(specifData));
-        console.debug('specif2jsonld:', pig);
+        console.debug('rdf.jsonld:', pig);
         return JSON.stringify(pig);
         function makeContext() {
             let ctx = {
@@ -77,47 +77,47 @@ moduleManager.construct({
             ;
             return ctx;
         }
-        function xClass(c, rg) {
+        function xClass(c) {
             return {
                 "@id": LIB.makeIdWithNamespace(nsOnto, c.id),
                 [RdfProperty.label]: xMultilanguageText(c.title),
-                [RdfProperty.comment]: xMultilanguageText(c.description),
-                [RdfProperty.range]: rg
+                [RdfProperty.comment]: xMultilanguageText(c.description)
             };
         }
-        function xProperty(c) {
+        function xPropertyClass(c) {
             let dT = LIB.itemByKey(specifData.dataTypes, c.dataType), L = [];
             if (!excludeProperties.includes(c.id) && !isRdfImplicit(c.id)) {
-                let pC = xClass(c, dT.enumeration ? LIB.makeIdWithNamespace(nsOnto, dT.id) : undefined);
+                let pC = xClass(c);
                 pC['@type'] = dT.enumeration ? "owl:ObjectProperty" : "owl:DatatypeProperty";
+                pC[RdfProperty.range] = dT.enumeration ? LIB.makeIdWithNamespace(nsOnto, dT.id) : undefined;
                 L.push(pC);
+                let sh = {
+                    "@id": makeShapeId(LIB.makeIdWithNamespace(nsOnto, c.id)),
+                    ['@type']: ShaclProperty.propertyShape,
+                    [ShaclProperty.path]: { "@id": LIB.makeIdWithNamespace(nsOnto, c.id) },
+                    [ShaclProperty.minCount]: c.required ? "1" : undefined,
+                    [ShaclProperty.maxCount]: c.multiple ? undefined : "1"
+                };
+                if (dT.enumeration)
+                    sh[ShaclProperty.class] = makeRef(nsOnto, dT.id);
+                else {
+                    sh[ShaclProperty.datatype] = { "@id": dT.type };
+                    if (dT.maxLength)
+                        sh[ShaclProperty.maxLength] = typeof (dT.maxLength) == 'string' ? dT.maxLength : dT.maxLength.toString();
+                    if (dT.minInclusive)
+                        sh[ShaclProperty.minInclusive] = typeof (dT.minInclusive) == 'string' ? dT.minInclusive : dT.minInclusive.toString();
+                    if (dT.maxInclusive)
+                        sh[ShaclProperty.maxInclusive] = typeof (dT.maxInclusive) == 'string' ? dT.maxInclusive : dT.maxInclusive.toString();
+                    if (dT.fractionDigits)
+                        sh[ShaclProperty.pattern] = `^\\d+(\\\\.\\\\d{0,${dT.fractionDigits}})?$`;
+                }
+                ;
+                L.push(sh);
             }
             ;
-            let sh = {
-                "@id": makeShapeId(LIB.makeIdWithNamespace(nsOnto, c.id)),
-                ['@type']: ShaclProperty.propertyShape,
-                [ShaclProperty.path]: { "@id": LIB.makeIdWithNamespace(nsOnto, c.id) },
-                [ShaclProperty.minCount]: c.required ? "1" : undefined,
-                [ShaclProperty.maxCount]: c.multiple ? undefined : "1"
-            };
-            if (dT.enumeration)
-                sh[ShaclProperty.class] = makeRef(nsOnto, dT.id);
-            else {
-                sh[ShaclProperty.datatype] = { "@id": dT.type };
-                if (dT.maxLength)
-                    sh[ShaclProperty.maxLength] = typeof (dT.maxLength) == 'string' ? dT.maxLength : dT.maxLength.toString();
-                if (dT.minInclusive)
-                    sh[ShaclProperty.minInclusive] = typeof (dT.minInclusive) == 'string' ? dT.minInclusive : dT.minInclusive.toString();
-                if (dT.maxInclusive)
-                    sh[ShaclProperty.maxInclusive] = typeof (dT.maxInclusive) == 'string' ? dT.maxInclusive : dT.maxInclusive.toString();
-                if (dT.fractionDigits)
-                    sh[ShaclProperty.pattern] = `^\\d+(\\\\.\\\\d{0,${dT.fractionDigits}})?$`;
-            }
-            ;
-            L.push(sh);
             return L;
         }
-        function xElement(c, subOf) {
+        function xElementClass(c, subOf) {
             return Object.assign(xClass(c), { [RdfProperty.subClassOf]: makeRef(nsOnto, c.extends ? c.extends.id : subOf) }, { "pig:icon": c.icon });
         }
         function makeElementShape(c) {
@@ -132,16 +132,16 @@ moduleManager.construct({
                 [ShaclProperty.targetClass]: makeRef(nsOnto, c.id)
             };
         }
-        function xEntity(c) {
+        function xResourceClass(c) {
             if (excludeEntities.includes(c.id) || isRdfImplicit(c.id))
                 return [];
             const exC = LIB.itemByKey(extendedClasses, LIB.keyOf(c)), ity = app.ontology.organizerClasses.includes(c.title) ? PigItemType.Organizer : PigItemType.Entity;
-            return [xElement(exC, ity), makeElementShape(exC)];
+            return [xElementClass(exC, ity), makeElementShape(exC)];
         }
-        function xRelationship(c) {
-            if (diagramRels.includes(c.id) || isRdfImplicit(c.id))
+        function xStatementClass(c) {
+            if (excludeRelationships.includes(c.id) || isRdfImplicit(c.id) || diagramRels.includes(c.id))
                 return [];
-            const exC = LIB.itemByKey(extendedClasses, LIB.keyOf(c)), relId = LIB.makeIdWithNamespace(nsOnto, c.id), r = xElement(exC, PigItemType.Relationship), rs = {
+            const exC = LIB.itemByKey(extendedClasses, LIB.keyOf(c)), relId = LIB.makeIdWithNamespace(nsOnto, c.id), r = xElementClass(exC, PigItemType.Relationship), rs = {
                 "@id": relId + suffixHasSrc,
                 [RdfProperty.subPropertyOf]: PigProperty.eligibleSource,
                 [RdfProperty.comment]: "Connects the source of " + relId,
@@ -170,14 +170,11 @@ moduleManager.construct({
             return [r, rs, rt, rS];
         }
         function xDatatype(dT) {
-            if (!LIB.isArrayWithContent(dT.enumeration))
-                return [];
             let dTL = [];
             if (LIB.isArrayWithContent(dT.enumeration)) {
                 let e = xClass(dT);
                 e['@type'] = 'owl:Class';
                 e['owl:oneOf'] = [];
-                dTL.push(e);
                 dT.enumeration.forEach(item => {
                     e['owl:oneOf'].push({ "@id": LIB.makeIdWithNamespace(nsOnto, item.id) });
                     dTL.push({
@@ -186,6 +183,7 @@ moduleManager.construct({
                         [RdfProperty.label]: xMultilanguageText(item.value)
                     });
                 });
+                dTL.push(e);
             }
             ;
             return dTL;
@@ -194,10 +192,10 @@ moduleManager.construct({
             let el = {
                 "@id": LIB.makeIdWithNamespace(nsData, c.id),
                 "@type": LIB.makeIdWithNamespace(nsOnto, c['class'].id),
-                "pig:revision": c.revision,
-                "pig:priorRevision": c.replaces,
-                "dcterms:modified": c.changedAt ?? date,
-                "dcterms:creator": c.changedBy
+                [PigProperty.revision]: c.revision,
+                [PigProperty.priorRevision]: c.replaces,
+                [DcProperty.modified]: c.changedAt ?? date,
+                [DcProperty.creator]: c.changedBy
             };
             if (LIB.isArrayWithContent(c.properties)) {
                 c.properties.forEach(p => {
@@ -230,7 +228,7 @@ moduleManager.construct({
             ;
             return el;
         }
-        function xAnEntity(r) {
+        function xResource(r) {
             if (hierarchyItems.includes(r['class'].id))
                 return [];
             let e = xAnElement(r);
@@ -264,7 +262,7 @@ moduleManager.construct({
             ;
             return [e];
         }
-        function xARelationship(s) {
+        function xStatement(s) {
             let r = xAnElement(s);
             if (['SpecIF:shows', 'uml:ownedDiagram'].includes(r['@type']))
                 return [];
@@ -274,7 +272,7 @@ moduleManager.construct({
         }
         function xAHierarchy(n) {
             let g = [], hr = {
-                "@id": LIB.makeIdWithNamespace(nsData, "HierarchyRoot"),
+                "@id": LIB.makeIdWithNamespace(nsData, "HierarchyRoot" + '-' + specifData.id),
                 [RdfProperty.type]: PigItemType.HierarchyRoot,
                 [RdfProperty.label]: 'Hierarchy Root',
                 [RdfProperty.comment]: '... anchoring all hierarchies of this graph (package)'
@@ -312,14 +310,14 @@ moduleManager.construct({
                         { "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#" },
                         { "@id": "http://www.w3.org/2000/01/rdf-schema#" }
                     ],
-                    "dcterms:license": specifData.rights ? specifData.rights.url : undefined,
-                    "dcterms:modified": specifData.createdAt,
-                    "dcterms:creator": specifData.createdBy ? specifData.createdBy.email : undefined,
+                    [DcProperty.license]: specifData.rights ? specifData.rights.url : undefined,
+                    [DcProperty.modified]: specifData.createdAt,
+                    [DcProperty.creator]: specifData.createdBy ? specifData.createdBy.email : undefined,
                 }];
         }
         function declarePigClasses() {
             let L = [];
-            pigElements.forEach(c => {
+            pigEntities.concat(pigRelationships).forEach(c => {
                 let ty = c[1].startsWith("owl:") ? "@type" : RdfProperty.subClassOf;
                 L.push({
                     "@id": c[0],
@@ -338,7 +336,7 @@ moduleManager.construct({
                     [ShaclProperty.targetClass]: makeRef(nsOnto, c[0])
                 });
             });
-            pigProperties.forEach(c => {
+            pigProperties.concat(pigReferences).forEach(c => {
                 let ty = c[1].startsWith("owl:") ? "@type" : RdfProperty.subPropertyOf;
                 L.push({
                     "@id": c[0],
@@ -350,7 +348,10 @@ moduleManager.construct({
                 let sh = {
                     "@id": pfx_shape + c[0],
                     ['@type']: ShaclProperty.propertyShape,
-                    [ShaclProperty.path]: makeRef(nsOnto, c[0])
+                    [ShaclProperty.path]: makeRef(nsOnto, c[0]),
+                    [ShaclProperty.maxLength]: c[6],
+                    [ShaclProperty.minCount]: c[7],
+                    [ShaclProperty.maxCount]: c[8]
                 };
                 if (Array.isArray(c[3]) && c[3].length > 0 && c[3][0].startsWith(pfx_datatype))
                     sh[ShaclProperty.datatype] = makeRef(undefined, c[3][0]);

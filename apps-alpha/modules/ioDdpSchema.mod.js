@@ -14,7 +14,7 @@ moduleManager.construct({
     name: 'ioDdpSchema'
 }, (self) => {
     "use strict";
-    const errInvalidXML = new resultMsg(898, 'DDP Schema is not valid XML.'), errTransformationCancelled = new resultMsg(999, 'Transformation cancelled on user request.'), errTransformationFailed = new resultMsg(999, 'Input file could not be transformed to SpecIF.'), domainOfDDPElements = "V-Domain-20", ns = "DDP:";
+    const errInvalidXML = new resultMsg({ status: 898, statusText: 'DDP Schema is not valid XML.' }), errTransformationCancelled = new resultMsg({ status: 999, statusText: 'Transformation cancelled on user request.' }), errTransformationFailed = new resultMsg({ status: 999, statusText: 'Input file could not be transformed to SpecIF.' }), domainOfDDPElements = "V-Domain-20", ns = "DDP:";
     self.init = () => {
         return true;
     };

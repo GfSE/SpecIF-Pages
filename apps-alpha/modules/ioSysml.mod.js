@@ -9,7 +9,7 @@
 moduleManager.construct({
     name: 'ioSysml'
 }, function (self) {
-    var fDate, fName, zipped, mime, errNoXMIFile = new resultMsg(897, 'No XMI file found in the container.'), errInvalidXML = new resultMsg(898, 'XMI data is not valid XML.');
+    var fDate, fName, zipped, mime, errNoXMIFile = new resultMsg({ status: 897, statusText: 'No XMI file found in the container.' }), errInvalidXML = new resultMsg({ status: 898, statusText: 'XMI data is not valid XML.' });
     self.init = function (options) {
         mime = undefined;
         return true;
@@ -92,7 +92,7 @@ moduleManager.construct({
             });
         }
         else {
-            sDO.reject(new resultMsg(899, 'SysML Import: Input file is not supported'));
+            sDO.reject(new resultMsg({ status: 899, statusText: 'SysML Import: Input file is not supported' }));
         }
         ;
         return sDO;

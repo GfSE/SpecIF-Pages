@@ -1,7 +1,7 @@
 "use strict";
 const CONFIG = {};
 CONFIG.specifVersion = "1.2";
-CONFIG.appVersion = CONFIG.specifVersion + ".b.4";
+CONFIG.appVersion = CONFIG.specifVersion + ".b.5";
 CONFIG.imgURL = './assets/images';
 CONFIG.remotePath = 'https://specif.de/v' + CONFIG.specifVersion + '/';
 CONFIG.localPath = '../../../SpecIF/Pages/v' + CONFIG.specifVersion + '/';
@@ -206,8 +206,8 @@ CONFIG.nativeProperties = new Map([
     ["SpecIF:createdBy", { name: "createdBy", type: "xs:string", check: function () { return true; } }],
     ["SpecIF:changedBy", { name: "changedBy", type: "xs:string", check: function () { return true; } }]
 ]);
-CONFIG.valuesTrue = ['true', 'yes', 'wahr', 'ja', 'vrai', 'oui', '1', 'True'];
-CONFIG.valuesFalse = ['false', 'no', 'falsch', 'nein', 'faux', 'non', '0', 'False'];
+CONFIG.valuesTrue = ['true', 'yes', 'wahr', 'ja', 'vrai', 'oui', '1'];
+CONFIG.valuesFalse = ['false', 'no', 'falsch', 'nein', 'faux', 'non', '0'];
 const RE = {};
 RE.ReqifId = /^[_a-zA-Z]{1}[_a-zA-Z\d.-]*$/;
 RE.SpecifId = /^[_a-zA-Z]{1}[_a-zA-Z\d.:#\/-]*$/;

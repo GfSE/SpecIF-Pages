@@ -265,7 +265,7 @@ moduleManager.construct({
         self.show();
     }
     function noOntologyFound(xhr) {
-        handleError(new resultMsg(xhr.status == 0 ? 404 : xhr.status, xhr.statusText, "text", "Ontology not found"));
+        handleError(new resultMsg({ status: xhr.status == 0 ? 404 : xhr.status, statusText: xhr.statusText, responseType: "text", response: "Ontology not found" }));
     }
     function handleResult(data) {
         var resQ = [], resIdx = 0;
@@ -317,7 +317,7 @@ moduleManager.construct({
                         resolve(ont);
                     }
                     else
-                        reject(new resultMsg(539, "bad file", "text", "Ontology is invalid."));
+                        reject(new resultMsg({ status: 539, statusText: "Bad file: Ontology is invalid." }));
                 },
                 fail: reject
             });

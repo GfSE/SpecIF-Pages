@@ -92,11 +92,11 @@ moduleManager.construct({
                         ;
                     }
                     ;
-                    resolve(new resultMsg(200, "ok", "json", clientL(ctg, res)));
+                    resolve(new resultMsg({ status: 200, statusText: "ok", responseType: "json", response: clientL(ctg, res) }));
                 })
                     .catch((err) => {
                     console.debug('Read-list fail:', err);
-                    reject(new resultMsg(411, 'Reading list from DB failed'));
+                    reject(new resultMsg({ status: 411, statusText: 'Reading list from DB failed' }));
                 });
                 return;
             }
@@ -114,20 +114,20 @@ moduleManager.construct({
                     ;
                     db.allDocs(options)
                         .then((res) => {
-                        resolve(new resultMsg(200, "ok", "json", clientL(ctg, res)));
+                        resolve(new resultMsg({ status: 200, statusText: "ok", responseType: "json", response: clientL(ctg, res) }));
                     })
                         .catch((err) => {
                         console.debug('getL fail:', err);
-                        reject(new resultMsg(411, 'Reading list from DB failed'));
+                        reject(new resultMsg({ status: 411, statusText: 'Reading list from DB failed' }));
                     });
                 }
                 else
-                    resolve(new resultMsg(200, "ok", "json", []));
+                    resolve(new resultMsg({ status: 200, statusText: "ok", responseType: "json", response: [] }));
                 return;
             }
             ;
             console.error(srvType + ': Invalid parameter when reading from DB');
-            reject(new resultMsg(412, 'Invalid parameter when reading from DB'));
+            reject(new resultMsg({ status: 412, statusText: 'Invalid parameter when reading from DB' }));
         });
     }
     function getE(ctg, el, opts) {
@@ -147,11 +147,11 @@ moduleManager.construct({
             db.get(dbId(ctg, el), opts)
                 .then((res) => {
                 console.debug('getE done:', res);
-                resolve(new resultMsg(200, "ok", "json", clientE(ctg, res)));
+                resolve(new resultMsg({ status: 200, statusText: "ok", responseType: "json", response: clientE(ctg, res) }));
             })
                 .catch((err) => {
                 console.debug('Reading element from DB failed:', ctg, err);
-                reject(new resultMsg(411, 'Reading element from DB failed'));
+                reject(new resultMsg({ status: 411, statusText: 'Reading element from DB failed' }));
             });
         });
     }
@@ -166,11 +166,11 @@ moduleManager.construct({
             db.put(nE)
                 .then(() => {
                 console.debug('putE done', ctg);
-                resolve(new resultMsg(200, "ok"));
+                resolve(new resultMsg({ status: 200, statusText: "ok" }));
             })
                 .catch((err) => {
                 console.debug('putE fail:', ctg, err);
-                reject({ status: 414, statusText: 'Updating element in DB failed' });
+                reject(new resultMsg({ status: 414, statusText: 'Updating element in DB failed' }));
             });
         });
     }
@@ -191,7 +191,7 @@ moduleManager.construct({
             })
                 .catch((err) => {
                 console.debug('removeE fail:', err);
-                reject({ status: 413, statusText: 'Delete element from DB failed' });
+                reject(new resultMsg({ status: 413, statusText: 'Delete element from DB failed' }));
             });
         });
     }
