@@ -240,7 +240,7 @@ moduleManager.construct({
                     if (sL.length > 0) {
                         let L = [];
                         for (let s of sL) {
-                            L.push({ "@id": LIB.makeIdWithNamespace(nsData, s.object.id) });
+                            L.push({ "@id": LIB.makeIdWithNamespace(nsData, s.object.id), [PigProperty.itemType]: PigItemType.aReference });
                         }
                         ;
                         e[PigProperty.shows] = L;
@@ -252,7 +252,7 @@ moduleManager.construct({
                     if (sL.length > 0) {
                         let L = [];
                         for (let s of sL) {
-                            L.push({ "@id": LIB.makeIdWithNamespace(nsData, s.subject.id) });
+                            L.push({ "@id": LIB.makeIdWithNamespace(nsData, s.subject.id), [PigProperty.itemType]: PigItemType.aReference });
                         }
                         ;
                         e[PigProperty.depicts] = L;
