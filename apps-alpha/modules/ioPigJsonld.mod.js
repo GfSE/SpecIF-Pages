@@ -305,6 +305,7 @@ moduleManager.construct({
                 "@id": LIB.makeIdWithNamespace(nsData, "HierarchyRoot" + '-' + specifData.id),
                 "@type": PigItemType.HierarchyRoot,
                 [PigProperty.itemType]: { '@id': PigItemType.anEntity },
+                [DcProperty.modified]: date,
                 [DcProperty.title]: xMultilanguageText('Hierarchy Root'),
                 [DcProperty.description]: xMultilanguageText('... anchoring all hierarchies of this graph (package)')
             };
