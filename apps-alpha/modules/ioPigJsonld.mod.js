@@ -35,11 +35,12 @@ moduleManager.construct({
             includeClasses: true,
             ...opts
         };
+        console.debug('ioJsonld.fromSpecif 0 |', simpleClone(specifData), opts);
         const sourceURI = encodeURI((opts.sourceFileName.startsWith('http') ? opts.sourceFileName : opts.baseURI + opts.sourceFileName) + '#'), ontURI = pigOnto + '#', date = new Date().toISOString();
         var pig = {
             "@context": makeContext(),
             "@id": LIB.makeIdWithNamespace(nsData, specifData.id),
-            "@type": "pig:Package",
+            "@type": PigItemType.Package,
             [DcProperty.title]: xMultilanguageText(specifData.title),
             [DcProperty.description]: xMultilanguageText(specifData.description),
             [DcProperty.creator]: specifData.createdBy ? specifData.createdBy.email : undefined,
@@ -47,6 +48,7 @@ moduleManager.construct({
             "@graph": declarePigClasses()
         };
         [
+            { fn: xDatatype, iL: specifData.dataTypes },
             { fn: xPropertyClass, iL: specifData.propertyClasses },
             { fn: xResourceClass, iL: specifData.resourceClasses },
             { fn: xStatementClass, iL: specifData.statementClasses },
@@ -57,61 +59,16 @@ moduleManager.construct({
                 pig['@graph'] = pig['@graph'].concat(dtr.fn(itm));
         });
         pig['@graph'] = pig['@graph'].concat(xAHierarchy(specifData));
-        console.debug('pig.jsonld:', pig);
         return JSON.stringify(pig);
         function makeContext() {
-            const usedPrefixes = new Set();
-            usedPrefixes.add('rdf');
-            usedPrefixes.add('sh');
-            usedPrefixes.add('owl');
-            usedPrefixes.add('pig');
-            usedPrefixes.add('pigShapes_pig');
-            function addPrefix(id) {
-                if (!id)
-                    return;
-                const match = id.match(/^([\w-]+)(:|\.)/);
-                if (match)
-                    usedPrefixes.add(match[1]);
-            }
-            [
-                specifData.dataTypes,
-                specifData.propertyClasses,
-                specifData.resourceClasses,
-                specifData.statementClasses,
-                specifData.resources,
-                specifData.statements
-            ].forEach(list => {
-                if (Array.isArray(list)) {
-                    list.forEach((item) => {
-                        addPrefix(item.id);
-                        addPrefix(item.type);
-                        addPrefix(item['class']?.id);
-                        addPrefix(item.dataType?.id);
-                        addPrefix(item.extends?.id);
-                        if (Array.isArray(item.propertyClasses)) {
-                            item.propertyClasses.forEach((pc) => addPrefix(pc.id));
-                        }
-                        ['subjectClasses', 'objectClasses'].forEach(prop => {
-                            if (Array.isArray(item[prop])) {
-                                item[prop].forEach((k) => addPrefix(k.id));
-                            }
-                        });
-                        if (Array.isArray(item.properties)) {
-                            item.properties.forEach((prp) => {
-                                let v = LIB.isMultiLanguageValue(prp.values[0]) ? LIB.languageTextOf(prp.values[0], { targetLanguage: 'default' }) : undefined;
-                                return addPrefix(v);
-                            });
-                        }
-                    });
-                }
-            });
+            const usedPrefixes = collectNamespaces(specifData);
             let ctx = {
                 "o": ontURI,
                 "d": sourceURI
             };
             for (let [tag, val] of app.ontology.namespaces) {
                 const cleanTag = tag.replace(/[\.:]$/, '');
-                if (usedPrefixes.has(cleanTag)) {
+                if (usedPrefixes.has(tag)) {
                     ctx[cleanTag] = val.url;
                 }
             }
@@ -121,26 +78,45 @@ moduleManager.construct({
             return {
                 "@id": LIB.makeIdWithNamespace(nsOnto, c.id),
                 [DcProperty.title]: xMultilanguageText(c.title),
-                [DcProperty.description]: xMultilanguageText(c.description)
+                [DcProperty.definition]: xMultilanguageText(c.description),
+                [PigProperty.revision]: c.revision,
+                [PigProperty.priorRevision]: c.replaces,
+                [DcProperty.modified]: c.changedAt ?? date,
+                [DcProperty.creator]: c.changedBy
             };
         }
+        function xDatatype(dT) {
+            if (!LIB.isArrayWithContent(dT.enumeration))
+                return [];
+            let c = xClass(dT);
+            c['@type'] = "owl:Class";
+            c[PigProperty.specializes] = makeRef(nsOnto, PigItemType.Enumeration);
+            c[PigProperty.itemType] = { '@id': PigItemType.Entity };
+            c[ShaclProperty.datatype] = makeRef(nsOnto, dT.type);
+            c[PigProperty.enumeratedValue] = [];
+            dT.enumeration.forEach(item => {
+                c[PigProperty.enumeratedValue].push({
+                    "@id": LIB.makeIdWithNamespace(nsOnto, item.id),
+                    [DcProperty.title]: xMultilanguageText(item.value)
+                });
+            });
+            return [c];
+        }
+        ;
         function xPropertyClass(c) {
             let L = [];
-            if (!excludeProperties.includes(c.id) && !isRdfImplicit(c.id)) {
+            if (!excludeProperties.includes(c.id) && !isEstablishedNs(c.id)) {
                 let dT = LIB.itemByKey(specifData.dataTypes, c.dataType), pC = xClass(c);
-                pC['@type'] = dT.enumeration ? "owl:ObjectProperty" : "owl:DatatypeProperty";
-                pC[PigProperty.itemType] = { '@id': PigItemType.Property };
-                pC[ShaclProperty.datatype] = makeRef(nsOnto, dT.type);
                 if (LIB.isArrayWithContent(dT.enumeration)) {
-                    pC[PigProperty.eligibleValue] = [];
-                    dT.enumeration.forEach(item => {
-                        pC[PigProperty.eligibleValue].push({
-                            "@id": LIB.makeIdWithNamespace(nsOnto, item.id),
-                            [DcProperty.title]: xMultilanguageText(item.value)
-                        });
-                    });
+                    pC['@type'] = "owl:ObjectProperty";
+                    pC[PigProperty.specializes] = makeRef(nsOnto, PigItemType.Link);
+                    pC[PigProperty.itemType] = makeRef(nsOnto, PigItemType.Link);
                 }
                 else {
+                    pC['@type'] = "owl:DatatypeProperty";
+                    pC[PigProperty.specializes] = makeRef(nsOnto, PigItemType.Property);
+                    pC[PigProperty.itemType] = makeRef(nsOnto, PigItemType.Property);
+                    pC[ShaclProperty.datatype] = makeRef(nsOnto, dT.type);
                     pC[ShaclProperty.minCount] = c.required ? 1 : undefined;
                     pC[ShaclProperty.maxCount] = c.multiple ? undefined : 1;
                     if (dT.maxLength)
@@ -168,39 +144,39 @@ moduleManager.construct({
             return Object.assign(xClass(c), {
                 [PigProperty.specializes]: makeRef(nsOnto, c.extends ? c.extends.id : subOf),
                 [PigProperty.icon]: typeof (c.icon) == 'string' && c.icon.length > 0 ? { ['@value']: c.icon } : undefined,
-                [PigProperty.eligibleProperty]: pL
+                [PigProperty.enumeratedProperty]: pL
             });
         }
         function xResourceClass(c) {
-            if (excludeEntities.includes(c.id) || isRdfImplicit(c.id))
+            if (excludeEntities.includes(c.id) || isEstablishedNs(c.id))
                 return [];
-            const ity = app.ontology.organizerClasses.includes(c.title) ? PigItemType.Organizer : PigItemType.Entity, ent = xElementClass(c, ity);
+            const ity = app.ontology.organizerClasses.includes(c.title) ? PigItemType.Organizer : PigItemType.Artifact, ent = xElementClass(c, ity);
             if (ity == PigItemType.Entity)
-                ent[PigProperty.eligibleTargetLink] = [];
+                ent[PigProperty.enumeratedTargetLink] = [];
             ent[PigProperty.itemType] = { '@id': PigItemType.Entity };
             return [ent];
         }
         function xStatementClass(c) {
-            if (excludeRelationships.includes(c.id) || isRdfImplicit(c.id) || diagramRels.includes(c.id))
+            if (excludeRelationships.includes(c.id) || isEstablishedNs(c.id) || diagramRels.includes(c.id))
                 return [];
             const r = Object.assign(xElementClass(c, PigItemType.Relationship), {
                 [PigProperty.itemType]: { '@id': PigItemType.Relationship },
-                [PigProperty.eligibleSourceLink]: LIB.makeIdWithNamespace(nsOnto, c.id + sfx_toSrc),
-                [PigProperty.eligibleTargetLink]: LIB.makeIdWithNamespace(nsOnto, c.id + sfx_toTrg)
+                [PigProperty.enumeratedSourceLink]: makeRef(nsOnto, c.id + sfx_toSrc),
+                [PigProperty.enumeratedTargetLink]: makeRef(nsOnto, c.id + sfx_toTrg)
             }), srcL = LIB.isArrayWithContent(c.subjectClasses) ? c.subjectClasses : [PigItemType.Entity, PigItemType.Relationship], rs = {
                 ['@id']: LIB.makeIdWithNamespace(nsOnto, c.id + sfx_toSrc),
                 [PigProperty.itemType]: { '@id': PigItemType.Link },
                 [PigProperty.specializes]: { '@id': PigProperty.SourceLink },
                 [DcProperty.title]: [{ ['@value']: c.id + " to source" }],
                 [DcProperty.description]: xMultilanguageText('Connects the source of ' + c.id),
-                [PigProperty.eligibleEndpoint]: makeList(nsOnto, srcL)
+                [PigProperty.enumeratedEndpoint]: makeList(nsOnto, srcL)
             }, tgtL = LIB.isArrayWithContent(c.objectClasses) ? c.objectClasses : [PigItemType.Entity, PigItemType.Relationship], rt = {
                 ['@id']: LIB.makeIdWithNamespace(nsOnto, c.id + sfx_toTrg),
                 [PigProperty.itemType]: { '@id': PigItemType.Link },
                 [PigProperty.specializes]: { '@id': PigProperty.TargetLink },
                 [DcProperty.title]: [{ ['@value']: c.id + " to target" }],
                 [DcProperty.description]: xMultilanguageText('Connects the target of ' + c.id),
-                [PigProperty.eligibleEndpoint]: makeList(nsOnto, tgtL)
+                [PigProperty.enumeratedEndpoint]: makeList(nsOnto, tgtL)
             };
             return [r, rs, rt];
         }
@@ -222,7 +198,7 @@ moduleManager.construct({
                             for (let v of p.values) {
                                 L.push({
                                     "@id": LIB.makeIdWithNamespace(nsData, v.id),
-                                    [PigProperty.itemType]: { '@id': PigItemType.aProperty }
+                                    [PigProperty.itemType]: { '@id': PigItemType.aLink }
                                 });
                             }
                             ;
@@ -262,7 +238,7 @@ moduleManager.construct({
             let e = xAnElement(r);
             e[PigProperty.itemType] = { '@id': PigItemType.anEntity };
             switch (e['@type']) {
-                case 'pig:View':
+                case PigItemType.View:
                     let sL = specifData.statements.filter(s => {
                         return s['class'].id.includes(':shows') && s.subject.id == r.id;
                     });
@@ -296,14 +272,14 @@ moduleManager.construct({
             if (['SpecIF:shows', 'uml:ownedDiagram'].includes(r['@type']))
                 return [];
             r[PigProperty.itemType] = { '@id': PigItemType.aRelationship };
-            r[LIB.makeIdWithNamespace(nsOnto, s['class'].id) + sfx_toSrc] = { "@id": LIB.makeIdWithNamespace(nsData, s.subject.id), [PigProperty.itemType]: { '@id': PigItemType.aSourceLink } };
-            r[LIB.makeIdWithNamespace(nsOnto, s['class'].id) + sfx_toTrg] = { "@id": LIB.makeIdWithNamespace(nsData, s.object.id), [PigProperty.itemType]: { '@id': PigItemType.aTargetLink } };
+            r[LIB.makeIdWithNamespace(nsOnto, s['class'].id) + sfx_toSrc] = [{ "@id": LIB.makeIdWithNamespace(nsData, s.subject.id), [PigProperty.itemType]: { '@id': PigItemType.aSourceLink } }];
+            r[LIB.makeIdWithNamespace(nsOnto, s['class'].id) + sfx_toTrg] = [{ "@id": LIB.makeIdWithNamespace(nsData, s.object.id), [PigProperty.itemType]: { '@id': PigItemType.aTargetLink } }];
             return [r];
         }
         function xAHierarchy(n) {
             let g = [], hr = {
                 "@id": LIB.makeIdWithNamespace(nsData, "HierarchyRoot" + '-' + specifData.id),
-                "@type": PigItemType.HierarchyRoot,
+                "@type": PigItemType.Root,
                 [PigProperty.itemType]: { '@id': PigItemType.anEntity },
                 [DcProperty.modified]: date,
                 [DcProperty.title]: xMultilanguageText('Hierarchy Root'),
@@ -340,7 +316,7 @@ moduleManager.construct({
             }
             let L = [];
             pigEntities.forEach(c => {
-                let ty = c[1].startsWith("owl:") ? "@type" : PigProperty.specializes, pL = [], rL = [];
+                let pL = [], rL = [];
                 if (LIB.isArrayWithContent(c[4]))
                     for (let p of c[4])
                         pL.push(makeRef(nsOnto, xTerm(p)));
@@ -349,53 +325,61 @@ moduleManager.construct({
                         rL.push(makeRef(nsOnto, xTerm(r)));
                 L.push({
                     "@id": c[0],
-                    [ty]: (ty == "@type") ? c[1] : makeRef(nsOnto, c[1]),
+                    "@type": "owl:Class",
+                    [PigProperty.specializes]: c[1] ? makeRef(nsOnto, c[1]) : undefined,
                     [PigProperty.itemType]: { '@id': PigItemType.Entity },
                     [DcProperty.title]: xMultilanguageText(c[2]),
-                    [DcProperty.description]: c[3] ? xMultilanguageText(c[3]) : undefined,
-                    [PigProperty.eligibleProperty]: pL,
-                    [PigProperty.eligibleTargetLink]: rL.length > 0 ? rL : undefined,
+                    [DcProperty.definition]: c[3] ? xMultilanguageText(c[3]) : undefined,
+                    [PigProperty.enumeratedProperty]: pL,
+                    [PigProperty.enumeratedTargetLink]: rL.length > 0 ? rL : undefined,
                 });
             });
             pigRelationships.forEach(c => {
-                let ty = c[1].startsWith("owl:") ? "@type" : PigProperty.specializes, pL = [];
+                let pL = [];
                 if (LIB.isArrayWithContent(c[4]))
                     for (let p of c[4])
                         pL.push(makeRef(nsOnto, xTerm(p)));
                 L.push({
                     "@id": c[0],
-                    [ty]: (ty == "@type") ? c[1] : makeRef(nsOnto, c[1]),
+                    "@type": "owl:Class",
+                    [PigProperty.specializes]: c[1] ? makeRef(nsOnto, c[1]) : undefined,
                     [PigProperty.itemType]: { '@id': PigItemType.Relationship },
                     [DcProperty.title]: xMultilanguageText(c[2]),
-                    [DcProperty.description]: c[3] ? xMultilanguageText(c[3]) : undefined,
-                    [PigProperty.eligibleProperty]: pL,
-                    [PigProperty.eligibleSourceLink]: makeRef(nsOnto, xTerm(c[5])),
-                    [PigProperty.eligibleTargetLink]: makeRef(nsOnto, xTerm(c[6]))
+                    [DcProperty.definition]: c[3] ? xMultilanguageText(c[3]) : undefined,
+                    [PigProperty.enumeratedProperty]: pL,
+                    [PigProperty.enumeratedSourceLink]: makeRef(nsOnto, xTerm(c[5])),
+                    [PigProperty.enumeratedTargetLink]: makeRef(nsOnto, xTerm(c[6]))
                 });
             });
             pigProperties.forEach(c => {
-                let ty = c[1].startsWith("owl:") ? "@type" : PigProperty.specializes;
-                L.push({
+                let pL = {
                     "@id": c[0],
-                    [ty]: (ty == "@type") ? c[1] : makeRef(nsOnto, c[1]),
+                    "@type": "owl:DatatypeProperty",
+                    [PigProperty.specializes]: c[1] ? makeRef(nsOnto, c[1]) : undefined,
                     [PigProperty.itemType]: { '@id': PigItemType.Property },
                     [DcProperty.title]: xMultilanguageText(c[4]),
-                    [DcProperty.description]: c[5] ? xMultilanguageText(c[5]) : undefined,
-                    [ShaclProperty.datatype]: makeRef(undefined, c[3]),
-                    [ShaclProperty.maxLength]: c[6],
-                    [ShaclProperty.minCount]: c[7],
-                    [ShaclProperty.maxCount]: c[8]
-                });
+                    [DcProperty.definition]: c[5] ? xMultilanguageText(c[5]) : undefined
+                };
+                if (c[3] != undefined) {
+                    pL = {
+                        ...pL,
+                        [ShaclProperty.datatype]: makeRef(undefined, c[3]),
+                        [ShaclProperty.maxLength]: c[6],
+                        [ShaclProperty.minCount]: c[7],
+                        [ShaclProperty.maxCount]: c[8]
+                    };
+                }
+                L.push(pL);
             });
             pigLinks.forEach(c => {
-                let ty = c[1].startsWith("owl:") ? "@type" : PigProperty.specializes;
                 L.push({
                     "@id": c[0],
-                    [ty]: (ty == "@type") ? c[1] : makeRef(nsOnto, c[1]),
+                    "@type": "owl:ObjectProperty",
+                    [PigProperty.specializes]: c[1] ? makeRef(nsOnto, c[1]) : undefined,
                     [PigProperty.itemType]: { '@id': PigItemType.Link },
-                    [PigProperty.eligibleEndpoint]: makeSet(nsOnto, c[3]),
+                    [PigProperty.enumeratedEndpoint]: makeSet(nsOnto, c[3]),
                     [DcProperty.title]: xMultilanguageText(c[4]),
-                    [DcProperty.description]: c[5] ? xMultilanguageText(c[5]) : undefined
+                    [DcProperty.definition]: c[5] ? xMultilanguageText(c[5]) : undefined
                 });
             });
             return L;

@@ -38,7 +38,7 @@ moduleManager.construct({
         return false;
     };
     self.toSpecif = function (buf) {
-        let sDO = $.Deferred(), modelL = [], sharedL = [], resL = [], xOpts = {
+        let sDO = $.Deferred(), xOpts = {
             fileName: fName,
             fileDate: fDate,
             titleLength: CONFIG.maxTitleLength,
@@ -49,8 +49,7 @@ moduleManager.construct({
         if (zipped) {
             new JSZip().loadAsync(buf)
                 .then(async (zip) => {
-                modelL = zip.filter((relPath, file) => file.name.endsWith('.uml_model.model'));
-                sharedL = zip.filter((relPath, file) => file.name.endsWith('.uml_model.shared_model'));
+                const modelL = zip.filter((relPath, file) => file.name.endsWith('.uml_model.model')), sharedL = zip.filter((relPath, file) => file.name.endsWith('.uml_model.shared_model')), resL = [];
                 if (modelL.length < 1) {
                     sDO.reject(errNoXMIFile);
                     return;
@@ -63,32 +62,23 @@ moduleManager.construct({
                 async function processFilesSequentially(files) {
                     for (const file of files) {
                         const xmi = await zip.file(file.name).async("string");
-                        const ok = await new Promise((resolve, reject) => {
-                            xlateWithCallback(xmi, resolve, reject);
-                        });
-                        if (!ok)
+                        if (!LIB.validXML(xmi)) {
+                            sDO.reject(errInvalidXML);
                             return;
+                        }
+                        const result = sysml2specif(xmi, xOpts);
+                        if (result.ok) {
+                            resL.push(result.response);
+                        }
+                        else {
+                            sDO.reject(result);
+                            return;
+                        }
                     }
                     sDO.resolve(resL);
                 }
-                function xlateWithCallback(xmi, resolve, reject) {
-                    if (!LIB.validXML(xmi)) {
-                        sDO.reject(errInvalidXML);
-                        resolve(false);
-                        return;
-                    }
-                    let result = sysml2specif(xmi, xOpts);
-                    if (result.ok()) {
-                        resL.push(result.response);
-                        resolve(true);
-                    }
-                    else {
-                        sDO.reject(result);
-                        resolve(false);
-                    }
-                }
                 const allFiles = [modelL[0], ...sharedL];
-                processFilesSequentially(allFiles);
+                await processFilesSequentially(allFiles);
             });
         }
         else {
