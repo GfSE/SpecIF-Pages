@@ -175,7 +175,7 @@ As is well known, Word files in change mode are a popular means of collaboration
 
 The term authoring tool is used here to describe software that is used to create partial models or compile other information related to a target system to be designed and specified.
 
-### Spreadsheet
+<h3 id="spreadsheet">Spreadsheet</h3>
 
 #### Sheets Become Folders
 
@@ -276,7 +276,7 @@ for example _SpecIF:priorityHigh_ is displayed as _hoch_ if German is selected i
 Of course, any terms can be used in the spreadsheet, which will then be imported unchanged by the
 SpecIF Editor/Viewer regardless of the active browser language, however without a defined meaning.
 
-### Archi
+<h3 id="archi">Archi</h3>
 
 Archi is a freely available modeling tool that supports the ArchiMate 3.0 notation of the Open Group. It can be obtained from <a href="https://www.archimatetool.com/download/" target="_blank">https://www.archimatetool.com/download/</a>.
 
@@ -291,7 +291,7 @@ A model created with Archi can be transformed into the SpecIF format or integrat
 
 Also for Archi, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in italics or key points can be enumerated in a bullet list.
 
-### ADOIT
+<h3 id="adoit">ADOIT</h3>
 
 ADOIT is a modeling tool licensed from the BOC Group, which supports the ArchiMate 3.0 notation of the Open Group. It can be obtained from <a href="https://www.boc-group.com" target="_blank">https://www.boc-group.com</a>.
 
@@ -302,7 +302,7 @@ A model created with ADOIT can be transformed into SpecIF format or integrated w
 
 Also for ADOIT, formatting in diagram or element descriptions using <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">markdown</a> is preserved during import so that, for example, text passages can be highlighted in bold or key points can be enumerated in a bullet list. Note that HTML formatting is suppressed when using the `ArchiMate exchange` export.
 
-### Cameo
+<h3 id="cameo">Cameo</h3>
 
 Cameo Systems Modeler is a commercial modeling tool licensed by <a href="https://www.3ds.com/" target="_blank">Dassault Systèmes</a> supporting the UML and SysML notation of the OMG. 
 It can be obtained from <a href="https://www.3ds.com/products/catia/no-magic/cameo-systems-modeler" target="_blank">https://www.3ds.com/products/catia/no-magic/cameo-systems-modeler</a>.
