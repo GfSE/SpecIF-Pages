@@ -908,19 +908,31 @@ class CProject {
     updateWithOntology(dta, opts) {
         if (opts && opts.noUpdateWithOntology)
             return;
-        let updatedIds = [];
+        function toCAS(ti) {
+            if (opts && opts.pigToCas) {
+                const TO_CAS = new Map([
+                    ['pig:', CONFIG.pfxNsMeta],
+                    ['dcterms:', CONFIG.pfxNsDcmi]
+                ]);
+                const parts = RE.Namespace.exec(ti);
+                return (TO_CAS.get(parts[1]) ?? ti).concat(parts[2]);
+            }
+            return ti;
+        }
+        let updatedIds = new Map();
         const ty = { ctg: 'enumeratedValue', oCtg: 'propertyValue', list: dta.dataTypes, fn: this.substituteEnum.bind(this) };
         ty.list.forEach((el) => {
             el.enumeration?.forEach((v) => {
                 let dV = LIB.displayValueOf(v.value), oT = app.ontology.getTermResource(ty.oCtg, dV, { lifeCycles: ["SpecIF:LifecycleStatusReleased", "SpecIF:LifecycleStatusEquivalent"] });
                 if (oT) {
-                    if (updatedIds.includes(dV)) {
+                    dV = toCAS(dV);
+                    if ([...updatedIds.values()].includes(dV)) {
                         console.warn('The ontology term ' + dV + ' has already been used to update another identifier; ' + el.id + ' is not replaced to avoid duplicates.');
                         return;
                     }
                     ;
                     console.info('Replacing ' + ty.ctg + ' id ' + v.id + ' with ontology term ' + dV);
-                    updatedIds.push(dV);
+                    updatedIds.set(v.id, dV);
                     ty.fn(dta, LIB.makeKey(dV), v);
                     v.id = dV;
                     v.value = app.ontology.getLocalTerms(oT);
@@ -928,7 +940,7 @@ class CProject {
             });
         });
         [
-            { ctg: 'dataType', oCtg: 'propertyClass', list: dta.dataTypes, postfix: '-Value', fn: this.substituteDT.bind(this) },
+            { ctg: 'dataType', oCtg: 'propertyClass', list: dta.dataTypes, postfix: CONFIG.postfixDT, fn: this.substituteDT.bind(this) },
             { ctg: 'propertyClass', oCtg: 'propertyClass', list: dta.propertyClasses, postfix: '', fn: this.substitutePC.bind(this) },
             { ctg: 'resourceClass', oCtg: 'resourceClass', list: dta.resourceClasses, postfix: '', fn: this.substituteRC.bind(this) },
             { ctg: 'statementClass', oCtg: 'statementClass', list: dta.statementClasses, postfix: '', fn: this.substituteSC.bind(this) }
@@ -936,32 +948,20 @@ class CProject {
             ty.list.forEach((el) => {
                 let dV = el.title, oT = app.ontology.getTermResource(ty.oCtg, dV, { lifeCycles: ["SpecIF:LifecycleStatusReleased", "SpecIF:LifecycleStatusEquivalent"] });
                 if (oT) {
-                    dV = dV + ty.postfix;
-                    if (updatedIds.includes(dV)) {
+                    dV = toCAS(dV) + ty.postfix;
+                    if ([...updatedIds.values()].includes(dV)) {
                         console.warn('The ontology term ' + dV + ' has already been used to update another identifier; ' + el.id + ' is not replaced to avoid duplicates.');
                         return;
                     }
                     ;
                     console.info('Replacing ' + ty.ctg + ' ' + el.id + ' with ontology term ' + dV);
-                    updatedIds.push(dV);
+                    updatedIds.set(el.id, dV);
                     ty.fn(dta, LIB.makeKey(dV), LIB.keyOf(el));
-                    el.id = map(dV);
+                    el.id = dV;
                     el.title = app.ontology.getLocalTerms(oT);
                     el.description = app.ontology.getDescriptions(oT);
                 }
-                ;
             });
-            function map(ti) {
-                if (opts && opts.pigToCas) {
-                    const TO_CAS = new Map([
-                        ['pig:', CONFIG.pfxNsMeta],
-                        ['dcterms:', CONFIG.pfxNsDcmi]
-                    ]);
-                    const parts = RE.Namespace.exec(ti);
-                    return (TO_CAS.get(parts[1]) ?? ti).concat(parts[2]);
-                }
-                return ti;
-            }
         });
         return;
     }
@@ -1971,7 +1971,6 @@ class CProject {
                 });
             });
         });
-        replacedE.id = replacingE.id;
     }
     substituteDT(prj, replacingE, replacedE) {
         this.substituteProp(prj.propertyClasses, 'dataType', LIB.makeKey(replacingE.id), LIB.keyOf(replacedE));

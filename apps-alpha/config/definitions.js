@@ -1,10 +1,10 @@
 "use strict";
 const CONFIG = {};
 CONFIG.specifVersion = "1.3";
-CONFIG.appVersion = CONFIG.specifVersion + ".c.1";
+CONFIG.appVersion = CONFIG.specifVersion + ".d";
 CONFIG.imgURL = './assets/images';
 CONFIG.remotePath = 'https://specif.de/v' + CONFIG.specifVersion + '/';
-CONFIG.localPath = '../../../SpecIF/Pages/v' + CONFIG.specifVersion + '/';
+CONFIG.localPath = '../../../GfSE/SpecIF-Pages/v' + CONFIG.specifVersion + '/';
 CONFIG.ontologyURL = CONFIG.remotePath + 'Ontology.specif';
 CONFIG.localOntologyURL = CONFIG.localPath + 'Ontology.specif';
 CONFIG.QuickStartGuideDe =
@@ -69,6 +69,7 @@ CONFIG.showEmptyProperties = false;
 CONFIG.pfxNsMeta = 'cas:';
 CONFIG.pfxNsSemi = 'cas:';
 CONFIG.pfxNsDcmi = 'dcterms:';
+CONFIG.postfixDT = '-Enumeration';
 CONFIG.propClassVisibleId =
     CONFIG.propClassId = `${CONFIG.pfxNsDcmi}identifier`;
 CONFIG.propClassTerm = "SpecIF:Term";

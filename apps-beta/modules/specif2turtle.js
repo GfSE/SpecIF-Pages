@@ -22,108 +22,191 @@
 *
 *   Andreas Müller: Don't mix class and instance level in RDF triples!
 */
-var PigItemType;
-(function (PigItemType) {
-    PigItemType["Property"] = "pig:Property";
-    PigItemType["aProperty"] = "pig:aProperty";
-    PigItemType["Link"] = "pig:Link";
-    PigItemType["aSourceLink"] = "pig:aSourceLink";
-    PigItemType["aTargetLink"] = "pig:aTargetLink";
-    PigItemType["Element"] = "pig:Element";
-    PigItemType["Organizer"] = "pig:Organizer";
-    PigItemType["anOrganizer"] = "pig:anOrganizer";
-    PigItemType["Entity"] = "pig:Entity";
-    PigItemType["anEntity"] = "pig:anEntity";
-    PigItemType["Relationship"] = "pig:Relationship";
-    PigItemType["aRelationship"] = "pig:aRelationship";
-    PigItemType["HierarchyRoot"] = "pig:HierarchyRoot";
-    PigItemType["Outline"] = "pig:Outline";
-    PigItemType["View"] = "pig:View";
-})(PigItemType || (PigItemType = {}));
-var PigProperty;
-(function (PigProperty) {
-    PigProperty["itemType"] = "pig:itemType";
-    PigProperty["eligibleValue"] = "pig:eligibleValue";
-    PigProperty["SourceLink"] = "pig:SourceLink";
-    PigProperty["TargetLink"] = "pig:TargetLink";
-    PigProperty["eligibleEndpoint"] = "pig:eligibleEndpoint";
-    PigProperty["eligibleProperty"] = "pig:eligibleProperty";
-    PigProperty["eligibleSourceLink"] = "pig:eligibleSourceLink";
-    PigProperty["eligibleTargetLink"] = "pig:eligibleTargetLink";
-    PigProperty["hasSourceLink"] = "pig:hasSourceLink";
-    PigProperty["hasTargetLink"] = "pig:hasTargetLink";
-    PigProperty["specializes"] = "pig:specializes";
-    PigProperty["lists"] = "pig:lists";
-    PigProperty["shows"] = "pig:shows";
-    PigProperty["depicts"] = "pig:depicts";
-    PigProperty["icon"] = "pig:icon";
-    PigProperty["category"] = "pig:category";
-    PigProperty["revision"] = "pig:revision";
-    PigProperty["priorRevision"] = "pig:priorRevision";
-})(PigProperty || (PigProperty = {}));
-var DcProperty;
-(function (DcProperty) {
-    DcProperty["title"] = "dcterms:title";
-    DcProperty["description"] = "dcterms:description";
-    DcProperty["type"] = "dcterms:type";
-    DcProperty["modified"] = "dcterms:modified";
-    DcProperty["creator"] = "dcterms:creator";
-    DcProperty["license"] = "dcterms:license";
-})(DcProperty || (DcProperty = {}));
-var RdfProperty;
-(function (RdfProperty) {
-    RdfProperty["type"] = "rdf:type";
-    RdfProperty["label"] = "rdfs:label";
-    RdfProperty["comment"] = "rdfs:comment";
-    RdfProperty["subClassOf"] = "rdfs:subClassOf";
-    RdfProperty["subPropertyOf"] = "rdfs:subPropertyOf";
-    RdfProperty["domain"] = "rdfs:domain";
-    RdfProperty["range"] = "rdfs:range";
-})(RdfProperty || (RdfProperty = {}));
-var ShaclProperty;
-(function (ShaclProperty) {
-    ShaclProperty["nodeShape"] = "sh:NodeShape";
-    ShaclProperty["propertyShape"] = "sh:PropertyShape";
-    ShaclProperty["targetClass"] = "sh:targetClass";
-    ShaclProperty["property"] = "sh:property";
-    ShaclProperty["path"] = "sh:path";
-    ShaclProperty["class"] = "sh:class";
-    ShaclProperty["datatype"] = "sh:datatype";
-    ShaclProperty["maxLength"] = "sh:maxLength";
-    ShaclProperty["minInclusive"] = "sh:minInclusive";
-    ShaclProperty["maxInclusive"] = "sh:maxInclusive";
-    ShaclProperty["minCount"] = "sh:minCount";
-    ShaclProperty["maxCount"] = "sh:maxCount";
-    ShaclProperty["pattern"] = "sh:pattern";
-    ShaclProperty["or"] = "sh:or";
-})(ShaclProperty || (ShaclProperty = {}));
-const nsData = 'd:', nsOnto = "o:", sfx_toSrc = "-toSource", sfx_toTrg = "-toTarget", pfx_datatype = 'xs:', pfx_shape = "pigShapes_", sfx_shape = "_shape", pigOnto = 'https://product-information-graph.org/v0.2/ontology', nsShapes = ['dcterms:', 'rdfs:', 'uml:', 'sysml:', 'FMC:', 'RFLP:', 'IREB:', 'oslc_rm:', 'oslc_cm:', 'ReqIF:', 'ReqIF-WF:', 'SpecIF:', 'pig:'], pigEntities = [
-    [PigItemType.Entity, 'owl:Class', 'Entity', 'A PIG meta-model element used for entities (aka resources or artifacts).', [PigProperty.category, PigProperty.icon], []],
-    [PigItemType.Organizer, PigItemType.Entity, 'Organizer', 'An element organizing model elements. An example is a list of requirements or a diagram using a certain notation.', [PigProperty.category], []],
-    [PigItemType.HierarchyRoot, PigItemType.Organizer, 'Hierarchy Root', 'A subclass of PIG organizer serving as a root for hierarchically organized graph elements.', [], [PigProperty.lists]],
-    [PigItemType.Outline, PigItemType.Organizer, 'Outline', 'A subclass of PIG organizer comprising all information items of a human-readable document. As usual, the outline is hierarchically organized.', [PigProperty.category], [PigProperty.lists]],
-    [PigItemType.View, PigItemType.Organizer, 'View', 'A subclass of PIG organizer representing a model view (diagram) using a certain notation showing selected model elements.', [PigProperty.category, PigProperty.icon], [PigProperty.shows, PigProperty.depicts]]
+const PigItemType = {
+    Property: `${CONFIG.pfxNsMeta}Property`,
+    aProperty: `${CONFIG.pfxNsMeta}aProperty`,
+    Link: `${CONFIG.pfxNsMeta}Link`,
+    aSourceLink: `${CONFIG.pfxNsMeta}aSourceLink`,
+    aTargetLink: `${CONFIG.pfxNsMeta}aTargetLink`,
+    Element: `${CONFIG.pfxNsMeta}Element`,
+    Entity: `${CONFIG.pfxNsMeta}Entity`,
+    anEntity: `${CONFIG.pfxNsMeta}anEntity`,
+    Relationship: `${CONFIG.pfxNsMeta}Relationship`,
+    aRelationship: `${CONFIG.pfxNsMeta}aRelationship`,
+    Package: `${CONFIG.pfxNsMeta}Package`,
+    aPackage: `${CONFIG.pfxNsMeta}aPackage`,
+    Ontology: `${CONFIG.pfxNsMeta}Ontology`,
+    anOntology: `${CONFIG.pfxNsMeta}anOntology`,
+    Artifact: `${CONFIG.pfxNsSemi}Artifact`,
+    Actor: `FMC:Actor`,
+    State: `FMC:State`,
+    Event: `FMC:Event`,
+    Organizer: `${CONFIG.pfxNsSemi}Organizer`,
+    anOrganizer: `${CONFIG.pfxNsSemi}anOrganizer`,
+    Root: `${CONFIG.pfxNsSemi}Root`,
+    Tree: `${CONFIG.pfxNsSemi}Tree`,
+    Outline: `${CONFIG.pfxNsSemi}Outline`,
+    Table: `${CONFIG.pfxNsSemi}Table`,
+    View: `${CONFIG.pfxNsSemi}View`,
+    Enumeration: `${CONFIG.pfxNsSemi}Enumeration`
+};
+const PigProperty = {
+    itemType: `${CONFIG.pfxNsMeta}itemType`,
+    enumeratedValue: `${CONFIG.pfxNsMeta}enumeratedValue`,
+    SourceLink: `${CONFIG.pfxNsMeta}SourceLink`,
+    TargetLink: `${CONFIG.pfxNsMeta}TargetLink`,
+    enumeratedEndpoint: `${CONFIG.pfxNsMeta}enumeratedEndpoint`,
+    enumeratedProperty: `${CONFIG.pfxNsMeta}enumeratedProperty`,
+    enumeratedSourceLink: `${CONFIG.pfxNsMeta}enumeratedSourceLink`,
+    enumeratedTargetLink: `${CONFIG.pfxNsMeta}enumeratedTargetLink`,
+    hasSourceLink: `${CONFIG.pfxNsMeta}hasSourceLink`,
+    hasTargetLink: `${CONFIG.pfxNsMeta}hasTargetLink`,
+    specializes: `${CONFIG.pfxNsMeta}specializes`,
+    revision: `${CONFIG.pfxNsMeta}revision`,
+    priorRevision: `${CONFIG.pfxNsMeta}priorRevision`,
+    lists: `${CONFIG.pfxNsSemi}lists`,
+    shows: `${CONFIG.pfxNsSemi}shows`,
+    depicts: `${CONFIG.pfxNsSemi}depicts`,
+    icon: `${CONFIG.pfxNsMeta}Icon`,
+    category: `${CONFIG.pfxNsSemi}Category`,
+    diagram: `${CONFIG.pfxNsSemi}Diagram`,
+    notation: `${CONFIG.pfxNsSemi}Notation`
+};
+const DcProperty = {
+    title: `${CONFIG.pfxNsDcmi}title`,
+    description: `${CONFIG.pfxNsDcmi}description`,
+    definition: `skos:definition`,
+    type: `${CONFIG.pfxNsDcmi}type`,
+    modified: `${CONFIG.pfxNsDcmi}modified`,
+    creator: `${CONFIG.pfxNsDcmi}creator`,
+    license: `${CONFIG.pfxNsDcmi}license`
+};
+const RdfProperty = {
+    type: 'rdf:type',
+    label: 'rdfs:label',
+    comment: 'rdfs:comment',
+    subClassOf: 'rdfs:subClassOf',
+    subPropertyOf: 'rdfs:subPropertyOf',
+    domain: 'rdfs:domain',
+    range: 'rdfs:range'
+};
+const ShaclProperty = {
+    nodeShape: 'sh:NodeShape',
+    propertyShape: 'sh:PropertyShape',
+    targetClass: 'sh:targetClass',
+    property: 'sh:property',
+    path: 'sh:path',
+    class: 'sh:class',
+    datatype: 'sh:datatype',
+    maxLength: 'sh:maxLength',
+    minInclusive: 'sh:minInclusive',
+    maxInclusive: 'sh:maxInclusive',
+    minCount: 'sh:minCount',
+    maxCount: 'sh:maxCount',
+    pattern: 'sh:pattern',
+    or: 'sh:or'
+};
+const nsData = 'd:', nsOnto = "o:", sfx_toSrc = "-toSource", sfx_toTrg = "-toTarget", pfx_datatype = 'xs:', pfx_shape = `${CONFIG.pfxNsMeta.slice(0, -1)}Shapes_`, sfx_shape = "_shape", pigOnto = 'https://product-information-graph.org/v0.2/ontology';
+const pigEntities = [
+    [PigItemType.Entity, undefined, 'Entity', 'A CASCaRA meta-model item used for entities (aka resources or artifacts).', [PigProperty.category, PigProperty.icon], []],
+    [PigItemType.Package, PigItemType.Entity, 'Package', 'A CASCaRA meta-model item used for packages comprising entities, relationships and potentially nested packages.', [], []],
+    [PigItemType.Artifact, PigItemType.Entity, 'Artifact', 'The most generic class for all model entities (e.g. requirement, function, system, component, state, event, ...).', [], []],
+    [PigItemType.Actor, PigItemType.Artifact, 'Actor', 'A fundamental model-element class for actors (e.g. users, functions, systems, components, ...).', [], []],
+    [PigItemType.State, PigItemType.Artifact, 'State', 'A fundamental model-element class for states (e.g. system or process states, information, form, color, ...).', [], []],
+    [PigItemType.Event, PigItemType.Artifact, 'Event', 'A fundamental model-element class for events (e.g. environmental or process events, ...).', [], []],
+    [PigItemType.Organizer, PigItemType.Entity, 'Organizer', `A class for organizing model-elements. An example is a list of requirements or a diagram using a certain notation.`, [], []],
+    [PigItemType.Root, PigItemType.Organizer, 'Root', `A subclass of ${PigItemType.Organizer} serving as a root for trees and tables.`, [], [PigProperty.lists]],
+    [PigItemType.Tree, PigItemType.Organizer, 'Tree', `A subclass of ${PigItemType.Organizer} for strictly hierarchical data structures referencing entities and relationships.`, [], [PigProperty.lists]],
+    [PigItemType.Outline, PigItemType.Tree, 'Outline', `A subclass of ${PigItemType.Tree} comprising all information items of a human-readable document. As usual, the outline is hierarchically organized.`, [], []],
+    [PigItemType.View, PigItemType.Organizer, 'View', `A subclass of ${PigItemType.Organizer} representing a model view (diagram) using a certain notation showing selected model elements.`, [PigProperty.diagram, PigProperty.notation], [PigProperty.shows, PigProperty.depicts]],
+    [PigItemType.Table, PigItemType.Organizer, 'Table', `A subclass of ${PigItemType.Organizer} representing a table showing selected model elements.`, [], [PigProperty.shows]],
+    [PigItemType.Enumeration, undefined, 'Enumeration', 'A CASCaRA meta-model item used for enumerations of values.', [], []]
 ], pigRelationships = [
-    [PigItemType.Relationship, 'owl:Class', 'Relationship', 'A PIG meta-model element used for reified relationships (aka predicates).', [PigProperty.category, PigProperty.icon], PigProperty.SourceLink, PigProperty.TargetLink],
+    [PigItemType.Relationship, undefined, 'Relationship', 'A CASCaRA meta-model item used for reified relationships (aka predicates).', [PigProperty.category, PigProperty.icon], PigProperty.SourceLink, PigProperty.TargetLink],
 ], pigProperties = [
-    [PigProperty.icon, 'owl:DatatypeProperty', [PigItemType.Entity, PigItemType.Relationship], XsDataType.String, 'has icon', 'Specifies an icon for a model element (entity or relationship).', undefined, 0, 1],
-    [PigProperty.category, DcProperty.type, [PigItemType.Entity, PigItemType.Relationship], XsDataType.String, 'has category', 'Specifies a category for an element (entity, relationship or organizer).', 32, 0, 1]
+    [PigItemType.Property, undefined, [PigItemType.Entity, PigItemType.Relationship], 'xs:anyType', 'Property', 'A CASCaRA meta-model item used for properties (aka attributes).', undefined, undefined, undefined],
+    [PigProperty.icon, PigItemType.Property, [PigItemType.Entity, PigItemType.Relationship], XsDataType.String, 'has icon', 'Specifies an icon for a model element (entity or relationship).', undefined, 0, 1],
+    [PigProperty.diagram, PigItemType.Property, [PigItemType.View], XsDataType.String, 'Diagram', 'A diagram illustrating the resource or a link to a diagram.', undefined, 0, undefined],
+    [PigProperty.category, PigItemType.Property, [PigItemType.Entity, PigItemType.Relationship], XsDataType.String, 'has category', 'Specifies a category for an element (entity, relationship or organizer).', 32, 0, 1],
+    [PigProperty.notation, PigProperty.category, [PigItemType.View], XsDataType.String, 'Notation', 'A reference to a notation defining the syntax and semantics of a diagram.', undefined, 0, 1]
 ], pigLinks = [
-    [PigItemType.Link, 'owl:ObjectProperty', [PigItemType.Organizer, PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'linked with', 'Connects a reified relationship with its source or target. Also connects an organizer to a model element'],
+    [PigItemType.Link, undefined, [PigItemType.Organizer, PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'linked with', 'A PIG meta-model item connecting a reified relationship with its source or target. Also connects an organizer to a model element.'],
     [PigProperty.SourceLink, PigItemType.Link, [PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'to source', 'Connects the source of a reified relationship.'],
     [PigProperty.TargetLink, PigItemType.Link, [PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'to target', 'Connects the target of a reified relationship or an organizer.'],
-    [PigProperty.lists, PigProperty.TargetLink, [PigItemType.HierarchyRoot, PigItemType.Outline], [PigItemType.Entity, PigItemType.Relationship, PigItemType.Organizer], 'lists', 'Lists an entity, a relationship or a subordinated organizer.'],
+    [PigProperty.lists, PigProperty.TargetLink, [PigItemType.Root, PigItemType.Tree], [PigItemType.Entity, PigItemType.Relationship, PigItemType.Organizer], 'lists', 'Lists an entity, a relationship or a subordinated organizer.'],
     [PigProperty.shows, PigProperty.TargetLink, [PigItemType.View], [PigItemType.Entity, PigItemType.Relationship], 'shows', 'Shows an entity or a relationship.'],
     [PigProperty.depicts, PigProperty.TargetLink, [PigItemType.View], [PigItemType.Entity], 'depicts', 'Depicts an entity; inverse of uml:ownedDiagram.']
-], pigNativeProperties = ['dcterms:title', 'dcterms:description'], rdfImplicit = ['rdf', 'rdfs', 'owl', 'xs', 'xsd'], diagramRels = ['SpecIF:shows', 'uml:ownedDiagram'], hierarchyItems = [CONFIG.resClassFolder, CONFIG.resClassOutline, CONFIG.resClassGlossary], excludeEntities = [PigItemType.Element].concat(pigEntities.map(en => en[0])), excludeRelationships = pigRelationships.map(rel => rel[0]), excludeProperties = pigProperties.concat(pigLinks).map(pr => pr[0]);
-function isRdfImplicit(id) {
-    return rdfImplicit.includes(id.split(':')[0]);
+], pigNativeProperties = [DcProperty.title, DcProperty.description, DcProperty.definition], diagramRels = ['SpecIF:shows', 'uml:ownedDiagram'], hierarchyItems = [CONFIG.resClassFolder, CONFIG.resClassOutline, CONFIG.resClassGlossary], excludeEntities = [PigItemType.Element].concat(pigEntities.map(en => en[0])), excludeRelationships = pigRelationships.map(rel => rel[0]), excludeProperties = pigProperties.concat(pigLinks).map(pr => pr[0]);
+function isEstablishedNs(id) {
+    const establishedNs = ['rdf', 'rdfs', 'owl', 'skos', 'sh', 'xs', 'xsd', CONFIG.pfxNsDcmi.slice(0, -1)];
+    return establishedNs.includes(id.split(':')[0]);
 }
 function isPigNative(str) {
     return pigNativeProperties.includes(str);
 }
 function makeShapeId(id) {
     return id.startsWith(nsOnto) ? id + sfx_shape : pfx_shape + id;
+}
+function collectNamespaces(specifData) {
+    const usedPrefixes = new Set();
+    usedPrefixes.add('rdf:');
+    usedPrefixes.add('rdfs:');
+    usedPrefixes.add('sh:');
+    usedPrefixes.add('owl:');
+    usedPrefixes.add('skos:');
+    usedPrefixes.add(CONFIG.pfxNsDcmi);
+    usedPrefixes.add(CONFIG.pfxNsMeta);
+    usedPrefixes.add(`${pfx_shape}${CONFIG.pfxNsMeta}`);
+    if (CONFIG.pfxNsMeta != CONFIG.pfxNsSemi) {
+        usedPrefixes.add(CONFIG.pfxNsSemi);
+        usedPrefixes.add(`${pfx_shape}${CONFIG.pfxNsSemi}`);
+    }
+    usedPrefixes.add('FMC:');
+    usedPrefixes.add(`${pfx_shape}FMC:`);
+    function addPrefix(id) {
+        if (!id)
+            return;
+        const match = id.match(/^([\w-]+)(:|\.)/);
+        if (match)
+            usedPrefixes.add(`${match[1]}:`);
+    }
+    [
+        specifData.dataTypes,
+        specifData.propertyClasses,
+        specifData.resourceClasses,
+        specifData.statementClasses,
+        specifData.resources,
+        specifData.statements
+    ].forEach(list => {
+        if (Array.isArray(list)) {
+            list.forEach((item) => {
+                addPrefix(item.id);
+                addPrefix(item.type);
+                addPrefix(item['class']?.id);
+                addPrefix(item.dataType?.id);
+                addPrefix(item.extends?.id);
+                if (Array.isArray(item.propertyClasses)) {
+                    item.propertyClasses.forEach((pc) => addPrefix(pc.id));
+                }
+                ['subjectClasses', 'objectClasses'].forEach(prop => {
+                    if (Array.isArray(item[prop])) {
+                        item[prop].forEach((k) => addPrefix(k.id));
+                    }
+                });
+                if (Array.isArray(item.properties)) {
+                    item.properties.forEach((prp) => {
+                        let v = LIB.isMultiLanguageValue(prp.values[0]) ? LIB.languageTextOf(prp.values[0], { targetLanguage: 'default' }) : undefined;
+                        return addPrefix(v);
+                    });
+                }
+                ;
+                if (Array.isArray(item.enumeration)) {
+                    item.enumeration.forEach((enV) => addPrefix(enV.id));
+                }
+            });
+        }
+    });
+    return usedPrefixes;
 }
 class CToRdf {
     constructor() {
@@ -132,7 +215,7 @@ class CToRdf {
     heading(str) {
         return this.newLine()
             + this.newLine('#################################################################')
-            + this.newLine('# ' + str)
+            + this.newLine(`# ${str}`)
             + this.newLine('#################################################################');
     }
     newLine(str) {
@@ -174,10 +257,10 @@ class CToRdf {
         ;
         return "";
     }
-    makeLines(prefix, object) {
+    makeLines(pred, object) {
         function noQuotes(str) {
             return (RE.NamespaceRDF.test(str) || str.startsWith('<http') || RE.contentInRoundBrackets.test(str) || RE.contentInSquareBrackets.test(str))
-                && !prefix.includes('rdfs:label') && !prefix.includes('rdfs:comment');
+                && !pred.includes('rdfs:label') && !pred.includes('rdfs:comment');
         }
         switch (typeof (object)) {
             case 'undefined':
@@ -188,9 +271,9 @@ class CToRdf {
             case 'string':
                 if (object.length > 0) {
                     if (noQuotes(object))
-                        return prefix + object;
+                        return pred + object;
                     else
-                        return prefix + `"${this.escapeTtl(object)}"`;
+                        return pred + `"${this.escapeTtl(object)}"`;
                 }
                 ;
                 return "";
@@ -204,23 +287,23 @@ class CToRdf {
                     if (object.length < 2) {
                         let t = object[0].text, l = object[0].language;
                         if (noQuotes(t))
-                            return prefix + `${t}`;
+                            return pred + `${t}`;
                         let languageTag = l ? `@${l}` : '';
-                        return prefix + `"${this.escapeTtl(t)}"` + languageTag;
+                        return pred + `"${this.escapeTtl(t)}"` + languageTag;
                     }
                     ;
                     let str = "";
                     object.forEach((v, i) => {
                         if (!v.language)
                             console.error("specif2turtle: Multilanguage text must have a language specified if there are multiple language versions:", v);
-                        str += (i == 0 ? prefix : " ,\n\t\t") + `"${this.escapeTtl(v['text'])}"@${v.language}`;
+                        str += (i == 0 ? pred : " ,\n\t\t") + `"${this.escapeTtl(v['text'])}"@${v.language}`;
                     });
                     return str;
                 }
                 else {
                     let str = '';
                     object.forEach((v, i) => {
-                        str += (i == 0 ? prefix : " ,\n\t\t") + (noQuotes(v) ? v : `"${v}"`);
+                        str += (i == 0 ? pred : " ,\n\t\t") + (noQuotes(v) ? v : `"${v}"`);
                     });
                     return str;
                 }
@@ -284,7 +367,11 @@ class CToRdf {
             return str.replace("\\", "\\\\").replace(/"/g, '\\$&').replace(/\u000a/g, '\\n').replace(/\u000d/g, '');
     }
 }
-app.specif2turtle = (specifData, opts) => {
+app.specif2turtle = (specifData, options) => {
+    const opts = {
+        withOwlClasses: true,
+        ...options
+    };
     const date = new Date().toISOString(), sourceURI = encodeURI((opts.sourceFileName.startsWith('http') ? opts.sourceFileName : opts.baseURI + opts.sourceFileName) + '#'), ontURI = pigOnto + '#', extendedClasses = LIB.getExtendedClasses(specifData.resourceClasses, 'all')
         .concat(LIB.getExtendedClasses(specifData.statementClasses, 'all'));
     let toRdf = new CToRdf();
@@ -302,68 +389,14 @@ app.specif2turtle = (specifData, opts) => {
     console.debug('rdf.ttl', ttl);
     return ttl;
     function defineNamespaces() {
-        const usedPrefixes = new Set();
-        usedPrefixes.add('rdf');
-        usedPrefixes.add('sh');
-        usedPrefixes.add('owl');
-        usedPrefixes.add('pig');
-        usedPrefixes.add('pigShapes_pig');
-        function addPrefix(id) {
-            if (!id)
-                return;
-            const match = id.match(/^([\w-]+)(:|\.)/);
-            if (match)
-                usedPrefixes.add(match[1]);
-        }
-        [
-            specifData.dataTypes,
-            specifData.propertyClasses,
-            specifData.resourceClasses,
-            specifData.statementClasses,
-            specifData.resources,
-            specifData.statements
-        ].forEach(list => {
-            if (Array.isArray(list)) {
-                list.forEach((item) => {
-                    addPrefix(item.id);
-                    addPrefix(item.type);
-                    addPrefix(item['class']?.id);
-                    addPrefix(item.dataType?.id);
-                    addPrefix(item.extends?.id);
-                    if (Array.isArray(item.propertyClasses)) {
-                        item.propertyClasses.forEach((pc) => addPrefix(pc.id));
-                    }
-                    ['subjectClasses', 'objectClasses'].forEach(prop => {
-                        if (Array.isArray(item[prop])) {
-                            item[prop].forEach((k) => addPrefix(k.id));
-                        }
-                    });
-                    if (Array.isArray(item.properties)) {
-                        item.properties.forEach((prp) => {
-                            let v = LIB.isMultiLanguageValue(prp.values[0]) ? LIB.languageTextOf(prp.values[0], { targetLanguage: 'default' }) : undefined;
-                            return addPrefix(v);
-                        });
-                    }
-                });
-            }
-        });
+        const usedPrefixes = collectNamespaces(specifData);
         let pfxL = '';
         for (let [tag, val] of app.ontology.namespaces) {
-            const cleanTag = tag.replace(/[\.:]$/, '');
+            const cleanTag = tag.replace(/[\.]$/, ':');
             if (usedPrefixes.has(cleanTag)) {
-                pfxL += toRdf.prefix(cleanTag + ':', val.url);
-            }
-        }
-        if (LIB.isArrayWithContent(nsShapes)) {
-            for (let ns of nsShapes) {
-                if (!ns.endsWith(':')) {
-                    ns += ':';
-                    console.warn('specif2turtle: Added a colon to namespace prefix:', ns);
-                }
-                const cleanNs = ns.replace(':', '');
-                if (usedPrefixes.has(cleanNs)) {
-                    pfxL += toRdf.prefix(pfx_shape + ns, pigOnto + '/shapes/' + ns + '#');
-                }
+                pfxL += toRdf.prefix(cleanTag, val.url);
+                if (!isEstablishedNs(cleanTag))
+                    pfxL += toRdf.prefix(`${pfx_shape}${cleanTag}`, `${pigOnto}/shapes/${cleanTag.slice(0, -1)}#`);
             }
         }
         pfxL += toRdf.newLine()
@@ -403,9 +436,13 @@ app.specif2turtle = (specifData, opts) => {
             if (LIB.isArrayWithContent(dT.enumeration)) {
                 ttlStr += toRdf.newLine()
                     + toRdf.tab0(dtId)
-                    + toRdf.tab1(RdfProperty.type, 'owl:Class')
+                    + (opts.withOwlClasses ? toRdf.tab1(RdfProperty.type, 'owl:Class') : '')
+                    + toRdf.tab1(RdfProperty.subClassOf, PigItemType.Enumeration)
                     + toRdf.tab1(RdfProperty.label, dT.title)
-                    + toRdf.tab1(RdfProperty.comment, dT.description)
+                    + toRdf.tab1(DcProperty.definition, dT.description)
+                    + toRdf.tab1(DcProperty.modified, dT.changedAt)
+                    + toRdf.tab1(DcProperty.creator, dT.changedBy)
+                    + toRdf.tab1(ShaclProperty.datatype, dT.type)
                     + toRdf.tab1('owl:oneOf', toRdf.makeRdflList(nsOnto, dT.enumeration.map(itm => itm.id)));
                 dT.enumeration.forEach(item => {
                     const vId = LIB.makeIdWithNamespace(nsOnto, item.id);
@@ -425,17 +462,22 @@ app.specif2turtle = (specifData, opts) => {
         let ttlStr = toRdf.heading('Ontology - Property Classes');
         pCs.forEach(pC => {
             const dT = LIB.itemByKey(specifData.dataTypes, pC.dataType), pcId = LIB.makeIdWithNamespace(nsOnto, pC.id);
-            if (excludeProperties.includes(pcId) || isRdfImplicit(pcId))
+            if (excludeProperties.includes(pcId) || isEstablishedNs(pcId))
                 ttlStr += toRdf.newLine()
                     + toRdf.newLine('# Skipping implicit property: ' + pcId);
             else {
                 ttlStr += toRdf.newLine()
                     + toRdf.tab0(pcId)
-                    + toRdf.tab1(RdfProperty.type, dT.enumeration ? "owl:ObjectProperty" : "owl:DatatypeProperty")
+                    + (dT.enumeration ?
+                        ((opts.withOwlClasses ? toRdf.tab1(RdfProperty.type, "owl:ObjectProperty") : '')
+                            + toRdf.tab1(RdfProperty.subPropertyOf, `${CONFIG.pfxNsMeta}Link`))
+                        : ((opts.withOwlClasses ? toRdf.tab1(RdfProperty.type, "owl:DatatypeProperty") : '')
+                            + toRdf.tab1(RdfProperty.subPropertyOf, `${CONFIG.pfxNsMeta}Property`)))
                     + toRdf.tab1(RdfProperty.label, pC.title)
-                    + toRdf.tab1(RdfProperty.comment, pC.description)
+                    + toRdf.tab1(DcProperty.definition, pC.description)
                     + toRdf.tab1(RdfProperty.range, dT.enumeration ? LIB.makeIdWithNamespace(nsOnto, dT.id) : undefined);
-                const dt = dT.type;
+                +toRdf.tab1(DcProperty.modified, pC.changedAt)
+                    + toRdf.tab1(DcProperty.creator, pC.changedBy);
                 ttlStr += toRdf.newLine()
                     + toRdf.tab0(makeShapeId(pcId))
                     + toRdf.tab1(RdfProperty.type, ShaclProperty.propertyShape)
@@ -445,7 +487,7 @@ app.specif2turtle = (specifData, opts) => {
                 if (dT.enumeration)
                     ttlStr += toRdf.tab1(ShaclProperty.class, LIB.makeIdWithNamespace(nsOnto, dT.id));
                 else {
-                    ttlStr += toRdf.tab1(ShaclProperty.datatype, dt)
+                    ttlStr += toRdf.tab1(ShaclProperty.datatype, dT.type)
                         + toRdf.tab1(ShaclProperty.maxLength, dT.maxLength)
                         + toRdf.tab1(ShaclProperty.minInclusive, dT.minInclusive)
                         + toRdf.tab1(ShaclProperty.maxInclusive, dT.maxInclusive)
@@ -465,12 +507,8 @@ app.specif2turtle = (specifData, opts) => {
             + toRdf.tab1(RdfProperty.type, ShaclProperty.nodeShape)
             + toRdf.tab1(ShaclProperty.targetClass, ecId);
         if (LIB.isArrayWithContent(eC.propertyClasses)) {
-            const fL = eC.propertyClasses.filter(pc => !isPigNative(pc.id));
-            fL.forEach((pC, i) => {
-                ttlStr += i < 1 ?
-                    toRdf.tab1(ShaclProperty.property, makeShapeId(LIB.makeIdWithNamespace(nsOnto, pC.id)))
-                    : toRdf.tab2(makeShapeId(LIB.makeIdWithNamespace(nsOnto, pC.id)));
-            });
+            const fL = eC.propertyClasses.filter(pc => !isPigNative(pc.id)).map(pc => (LIB.makeIdWithNamespace(nsOnto, pc.id)));
+            ttlStr += toRdf.tab1(ShaclProperty.property, fL.map(mapShPrp));
         }
         ;
         return ttlStr;
@@ -480,17 +518,20 @@ app.specif2turtle = (specifData, opts) => {
             return '';
         let ttlStr = toRdf.heading('Ontology - Entity Classes');
         rCL.forEach(rC => {
-            if (excludeEntities.includes(rC.id) || isRdfImplicit(rC.id)) {
+            if (excludeEntities.includes(rC.id) || isEstablishedNs(rC.id)) {
                 return;
             }
             ;
-            const exC = LIB.itemByKey(extendedClasses, LIB.keyOf(rC)), entId = LIB.makeIdWithNamespace(nsOnto, rC.id), ity = app.ontology.organizerClasses.includes(entId) ? PigItemType.Organizer : PigItemType.Entity;
+            const exC = LIB.itemByKey(extendedClasses, LIB.keyOf(rC)), entId = LIB.makeIdWithNamespace(nsOnto, rC.id), ity = app.ontology.organizerClasses.includes(entId) ? PigItemType.Organizer : PigItemType.Artifact;
             ttlStr += toRdf.newLine()
                 + toRdf.tab0(entId)
+                + (opts.withOwlClasses ? toRdf.tab1(RdfProperty.type, 'owl:Class') : '')
                 + toRdf.tab1(RdfProperty.subClassOf, (rC.extends ? LIB.makeIdWithNamespace(nsOnto, rC.extends.id) : ity))
                 + toRdf.tab1(RdfProperty.label, rC.title)
-                + toRdf.tab1(RdfProperty.comment, rC.description)
+                + toRdf.tab1(DcProperty.definition, rC.description)
                 + toRdf.tab1(PigProperty.icon, rC.icon);
+            +toRdf.tab1(DcProperty.modified, rC.changedAt)
+                + toRdf.tab1(DcProperty.creator, rC.changedBy);
             ttlStr += makeClassShape(exC);
         });
         return ttlStr;
@@ -501,16 +542,19 @@ app.specif2turtle = (specifData, opts) => {
             return '';
         let ttlStr = toRdf.heading('Ontology - Relationship Classes');
         sCL.forEach(sC => {
-            if (excludeRelationships.includes(sC.id) || isRdfImplicit(sC.id) || diagramRels.includes(sC.id)) {
+            if (excludeRelationships.includes(sC.id) || isEstablishedNs(sC.id) || diagramRels.includes(sC.id)) {
                 return;
             }
             const exC = LIB.itemByKey(extendedClasses, LIB.keyOf(sC)), relId = LIB.makeIdWithNamespace(nsOnto, sC.id);
             ttlStr += toRdf.newLine()
                 + toRdf.tab0(relId)
+                + (opts.withOwlClasses ? toRdf.tab1(RdfProperty.type, 'owl:Class') : '')
                 + toRdf.tab1(RdfProperty.subClassOf, (sC.extends ? LIB.makeIdWithNamespace(nsOnto, sC.extends.id) : PigItemType.Relationship))
                 + toRdf.tab1(RdfProperty.label, sC.title)
-                + toRdf.tab1(RdfProperty.comment, sC.description)
+                + toRdf.tab1(DcProperty.definition, sC.description)
                 + toRdf.tab1(PigProperty.icon, sC.icon)
+                + toRdf.tab1(DcProperty.modified, sC.changedAt)
+                + toRdf.tab1(DcProperty.creator, sC.changedBy)
                 + toRdf.newLine()
                 + toRdf.tab0(relId + sfx_toSrc)
                 + toRdf.tab1(RdfProperty.subPropertyOf, PigProperty.SourceLink)
@@ -572,8 +616,8 @@ app.specif2turtle = (specifData, opts) => {
             + toRdf.tab0(nsData + r.id)
             + toRdf.tab1(RdfProperty.type, LIB.makeIdWithNamespace(nsOnto, r['class'].id))
             + xProperties(r)
-            + toRdf.tab1("pig:revision", r.revision)
-            + toRdf.tab1("pig:priorRevision", r.replaces)
+            + toRdf.tab1(PigProperty.revision, r.revision)
+            + toRdf.tab1(PigProperty.priorRevision, r.replaces)
             + toRdf.tab1(DcProperty.modified, r.changedAt ?? date)
             + toRdf.tab1(DcProperty.creator, r.changedBy);
     }
@@ -584,7 +628,7 @@ app.specif2turtle = (specifData, opts) => {
                 if (!hierarchyItems.includes(r['class'].id)) {
                     ttlStr += xAnElement(r);
                     switch (r['class'].id) {
-                        case 'pig:View':
+                        case PigItemType.View:
                             let sL = specifData.statements.filter(s => {
                                 return s['class'].id.includes(':shows') && s.subject.id == r.id;
                             });
@@ -644,7 +688,7 @@ app.specif2turtle = (specifData, opts) => {
             let ttlStr = toRdf.heading('Hierarchy')
                 + toRdf.newLine()
                 + toRdf.tab0(nsData + 'HierarchyRoot' + '-' + specifData.id)
-                + toRdf.tab1(RdfProperty.type, PigItemType.HierarchyRoot)
+                + toRdf.tab1(RdfProperty.type, PigItemType.Root)
                 + toRdf.tab1(DcProperty.modified, date)
                 + toRdf.tab1(RdfProperty.label, 'Hierarchy Root')
                 + toRdf.tab1(RdfProperty.comment, '... anchoring all hierarchies of this graph (package)');
@@ -666,53 +710,69 @@ app.specif2turtle = (specifData, opts) => {
         return '';
     }
     ;
+    function mapShPrp(p) {
+        if (p.startsWith('rdfs')) {
+            return toRdf.makeShaclList([{ prd: ShaclProperty.path, obj: p }, { prd: ShaclProperty.minCount, obj: '1' }]);
+        }
+        return makeShapeId(p);
+    }
     function declarePigClasses() {
-        let ttlStr = toRdf.heading('PIG Metamodel (pig:)');
+        let ttlStr = toRdf.heading('CASCaRA Metamodel and Semantic Infrastructure');
         pigEntities.forEach(c => {
-            let prpL = [RdfProperty.label, RdfProperty.comment].concat(c[4]).concat(c[5]);
+            let prpL = [RdfProperty.label, RdfProperty.comment].concat(c[4], c[5]);
             ttlStr += toRdf.newLine()
                 + toRdf.tab0(c[0])
-                + toRdf.tab1(c[1].startsWith("owl:") ? RdfProperty.type : RdfProperty.subClassOf, c[1])
+                + toRdf.tab1(RdfProperty.type, 'owl:Class')
+                + (c[1] ? toRdf.tab1(RdfProperty.subClassOf, c[1]) : '')
                 + toRdf.tab1(RdfProperty.label, c[2])
-                + toRdf.tab1(RdfProperty.comment, c[3])
+                + toRdf.tab1(DcProperty.definition, c[3])
                 + toRdf.newLine()
                 + toRdf.tab0(pfx_shape + c[0])
                 + toRdf.tab1(RdfProperty.type, ShaclProperty.nodeShape)
                 + toRdf.tab1(ShaclProperty.targetClass, c[0])
-                + toRdf.tab1(ShaclProperty.property, LIB.isArrayWithContent(prpL) ? prpL.map(p => pfx_shape + p) : undefined);
+                + toRdf.tab1(ShaclProperty.property, LIB.isArrayWithContent(prpL) ? prpL.map(mapShPrp) : undefined);
         });
         pigRelationships.forEach(c => {
-            let prpL = [RdfProperty.label, RdfProperty.comment].concat(c[4]).concat([c[5], c[6]]);
+            let prpL = [RdfProperty.label, RdfProperty.comment].concat(c[4], [c[5], c[6]]);
             ttlStr += toRdf.newLine()
                 + toRdf.tab0(c[0])
-                + toRdf.tab1(c[1].startsWith("owl:") ? RdfProperty.type : RdfProperty.subClassOf, c[1])
+                + toRdf.tab1(RdfProperty.type, 'owl:Class')
+                + (c[1] ? toRdf.tab1(RdfProperty.subClassOf, c[1]) : '')
                 + toRdf.tab1(RdfProperty.label, c[2])
-                + toRdf.tab1(RdfProperty.comment, c[3])
+                + toRdf.tab1(DcProperty.definition, c[3])
                 + toRdf.newLine()
                 + toRdf.tab0(pfx_shape + c[0])
                 + toRdf.tab1(RdfProperty.type, ShaclProperty.nodeShape)
                 + toRdf.tab1(ShaclProperty.targetClass, c[0])
-                + toRdf.tab1(ShaclProperty.property, LIB.isArrayWithContent(prpL) ? prpL.map(p => pfx_shape + p) : undefined);
+                + toRdf.tab1(ShaclProperty.property, LIB.isArrayWithContent(prpL) ? prpL.map(mapShPrp) : undefined);
         });
-        pigProperties.concat(pigLinks).forEach(c => {
-            ttlStr += toRdf.newLine()
-                + toRdf.tab0(c[0])
-                + toRdf.tab1(c[1].startsWith("owl:") || c[1].startsWith("rdf:") ? RdfProperty.type : RdfProperty.subPropertyOf, c[1])
-                + toRdf.tab1(RdfProperty.range, toRdf.makeOwlUnion(nsOnto, c[3]))
-                + toRdf.tab1(RdfProperty.label, c[4])
-                + toRdf.tab1(RdfProperty.comment, c[5])
-                + toRdf.newLine()
-                + toRdf.tab0(pfx_shape + c[0])
-                + toRdf.tab1(RdfProperty.type, ShaclProperty.propertyShape)
-                + toRdf.tab1(ShaclProperty.path, c[0]);
-            if (typeof (c[3]) == 'string' && c[3].startsWith(pfx_datatype)) {
-                ttlStr += toRdf.tab1(ShaclProperty.datatype, c[3]);
-                ttlStr += toRdf.tab1(ShaclProperty.maxLength, c[6]);
-                ttlStr += toRdf.tab1(ShaclProperty.minCount, c[7]);
-                ttlStr += toRdf.tab1(ShaclProperty.maxCount, c[8]);
-            }
-            else
-                ttlStr += toRdf.tab1(ShaclProperty.or, toRdf.makeShaclOr(nsOnto, ShaclProperty.class, c[3]));
+        [
+            { list: pigProperties, type: 'owl:DatatypeProperty' },
+            { list: pigLinks, type: 'owl:ObjectProperty' }
+        ].forEach(cL => {
+            cL.list.forEach(c => {
+                ttlStr += toRdf.newLine()
+                    + toRdf.tab0(c[0])
+                    + toRdf.tab1(RdfProperty.type, cL.type)
+                    + (c[1] ? toRdf.tab1(RdfProperty.subPropertyOf, c[1]) : '')
+                    + toRdf.tab1(RdfProperty.range, toRdf.makeOwlUnion(nsOnto, c[3]))
+                    + toRdf.tab1(RdfProperty.label, c[4])
+                    + toRdf.tab1(DcProperty.definition, c[5]);
+                if (c[3] != undefined) {
+                    ttlStr += toRdf.newLine()
+                        + toRdf.tab0(pfx_shape + c[0])
+                        + toRdf.tab1(RdfProperty.type, ShaclProperty.propertyShape)
+                        + toRdf.tab1(ShaclProperty.path, c[0]);
+                    if (typeof (c[3]) == 'string' && c[3].startsWith(pfx_datatype)) {
+                        ttlStr += toRdf.tab1(ShaclProperty.datatype, c[3])
+                            + toRdf.tab1(ShaclProperty.maxLength, c[6])
+                            + toRdf.tab1(ShaclProperty.minCount, c[7])
+                            + toRdf.tab1(ShaclProperty.maxCount, c[8]);
+                    }
+                    else
+                        ttlStr += toRdf.tab1(ShaclProperty.or, toRdf.makeShaclOr(nsOnto, ShaclProperty.class, c[3]));
+                }
+            });
         });
         return ttlStr;
     }
