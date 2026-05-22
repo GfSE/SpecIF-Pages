@@ -89,7 +89,7 @@ moduleManager.construct({
     return self;
     function ddpSchema2specifClasses(xsd) {
         "use strict";
-        var xlsTerms = ["xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI", CONFIG.propClassId, CONFIG.propClassType, CONFIG.resClassFolder], spD = app.ontology.generateSpecifClasses({ terms: xlsTerms });
+        var xsTerms = ["xs:string", "xs:boolean", "xs:integer", "xs:double", "xs:dateTime", "xs:anyURI"], spD = app.ontology.generateSpecifClasses({ terms: xsTerms });
         spD.title = [{ text: "SpecIF Classes for prostep iViP DDP (Data Model)" }];
         spD.description = [{ text: "SpecIF Classes derived from DDP Schema Version 2.0 created 10.03.2023 08:09:28 by Michael Kirsch, :em engineering methods AG on behalf of prostep iViP Association" }];
         spD.id = "P-DDP-Classes-V20";
@@ -101,7 +101,7 @@ moduleManager.construct({
         Array.from(dictionaryEntities[0].children[0].children, (d) => {
             let dE = d.children[0].children[0].children[0];
             let ti = dE.getAttribute("name") || "", rC = {
-                id: CONFIG.prefixRC + simpleHash(ti),
+                id: CONFIG.prefixRC + ti.toJsId(),
                 title: ti,
                 description: getDesc(dE),
                 instantiation: ["auto", "user"],
@@ -111,7 +111,7 @@ moduleManager.construct({
             let attC = dE.getElementsByTagName('xs:complexContent'), atts = attC[0].children[0].children;
             let prpL = (atts && atts.length == 1) ? Array.from(atts[0].getElementsByTagName('xs:element')) : [];
             prpL.forEach((prp) => {
-                let ti = prp.getAttribute("ref") || prp.getAttribute("name") || "", id = CONFIG.prefixPC + simpleHash(ti), ty = prp.getAttribute("type") || "xs:string", dT = LIB.itemBy(spD.dataTypes, "type", ty);
+                let ti = prp.getAttribute("ref") || prp.getAttribute("name") || "", id = CONFIG.prefixPC + ti.toJsId(), ty = prp.getAttribute("type") || "xs:string", dT = LIB.itemBy(spD.dataTypes, "type", ty);
                 if (dT) {
                     let pC = {
                         id: id,
@@ -134,7 +134,7 @@ moduleManager.construct({
         Array.from(dictionaryRelations[0].children[0].children, (rel) => {
             if (rel.tagName == "xs:element") {
                 let ti = rel.getAttribute("name") || "", sC = {
-                    id: CONFIG.prefixSC + simpleHash(ti),
+                    id: CONFIG.prefixSC + ti.toJsId(),
                     title: ti,
                     description: getDesc(rel),
                     subjectClasses: [],
@@ -148,10 +148,10 @@ moduleManager.construct({
                 });
                 let sTi = sbj[0].getAttribute("name").substring(7), oTi = obj[0].getAttribute("name").substring(6);
                 sC.subjectClasses.push({
-                    id: CONFIG.prefixRC + simpleHash(sTi)
+                    id: CONFIG.prefixRC + sTi.toJsId()
                 });
                 sC.objectClasses.push({
-                    id: CONFIG.prefixRC + simpleHash(oTi)
+                    id: CONFIG.prefixRC + oTi.toJsId()
                 });
                 LIB.cacheE(spD.statementClasses, sC);
             }
@@ -176,7 +176,7 @@ moduleManager.construct({
         Array.from(dictionaryEntities[0].children[0].children, (d) => {
             let dE = d.children[0].children[0].children[0];
             let ti = dE.getAttribute("name") || "", rT = {
-                id: CONFIG.prefixR + simpleHash(ti),
+                id: CONFIG.prefixR + ti.toJsId(),
                 changedAt: spD.createdAt,
                 class: {
                     "id": "RC-SpecifTermresourceclass"
@@ -194,7 +194,7 @@ moduleManager.construct({
                 let ti = prp.getAttribute("ref") || prp.getAttribute("name") || "", ty = prp.getAttribute("type") || "xs:string", dT = LIB.itemBy(spD.dataTypes, "type", ty);
                 if (dT) {
                     let pT = {
-                        id: CONFIG.prefixR + simpleHash(ti),
+                        id: CONFIG.prefixR + ti.toJsId(),
                         changedAt: spD.createdAt,
                         class: {
                             "id": termPropertyClasses.get(ty)
@@ -207,7 +207,7 @@ moduleManager.construct({
                     LIB.cacheE(spD.resources, pT);
                     add2Hierarchy(pT.id, "N-FolderTermsPropertyClass");
                     spD.statements.push({
-                        id: CONFIG.prefixS + simpleHash(rT.id + pT.id),
+                        id: CONFIG.prefixS + (rT.id + 'property' + pT.id).toJsId(),
                         class: { id: "SC-hasProperty" },
                         subject: { id: rT.id },
                         object: { id: pT.id },
@@ -224,7 +224,7 @@ moduleManager.construct({
         Array.from(dictionaryRelations[0].children[0].children, (rel) => {
             if (rel.tagName == "xs:element") {
                 let ti = rel.getAttribute("name") || "", sT = {
-                    id: CONFIG.prefixR + simpleHash(ti),
+                    id: CONFIG.prefixR + ti.toJsId(),
                     changedAt: spD.createdAt,
                     class: {
                         "id": "RC-SpecifTermstatementclass"
@@ -241,16 +241,16 @@ moduleManager.construct({
                 }), obj = entities.filter((en) => {
                     return en.getAttribute("name").includes("object");
                 });
-                let sTi = sbj[0].getAttribute("name").substring(7), oTi = obj[0].getAttribute("name").substring(6), sbjId = CONFIG.prefixR + simpleHash(sTi), objId = CONFIG.prefixR + simpleHash(oTi);
+                let sTi = sbj[0].getAttribute("name").substring(7), oTi = obj[0].getAttribute("name").substring(6), sbjId = CONFIG.prefixR + sTi.toJsId(), objId = CONFIG.prefixR + oTi.toJsId();
                 spD.statements.push({
-                    id: CONFIG.prefixS + simpleHash(sT.id + 'subject' + sbjId),
+                    id: CONFIG.prefixS + (sT.id + 'subject' + sbjId).toJsId(),
                     class: { id: "SC-isEligibleAsSubject" },
                     subject: { id: sbjId },
                     object: { id: sT.id },
                     changedAt: spD.createdAt
                 });
                 spD.statements.push({
-                    id: CONFIG.prefixS + simpleHash(sT.id + 'object' + objId),
+                    id: CONFIG.prefixS + (sT.id + 'object' + objId).toJsId(),
                     class: { id: "SC-isEligibleAsObject" },
                     subject: { id: objId },
                     object: { id: sT.id },

@@ -34,7 +34,7 @@ class CPropertyToEdit extends CPropertyToShow {
             return makeBooleanField(ti, this.values.length > 0 ? LIB.isTrue(this.values[0]) : false, this.dispOpts());
         }
         ;
-        if (this.dT.type == XsDataType.String && this.pC.title == CONFIG.propClassDiagram) {
+        if (this.dT.type == XsDataType.String && CONFIG.propClassDiagrams.includes(this.pC.title)) {
             return this.makeDiagramField(localOpts);
         }
         ;
@@ -43,7 +43,7 @@ class CPropertyToEdit extends CPropertyToShow {
             if (opts && opts.dialogForm)
                 opts.dialogForm.addField(ti, this.dT, { required: this.pC.required });
             return makeTextField(ti, this.dT.type == XsDataType.String ? this.get(localOpts).escapeHTML() : this.get(localOpts), {
-                typ: ((this.dT.maxLength && this.dT.maxLength < CONFIG.textThreshold + 1) || CONFIG.titleProperties.includes(this.pC.title)) ? 'line' : 'area',
+                typ: (this.dT.type == XsDataType.String && (!this.dT.maxLength || this.dT.maxLength > CONFIG.textThreshold || !CONFIG.titleProperties.includes(this.pC.title))) ? 'area' : 'line',
                 handle: opts.myFullName + '.check()',
                 hint: this.pC.description
             });
@@ -119,7 +119,7 @@ class CPropertyToEdit extends CPropertyToShow {
         let val;
         switch (this.dT.type) {
             case XsDataType.String:
-                if (this.pC.title == CONFIG.propClassDiagram) {
+                if (CONFIG.propClassDiagrams.includes(this.pC.title)) {
                     return { class: LIB.makeKey(this.pC.id), values: this.values };
                 }
                 else {

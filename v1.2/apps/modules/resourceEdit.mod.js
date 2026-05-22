@@ -27,10 +27,7 @@ class CPropertyToEdit extends CPropertyToShow {
                 let val = this.dT.type == XsDataType.String ? app.ontology.localize(LIB.languageTextOf(eV.value, localOpts), localOpts) : eV.value;
                 return { title: val, id: eV.id, checked: this.enumIdL.includes(eV.id) };
             });
-            if (this.pC.multiple)
-                return makeCheckboxField(ti, entryL, this.dispOpts());
-            else
-                return makeRadioField(ti, entryL, this.dispOpts());
+            return makeSelectionField(ti, entryL, Object.assign(this.dispOpts(), { kind: this.pC.multiple ? 'checkbox' : 'radio' }));
         }
         ;
         if (this.dT.type == XsDataType.Boolean) {
@@ -42,10 +39,11 @@ class CPropertyToEdit extends CPropertyToShow {
         }
         ;
         if (this.pC.permissionVector.U) {
+            let self = this;
             if (opts && opts.dialogForm)
-                opts.dialogForm.addField(ti, this.dT);
+                opts.dialogForm.addField(ti, this.dT, { required: this.pC.required });
             return makeTextField(ti, this.dT.type == XsDataType.String ? this.get(localOpts).escapeHTML() : this.get(localOpts), {
-                typ: this.dT.type == XsDataType.String && app.ontology.propertyClassIsText(this.pC.title) ? 'area' : 'line',
+                typ: ((this.dT.maxLength && this.dT.maxLength < CONFIG.textThreshold + 1) || CONFIG.titleProperties.includes(this.pC.title)) ? 'line' : 'area',
                 handle: opts.myFullName + '.check()',
                 hint: this.pC.description
             });
@@ -72,9 +70,9 @@ class CPropertyToEdit extends CPropertyToShow {
             return str;
         }
         if (this.pC.permissionVector.U) {
-            return '<div class="form-group form-active mt-1" >'
-                + '<div class="attribute-label" >' + LIB.titleOf(this, opts) + '</div>'
-                + '<div class="attribute-value">'
+            return '<div class="row mx-0 my-1 attribute form-active" >'
+                + '<div class="col-3 attribute-label" >' + LIB.titleOf(this, opts) + '</div>'
+                + '<div class="col attribute-value">'
                 + '<div class="btn-group" style="float: right;" >'
                 + '<span class="btn btn-light btn-fileinput">'
                 + '<span>' + i18n.IcoEdit + '</span>'
@@ -90,9 +88,9 @@ class CPropertyToEdit extends CPropertyToShow {
                 + '</div>';
         }
         else {
-            return '<div class="mt-1">'
-                + '<div class="attribute-label" >' + LIB.titleOf(this, opts) + '</div>'
-                + '<div class="attribute-value">' + this.renderImg(opts) + '</div>'
+            return '<div class="row mx-0 my-1 attribute">'
+                + '<div class="col-3 attribute-label" >' + LIB.titleOf(this, opts) + '</div>'
+                + '<div class="col attribute-value">' + this.renderImg(opts) + '</div>'
                 + '</div>';
         }
     }
@@ -154,6 +152,7 @@ class CPropertyToEdit extends CPropertyToShow {
             case XsDataType.Boolean:
                 val = booleanValue(ti).toString();
                 return { class: LIB.makeKey(this.pC.id), values: [val] };
+            case XsDataType.ComplexType:
             default:
                 val = textValue(ti);
                 return { class: LIB.makeKey(this.pC.id), values: (LIB.hasContent(val) ? [val] : []) };
@@ -189,7 +188,7 @@ class CResourceToEdit {
                 + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" > </button>'
                 + '</div>'
                 + '<div class="modal-body" >'
-                + '<div style="max-height:' + (LIB.getHeight('#app') - 220) + 'px; overflow:auto" >'
+                + '<div class="container" style="max-height:' + (LIB.getHeight('#app') - 220) + 'px; overflow:auto" >'
                 + function () {
                     let form = '';
                     self.properties.forEach((p) => { form += p.editField(editOpts); });
@@ -413,8 +412,8 @@ moduleManager.construct({
                                 + '<button id="selRCclose" type="button" class="btn-close" aria-label="Close" > </button>'
                                 + '</div>'
                                 + '<div class="modal-body" >'
-                                + '<div style="max-height:' + (LIB.getHeight('#app') - 220) + 'px; overflow:auto" >'
-                                + makeRadioField(i18n.LblResourceClass, resClasses)
+                                + '<div class="container" style="max-height:' + (LIB.getHeight('#app') - 220) + 'px; overflow:auto" >'
+                                + makeSelectionField(i18n.LblResourceClass, resClasses, { kind: 'radio' })
                                 + '</div>'
                                 + '</div>'
                                 + '<div class="modal-footer" >'

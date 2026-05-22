@@ -60,7 +60,7 @@ moduleManager.construct({
                 chooseResourceToLink();
             }, LIB.stdError);
             self.allResources.length = 0;
-            LIB.iterateNodes(cData.get("hierarchy", selPrj.nodes)
+            LIB.iterateSpecifNodes(cData.get("hierarchy", selPrj.nodes)
                 .filter((h) => {
                 return LIB.typeOf(h.resource, cData) != CONFIG.resClassUnreferencedResources;
             }), (nd) => {
@@ -134,7 +134,7 @@ moduleManager.construct({
                 && LIB.referenceIndexBy(sL, 'object', res) < 0
                 && (candidateMayBeObject(self.selectedStatementClass, res)
                     || candidateMayBeSubject(self.selectedStatementClass, res))) {
-                let ti = cData.instanceTitleOf(res, $.extend({}, opts, { neverEmpty: true }));
+                let ti = cData.instanceTitleOf(res, Object.assign({}, opts, { neverEmpty: true }));
                 if (reTi.test(ti))
                     eligibleRs += '<div id="cand-' + i + '" class="candidates text-black bg-white" onclick="' + myFullName + '.itemClicked(\'' + i + '\')">' + ti + '</div>';
             }

@@ -33,9 +33,9 @@ moduleManager.construct({
     var iFormats = [];
     self.projectName = '';
     self.importFormat = undefined;
-    var showFileSelect, importMode = { id: 'replace' }, myFullName = 'app.' + self.loadAs, urlP, urlOntology = (window.location.href.startsWith('http') || window.location.href.endsWith('.specif.html') ?
+    var showFileSelect, importMode = { id: 'replace' }, myFullName = 'app.' + self.loadAs, urlP, urlOntology = (LIB.useRemotePath() ?
         CONFIG.ontologyURL
-        : '../../../SpecIF/vocabulary/Ontology.specif'), importing = false;
+        : CONFIG.localOntologyURL), importing = false;
     self.clear = function () {
         $('input[type=file]').val('');
         setTextValue(i18n.LblFileName, '');
@@ -67,7 +67,7 @@ moduleManager.construct({
                 desc: 'Specification Integration Facility',
                 label: 'SpecIF',
                 extensions: [".specif", ".specifz", ".specif.zip"],
-                opts: { mediaTypeOf: LIB.attachment2mediaType, doCheck: ['statementClass.subjectClasses', 'statementClass.objectClasses'] },
+                opts: { mediaTypeOf: LIB.attachment2mediaType },
                 help: i18n.MsgImportSpecif
             }, {
                 id: 'archimate',
@@ -75,7 +75,7 @@ moduleManager.construct({
                 desc: 'ArchiMate Open Exchange',
                 label: 'ArchiMate®',
                 extensions: [".xml"],
-                opts: { mediaTypeOf: LIB.attachment2mediaType },
+                opts: { ingest: ["source"], mediaTypeOf: LIB.attachment2mediaType },
                 help: "Experimental: Import an ArchiMate Open Exchange file (*.xml) and add the diagrams (*.png or *.svg) to their respective resources using the 'edit' function."
             }, {
                 id: 'bpmn',
@@ -90,7 +90,8 @@ moduleManager.construct({
                 name: 'ioSysml',
                 desc: 'System Modeling Language',
                 label: 'UML/SysML',
-                extensions: [".mdzip"],
+                extensions: [".mdzip", ".mdzip.bak"],
+                opts: { ingest: ["source"] },
                 help: "Experimental: Import an XMI file from Cameo v19.0."
             }, {
                 id: 'reqif',
@@ -106,29 +107,29 @@ moduleManager.construct({
                 desc: 'MS Excel® or LibreOffice Spreadsheet',
                 label: 'Excel®',
                 extensions: [".xlsx", ".xls", ".csv", ".ods", ".fods"],
-                opts: { dontCheck: ["statement.object"] },
+                opts: { replacePropertiesWithStatements: [CONFIG.propClassVisibleId, CONFIG.propClassTitle] },
                 help: i18n.MsgImportXls
             }];
-        let h = '<div style="max-width:768px; margin-top:1em">'
-            + '<div class="fileSelect" style="display:none;" >'
-            + '<div class="attribute-label" style="vertical-align:top; padding-top:0.2em" >' + i18n.LblOntology + '</div>'
-            + '<div class="attribute-value" >'
-            + '<div id="ontologySelector" style="margin: 0 0 0.4em 0" ></div>'
+        let h = '<div class="container max-width-lg mt-4" >'
+            + '<div class="row attribute fileSelect" style="display:none;" >'
+            + '<div class="col-2 attribute-label" >' + i18n.LblOntology + '</div>'
+            + '<div class="col attribute-value" >'
+            + '<div id="ontologySelector" ></div>'
             + '</div>'
             + '</div>'
-            + '<div class="fileSelect" style="display:none;" >'
-            + '<div class="attribute-label" style="vertical-align:top; font-size:140%; padding-top:0.2em" >' + i18n.LblImport + '</div>'
-            + '<div class="attribute-value" >'
-            + '<div id="formatSelector" class="btn-group" style="margin: 0 0 0.4em 0" ></div>'
-            + '<div id="helpImport" style="margin: 0 0 0.4em 0" ></div>'
-            + '<div id="fileSelectBtn" class="btn btn-light btn-fileinput" style="margin: 0 0 0.8em 0" ></div>'
+            + '<div class="row attribute fileSelect mt-3" style="display:none;" >'
+            + '<div class="col-2 attribute-label" style="font-size:140%; " >' + i18n.LblImport + '</div>'
+            + '<div class="col attribute-value" >'
+            + '<div id="formatSelector" class="btn-group" ></div>'
+            + '<div id="helpImport" class="mt-1" ></div>'
+            + '<div id="fileSelectBtn" class="btn btn-primary btn-fileinput mt-1" ></div>'
             + '</div>'
             + '</div>'
-            + '<form id="formNames" class="form-horizontal" role="form"></form>'
-            + '<div class="fileSelect" style="display:none;" >'
-            + '<div class="attribute-label" ></div>'
-            + '<div class="attribute-value" >'
-            + '<div id="modeSelector" class="btn-group mt-1" style="margin: 0 0 0.4em 0" >'
+            + '<form id="formNames" class="form-horizontal mt-3" role="form"></form>'
+            + '<div class="row attribute fileSelect mt-1" style="display:none;" >'
+            + '<div class="col-2 attribute-label" ></div>'
+            + '<div class="col attribute-value" >'
+            + '<div id="modeSelector" class="btn-group my-1" >'
             + function () {
                 let btns = '';
                 actions.forEach((a) => {
@@ -139,17 +140,17 @@ moduleManager.construct({
             + '</div>'
             + '</div>'
             + '</div>'
-            + '<div>'
-            + '<div class="attribute-label" ></div>'
-            + '<div class="attribute-value" >'
+            + '<div class="row attribute mt-1">'
+            + '<div class="col-2 attribute-label" ></div>'
+            + '<div class="col attribute-value" >'
             + '<div id="progress" class="progress" >'
             + '<div class="progress-bar progress-bar-primary" ></div>'
             + '</div>'
             + '</div>'
             + '</div>'
-            + '<div style="padding-top:2em">'
-            + '<div class="attribute-label" ></div>'
-            + '<div class="attribute-value" >' + i18n.MsgIntro + '</div>'
+            + '<div class="row attribute mt-3">'
+            + '<div class="col-2 attribute-label" ></div>'
+            + '<div class="col attribute-value" >' + i18n.MsgIntro + '</div>'
             + '</div>'
             + '</div>';
         $(self.view).prepend(h);
@@ -183,15 +184,15 @@ moduleManager.construct({
             return uP ? uP[CONFIG.keyOntology] : undefined;
         }
         urlP = opts.urlParams;
-        urlOntology = getOntologyURL(urlP) || urlOntology;
+        urlOntology = getOntologyURL(urlP) ?? urlOntology;
         if (urlP && urlP[CONFIG.keyImport]) {
-            importMode = { id: urlP[CONFIG.keyMode] || 'replace' };
+            importMode = { id: urlP[CONFIG.keyMode] ?? 'replace' };
             self.file.name = urlP[CONFIG.keyImport];
             self.importFormat = getFormat(urlP);
             if (self.importFormat && app[self.importFormat.name]) {
                 app[self.importFormat.name].init(self.importFormat.opts);
                 if (app[self.importFormat.name].verify({ name: urlP[CONFIG.keyImport] })) {
-                    let rF = makeTextField(i18n.LblFileName, self.file.name);
+                    let rF = makeTextField(i18n.LblFileName, self.file.name, { tagCols: 2 });
                     $("#formNames").html(rF);
                     self.projectName = self.file.name.fileName();
                     setImporting(true);
@@ -253,9 +254,9 @@ moduleManager.construct({
         }
         ;
         app[self.importFormat.name].init(self.importFormat.opts);
-        let rF = makeTextField(i18n.LblFileName, '');
+        let rF = makeTextField(i18n.LblFileName, '', { tagCols: 2 });
         if (fId == 'xls')
-            rF += makeTextField(i18n.LblProjectName, self.projectName, { typ: 'line', handle: myFullName + '.enableActions()' });
+            rF += makeTextField(i18n.LblProjectName, self.projectName, { typ: 'line', handle: myFullName + '.enableActions()', tagCols: 2 });
         $('#helpImport').html(self.importFormat.help);
         $("#formNames").html(rF);
         $("#fileSelectBtn").html('<span>' + i18n.BtnFileSelect + '</span>'
@@ -350,7 +351,12 @@ moduleManager.construct({
             self.clear();
             if (urlP)
                 delete urlP[CONFIG.keyImport];
-            moduleManager.show({ view: '#' + (app.title == "check" ? CONFIG.importAny : (urlP && urlP[CONFIG.keyView] ? urlP[CONFIG.keyView] : CONFIG.specifications)), urlParams: urlP });
+            moduleManager.show({
+                view: '#'
+                    + (app.title == "check" ? CONFIG.importAny
+                        : (urlP && urlP[CONFIG.keyView] && urlP[CONFIG.keyView] != CONFIG.importAny ? urlP[CONFIG.keyView] : CONFIG.specifications)),
+                urlParams: urlP
+            });
         }, CONFIG.showTimelag);
     }
     function handleError(xhr) {
@@ -381,8 +387,9 @@ moduleManager.construct({
         }
         function handle(dta, idx) {
             setProgress(importMode.id + ' project', 20);
-            let opts = self.importFormat.opts || {};
-            opts.mode = idx < 1 ? importMode.id : opts.multipleMode || 'update';
+            let opts = self.importFormat.opts ?? {};
+            opts.sourceFileName = self.file.name;
+            opts.mode = idx < 1 ? importMode.id : opts.multipleMode ?? 'update';
             opts.normalizeTerms = true;
             opts.deduplicate =
                 opts.addGlossary =
@@ -418,24 +425,6 @@ moduleManager.construct({
     ;
     function setProgress(msg, perc) {
         $('#progress .progress-bar').css('width', perc + '%').html(msg);
-    }
-    function getOntology(urlO) {
-        return new Promise((resolve, reject) => {
-            LIB.httpGet({
-                url: urlO + "?" + new Date().toISOString(),
-                responseType: 'arraybuffer',
-                withCredentials: false,
-                done: (xhr) => {
-                    let txt = JSON.parse(LIB.ab2str(xhr.response)), ont = new COntology(txt);
-                    if (ont.isValid()) {
-                        resolve(ont);
-                    }
-                    else
-                        reject(new resultMsg(539, "bad file", "text", "Ontology is invalid."));
-                },
-                fail: reject
-            });
-        });
     }
     return self;
 });

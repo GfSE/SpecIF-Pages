@@ -37,7 +37,6 @@ const PigItemType = {
     aPackage: `${CONFIG.pfxNsMeta}aPackage`,
     Ontology: `${CONFIG.pfxNsMeta}Ontology`,
     anOntology: `${CONFIG.pfxNsMeta}anOntology`,
-    Artifact: `${CONFIG.pfxNsSemi}Artifact`,
     Actor: `FMC:Actor`,
     State: `FMC:State`,
     Event: `FMC:Event`,
@@ -72,11 +71,11 @@ const PigProperty = {
     diagram: `${CONFIG.pfxNsSemi}Diagram`,
     notation: `${CONFIG.pfxNsSemi}Notation`
 };
-const DcProperty = {
-    title: `${CONFIG.pfxNsDcmi}title`,
-    description: `${CONFIG.pfxNsDcmi}description`,
+const casProperty = {
+    title: CONFIG.propClassTitle,
+    description: CONFIG.propClassDesc,
     definition: `skos:definition`,
-    type: `${CONFIG.pfxNsDcmi}type`,
+    type: CONFIG.propClassType,
     modified: `${CONFIG.pfxNsDcmi}modified`,
     creator: `${CONFIG.pfxNsDcmi}creator`,
     license: `${CONFIG.pfxNsDcmi}license`
@@ -107,25 +106,20 @@ const ShaclProperty = {
     or: 'sh:or'
 };
 const nsData = 'd:', nsOnto = "o:", sfx_toSrc = "-toSource", sfx_toTrg = "-toTarget", pfx_datatype = 'xs:', pfx_shape = `${CONFIG.pfxNsMeta.slice(0, -1)}Shapes_`, sfx_shape = "_shape", pigOnto = 'https://product-information-graph.org/v0.2/ontology';
-const pigEntities = [
-    [PigItemType.Entity, undefined, 'Entity', 'A CASCaRA meta-model item used for entities (aka resources or artifacts).', [PigProperty.category, PigProperty.icon], []],
-    [PigItemType.Package, PigItemType.Entity, 'Package', 'A CASCaRA meta-model item used for packages comprising entities, relationships and potentially nested packages.', [], []],
-    [PigItemType.Artifact, PigItemType.Entity, 'Artifact', 'The most generic class for all model entities (e.g. requirement, function, system, component, state, event, ...).', [], []],
-    [PigItemType.Actor, PigItemType.Artifact, 'Actor', 'A fundamental model-element class for actors (e.g. users, functions, systems, components, ...).', [], []],
-    [PigItemType.State, PigItemType.Artifact, 'State', 'A fundamental model-element class for states (e.g. system or process states, information, form, color, ...).', [], []],
-    [PigItemType.Event, PigItemType.Artifact, 'Event', 'A fundamental model-element class for events (e.g. environmental or process events, ...).', [], []],
-    [PigItemType.Organizer, PigItemType.Entity, 'Organizer', `A class for organizing model-elements. An example is a list of requirements or a diagram using a certain notation.`, [], []],
+const pigEnumerations = [
+    [PigItemType.Enumeration, undefined, 'Enumeration', 'A CASCaRA meta-model item used for value enumerations.']
+], pigEntities = [
+    [PigItemType.Entity, undefined, 'Entity', 'A CASCaRA meta-model item used for entities (aka resources or artifacts).', [PigProperty.category], []],
+    [PigItemType.Organizer, PigItemType.Entity, 'Organizer', `A CASCaRA meta-model item for organizing model-elements. An example is a list of requirements or a diagram using a certain notation.`, [], []],
+    [PigItemType.Package, PigItemType.Organizer, 'Package', `A subclass of ${PigItemType.Organizer} used for a partial graph selected for exchange or access permissions.`, [], []],
     [PigItemType.Root, PigItemType.Organizer, 'Root', `A subclass of ${PigItemType.Organizer} serving as a root for trees and tables.`, [], [PigProperty.lists]],
     [PigItemType.Tree, PigItemType.Organizer, 'Tree', `A subclass of ${PigItemType.Organizer} for strictly hierarchical data structures referencing entities and relationships.`, [], [PigProperty.lists]],
     [PigItemType.Outline, PigItemType.Tree, 'Outline', `A subclass of ${PigItemType.Tree} comprising all information items of a human-readable document. As usual, the outline is hierarchically organized.`, [], []],
-    [PigItemType.View, PigItemType.Organizer, 'View', `A subclass of ${PigItemType.Organizer} representing a model view (diagram) using a certain notation showing selected model elements.`, [PigProperty.diagram, PigProperty.notation], [PigProperty.shows, PigProperty.depicts]],
-    [PigItemType.Table, PigItemType.Organizer, 'Table', `A subclass of ${PigItemType.Organizer} representing a table showing selected model elements.`, [], [PigProperty.shows]],
-    [PigItemType.Enumeration, undefined, 'Enumeration', 'A CASCaRA meta-model item used for enumerations of values.', [], []]
+    [PigItemType.Table, PigItemType.Organizer, 'Table', `A subclass of ${PigItemType.Organizer} representing a table showing selected model elements.`, [], [PigProperty.shows]]
 ], pigRelationships = [
-    [PigItemType.Relationship, undefined, 'Relationship', 'A CASCaRA meta-model item used for reified relationships (aka predicates).', [PigProperty.category, PigProperty.icon], PigProperty.SourceLink, PigProperty.TargetLink],
+    [PigItemType.Relationship, undefined, 'Relationship', 'A CASCaRA meta-model item used for reified relationships (aka predicates).', [PigProperty.category], PigProperty.SourceLink, PigProperty.TargetLink],
 ], pigProperties = [
     [PigItemType.Property, undefined, [PigItemType.Entity, PigItemType.Relationship], 'xs:anyType', 'Property', 'A CASCaRA meta-model item used for properties (aka attributes).', undefined, undefined, undefined],
-    [PigProperty.icon, PigItemType.Property, [PigItemType.Entity, PigItemType.Relationship], XsDataType.String, 'has icon', 'Specifies an icon for a model element (entity or relationship).', undefined, 0, 1],
     [PigProperty.diagram, PigItemType.Property, [PigItemType.View], XsDataType.String, 'Diagram', 'A diagram illustrating the resource or a link to a diagram.', undefined, 0, undefined],
     [PigProperty.category, PigItemType.Property, [PigItemType.Entity, PigItemType.Relationship], XsDataType.String, 'has category', 'Specifies a category for an element (entity, relationship or organizer).', 32, 0, 1],
     [PigProperty.notation, PigProperty.category, [PigItemType.View], XsDataType.String, 'Notation', 'A reference to a notation defining the syntax and semantics of a diagram.', undefined, 0, 1]
@@ -136,13 +130,13 @@ const pigEntities = [
     [PigProperty.lists, PigProperty.TargetLink, [PigItemType.Root, PigItemType.Tree], [PigItemType.Entity, PigItemType.Relationship, PigItemType.Organizer], 'lists', 'Lists an entity, a relationship or a subordinated organizer.'],
     [PigProperty.shows, PigProperty.TargetLink, [PigItemType.View], [PigItemType.Entity, PigItemType.Relationship], 'shows', 'Shows an entity or a relationship.'],
     [PigProperty.depicts, PigProperty.TargetLink, [PigItemType.View], [PigItemType.Entity], 'depicts', 'Depicts an entity; inverse of uml:ownedDiagram.']
-], pigNativeProperties = [DcProperty.title, DcProperty.description, DcProperty.definition], diagramRels = ['SpecIF:shows', 'uml:ownedDiagram'], hierarchyItems = [CONFIG.resClassFolder, CONFIG.resClassOutline, CONFIG.resClassGlossary], excludeEntities = [PigItemType.Element].concat(pigEntities.map(en => en[0])), excludeRelationships = pigRelationships.map(rel => rel[0]), excludeProperties = pigProperties.concat(pigLinks).map(pr => pr[0]);
-function isEstablishedNs(id) {
-    const establishedNs = ['rdf', 'rdfs', 'owl', 'skos', 'sh', 'xs', 'xsd', CONFIG.pfxNsDcmi.slice(0, -1)];
-    return establishedNs.includes(id.split(':')[0]);
-}
+], pigNativeProperties = [casProperty.title, casProperty.description, casProperty.definition], diagramRels = ['SpecIF:shows', 'uml:ownedDiagram'], hierarchyItems = [CONFIG.resClassFolder, CONFIG.resClassOutline, CONFIG.resClassGlossary], excludeEntities = [PigItemType.Element].concat(pigEntities.map(en => en[0])), excludeRelationships = pigRelationships.map(rel => rel[0]), excludeProperties = pigProperties.concat(pigLinks).map(pr => pr[0]);
 function isPigNative(str) {
     return pigNativeProperties.includes(str);
+}
+function isEstablished(id) {
+    const establishedNs = ['rdf', 'rdfs', 'owl', 'skos', 'sh', 'xs', 'xsd'];
+    return establishedNs.includes(id.split(':')[0]) || isPigNative(id);
 }
 function makeShapeId(id) {
     return id.startsWith(nsOnto) ? id + sfx_shape : pfx_shape + id;
@@ -395,7 +389,7 @@ app.specif2turtle = (specifData, options) => {
             const cleanTag = tag.replace(/[\.]$/, ':');
             if (usedPrefixes.has(cleanTag)) {
                 pfxL += toRdf.prefix(cleanTag, val.url);
-                if (!isEstablishedNs(cleanTag))
+                if (!isEstablished(cleanTag))
                     pfxL += toRdf.prefix(`${pfx_shape}${cleanTag}`, `${pigOnto}/shapes/${cleanTag.slice(0, -1)}#`);
             }
         }
@@ -414,9 +408,9 @@ app.specif2turtle = (specifData, options) => {
             + toRdf.tab1(RdfProperty.comment, description)
             + toRdf.tab1('owl:imports', '<http://www.w3.org/1999/02/22-rdf-syntax-ns#>')
             + toRdf.tab2('<http://www.w3.org/2000/01/rdf-schema#>')
-            + (rights ? (toRdf.tab1(DcProperty.license, '<' + rights.url + '>')) : '')
-            + (createdBy ? (toRdf.tab1(DcProperty.creator, '<mailto:' + createdBy.email + '>')) : '')
-            + toRdf.tab1(DcProperty.modified, createdAt);
+            + (rights ? (toRdf.tab1(casProperty.license, '<' + rights.url + '>')) : '')
+            + (createdBy ? (toRdf.tab1(casProperty.creator, '<mailto:' + createdBy.email + '>')) : '')
+            + toRdf.tab1(casProperty.modified, createdAt);
         return ttlStr;
     }
     ;
@@ -432,16 +426,16 @@ app.specif2turtle = (specifData, options) => {
             return '';
         let ttlStr = toRdf.heading('Data Types with Enumerated Values');
         dTs.forEach(dT => {
-            const dtId = LIB.makeIdWithNamespace(nsOnto, dT.id);
             if (LIB.isArrayWithContent(dT.enumeration)) {
+                const dtId = LIB.makeIdWithNamespace(nsOnto, dT.id);
                 ttlStr += toRdf.newLine()
                     + toRdf.tab0(dtId)
                     + (opts.withOwlClasses ? toRdf.tab1(RdfProperty.type, 'owl:Class') : '')
                     + toRdf.tab1(RdfProperty.subClassOf, PigItemType.Enumeration)
                     + toRdf.tab1(RdfProperty.label, dT.title)
-                    + toRdf.tab1(DcProperty.definition, dT.description)
-                    + toRdf.tab1(DcProperty.modified, dT.changedAt)
-                    + toRdf.tab1(DcProperty.creator, dT.changedBy)
+                    + toRdf.tab1(casProperty.definition, dT.description)
+                    + toRdf.tab1(casProperty.modified, dT.changedAt)
+                    + toRdf.tab1(casProperty.creator, dT.changedBy)
                     + toRdf.tab1(ShaclProperty.datatype, dT.type)
                     + toRdf.tab1('owl:oneOf', toRdf.makeRdflList(nsOnto, dT.enumeration.map(itm => itm.id)));
                 dT.enumeration.forEach(item => {
@@ -462,7 +456,7 @@ app.specif2turtle = (specifData, options) => {
         let ttlStr = toRdf.heading('Ontology - Property Classes');
         pCs.forEach(pC => {
             const dT = LIB.itemByKey(specifData.dataTypes, pC.dataType), pcId = LIB.makeIdWithNamespace(nsOnto, pC.id);
-            if (excludeProperties.includes(pcId) || isEstablishedNs(pcId))
+            if (excludeProperties.includes(pcId) || isEstablished(pcId))
                 ttlStr += toRdf.newLine()
                     + toRdf.newLine('# Skipping implicit property: ' + pcId);
             else {
@@ -474,10 +468,10 @@ app.specif2turtle = (specifData, options) => {
                         : ((opts.withOwlClasses ? toRdf.tab1(RdfProperty.type, "owl:DatatypeProperty") : '')
                             + toRdf.tab1(RdfProperty.subPropertyOf, `${CONFIG.pfxNsMeta}Property`)))
                     + toRdf.tab1(RdfProperty.label, pC.title)
-                    + toRdf.tab1(DcProperty.definition, pC.description)
+                    + toRdf.tab1(casProperty.definition, pC.description)
                     + toRdf.tab1(RdfProperty.range, dT.enumeration ? LIB.makeIdWithNamespace(nsOnto, dT.id) : undefined);
-                +toRdf.tab1(DcProperty.modified, pC.changedAt)
-                    + toRdf.tab1(DcProperty.creator, pC.changedBy);
+                +toRdf.tab1(casProperty.modified, pC.changedAt)
+                    + toRdf.tab1(casProperty.creator, pC.changedBy);
                 ttlStr += toRdf.newLine()
                     + toRdf.tab0(makeShapeId(pcId))
                     + toRdf.tab1(RdfProperty.type, ShaclProperty.propertyShape)
@@ -518,20 +512,20 @@ app.specif2turtle = (specifData, options) => {
             return '';
         let ttlStr = toRdf.heading('Ontology - Entity Classes');
         rCL.forEach(rC => {
-            if (excludeEntities.includes(rC.id) || isEstablishedNs(rC.id)) {
+            if (excludeEntities.includes(rC.id) || isEstablished(rC.id)) {
                 return;
             }
             ;
-            const exC = LIB.itemByKey(extendedClasses, LIB.keyOf(rC)), entId = LIB.makeIdWithNamespace(nsOnto, rC.id), ity = app.ontology.organizerClasses.includes(entId) ? PigItemType.Organizer : PigItemType.Artifact;
+            const exC = LIB.itemByKey(extendedClasses, LIB.keyOf(rC)), entId = LIB.makeIdWithNamespace(nsOnto, rC.id), ity = app.ontology.organizerClasses.includes(entId) ? PigItemType.Organizer : PigItemType.Entity;
             ttlStr += toRdf.newLine()
                 + toRdf.tab0(entId)
                 + (opts.withOwlClasses ? toRdf.tab1(RdfProperty.type, 'owl:Class') : '')
                 + toRdf.tab1(RdfProperty.subClassOf, (rC.extends ? LIB.makeIdWithNamespace(nsOnto, rC.extends.id) : ity))
                 + toRdf.tab1(RdfProperty.label, rC.title)
-                + toRdf.tab1(DcProperty.definition, rC.description)
+                + toRdf.tab1(casProperty.definition, rC.description)
                 + toRdf.tab1(PigProperty.icon, rC.icon);
-            +toRdf.tab1(DcProperty.modified, rC.changedAt)
-                + toRdf.tab1(DcProperty.creator, rC.changedBy);
+            +toRdf.tab1(casProperty.modified, rC.changedAt)
+                + toRdf.tab1(casProperty.creator, rC.changedBy);
             ttlStr += makeClassShape(exC);
         });
         return ttlStr;
@@ -542,7 +536,7 @@ app.specif2turtle = (specifData, options) => {
             return '';
         let ttlStr = toRdf.heading('Ontology - Relationship Classes');
         sCL.forEach(sC => {
-            if (excludeRelationships.includes(sC.id) || isEstablishedNs(sC.id) || diagramRels.includes(sC.id)) {
+            if (excludeRelationships.includes(sC.id) || isEstablished(sC.id) || diagramRels.includes(sC.id)) {
                 return;
             }
             const exC = LIB.itemByKey(extendedClasses, LIB.keyOf(sC)), relId = LIB.makeIdWithNamespace(nsOnto, sC.id);
@@ -551,10 +545,10 @@ app.specif2turtle = (specifData, options) => {
                 + (opts.withOwlClasses ? toRdf.tab1(RdfProperty.type, 'owl:Class') : '')
                 + toRdf.tab1(RdfProperty.subClassOf, (sC.extends ? LIB.makeIdWithNamespace(nsOnto, sC.extends.id) : PigItemType.Relationship))
                 + toRdf.tab1(RdfProperty.label, sC.title)
-                + toRdf.tab1(DcProperty.definition, sC.description)
+                + toRdf.tab1(casProperty.definition, sC.description)
                 + toRdf.tab1(PigProperty.icon, sC.icon)
-                + toRdf.tab1(DcProperty.modified, sC.changedAt)
-                + toRdf.tab1(DcProperty.creator, sC.changedBy)
+                + toRdf.tab1(casProperty.modified, sC.changedAt)
+                + toRdf.tab1(casProperty.creator, sC.changedBy)
                 + toRdf.newLine()
                 + toRdf.tab0(relId + sfx_toSrc)
                 + toRdf.tab1(RdfProperty.subPropertyOf, PigProperty.SourceLink)
@@ -618,8 +612,8 @@ app.specif2turtle = (specifData, options) => {
             + xProperties(r)
             + toRdf.tab1(PigProperty.revision, r.revision)
             + toRdf.tab1(PigProperty.priorRevision, r.replaces)
-            + toRdf.tab1(DcProperty.modified, r.changedAt ?? date)
-            + toRdf.tab1(DcProperty.creator, r.changedBy);
+            + toRdf.tab1(casProperty.modified, r.changedAt ?? date)
+            + toRdf.tab1(casProperty.creator, r.changedBy);
     }
     function xResources(rL) {
         if (LIB.isArrayWithContent(rL)) {
@@ -672,8 +666,8 @@ app.specif2turtle = (specifData, options) => {
                             + toRdf.tab1(sCId + sfx_toSrc, nsData + s.subject.id)
                             + toRdf.tab1(sCId + sfx_toTrg, nsData + s.object.id)
                             + xProperties(s)
-                            + toRdf.tab1(DcProperty.modified, s.changedAt ?? date)
-                            + toRdf.tab1(DcProperty.creator, s.changedBy);
+                            + toRdf.tab1(casProperty.modified, s.changedAt ?? date)
+                            + toRdf.tab1(casProperty.creator, s.changedBy);
                 }
                 ;
             });
@@ -689,7 +683,7 @@ app.specif2turtle = (specifData, options) => {
                 + toRdf.newLine()
                 + toRdf.tab0(nsData + 'HierarchyRoot' + '-' + specifData.id)
                 + toRdf.tab1(RdfProperty.type, PigItemType.Root)
-                + toRdf.tab1(DcProperty.modified, date)
+                + toRdf.tab1(casProperty.modified, date)
                 + toRdf.tab1(RdfProperty.label, 'Hierarchy Root')
                 + toRdf.tab1(RdfProperty.comment, '... anchoring all hierarchies of this graph (package)');
             ttlStr += toRdf.tab1(PigProperty.lists, toRdf.makeRdflList(nsData, nodes.map(nd => nd.resource.id)));
@@ -718,6 +712,17 @@ app.specif2turtle = (specifData, options) => {
     }
     function declarePigClasses() {
         let ttlStr = toRdf.heading('CASCaRA Metamodel and Semantic Infrastructure');
+        pigEnumerations.forEach(c => {
+            ttlStr += toRdf.newLine()
+                + toRdf.tab0(c[0])
+                + toRdf.tab1(RdfProperty.type, 'owl:Class')
+                + (c[1] ? toRdf.tab1(RdfProperty.subClassOf, c[1]) : '')
+                + toRdf.tab1(RdfProperty.label, c[2])
+                + toRdf.tab1(casProperty.definition, c[3])
+                + toRdf.newLine()
+                + toRdf.tab0(pfx_shape + c[0])
+                + toRdf.tab1(RdfProperty.type, ShaclProperty.nodeShape);
+        });
         pigEntities.forEach(c => {
             let prpL = [RdfProperty.label, RdfProperty.comment].concat(c[4], c[5]);
             ttlStr += toRdf.newLine()
@@ -725,7 +730,7 @@ app.specif2turtle = (specifData, options) => {
                 + toRdf.tab1(RdfProperty.type, 'owl:Class')
                 + (c[1] ? toRdf.tab1(RdfProperty.subClassOf, c[1]) : '')
                 + toRdf.tab1(RdfProperty.label, c[2])
-                + toRdf.tab1(DcProperty.definition, c[3])
+                + toRdf.tab1(casProperty.definition, c[3])
                 + toRdf.newLine()
                 + toRdf.tab0(pfx_shape + c[0])
                 + toRdf.tab1(RdfProperty.type, ShaclProperty.nodeShape)
@@ -739,7 +744,7 @@ app.specif2turtle = (specifData, options) => {
                 + toRdf.tab1(RdfProperty.type, 'owl:Class')
                 + (c[1] ? toRdf.tab1(RdfProperty.subClassOf, c[1]) : '')
                 + toRdf.tab1(RdfProperty.label, c[2])
-                + toRdf.tab1(DcProperty.definition, c[3])
+                + toRdf.tab1(casProperty.definition, c[3])
                 + toRdf.newLine()
                 + toRdf.tab0(pfx_shape + c[0])
                 + toRdf.tab1(RdfProperty.type, ShaclProperty.nodeShape)
@@ -757,7 +762,7 @@ app.specif2turtle = (specifData, options) => {
                     + (c[1] ? toRdf.tab1(RdfProperty.subPropertyOf, c[1]) : '')
                     + toRdf.tab1(RdfProperty.range, toRdf.makeOwlUnion(nsOnto, c[3]))
                     + toRdf.tab1(RdfProperty.label, c[4])
-                    + toRdf.tab1(DcProperty.definition, c[5]);
+                    + toRdf.tab1(casProperty.definition, c[5]);
                 if (c[3] != undefined) {
                     ttlStr += toRdf.newLine()
                         + toRdf.tab0(pfx_shape + c[0])

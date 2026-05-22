@@ -1,10 +1,10 @@
 "use strict";
 const CONFIG = {};
-CONFIG.specifVersion = "1.2";
-CONFIG.appVersion = CONFIG.specifVersion + ".a.38";
+CONFIG.specifVersion = "1.3";
+CONFIG.appVersion = CONFIG.specifVersion + ".d";
 CONFIG.imgURL = './assets/images';
 CONFIG.remotePath = 'https://specif.de/v' + CONFIG.specifVersion + '/';
-CONFIG.localPath = '../../../SpecIF/Pages/v' + CONFIG.specifVersion + '/';
+CONFIG.localPath = '../../../GfSE/SpecIF-Pages/v' + CONFIG.specifVersion + '/';
 CONFIG.ontologyURL = CONFIG.remotePath + 'Ontology.specif';
 CONFIG.localOntologyURL = CONFIG.localPath + 'Ontology.specif';
 CONFIG.QuickStartGuideDe =
@@ -66,24 +66,28 @@ CONFIG.files = 'files';
 CONFIG.comments = 'comments';
 CONFIG.reports = 'reports';
 CONFIG.showEmptyProperties = false;
+CONFIG.pfxNsMeta = 'cas:';
+CONFIG.pfxNsSemi = 'cas:';
+CONFIG.pfxNsDcmi = 'dcterms:';
+CONFIG.postfixDT = '-Enumeration';
 CONFIG.propClassVisibleId =
-    CONFIG.propClassId = "dcterms:identifier";
+    CONFIG.propClassId = `${CONFIG.pfxNsDcmi}identifier`;
 CONFIG.propClassTerm = "SpecIF:Term";
-CONFIG.propClassTitle = "dcterms:title";
-CONFIG.propClassDesc = "dcterms:description";
-CONFIG.propClassType = "dcterms:type";
+CONFIG.propClassTitle = `${CONFIG.pfxNsDcmi}title`;
+CONFIG.propClassDesc = `${CONFIG.pfxNsDcmi}description`;
+CONFIG.propClassType = `${CONFIG.pfxNsDcmi}type`;
 CONFIG.propClassLifecycleStatus = 'SpecIF:LifecycleStatus';
 CONFIG.propClassDomain = "SpecIF:Domain";
-CONFIG.propClassDiagram = 'SpecIF:Diagram';
+CONFIG.propClassDiagrams = ['SpecIF:Diagram', `${CONFIG.pfxNsMeta}Diagram`];
 CONFIG.propClassLocalTerm = "SpecIF:LocalTerm";
 CONFIG.resClassResource = "SpecIF:Resource";
 CONFIG.resClassStatement = "SpecIF:Statement";
 CONFIG.resClassView = "SpecIF:View";
 CONFIG.resClassXlsRow = 'XLS:Resource';
-CONFIG.resClassOrganizer = 'pig:Organizer';
+CONFIG.resClassOrganizerClass = `${CONFIG.pfxNsSemi}Organizer`;
 CONFIG.resClassUnreferencedResources = "SpecIF:UnreferencedResources";
 CONFIG.resClassHierarchyRoot = 'SpecIF:HierarchyRoot';
-CONFIG.resClassOutline = 'SpecIF:Outline';
+CONFIG.resClassOutline = `${CONFIG.pfxNsSemi}Outline`;
 CONFIG.resClassBoM = 'SpecIF:BillOfMaterials';
 CONFIG.resClassGlossary = 'SpecIF:Glossary';
 CONFIG.resClassOntology = "W3C:Ontology";
@@ -109,6 +113,7 @@ CONFIG.prefixRC = "RC-";
 CONFIG.prefixSC = "SC-";
 CONFIG.prefixHC = "HC-";
 CONFIG.prefixHR = "HR-";
+CONFIG.prefixO = "O-";
 CONFIG.prefixR = "R-";
 CONFIG.prefixS = "S-";
 CONFIG.prefixH = "H-";
@@ -126,9 +131,8 @@ CONFIG.titleProperties = [
 ];
 CONFIG.descProperties = [
     CONFIG.propClassDesc,
-    CONFIG.propClassDiagram,
     "dc:description"
-];
+].concat(CONFIG.propClassDiagrams);
 CONFIG.commentProperties = [
     "ReqIF-WF.CustomerComment",
     "ReqIF-WF.SupplierComment",
@@ -205,10 +209,11 @@ CONFIG.nativeProperties = new Map([
     ["SpecIF:createdBy", { name: "createdBy", type: "xs:string", check: function () { return true; } }],
     ["SpecIF:changedBy", { name: "changedBy", type: "xs:string", check: function () { return true; } }]
 ]);
-CONFIG.valuesTrue = ['true', 'yes', 'wahr', 'ja', 'vrai', 'oui', '1', 'True'];
-CONFIG.valuesFalse = ['false', 'no', 'falsch', 'nein', 'faux', 'non', '0', 'False'];
+CONFIG.valuesTrue = ['true', 'yes', 'wahr', 'ja', 'vrai', 'oui', '1'];
+CONFIG.valuesFalse = ['false', 'no', 'falsch', 'nein', 'faux', 'non', '0'];
 const RE = {};
-RE.Id = /^[_a-zA-Z]{1}[_a-zA-Z\d.-]*$/;
+RE.ReqifId = /^[_a-zA-Z]{1}[_a-zA-Z\d.-]*$/;
+RE.SpecifId = /^[_a-zA-Z]{1}[_a-zA-Z\d.:#\/-]*$/;
 RE.Email = /^[A-Z\d._%+-]+@[A-Z\d.-]+\.[A-Z]{2,4}$/i;
 RE.URI = /(^|\s|>)((https?:\/\/|www\.)([^\s\/.$?#=]+\.)*([^\s\/.$?#=]+\.[\w]{2,4})((?:\/[^\s#?\/]*?){0,9})(\?[^\s#?]+?)?(#[^\s#]*?)?)(\s|,|:|<|\.\s|\.?$)/gm;
 RE.IsoDateTime = /^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2]\d|30|31)(?:T([0-1]\d|2[0-4]):([0-5]\d):([0-5]\d(?:\.\d{1,3})?)(\+(0\d|11|12):([0-5]\d)|-(0\d|11|12):([0-5]\d)|Z)?)?$/;
@@ -229,7 +234,9 @@ RE.tagSingleObject = new RegExp(tagSO, 'g');
 RE.tagNestedObjects = new RegExp(tagNO, 'g');
 RE.inBracketsAtEnd = /{(\S[^}]*?\S)}$/;
 RE.withoutBracketsAtEnd = /^\s*([^{]+[^{\s])\s*(?:\s{1}{\S.*?\S})?$/;
-RE.contentInQuotes = /"(\S[^"]*?\S)"|'(\S[^']*?\S)'/i;
+RE.contentInQuotes = /"(\S[^"]+?\S)"|'(\S[^']+?\S)'/i;
+RE.contentInRoundBrackets = /^\(([\S\s]+?)\)$/i;
+RE.contentInSquareBrackets = /^\[([\S\s]+?)\]$/i;
 RE.isolatePrefix = /^([A-Z]{1,2}-)?(\S+)/;
 RE.isolateNamespace = /^([A-Z]+(?:\.|:))(\S+)/i;
 const tagStr = "(<\\/?)([a-z]{1,10}(?: [^<>]+)?\\/?>)";
@@ -238,7 +245,8 @@ RE.innerTag = new RegExp("([\\s\\S]*?)" + tagStr, 'g');
 const tagsHtml = "(p|div|object|img|a|br|b|i|em|span|ul|ol|li|table|thead|tbody|tfoot|th|td)";
 RE.escapedHtmlTag = new RegExp("&(?:lt|#60);(\\/?)" + tagsHtml + "(.*?\\/?)&(?:gt|#62);", "g");
 RE.innerHtmlTag = new RegExp("([\\s\\S]*?)(<\\/?)" + tagsHtml + "((?: [^<>]+)?\\/?>)", 'g');
-RE.Namespace = /^([\w-]+)[.:](\w)/;
+RE.Namespace = /^([\w-]+)[.:]([\w\.-]*)$/;
+RE.NamespaceRDF = /^([\w-]+):([\w\.-]*)$/;
 RE.vocabularyTerm = /^[\w-]+(?:\:|\.)[\w\.:-]+$/;
 RE.splitVocabularyTerm = /^([\w-]+:|[\w-]+\.)?([\w\.:-]+)$/;
 RE.AmpersandPlus = new RegExp('&(.{0,8})', 'g');

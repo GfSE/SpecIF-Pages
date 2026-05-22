@@ -167,7 +167,7 @@ class CPropertyToShow {
                     f1.renderDownloadLink('<div class="' + opts.imgClass + ' ' + tagId(u2) + '"'
                         + makeStyle(w2, h2)
                         + '></div>', opts);
-                    f2.renderImage($.extend({}, opts, { timelag: opts.timelag * 1.2 }));
+                    f2.renderImage(Object.assign({}, opts, { timelag: opts.timelag * 1.2 }));
                 }
                 else {
                     repStrings.push('<span class="' + tagId(u1) + '"></span>');
@@ -321,9 +321,9 @@ class CResourceToShow {
     }
     renderAttr(lbl, val, opts) {
         let cl = opts && opts.condensed ? "attribute-condensed" : "attribute";
-        return '<div class="' + cl + '">'
-            + (lbl ? '<div class="attribute-label" >' + lbl + '</div><div class="attribute-value" >'
-                : '<div class="attribute-wide" >')
+        return '<div class="row ' + cl + '">'
+            + (lbl ? '<div class="col-3 attribute-label" >' + lbl + '</div><div class="col-9 attribute-value" >'
+                : '<div class="col-12" >')
             + val
             + '</div>'
             + '</div>';
@@ -370,7 +370,7 @@ class CResourceToShow {
         });
         rO += '</div>'
             + '<div class="col-xl">';
-        rO += this.renderAttr(app.ontology.localize('SpecIF:Resource', opts), LIB.titleOf(this.rC, opts), { condensed: true });
+        rO += this.renderAttr(app.ontology.localize(CONFIG.resClassResource, opts), LIB.titleOf(this.rC, opts), { condensed: true });
         this.other.forEach((prp) => {
             if (prp.isVisible(opts)) {
                 rO += this.renderAttr(LIB.titleOf(prp, opts), prp.get(opts), { condensed: true });
@@ -660,9 +660,9 @@ class CFileWithContent {
 moduleManager.construct({
     name: CONFIG.specifications
 }, (self) => {
-    let myName = self.loadAs, myFullName = 'app.' + myName;
+    const myName = self.loadAs, myFullName = 'app.' + myName;
     self.selectedView = () => {
-        return self.ViewControl.selected.view.substring(1);
+        return self.viewControl.selected.view.substring(1);
     };
     self.emptyTab = (tab) => {
         app.busy.reset();
@@ -670,18 +670,26 @@ moduleManager.construct({
     };
     self.init = () => {
         self.clear();
-        let h = '<div id="specLeft" class="paneLeft" style="position:relative">'
-            + '<div id="navBtns" class="btn-group-vertical btn-group-sm" role="group" style="position:absolute;top:4px;right:12px;z-index:900">'
+        let h = '<div id="specContent" class="container-fluid"><div class="row">'
+            + '<div id="specLeft" class="col-lg-3 background-select" style="position:relative">'
+            + '<div id="navBtns" class="btn-group-vertical btn-group-sm" role="group" style="position:absolute;top:1em;right:1.2em;z-index:900">'
             + '<button class="btn btn-light" onclick="' + myFullName + '.tree.moveUp()" data-toggle="popover" title="' + i18n.LblPrevious + '" >' + i18n.IcoPrevious + '</button>'
             + '<button class="btn btn-light" onclick="' + myFullName + '.tree.moveDown()" data-toggle="popover" title="' + i18n.LblNext + '" >' + i18n.IcoNext + '</button>'
             + '</div>'
             + '<div id="hierarchy" class="pane-tree" ></div>'
             + '<div id="details" class="pane-details" ></div>'
-            + '</div>';
-        if (self.selector)
-            $(self.selector).after(h);
-        else
-            $(self.view).prepend(h);
+            + '</div>'
+            + '</div></div>';
+        $(self.selector).after(h);
+        $('#specLeft').after($('#' + CONFIG.objectList).addClass('col-lg'), $('#' + CONFIG.relations).addClass('col-lg'));
+        self.showLeft = new State({
+            showWhenSet: ['#specLeft'],
+            hideWhenSet: []
+        });
+        self.showTree = new State({
+            showWhenSet: ['#hierarchy', '#navBtns'],
+            hideWhenSet: ['#details']
+        });
         self.tree = new Tree({
             loc: '#hierarchy',
             dragAndDrop: app.title != i18n.LblReader,
@@ -741,14 +749,6 @@ moduleManager.construct({
                 }
             }
         });
-        self.showLeft = new State({
-            showWhenSet: ['#specLeft'],
-            hideWhenSet: []
-        });
-        self.showTree = new State({
-            showWhenSet: ['#hierarchy', '#navBtns'],
-            hideWhenSet: ['#details']
-        });
         refreshReqCnt = 0;
         return true;
     };
@@ -773,7 +773,7 @@ moduleManager.construct({
         return;
         function toJqTreeWithoutRoot(iE) {
             let r = LIB.itemByKey(self.cData.resources, iE.resource), ty = LIB.valueByTitle(r, CONFIG.propClassType, self.cData);
-            if (ty == CONFIG.hierarchyRoot)
+            if ([CONFIG.resClassHierarchyRoot, CONFIG.reqifHierarchyRoot].includes(ty))
                 return LIB.forAll(iE.nodes, toJqTree);
             return toJqTree(iE);
         }
@@ -833,7 +833,7 @@ moduleManager.construct({
         }, CONFIG.noMultipleRefreshWithin);
     };
     self.doRefresh = (parms) => {
-        self.ViewControl.selected.show(parms);
+        self.viewControl.selected.show(parms);
     };
     self.reworkTree = () => {
         self.selPrj.createFolderWithGlossary({ addGlossary: true })
@@ -853,6 +853,7 @@ moduleManager.construct({
         if ([CONFIG.objectRevisions, CONFIG.comments].includes(self.selectedView()))
             return;
         if (self.tree.selectedNode.ref != rId) {
+            self.showTree.set();
             self.tree.selectNodeByRef(LIB.makeKey(rId));
             document.getElementById(CONFIG.objectList).scrollTop = 0;
             self.tree.openNode();
@@ -866,7 +867,8 @@ moduleManager.construct({
 moduleManager.construct({
     view: '#' + CONFIG.objectList
 }, (self) => {
-    var myName = self.loadAs, myFullName = 'app.' + myName, selPrj, selRes, modalDelNode;
+    const myName = self.loadAs, myFullName = 'app.' + myName;
+    var selPrj, selRes, modalDelNode;
     self.init = () => {
         self.resCreClasses = [];
         self.resCre = false;
@@ -891,7 +893,7 @@ moduleManager.construct({
         if (!self.parent.tree.selectedNode)
             self.parent.tree.selectFirstNode();
         var nL;
-        getPermissionsPrj();
+        getPermissionsRes();
         getNextResources()
             .then(renderNextResources, (err) => {
             if (err.status == 744) {
@@ -937,7 +939,7 @@ moduleManager.construct({
             app.busy.reset();
         }
         function actionBtns() {
-            var rB = '<div class="btn-group" role="group" style="position:absolute;top:4px;right:4px;z-index:900">';
+            var rB = '<div class="btn-group" role="group" style="position:absolute;top:1em;right:1em;z-index:900">';
             if (self.resCre && (!selRes || selRes.isUserInstantiated()))
                 rB += '<button class="btn btn-success" onclick="' + myFullName + '.editResource(\'create\')" '
                     + 'data-toggle="popover" title="' + i18n.LblAddObject + '" >' + i18n.IcoAdd + '</button>';
@@ -964,7 +966,7 @@ moduleManager.construct({
             return rB + '</div>';
         }
         ;
-        function getPermissionsPrj() {
+        function getPermissionsRes() {
             if (app.title != i18n.LblReader) {
                 self.resCreClasses.length = 0;
                 selPrj.cache.get('resourceClass', selPrj.resourceClasses)
@@ -1037,9 +1039,11 @@ moduleManager.construct({
 moduleManager.construct({
     view: '#' + CONFIG.relations
 }, (self) => {
-    var myName = self.loadAs, myFullName = 'app.' + myName, selPrj, cacheData, selRes, net, modeStaDel = false;
+    const myName = self.loadAs, myFullName = 'app.' + myName;
+    var selPrj, cacheData, selRes, net, modeStaDel = false;
     self.staCreClasses = { subjectClasses: [], objectClasses: [] };
     self.staCre = false;
+    self.staDelClasses = [];
     self.staDel = false;
     self.init = () => {
         return true;
@@ -1083,7 +1087,7 @@ moduleManager.construct({
             .then((rResL) => {
             rResL.forEach((r) => { cacheMinRes(net, r); });
             selRes = LIB.itemByKey(rResL, nd.ref);
-            getPermissions(selRes);
+            getPermissionsSta(selRes);
             return getMentionsRels(selRes, opts);
         })
             .then((stL) => {
@@ -1175,35 +1179,53 @@ moduleManager.construct({
     function linkBtns() {
         if (!selRes)
             return '';
-        var rB = '<div id="linkBtns" class="btn-group" role="group" style="position:absolute;top:4px;right:4px;z-index:900">';
+        var rB = '<div id="linkBtns" class="btn-group" role="group" style="position:absolute;top:1em;right:1em;z-index:900">';
         if (modeStaDel)
-            return rB + '<button class="btn btn-light" onclick="' + myFullName + '.toggleModeStaDel()" >' + i18n.BtnCancel + '</button></div>';
-        if (app.title != i18n.LblReader && self.staCre)
+            return rB + '<button class="btn btn-light" onclick="' + myFullName + '.toggleModeStaDel()" >' + i18n.BtnTerminate + '</button></div>';
+        if (self.staCre)
             rB += '<button class="btn btn-success" onclick="' + myFullName + '.linkResource()" '
                 + 'data-toggle="popover" title="' + i18n.LblAddRelation + '" >' + i18n.IcoAdd + '</button>';
         else
-            rB += '<button disabled class="btn btn-success" >' + i18n.IcoAdd + '</button>';
-        if (app.title != i18n.LblReader && net.statements.length > 0)
+            rB += '<button disabled class="btn btn-light" >' + i18n.IcoAdd + '</button>';
+        if (self.staDel && net.statements.length > 0)
             rB += '<button class="btn btn-danger ' + (modeStaDel ? 'active' : '') + '" onclick="' + myFullName + '.toggleModeStaDel()" '
                 + 'data-toggle="popover" title="' + i18n.LblDeleteRelation + '" >' + i18n.IcoDelete + '</button>';
         else
-            rB += '<button disabled class="btn btn-danger" >' + i18n.IcoDelete + '</button>';
+            rB += '<button disabled class="btn btn-light" >' + i18n.IcoDelete + '</button>';
         return rB + '</div>';
     }
-    function getPermissions(res) {
+    function getPermissionsSta(res) {
         if (app.title != i18n.LblReader && res) {
             self.staCreClasses.subjectClasses.length = 0;
             self.staCreClasses.objectClasses.length = 0;
-            selPrj.cache.statementClasses.forEach((sC) => {
+            selPrj.cache.get('statementClass', selPrj.statementClasses)
+                .forEach((sC) => {
+                let iPrm = LIB.itemBy(selPrj.myPermissions, 'item', sC.id);
+                if (iPrm)
+                    sC.permissionVector = iPrm.permissionVector;
+                else {
+                    iPrm = LIB.itemBy(selPrj.myPermissions, 'item', selPrj.id);
+                    if (iPrm)
+                        sC.permissionVector = iPrm.permissionVector;
+                    else
+                        sC.permissionVector = noPermission;
+                }
+                ;
                 if (!sC.instantiation || sC.instantiation.includes(SpecifInstantiation.User)) {
-                    if (!sC.subjectClasses || LIB.indexByKey(sC.subjectClasses, res['class']) > -1)
-                        self.staCreClasses.subjectClasses.push(LIB.keyOf(sC));
-                    if (!sC.objectClasses || LIB.indexByKey(sC.objectClasses, res['class']) > -1)
-                        self.staCreClasses.objectClasses.push(LIB.keyOf(sC));
+                    if (sC.permissionVector.C) {
+                        if (!sC.subjectClasses || LIB.indexByKey(sC.subjectClasses, res['class']) > -1)
+                            self.staCreClasses.subjectClasses.push(LIB.keyOf(sC));
+                        if (!sC.objectClasses || LIB.indexByKey(sC.objectClasses, res['class']) > -1)
+                            self.staCreClasses.objectClasses.push(LIB.keyOf(sC));
+                    }
+                    ;
+                    if (sC.permissionVector.D)
+                        self.staDelClasses.push(sC.id);
                 }
                 ;
             });
             self.staCre = self.staCreClasses.subjectClasses.length > 0 || self.staCreClasses.objectClasses.length > 0;
+            self.staDel = self.staDelClasses.length > 0;
         }
     }
     function renderStatements(net) {
@@ -1220,11 +1242,11 @@ moduleManager.construct({
                 if (typeof (evt.target.resource) == 'string')
                     app[myName].relatedItemClicked(evt.target.resource, evt.target.statement);
             },
-            focusColor: CONFIG.focusColor,
-            nodeColor: modeStaDel ? '#ef9a9a' : '#afcbef'
+            nodeColorFocus: '#3B71CA',
+            nodeColor: modeStaDel ? '#f8d7da' : '#bbd2f0'
         });
         net.show(graphOptions);
-        $(self.view).prepend('<div style="position:absolute;left:4px;z-index:900">'
+        $(self.view).prepend('<div style="position:absolute;left:1em;z-index:900">'
             + (modeStaDel ? '<span class="notice-danger" >' + i18n.MsgClickToDeleteRel
                 : '<span class="notice-default" >' + i18n.MsgClickToNavigate)
             + '</span></div>');

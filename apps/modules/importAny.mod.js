@@ -365,7 +365,7 @@ moduleManager.construct({
         self.show();
     }
     function noOntologyFound(xhr) {
-        handleError(new resultMsg(xhr.status == 0 ? 404 : xhr.status, xhr.statusText, "text", "Ontology not found"));
+        handleError(new resultMsg({ status: xhr.status == 0 ? 404 : xhr.status, statusText: xhr.statusText, responseType: "text", response: "Ontology not found" }));
     }
     function handleResult(data) {
         var resQ = [], resIdx = 0;

@@ -22,7 +22,7 @@ moduleManager.construct({
     name: 'ioReqif'
 }, (self) => {
     "use strict";
-    let mime, zipped, opts, errNoOptions = new resultMsg(896, 'No options or no mediaTypes defined.'), errNoReqifFile = new resultMsg(897, 'No ReqIF file found in the reqifz container.'), errInvalidXML = new resultMsg(898, 'ReqIF data is not valid XML.');
+    let mime, zipped, opts, errNoOptions = new resultMsg({ status: 896, statusText: 'No options or no mediaTypes defined.' }), errNoReqifFile = new resultMsg({ status: 897, statusText: 'No ReqIF file found in the reqifz container.' }), errInvalidXML = new resultMsg({ status: 898, statusText: 'ReqIF data is not valid XML.' });
     self.init = (options) => {
         mime = undefined;
         opts = options;

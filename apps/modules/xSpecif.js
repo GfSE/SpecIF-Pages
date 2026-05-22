@@ -88,10 +88,10 @@ class CSpecIF {
             return typeof (spD.id) == 'string' && spD.id.length > 0;
         return false;
     }
-    isOntology(specifData) {
-        return (specifData.id.includes("Ontology")
-            && Array.isArray(specifData.title) && specifData.title[0] && specifData.title[0]['text']
-            && specifData.title[0]['text'].includes("Ontology"));
+    isOntology(spD) {
+        return (spD.id.includes("Ontology")
+            && Array.isArray(spD.title) && spD.title[0] && spD.title[0]['text']
+            && spD.title[0]['text'].includes("Ontology"));
     }
     ;
     set(spD, opts) {
@@ -113,7 +113,7 @@ class CSpecIF {
                     reject(msg);
             }
             else {
-                msg = new resultMsg(999, "SpecIF input is not valid or version is not supported.").warn();
+                msg = new resultMsg({ status: 999, statusText: "SpecIF input is not valid or version is not supported." }).warn();
                 reject(msg);
             }
         });
@@ -131,14 +131,14 @@ class CSpecIF {
                         getSchema();
                         checker = new modChk.CCheck();
                     })
-                        .catch((err) => { console.error(err); reject(new resultMsg(903, 'Schema- and constraint-check nof found.')); });
+                        .catch((err) => { console.error(err); reject(new resultMsg({ status: 903, statusText: 'Schema- and constraint-check nof found.' })); });
                 }
                 else {
                     throw "Programming Error: Inexpected check of SpecIF data set < v1.1";
                 }
             }
             else {
-                reject(new resultMsg(999, 'No SpecIF data provided for checking'));
+                reject(new resultMsg({ status: 999, statusText: 'No SpecIF data provided for checking' }));
             }
             ;
             return;
@@ -154,7 +154,7 @@ class CSpecIF {
                             return;
                         }
                     }
-                    ;
+                    console.warn(`${rc.statusText}: (${rc.status}) ${rc.response ?? rc.responseText}`);
                     console.info("The invalid SpecIF data set: ", spD);
                     reject(rc);
                 }
@@ -167,7 +167,7 @@ class CSpecIF {
                     responseType: 'arraybuffer',
                     withCredentials: false,
                     done: handleResult,
-                    fail: () => { reject(new resultMsg(903, 'Schema not found')); }
+                    fail: () => { reject(new resultMsg({ status: 903, statusText: 'Schema not found' })); }
                 });
             }
         });
@@ -201,8 +201,8 @@ class CSpecIF {
         }
         catch (e) {
             let txt = "Error when importing the project '" + LIB.displayValueOf(spD.title, { targetLanguage: spD.language || browser.language }) + "': " + e;
-            console.error(txt);
-            return new resultMsg(904, txt);
+            console.error("Rejected input: ", spD);
+            return new resultMsg({ status: 904, statusText: txt });
         }
         ;
         if (spD.rights)
@@ -224,7 +224,7 @@ class CSpecIF {
         if (spD.title)
             this.title = makeMultiLanguageText(spD.title);
         this.id = spD.id;
-        return new resultMsg(0, 'SpecIF data has been successfully transformed!');
+        return new resultMsg({ status: 0, statusText: 'SpecIF data has been successfully transformed!' });
         function i2int(iE) {
             var oE = {
                 id: iE.id ? iE.id.toSpecifId() : undefined,
@@ -557,7 +557,11 @@ class CSpecIF {
                 function makeValue(val) {
                     if (val) {
                         if (dT.enumeration) {
-                            return val.id ? val : { id: val };
+                            if (typeof (val.id) == 'string')
+                                return val;
+                            if (typeof (val) == 'string')
+                                return { id: val };
+                            throw new Error('Property value with an enumerated data type must reference a valid value id.');
                         }
                         ;
                         switch (dT.type) {
@@ -582,16 +586,44 @@ class CSpecIF {
                             case XsDataType.DateTime:
                                 if (typeof (val) == 'string')
                                     return makeISODate(LIB.cleanValue(val));
-                                else
-                                    throw Error("Value of property " + prp.id + " with class " + prp['class'].id + " must be a string.");
+                                console.warn('Datetime value ', val, ' of property with class ' + prp['class'].id + ' must be a string.');
+                                break;
                             case XsDataType.Boolean:
-                                if (CONFIG.valuesTrue.includes(LIB.cleanValue(val)))
-                                    return "true";
-                                if (CONFIG.valuesFalse.includes(LIB.cleanValue(val)))
-                                    return "false";
-                                console.warn('Unknown boolean value ' + LIB.cleanValue(val) + ' skipped.');
+                                switch (typeof (val)) {
+                                    case 'string':
+                                        if (CONFIG.valuesTrue.includes(val))
+                                            return "true";
+                                        if (CONFIG.valuesFalse.includes(val))
+                                            return "false";
+                                        break;
+                                    case 'number':
+                                        console.warn('Boolean value ', val, ' of property with class ' + prp['class'].id + ' is not a string, but will be transformed to a string.');
+                                        if (val == 0)
+                                            return "false";
+                                        if (val == 1)
+                                            return "true";
+                                        break;
+                                    case 'boolean':
+                                        console.warn('Boolean value ', val, ' of property with class ' + prp['class'].id + ' is not a string, but will be transformed to a string.');
+                                        return val ? "true" : "false";
+                                }
+                                ;
+                                console.warn('Unknown boolean value ', val, ' of property with class ' + prp['class'].id + ' skipped.');
+                                break;
+                            case XsDataType.Integer:
+                            case XsDataType.Double:
+                                switch (typeof (val)) {
+                                    case 'string':
+                                        return LIB.cleanValue(val);
+                                    case 'number':
+                                        console.warn('Number value ', val, ' of property with class ' + prp['class'].id + ' is not a string, but will be transformed to a string.');
+                                        return val.toString();
+                                }
+                                ;
+                                console.warn('Unknown number value ', val, ' of property with class ' + prp['class'].id + ' skipped.');
                                 break;
                             case XsDataType.ComplexType:
+                                console.warn('Complex types not yet supported;', val, 'skipped.');
                                 break;
                             default:
                                 return LIB.cleanValue(val);
@@ -646,9 +678,10 @@ class CSpecIF {
     toExt(opts) {
         return new Promise((resolve, reject) => {
             let self = this, pend = 0;
+            let input = simpleClone(this);
             let spD = Object.assign(app.standards.makeTemplate(), {
-                id: this.id,
-                title: LIB.selectTargetLanguage(this.title, opts)
+                id: input.id,
+                title: LIB.selectTargetLanguage(input.title, opts)
             });
             function nodeIsNoRoot(r) {
                 let valL = LIB.valuesByTitle(r, [CONFIG.propClassType], self);
@@ -659,18 +692,18 @@ class CSpecIF {
                     let r = LIB.itemByKey(this.resources, this.nodes[i].resource);
                     if (nodeIsNoRoot(r)) {
                         let oC = app.ontology.generateSpecifClasses({ terms: [CONFIG.resClassFolder], referencesWithoutRevision: true, referencesWithoutRevision: true, delta: true });
-                        ['dataTypes', 'propertyClasses', 'resourceClasses'].forEach((li) => { LIB.cacheL(spD[li], oC[li]); });
+                        ['dataTypes', 'propertyClasses', 'resourceClasses'].forEach((li) => { LIB.cacheL(input[li], oC[li]); });
                         break;
                     }
                 }
             }
             ;
-            if (LIB.multiLanguageValueHasContent(this.description))
-                spD.description = LIB.selectTargetLanguage(this.description, opts);
-            if (this.language)
-                spD.language = this.language;
-            if (this.rights && this.rights.title && this.rights.url)
-                spD.rights = this.rights;
+            if (LIB.multiLanguageValueHasContent(input.description))
+                spD.description = LIB.selectTargetLanguage(input.description, opts);
+            if (input.language)
+                spD.language = input.language;
+            if (input.rights && input.rights.title && input.rights.url)
+                spD.rights = input.rights;
             if (app.me && app.me.email) {
                 spD.createdBy = {
                     familyName: app.me.lastName,
@@ -681,35 +714,38 @@ class CSpecIF {
                     spD.createdBy.org = { organizationName: app.me.organization };
             }
             else {
-                if (this.createdBy && this.createdBy.email) {
+                if (input.createdBy && input.createdBy.email) {
                     spD.createdBy = {
-                        familyName: this.createdBy.familyName,
-                        givenName: this.createdBy.givenName,
-                        email: this.createdBy.email
+                        familyName: input.createdBy.familyName,
+                        givenName: input.createdBy.givenName,
+                        email: input.createdBy.email
                     };
-                    if (this.createdBy.org && this.createdBy.org.organizationName)
-                        spD.createdBy.org = this.createdBy.org;
+                    if (input.createdBy.org && input.createdBy.org.organizationName)
+                        spD.createdBy.org = input.createdBy.org;
                 }
                 ;
             }
             ;
-            LIB.cacheL(spD.dataTypes, LIB.forAll(this.dataTypes, dT2ext));
-            LIB.cacheL(spD.propertyClasses, LIB.forAll(this.propertyClasses, pC2ext));
-            LIB.cacheL(spD.resourceClasses, LIB.forAll(this.resourceClasses, rC2ext));
-            LIB.cacheL(spD.statementClasses, LIB.forAll(this.statementClasses, sC2ext));
-            for (var f of this.files) {
-                pend++;
-                f2ext(f)
-                    .then((oF) => {
-                    spD.files.push(oF);
-                    if (--pend < 1)
-                        finalize();
-                }, reject);
+            LIB.cacheL(spD.dataTypes, LIB.forAll(input.dataTypes, dT2ext));
+            LIB.cacheL(spD.propertyClasses, LIB.forAll(input.propertyClasses, pC2ext));
+            LIB.cacheL(spD.resourceClasses, LIB.forAll(input.resourceClasses, rC2ext));
+            LIB.cacheL(spD.statementClasses, LIB.forAll(input.statementClasses, sC2ext));
+            for (var f of input.files) {
+                if (f.blob) {
+                    pend++;
+                    f2ext(f)
+                        .then((oF) => {
+                        spD.files.push(oF);
+                        if (--pend < 1)
+                            finalize();
+                    }, reject);
+                }
+                ;
             }
             ;
-            LIB.cacheL(spD.resources, LIB.forAll((this.resources), r2ext));
-            LIB.cacheL(spD.statements, LIB.forAll(this.statements, s2ext));
-            LIB.cacheL(spD.nodes, LIB.forAll(this.nodes, h2ext));
+            LIB.cacheL(spD.resources, LIB.forAll((input.resources), r2ext));
+            LIB.cacheL(spD.statements, LIB.forAll(input.statements, s2ext));
+            LIB.cacheL(spD.nodes, LIB.forAll(input.nodes, h2ext));
             if (pend < 1)
                 finalize();
             return;
@@ -939,17 +975,26 @@ class CSpecIF {
                 let r = LIB.itemByKey(self.resources, iN.resource);
                 if (opts && opts.createHierarchyRootIfMissing && nodeIsNoRoot(r)) {
                     console.info("Adding hierarchy root to hierarchy with id '" + iN.id + "'");
-                    let rId = LIB.replacePrefix(CONFIG.prefixHR, iN.id);
+                    const rId = LIB.replacePrefix(CONFIG.prefixHR, iN.id);
+                    const prpL = [];
+                    prpL.push({
+                        class: LIB.makeKey("PC-Name"),
+                        values: [self.title]
+                    });
+                    if (LIB.multiLanguageValueHasContent(self.description)) {
+                        prpL.push({
+                            class: LIB.makeKey("PC-Description"),
+                            values: [self.description]
+                        });
+                    }
+                    prpL.push({
+                        class: LIB.makeKey("PC-Type"),
+                        values: [[{ text: CONFIG.reqifHierarchyRoot }]]
+                    });
                     spD.resources.push({
                         id: rId,
                         class: LIB.makeKey("RC-Folder"),
-                        properties: [{
-                                class: LIB.makeKey("PC-Name"),
-                                values: [[{ text: "Root for " + iN.id }]]
-                            }, {
-                                class: LIB.makeKey("PC-Type"),
-                                values: [[{ text: CONFIG.reqifHierarchyRoot }]]
-                            }],
+                        properties: prpL,
                         changedAt: new Date().toISOString()
                     });
                     return {
@@ -967,9 +1012,9 @@ class CSpecIF {
                     if (opts && opts.preferPng) {
                         switch (iE.type) {
                             case 'image/svg+xml':
-                                let pngN = f.title.fileName() + '.png';
+                                let pngN = iE.title.fileName() + '.png';
                                 if (LIB.itemByTitle(self.files, pngN)) {
-                                    console.info("File '" + f.title + "' has a sibling of type PNG");
+                                    console.info("File '" + iE.title + "' has a sibling of type PNG");
                                     break;
                                 }
                                 ;
@@ -978,7 +1023,7 @@ class CSpecIF {
                                     can.height = img.height;
                                     ctx.drawImage(img, 0, 0);
                                     can.toBlob((b) => {
-                                        resolve({ id: f.id, title: pngN, type: 'image/png', h: img.height, w: img.width, blob: b });
+                                        resolve({ id: iE.id, title: pngN, type: 'image/png', h: img.height, w: img.width, blob: b });
                                     }, 'image/png');
                                 }
                                 let can = document.createElement('canvas'), ctx = can.getContext('2d'), img = new Image();
@@ -987,8 +1032,8 @@ class CSpecIF {
                                 reader.addEventListener('loadend', (e) => {
                                     img.src = 'data:image/svg+xml,' + encodeURIComponent(e.target.result);
                                 });
-                                reader.readAsText(f.blob);
-                                console.info("File '" + f.title + "' transformed to PNG");
+                                reader.readAsText(iE.blob);
+                                console.info("File '" + iE.title + "' transformed to PNG");
                                 return;
                             default:
                                 if (!CONFIG.imgTypes.includes(iE.type))
@@ -1000,5 +1045,11 @@ class CSpecIF {
                 });
             }
         });
+    }
+    async save() {
+        const filename = (this.title && this.title[0] && this.title[0].text ? this.title[0].text : this.id) + '.specif';
+        const blob = new Blob([JSON.stringify(this, null, 2)], { type: 'application/json' });
+        saveAs(blob, filename);
+        console.info('SpecIF saved as file:', filename);
     }
 }
