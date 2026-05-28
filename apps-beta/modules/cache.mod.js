@@ -1463,8 +1463,8 @@ class CProject {
             [
                 { title: 'SpecIF v' + CONFIG.specifVersion, id: 'specif', checked: true },
                 { title: 'HTML with embedded SpecIF v' + CONFIG.specifVersion, id: 'html' },
-                { title: 'PIG (JSON-LD) <em>(experimental)</em>', id: 'pig-jsonld' },
-                { title: 'RDF (Turtle) <em>(experimental)</em>', id: 'rdf-ttl' },
+                { title: 'CASCaRA (JSON-LD) <em>(experimental)</em>', id: 'pig-jsonld' },
+                { title: 'CASCaRA (Turtle) <em>(experimental)</em>', id: 'rdf-ttl' },
                 { title: 'ReqIF v1.0', id: 'reqif' },
                 { title: 'MS Excel® <em>(experimental)</em>', id: 'xlsx' },
                 { title: 'Plain HTML', id: 'xhtml' },
