@@ -66,7 +66,7 @@ const PigProperty = {
     lists: `${CONFIG.pfxNsSemi}lists`,
     shows: `${CONFIG.pfxNsSemi}shows`,
     depicts: `${CONFIG.pfxNsSemi}depicts`,
-    icon: `${CONFIG.pfxNsMeta}Icon`,
+    icon: `${CONFIG.pfxNsMeta}icon`,
     category: `${CONFIG.pfxNsSemi}Category`,
     diagram: `${CONFIG.pfxNsSemi}Diagram`,
     notation: `${CONFIG.pfxNsSemi}Notation`
