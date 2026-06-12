@@ -316,8 +316,8 @@ moduleManager.construct({
                     g.push(hi);
                 }
                 else {
-                    if (LIB.isArrayWithContent(tree.nodes))
-                        console.warn("JSON-LD Export: Hierarchy Node " + tree.id + " with resource " + r.id + " of type " + r['class'].id
+                    if (LIB.isArrayWithContent(n.nodes))
+                        console.warn("JSON-LD Export: Hierarchy Node " + n.id + " with resource " + r.id + " of type " + r['class'].id
                             + " is a leaf by type, but has children. Children are ignored in the export.");
                 }
                 return { "@id": LIB.makeIdWithNamespace(nsData, n.resource.id), [PigProperty.itemType]: { '@id': PigItemType.aTargetLink } };
