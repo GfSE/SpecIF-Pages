@@ -950,7 +950,12 @@ class CProject {
                 if (oT) {
                     dV = toCAS(dV) + ty.postfix;
                     if ([...updatedIds.values()].includes(dV)) {
-                        console.warn('The ontology term ' + dV + ' has already been used to update another identifier; ' + el.id + ' is not replaced to avoid duplicates.');
+                        if (ty.ctg === 'propertyClass' && dV.startsWith(CONFIG.pfxNsDcmi)) {
+                            ty.fn(dta, LIB.makeKey(dV), LIB.keyOf(el));
+                            el = null;
+                        }
+                        else
+                            console.info('The ontology term ' + dV + ' has already been used to update another identifier; ' + el.id + ' is not replaced to avoid duplicates.');
                         return;
                     }
                     ;
@@ -961,7 +966,8 @@ class CProject {
                     el.title = app.ontology.getLocalTerms(oT);
                     el.description = app.ontology.getDescriptions(oT);
                 }
-            });
+            })
+                .filter(el => el !== null);
         });
         return;
     }
@@ -1463,8 +1469,8 @@ class CProject {
             [
                 { title: 'SpecIF v' + CONFIG.specifVersion, id: 'specif', checked: true },
                 { title: 'HTML with embedded SpecIF v' + CONFIG.specifVersion, id: 'html' },
-                { title: 'CASCaRA (JSON-LD) <em>(experimental)</em>', id: 'pig-jsonld' },
-                { title: 'CASCaRA (Turtle) <em>(experimental)</em>', id: 'rdf-ttl' },
+                { title: 'CASCaRA (JSON-LD) <em>(experimental)</em>', id: 'cas-jsonld' },
+                { title: 'CASCaRA (Turtle) <em>(experimental)</em>', id: 'cas-ttl' },
                 { title: 'ReqIF v1.0', id: 'reqif' },
                 { title: 'MS Excel® <em>(experimental)</em>', id: 'xlsx' },
                 { title: 'Plain HTML', id: 'xhtml' },
@@ -1474,8 +1480,8 @@ class CProject {
             : (app.title == "DDP Schema to SpecIF" ?
                 [
                     { title: 'SpecIF v' + CONFIG.specifVersion, id: 'specif', checked: true },
-                    { title: 'PIG (JSON-LD) <em>(experimental)</em>', id: 'pig-jsonld' },
-                    { title: 'RDF (Turtle) <em>(experimental)</em>', id: 'rdf-ttl' }
+                    { title: 'CASCaRA (JSON-LD) <em>(experimental)</em>', id: 'cas-jsonld' },
+                    { title: 'CASCaRA (Turtle) <em>(experimental)</em>', id: 'cas-ttl' }
                 ]
                 :
                     [
@@ -1564,11 +1570,10 @@ class CProject {
             else {
                 self.exporting = true;
                 switch (opts.format) {
-                    case 'rdf-ttl':
+                    case 'cas-ttl':
                     case 'reqif':
                     case 'specif':
-                    case 'rdf-jsonld':
-                    case 'pig-jsonld':
+                    case 'cas-jsonld':
                     case 'html':
                     case 'specifClasses':
                         storeAs(opts);
@@ -1641,7 +1646,7 @@ class CProject {
                 }, reject);
             }
             function storeAs(opts) {
-                opts.allDiagramsAsImage = ["html", "rdf-ttl", "rdf-jsonld", "pig-jsonld", "reqif"].includes(opts.format);
+                opts.allDiagramsAsImage = ["html", "cas-ttl", "cas-jsonld", "reqif"].includes(opts.format);
                 opts.preferPng = ["reqif"].includes(opts.format);
                 switch (opts.format) {
                     case 'specif':
@@ -1649,7 +1654,7 @@ class CProject {
                         opts.lookupTitles = false;
                         opts.lookupValues = false;
                         break;
-                    case 'pig-jsonld':
+                    case 'cas-jsonld':
                         opts.lookupTitles = true;
                         opts.lookupValues = false;
                         opts.targetNamespaces = [CONFIG.pfxNsMeta];
@@ -1658,8 +1663,7 @@ class CProject {
                         opts.createHierarchyRootIfMissing = true;
                         opts.revisionDate = new Date().toISOString();
                         break;
-                    case 'rdf-jsonld':
-                    case 'rdf-ttl':
+                    case 'cas-ttl':
                         opts.lookupTitles = true;
                         opts.lookupValues = false;
                         opts.targetNamespaces = [CONFIG.pfxNsMeta, "rdf:", "rdfs:"];
@@ -1686,7 +1690,7 @@ class CProject {
                 self.read(opts)
                     .then((expD) => {
                     let fName = opts.fileName;
-                    if (['html', 'reqif', 'rdf-ttl'].includes(opts.format))
+                    if (['html', 'reqif', 'cas-ttl'].includes(opts.format))
                         expD.title = LIB.makeMultiLanguageValue(opts.projectName);
                     if (opts.targetLanguage)
                         expD.language = opts.targetLanguage;
@@ -1729,7 +1733,7 @@ class CProject {
                             ;
                             expStr = JSON.stringify(new COntology(expD).generateSpecifClasses(opts));
                             break;
-                        case 'pig-jsonld':
+                        case 'cas-jsonld':
                             fName += `.${CONFIG.pfxNsMeta.slice(0, -1)}.jsonld`;
                             zName = fName + '.zip';
                             opts.baseURI = "https://product-information-graph.org/examples/";
@@ -1737,15 +1741,7 @@ class CProject {
                             self.updateWithOntology(expD, opts);
                             expStr = app.ioPigJsonld.fromSpecif(expD, opts);
                             break;
-                        case 'rdf-jsonld':
-                            fName += ".rdf.jsonld";
-                            zName = fName + '.zip';
-                            opts.baseURI = "https://product-information-graph.org/examples/";
-                            opts.pig2cas = true;
-                            self.updateWithOntology(expD, opts);
-                            expStr = app.ioRdfJsonld.fromSpecif(expD, opts);
-                            break;
-                        case 'rdf-ttl':
+                        case 'cas-ttl':
                             fName += `.${CONFIG.pfxNsMeta.slice(0, -1)}.ttl`;
                             zName = fName + '.zip';
                             opts.baseURI = "https://product-information-graph.org/examples/";

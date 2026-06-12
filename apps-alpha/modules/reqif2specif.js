@@ -92,7 +92,7 @@ function reqif2Specif(xml, options) {
                     "DATATYPE-DEFINITION-REAL": 'xs:double',
                     "DATATYPE-DEFINITION-STRING": 'xs:string',
                     "DATATYPE-DEFINITION-XHTML": 'xhtml',
-                    "DATATYPE-DEFINITION-ENUMERATION": 'xs:enumeration',
+                    "DATATYPE-DEFINITION-ENUMERATION": 'xs:enumeration'
                 }[datatype.nodeName];
             }
             function extractDataTypeValues(DataTypeValuesHtmlCollection) {
@@ -278,12 +278,16 @@ function reqif2Specif(xml, options) {
             if (property.getAttribute("THE-VALUE")) {
                 specifProperty.value = property.getAttribute("THE-VALUE");
                 pC = itemById(xhr.response.propertyClasses, specifProperty['class']);
-                dT = itemById(xhr.response.dataTypes, pC.dataType);
-                if (typeof (dT.maxLength) == 'number' && dT.maxLength < specifProperty.value.length) {
-                    console.warn("Truncated ReqIF Attribute with value '" + specifProperty.value + "' to the specified maxLength of " + dT.maxLength + " characters");
-                    specifProperty.value = specifProperty.value.substring(0, dT.maxLength);
+                if (pC) {
+                    dT = itemById(xhr.response.dataTypes, pC.dataType);
+                    if (typeof (dT.maxLength) == 'number' && dT.maxLength < specifProperty.value.length) {
+                        console.warn("Truncated ReqIF Attribute with value '" + specifProperty.value + "' to the specified maxLength of " + dT.maxLength + " characters");
+                        specifProperty.value = specifProperty.value.substring(0, dT.maxLength);
+                    }
+                    ;
                 }
-                ;
+                else
+                    console.warn("There is no propertyClass with id '" + specifProperty['class'] + "' for property with value '" + specifProperty.value + "'");
             }
             else if (property.getElementsByTagName("THE-VALUE")[0])
                 specifProperty.value = removeNamespace(property.getElementsByTagName("THE-VALUE")[0].innerHTML);
@@ -298,7 +302,7 @@ function reqif2Specif(xml, options) {
     function extractHierarchies(xmlSpecifications) {
         return xmlSpecifications.length < 1 ? [] : Array.from(xmlSpecifications[0].getElementsByTagName("SPECIFICATION"), extractHierarchy);
         function extractHierarchy(xmlSpecification) {
-            let hId = xmlSpecification.getAttribute("IDENTIFIER");
+            const hId = xmlSpecification.getAttribute("IDENTIFIER");
             return {
                 id: opts.prefixHR + hId,
                 resource: hId,
@@ -306,11 +310,11 @@ function reqif2Specif(xml, options) {
                 nodes: extractNodes(xmlSpecification.children)
             };
             function extractNodes(L) {
-                let ch1 = getNodeswithTag(L, 'CHILDREN')[0];
+                const ch1 = getNodeswithTag(L, 'CHILDREN')[0];
                 if (ch1) {
-                    let L = [];
+                    const L = [];
                     Array.from(ch1.children, (ch) => {
-                        let obj = getNodeswithTag(ch.children, 'OBJECT')[0], ref = obj.getElementsByTagName('SPEC-OBJECT-REF')[0], oId = ref.innerHTML;
+                        const obj = getNodeswithTag(ch.children, 'OBJECT')[0], ref = obj.getElementsByTagName('SPEC-OBJECT-REF')[0], oId = ref.innerHTML;
                         L.push({
                             id: ch.getAttribute("IDENTIFIER"),
                             resource: oId,
@@ -324,7 +328,7 @@ function reqif2Specif(xml, options) {
             }
             ;
             function getNodeswithTag(chL, tag) {
-                let a = Array.from(chL);
+                const a = Array.from(chL);
                 return a.filter(el => { return el.nodeName == tag; });
             }
         }

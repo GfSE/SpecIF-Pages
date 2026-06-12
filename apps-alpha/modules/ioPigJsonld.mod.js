@@ -386,7 +386,7 @@ moduleManager.construct({
                 if (c[3] != undefined) {
                     pL = {
                         ...pL,
-                        [ShaclProperty.datatype]: makeRef(undefined, c[3]),
+                        [ShaclProperty.datatype]: c[3] ? makeRef(undefined, c[3]) : undefined,
                         [ShaclProperty.maxLength]: c[6],
                         [ShaclProperty.minCount]: c[7],
                         [ShaclProperty.maxCount]: c[8]
@@ -400,7 +400,7 @@ moduleManager.construct({
                     "@type": "owl:ObjectProperty",
                     [PigProperty.specializes]: c[1] ? makeRef(nsOnto, c[1]) : undefined,
                     [PigProperty.itemType]: { '@id': PigItemType.Link },
-                    [PigProperty.enumeratedEndpoint]: makeSet(nsOnto, c[3]),
+                    [PigProperty.enumeratedEndpoint]: c[3] ? makeSet(nsOnto, c[3]) : undefined,
                     [casProperty.title]: xMultilanguageText(c[4]),
                     [casProperty.definition]: c[5] ? xMultilanguageText(c[5]) : undefined
                 });

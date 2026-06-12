@@ -136,6 +136,9 @@ moduleManager.construct({
             ;
             return idx;
         }
+        function isDefinitionSheet(wsNm) {
+            return wsNm.startsWith('{') && wsNm.endsWith('}');
+        }
         function collectDefinitions(ws) {
             if (ws && ws.isValid) {
                 switch (ws.name) {
@@ -171,14 +174,14 @@ moduleManager.construct({
                         ;
                         break;
                     default:
-                        if (ws.name.startsWith('{') && ws.name.endsWith('}'))
+                        if (isDefinitionSheet(ws.name))
                             console.warn("Sheet with name " + ws.name + " skipped, because it has an unknown keyword in curly brackets");
                 }
             }
         }
         function transformData(ws) {
             if (ws && ws.isValid) {
-                if (ws.name.startsWith("{") && ws.name.endsWith("}"))
+                if (isDefinitionSheet(ws.name))
                     return;
                 function isDateTime(cell) {
                     return cell && (cell.t == 'd' || cell.t == 's' && LIB.isIsoDateTime(cell.v));

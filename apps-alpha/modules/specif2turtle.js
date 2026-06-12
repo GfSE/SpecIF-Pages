@@ -52,8 +52,8 @@ const PigItemType = {
 const PigProperty = {
     itemType: `${CONFIG.pfxNsMeta}itemType`,
     enumeratedValue: `${CONFIG.pfxNsMeta}enumeratedValue`,
-    SourceLink: `${CONFIG.pfxNsMeta}SourceLink`,
-    TargetLink: `${CONFIG.pfxNsMeta}TargetLink`,
+    SourceLink: `${CONFIG.pfxNsMeta}linksSource`,
+    TargetLink: `${CONFIG.pfxNsMeta}linksTarget`,
     enumeratedEndpoint: `${CONFIG.pfxNsMeta}enumeratedEndpoint`,
     enumeratedProperty: `${CONFIG.pfxNsMeta}enumeratedProperty`,
     enumeratedSourceLink: `${CONFIG.pfxNsMeta}enumeratedSourceLink`,
@@ -67,6 +67,7 @@ const PigProperty = {
     shows: `${CONFIG.pfxNsSemi}shows`,
     depicts: `${CONFIG.pfxNsSemi}depicts`,
     icon: `${CONFIG.pfxNsMeta}icon`,
+    unit: `${CONFIG.pfxNsMeta}unit`,
     category: `${CONFIG.pfxNsSemi}Category`,
     diagram: `${CONFIG.pfxNsSemi}Diagram`,
     notation: `${CONFIG.pfxNsSemi}Notation`
@@ -119,12 +120,12 @@ const pigEnumerations = [
 ], pigRelationships = [
     [PigItemType.Relationship, undefined, 'Relationship', 'A CASCaRA meta-model item used for reified relationships (aka predicates).', [PigProperty.category], PigProperty.SourceLink, PigProperty.TargetLink],
 ], pigProperties = [
-    [PigItemType.Property, undefined, [PigItemType.Entity, PigItemType.Relationship], 'xs:anyType', 'Property', 'A CASCaRA meta-model item used for properties (aka attributes).', undefined, undefined, undefined],
+    [PigItemType.Property, undefined, [PigItemType.Entity, PigItemType.Relationship], undefined, 'Property', 'A CASCaRA meta-model item used for properties (aka attributes).', undefined, undefined, undefined],
     [PigProperty.diagram, PigItemType.Property, [PigItemType.View], XsDataType.String, 'Diagram', 'A diagram illustrating the resource or a link to a diagram.', undefined, 0, undefined],
     [PigProperty.category, PigItemType.Property, [PigItemType.Entity, PigItemType.Relationship], XsDataType.String, 'has category', 'Specifies a category for an element (entity, relationship or organizer).', 32, 0, 1],
     [PigProperty.notation, PigProperty.category, [PigItemType.View], XsDataType.String, 'Notation', 'A reference to a notation defining the syntax and semantics of a diagram.', undefined, 0, 1]
 ], pigLinks = [
-    [PigItemType.Link, undefined, [PigItemType.Organizer, PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'linked with', 'A PIG meta-model item connecting a reified relationship with its source or target. Also connects an organizer to a model element.'],
+    [PigItemType.Link, undefined, [PigItemType.Organizer, PigItemType.Relationship], undefined, 'linked with', 'A PIG meta-model item connecting a reified relationship with its source or target. Also connects an organizer to a model element.'],
     [PigProperty.SourceLink, PigItemType.Link, [PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'to source', 'Connects the source of a reified relationship.'],
     [PigProperty.TargetLink, PigItemType.Link, [PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'to target', 'Connects the target of a reified relationship or an organizer.'],
     [PigProperty.lists, PigProperty.TargetLink, [PigItemType.Root, PigItemType.Tree], [PigItemType.Entity, PigItemType.Relationship, PigItemType.Organizer], 'lists', 'Lists an entity, a relationship or a subordinated organizer.'],
@@ -738,7 +739,7 @@ app.specif2turtle = (specifData, options) => {
                 + toRdf.tab1(ShaclProperty.property, LIB.isArrayWithContent(prpL) ? prpL.map(mapShPrp) : undefined);
         });
         pigRelationships.forEach(c => {
-            let prpL = [RdfProperty.label, RdfProperty.comment].concat(c[4], [c[5], c[6]]);
+            const prpL = [RdfProperty.label, RdfProperty.comment].concat(c[4], [c[5], c[6]]);
             ttlStr += toRdf.newLine()
                 + toRdf.tab0(c[0])
                 + toRdf.tab1(RdfProperty.type, 'owl:Class')
@@ -760,7 +761,7 @@ app.specif2turtle = (specifData, options) => {
                     + toRdf.tab0(c[0])
                     + toRdf.tab1(RdfProperty.type, cL.type)
                     + (c[1] ? toRdf.tab1(RdfProperty.subPropertyOf, c[1]) : '')
-                    + toRdf.tab1(RdfProperty.range, toRdf.makeOwlUnion(nsOnto, c[3]))
+                    + (c[3] ? toRdf.tab1(RdfProperty.range, toRdf.makeOwlUnion(nsOnto, c[3])) : '')
                     + toRdf.tab1(RdfProperty.label, c[4])
                     + toRdf.tab1(casProperty.definition, c[5]);
                 if (c[3] != undefined) {
