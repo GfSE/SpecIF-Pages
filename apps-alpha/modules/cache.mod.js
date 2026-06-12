@@ -966,8 +966,8 @@ class CProject {
                     el.title = app.ontology.getLocalTerms(oT);
                     el.description = app.ontology.getDescriptions(oT);
                 }
-            })
-                .filter(el => el !== null);
+            });
+            ty.list.filter(el => el !== null);
         });
         return;
     }

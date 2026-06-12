@@ -290,7 +290,7 @@ moduleManager.construct({
             return [r];
         }
         function xAHierarchy(n) {
-            let g = [], hr = {
+            const g = [], hr = {
                 "@id": LIB.makeIdWithNamespace(nsData, "HierarchyRoot" + '-' + specifData.id),
                 "@type": PigItemType.Root,
                 [PigProperty.itemType]: { '@id': PigItemType.anEntity },
@@ -315,7 +315,11 @@ moduleManager.construct({
                     ;
                     g.push(hi);
                 }
-                ;
+                else {
+                    if (LIB.isArrayWithContent(tree.nodes))
+                        console.warn("JSON-LD Export: Hierarchy Node " + tree.id + " with resource " + r.id + " of type " + r['class'].id
+                            + " is a leaf by type, but has children. Children are ignored in the export.");
+                }
                 return { "@id": LIB.makeIdWithNamespace(nsData, n.resource.id), [PigProperty.itemType]: { '@id': PigItemType.aTargetLink } };
             }
         }

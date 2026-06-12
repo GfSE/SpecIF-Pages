@@ -125,7 +125,7 @@ const pigEnumerations = [
     [PigProperty.category, PigItemType.Property, [PigItemType.Entity, PigItemType.Relationship], XsDataType.String, 'has category', 'Specifies a category for an element (entity, relationship or organizer).', 32, 0, 1],
     [PigProperty.notation, PigProperty.category, [PigItemType.View], XsDataType.String, 'Notation', 'A reference to a notation defining the syntax and semantics of a diagram.', undefined, 0, 1]
 ], pigLinks = [
-    [PigItemType.Link, undefined, [PigItemType.Organizer, PigItemType.Relationship], undefined, 'linked with', 'A PIG meta-model item connecting a reified relationship with its source or target. Also connects an organizer to a model element.'],
+    [PigItemType.Link, undefined, [PigItemType.Organizer, PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'linked with', 'A PIG meta-model item connecting a reified relationship with its source or target. Also connects an organizer to a model element.'],
     [PigProperty.SourceLink, PigItemType.Link, [PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'to source', 'Connects the source of a reified relationship.'],
     [PigProperty.TargetLink, PigItemType.Link, [PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'to target', 'Connects the target of a reified relationship or an organizer.'],
     [PigProperty.lists, PigProperty.TargetLink, [PigItemType.Root, PigItemType.Tree], [PigItemType.Entity, PigItemType.Relationship, PigItemType.Organizer], 'lists', 'Lists an entity, a relationship or a subordinated organizer.'],
@@ -697,7 +697,11 @@ app.specif2turtle = (specifData, options) => {
                     }
                     ;
                 }
-                ;
+                else {
+                    if (LIB.isArrayWithContent(tree.nodes))
+                        console.warn("RDF/Turtle Export: Hierarchy Node " + tree.id + " with resource " + r.id + " of type " + r['class'].id
+                            + " is a leaf by type, but has children. Children are ignored in the export.");
+                }
                 return true;
             });
             return ttlStr;
