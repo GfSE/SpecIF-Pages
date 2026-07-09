@@ -364,28 +364,9 @@ class CProject {
         let role = LIB.itemById(this.roles, app.me.myRole(spD.id).toJsId());
         if (role)
             this.myPermissions = role.permissions;
-        return new Promise((resolve, reject) => {
-            if (app.server) {
-                app.server.get('project', meta)
-                    .then((msg) => {
-                    return app.server.put('project', Object.assign({}, meta, { revision: msg.response.revision }));
-                }, (msg) => {
-                    return app.server.put('project', meta);
-                })
-                    .then((msg) => {
-                    Object.assign(this, meta);
-                    resolve(msg);
-                })
-                    .catch((msg) => {
-                    console.error(msg);
-                    reject(msg);
-                });
-            }
-            else {
-                Object.assign(this, meta);
-                resolve({ status: 0, statusText: "ok" });
-            }
-            ;
+        return new Promise((resolve) => {
+            Object.assign(this, meta);
+            resolve({ status: 0, statusText: "ok" });
         });
     }
     ;
