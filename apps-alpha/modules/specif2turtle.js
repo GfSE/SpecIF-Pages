@@ -137,26 +137,26 @@ function makeShapeId(id) {
 }
 function collectNamespaces(specifData) {
     const usedPrefixes = new Set();
-    usedPrefixes.add('rdf:');
-    usedPrefixes.add('rdfs:');
-    usedPrefixes.add('sh:');
-    usedPrefixes.add('owl:');
-    usedPrefixes.add('skos:');
-    usedPrefixes.add(CONFIG.pfxNsDcmi);
-    usedPrefixes.add(CONFIG.pfxNsMeta);
-    usedPrefixes.add(`${pfx_shape}${CONFIG.pfxNsMeta}`);
+    addPrefix('rdf:');
+    addPrefix('rdfs:');
+    addPrefix('sh:');
+    addPrefix('owl:');
+    addPrefix('skos:');
+    addPrefix(CONFIG.pfxNsDcmi);
+    addPrefix(CONFIG.pfxNsMeta);
+    addPrefix(`${pfx_shape}${CONFIG.pfxNsMeta}`);
     if (CONFIG.pfxNsMeta != CONFIG.pfxNsSemi) {
-        usedPrefixes.add(CONFIG.pfxNsSemi);
-        usedPrefixes.add(`${pfx_shape}${CONFIG.pfxNsSemi}`);
+        addPrefix(CONFIG.pfxNsSemi);
+        addPrefix(`${pfx_shape}${CONFIG.pfxNsSemi}`);
     }
-    usedPrefixes.add('FMC:');
-    usedPrefixes.add(`${pfx_shape}FMC:`);
+    addPrefix('FMC:');
+    addPrefix(`${pfx_shape}FMC:`);
     function addPrefix(id) {
         if (!id)
             return;
         const match = id.match(/^([\w-]+)(:|\.)/);
         if (match)
-            usedPrefixes.add(`${match[1]}:`);
+            usedPrefixes.add(`${match[1]}`);
     }
     [
         specifData.dataTypes,
@@ -374,17 +374,16 @@ app.specif2turtle = (specifData, options) => {
         + xStatements(specifData.statements)
         + xHierarchies(specifData.nodes)
         + toRdf.newLine();
-    console.debug('rdf.ttl', ttl);
     return ttl;
     function defineNamespaces() {
         const usedPrefixes = collectNamespaces(specifData);
         let pfxL = '';
         for (let [tag, val] of app.ontology.namespaces) {
-            const cleanTag = tag.replace(/[\.]$/, ':');
+            const cleanTag = tag.replace(/[.:]$/, '');
             if (usedPrefixes.has(cleanTag)) {
-                pfxL += toRdf.prefix(cleanTag, val.url);
+                pfxL += toRdf.prefix(`${cleanTag}:`, val.url);
                 if (!isEstablished(cleanTag))
-                    pfxL += toRdf.prefix(`${pfx_shape}${cleanTag}`, `${pigOnto}/shapes/${cleanTag.slice(0, -1)}#`);
+                    pfxL += toRdf.prefix(`${pfx_shape}${cleanTag}:`, `${pigOnto}/shapes/${cleanTag.slice(0, -1)}#`);
             }
         }
         pfxL += toRdf.newLine()
@@ -681,8 +680,8 @@ app.specif2turtle = (specifData, options) => {
                 + toRdf.tab1(RdfProperty.label, 'Hierarchy Root')
                 + toRdf.tab1(RdfProperty.comment, '... anchoring all hierarchies of this graph (package)');
             ttlStr += toRdf.tab1(PigProperty.lists, toRdf.makeRdflList(nsData, nodes.map(nd => nd.resource.id)));
-            LIB.iterateSpecifNodes(nodes, (nd) => {
-                const r = LIB.itemById(specifData.resources, nd.resource.id);
+            LIB.iterateSpecifNodes(nodes, (tree) => {
+                const r = LIB.itemById(specifData.resources, tree.resource.id);
                 if (hierarchyItems.includes(r['class'].id)) {
                     ttlStr += xAnElement(r);
                     if (LIB.isArrayWithContent(tree.nodes)) {
@@ -691,8 +690,8 @@ app.specif2turtle = (specifData, options) => {
                     ;
                 }
                 else {
-                    if (LIB.isArrayWithContent(nd.nodes))
-                        console.warn("RDF/Turtle Export: Hierarchy Node " + nd.id + " with resource " + r.id + " of type " + r['class'].id
+                    if (LIB.isArrayWithContent(tree.nodes))
+                        console.warn("RDF/Turtle Export: Hierarchy Node " + tree.id + " with resource " + r.id + " of type " + r['class'].id
                             + " is a leaf by type, but has children. Children are ignored in the export.");
                 }
                 return true;

@@ -67,8 +67,8 @@ moduleManager.construct({
                 "d": sourceURI
             };
             for (let [tag, val] of app.ontology.namespaces) {
-                const cleanTag = tag.replace(/[\.:]$/, '');
-                if (usedPrefixes.has(tag)) {
+                const cleanTag = tag.replace(/[.:]$/, '');
+                if (usedPrefixes.has(cleanTag)) {
                     ctx[cleanTag] = val.url;
                 }
             }
