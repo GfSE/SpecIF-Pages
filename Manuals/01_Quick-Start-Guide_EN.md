@@ -180,7 +180,7 @@ The term authoring tool is used here to describe software that is used to create
 #### Sheets Become Folders
 
 When importing a workbook with one or more spreadsheets (Excel® *.xlsx, LibreOffice *.ods as well as *.csv), 
-a folder with the file name as title is created in the hierarchy of the ReqIF data-set. 
+a folder with the file name as title is created in the hierarchy of the SpecIF data-set. 
 For each spreadsheet a subfolder is created with its name as title. 
 
 #### Resource Classes and Resources
