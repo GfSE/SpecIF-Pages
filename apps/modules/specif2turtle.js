@@ -52,8 +52,8 @@ const PigItemType = {
 const PigProperty = {
     itemType: `${CONFIG.pfxNsMeta}itemType`,
     enumeratedValue: `${CONFIG.pfxNsMeta}enumeratedValue`,
-    SourceLink: `${CONFIG.pfxNsMeta}SourceLink`,
-    TargetLink: `${CONFIG.pfxNsMeta}TargetLink`,
+    SourceLink: `${CONFIG.pfxNsMeta}linksSource`,
+    TargetLink: `${CONFIG.pfxNsMeta}linksTarget`,
     enumeratedEndpoint: `${CONFIG.pfxNsMeta}enumeratedEndpoint`,
     enumeratedProperty: `${CONFIG.pfxNsMeta}enumeratedProperty`,
     enumeratedSourceLink: `${CONFIG.pfxNsMeta}enumeratedSourceLink`,
@@ -67,6 +67,7 @@ const PigProperty = {
     shows: `${CONFIG.pfxNsSemi}shows`,
     depicts: `${CONFIG.pfxNsSemi}depicts`,
     icon: `${CONFIG.pfxNsMeta}icon`,
+    unit: `${CONFIG.pfxNsMeta}unit`,
     category: `${CONFIG.pfxNsSemi}Category`,
     diagram: `${CONFIG.pfxNsSemi}Diagram`,
     notation: `${CONFIG.pfxNsSemi}Notation`
@@ -76,6 +77,7 @@ const casProperty = {
     description: CONFIG.propClassDesc,
     definition: `skos:definition`,
     type: CONFIG.propClassType,
+    category: `${CONFIG.pfxNsSemi}Category`,
     modified: `${CONFIG.pfxNsDcmi}modified`,
     creator: `${CONFIG.pfxNsDcmi}creator`,
     license: `${CONFIG.pfxNsDcmi}license`
@@ -106,31 +108,24 @@ const ShaclProperty = {
     or: 'sh:or'
 };
 const nsData = 'd:', nsOnto = "o:", sfx_toSrc = "-toSource", sfx_toTrg = "-toTarget", pfx_datatype = 'xs:', pfx_shape = `${CONFIG.pfxNsMeta.slice(0, -1)}Shapes_`, sfx_shape = "_shape", pigOnto = 'https://product-information-graph.org/v0.2/ontology';
-const pigEnumerations = [
-    [PigItemType.Enumeration, undefined, 'Enumeration', 'A CASCaRA meta-model item used for value enumerations.']
-], pigEntities = [
-    [PigItemType.Entity, undefined, 'Entity', 'A CASCaRA meta-model item used for entities (aka resources or artifacts).', [PigProperty.category], []],
+const pigEnumerations = [], pigEntities = [
     [PigItemType.Organizer, PigItemType.Entity, 'Organizer', `A CASCaRA meta-model item for organizing model-elements. An example is a list of requirements or a diagram using a certain notation.`, [], []],
     [PigItemType.Package, PigItemType.Organizer, 'Package', `A subclass of ${PigItemType.Organizer} used for a partial graph selected for exchange or access permissions.`, [], []],
     [PigItemType.Root, PigItemType.Organizer, 'Root', `A subclass of ${PigItemType.Organizer} serving as a root for trees and tables.`, [], [PigProperty.lists]],
     [PigItemType.Tree, PigItemType.Organizer, 'Tree', `A subclass of ${PigItemType.Organizer} for strictly hierarchical data structures referencing entities and relationships.`, [], [PigProperty.lists]],
     [PigItemType.Outline, PigItemType.Tree, 'Outline', `A subclass of ${PigItemType.Tree} comprising all information items of a human-readable document. As usual, the outline is hierarchically organized.`, [], []],
     [PigItemType.Table, PigItemType.Organizer, 'Table', `A subclass of ${PigItemType.Organizer} representing a table showing selected model elements.`, [], [PigProperty.shows]]
-], pigRelationships = [
-    [PigItemType.Relationship, undefined, 'Relationship', 'A CASCaRA meta-model item used for reified relationships (aka predicates).', [PigProperty.category], PigProperty.SourceLink, PigProperty.TargetLink],
-], pigProperties = [
-    [PigItemType.Property, undefined, [PigItemType.Entity, PigItemType.Relationship], 'xs:anyType', 'Property', 'A CASCaRA meta-model item used for properties (aka attributes).', undefined, undefined, undefined],
+], pigRelationships = [], pigProperties = [
     [PigProperty.diagram, PigItemType.Property, [PigItemType.View], XsDataType.String, 'Diagram', 'A diagram illustrating the resource or a link to a diagram.', undefined, 0, undefined],
     [PigProperty.category, PigItemType.Property, [PigItemType.Entity, PigItemType.Relationship], XsDataType.String, 'has category', 'Specifies a category for an element (entity, relationship or organizer).', 32, 0, 1],
     [PigProperty.notation, PigProperty.category, [PigItemType.View], XsDataType.String, 'Notation', 'A reference to a notation defining the syntax and semantics of a diagram.', undefined, 0, 1]
 ], pigLinks = [
-    [PigItemType.Link, undefined, [PigItemType.Organizer, PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'linked with', 'A PIG meta-model item connecting a reified relationship with its source or target. Also connects an organizer to a model element.'],
     [PigProperty.SourceLink, PigItemType.Link, [PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'to source', 'Connects the source of a reified relationship.'],
     [PigProperty.TargetLink, PigItemType.Link, [PigItemType.Relationship], [PigItemType.Entity, PigItemType.Relationship], 'to target', 'Connects the target of a reified relationship or an organizer.'],
     [PigProperty.lists, PigProperty.TargetLink, [PigItemType.Root, PigItemType.Tree], [PigItemType.Entity, PigItemType.Relationship, PigItemType.Organizer], 'lists', 'Lists an entity, a relationship or a subordinated organizer.'],
     [PigProperty.shows, PigProperty.TargetLink, [PigItemType.View], [PigItemType.Entity, PigItemType.Relationship], 'shows', 'Shows an entity or a relationship.'],
     [PigProperty.depicts, PigProperty.TargetLink, [PigItemType.View], [PigItemType.Entity], 'depicts', 'Depicts an entity; inverse of uml:ownedDiagram.']
-], pigNativeProperties = [casProperty.title, casProperty.description, casProperty.definition], diagramRels = ['SpecIF:shows', 'uml:ownedDiagram'], hierarchyItems = [CONFIG.resClassFolder, CONFIG.resClassOutline, CONFIG.resClassGlossary], excludeEntities = [PigItemType.Element].concat(pigEntities.map(en => en[0])), excludeRelationships = pigRelationships.map(rel => rel[0]), excludeProperties = pigProperties.concat(pigLinks).map(pr => pr[0]);
+], pigNativeProperties = [casProperty.title, casProperty.description, casProperty.definition], diagramRels = ['SpecIF:shows', 'uml:ownedDiagram'], excludeEntities = [PigItemType.Element].concat(pigEntities.map(en => en[0])), excludeRelationships = pigRelationships.map(rel => rel[0]), excludeProperties = pigProperties.concat(pigLinks).map(pr => pr[0]);
 function isPigNative(str) {
     return pigNativeProperties.includes(str);
 }
@@ -138,31 +133,36 @@ function isEstablished(id) {
     const establishedNs = ['rdf', 'rdfs', 'owl', 'skos', 'sh', 'xs', 'xsd'];
     return establishedNs.includes(id.split(':')[0]) || isPigNative(id);
 }
+function isHierarchyItem(r) {
+    const hierarchyItems = [CONFIG.resClassFolder, CONFIG.resClassOutline, CONFIG.resClassGlossary];
+    return hierarchyItems.includes(r['class'].id)
+        || r.properties?.some(prp => prp['class'].id === casProperty.category && prp.values[0][0]?.text === CONFIG.reqifHierarchyRoot);
+}
 function makeShapeId(id) {
     return id.startsWith(nsOnto) ? id + sfx_shape : pfx_shape + id;
 }
 function collectNamespaces(specifData) {
     const usedPrefixes = new Set();
-    usedPrefixes.add('rdf:');
-    usedPrefixes.add('rdfs:');
-    usedPrefixes.add('sh:');
-    usedPrefixes.add('owl:');
-    usedPrefixes.add('skos:');
-    usedPrefixes.add(CONFIG.pfxNsDcmi);
-    usedPrefixes.add(CONFIG.pfxNsMeta);
-    usedPrefixes.add(`${pfx_shape}${CONFIG.pfxNsMeta}`);
+    addPrefix('rdf:');
+    addPrefix('rdfs:');
+    addPrefix('sh:');
+    addPrefix('owl:');
+    addPrefix('skos:');
+    addPrefix(CONFIG.pfxNsDcmi);
+    addPrefix(CONFIG.pfxNsMeta);
+    addPrefix(`${pfx_shape}${CONFIG.pfxNsMeta}`);
     if (CONFIG.pfxNsMeta != CONFIG.pfxNsSemi) {
-        usedPrefixes.add(CONFIG.pfxNsSemi);
-        usedPrefixes.add(`${pfx_shape}${CONFIG.pfxNsSemi}`);
+        addPrefix(CONFIG.pfxNsSemi);
+        addPrefix(`${pfx_shape}${CONFIG.pfxNsSemi}`);
     }
-    usedPrefixes.add('FMC:');
-    usedPrefixes.add(`${pfx_shape}FMC:`);
+    addPrefix('FMC:');
+    addPrefix(`${pfx_shape}FMC:`);
     function addPrefix(id) {
         if (!id)
             return;
         const match = id.match(/^([\w-]+)(:|\.)/);
         if (match)
-            usedPrefixes.add(`${match[1]}:`);
+            usedPrefixes.add(`${match[1]}`);
     }
     [
         specifData.dataTypes,
@@ -308,7 +308,7 @@ class CToRdf {
         let str = "";
         if (Array.isArray(L) && L.length > 0) {
             str = '(';
-            for (let l of L) {
+            for (const l of L) {
                 str += '\n\t\t\t' + LIB.makeIdWithNamespace(ont, l.id ?? l);
             }
             ;
@@ -386,11 +386,11 @@ app.specif2turtle = (specifData, options) => {
         const usedPrefixes = collectNamespaces(specifData);
         let pfxL = '';
         for (let [tag, val] of app.ontology.namespaces) {
-            const cleanTag = tag.replace(/[\.]$/, ':');
+            const cleanTag = tag.replace(/[.:]$/, '');
             if (usedPrefixes.has(cleanTag)) {
-                pfxL += toRdf.prefix(cleanTag, val.url);
+                pfxL += toRdf.prefix(`${cleanTag}:`, val.url);
                 if (!isEstablished(cleanTag))
-                    pfxL += toRdf.prefix(`${pfx_shape}${cleanTag}`, `${pigOnto}/shapes/${cleanTag.slice(0, -1)}#`);
+                    pfxL += toRdf.prefix(`${pfx_shape}${cleanTag}:`, `${pigOnto}/shapes/${cleanTag.slice(0, -1)}#`);
             }
         }
         pfxL += toRdf.newLine()
@@ -619,7 +619,7 @@ app.specif2turtle = (specifData, options) => {
         if (LIB.isArrayWithContent(rL)) {
             let ttlStr = toRdf.heading('Entities');
             rL.forEach(r => {
-                if (!hierarchyItems.includes(r['class'].id)) {
+                if (!isHierarchyItem(r)) {
                     ttlStr += xAnElement(r);
                     switch (r['class'].id) {
                         case PigItemType.View:
@@ -687,14 +687,16 @@ app.specif2turtle = (specifData, options) => {
                 + toRdf.tab1(RdfProperty.label, 'Hierarchy Root')
                 + toRdf.tab1(RdfProperty.comment, '... anchoring all hierarchies of this graph (package)');
             ttlStr += toRdf.tab1(PigProperty.lists, toRdf.makeRdflList(nsData, nodes.map(nd => nd.resource.id)));
-            LIB.iterateSpecifNodes(nodes, (tree) => {
-                const r = LIB.itemById(specifData.resources, tree.resource.id);
-                if (hierarchyItems.includes(r['class'].id)) {
-                    ttlStr += xAnElement(r);
-                    if (LIB.isArrayWithContent(tree.nodes)) {
-                        ttlStr += toRdf.tab1(PigProperty.lists, toRdf.makeRdflList(nsData, tree.nodes.map(nd => nd.resource.id)));
-                    }
-                    ;
+            LIB.iterateSpecifNodes(nodes, (nd) => {
+                const r = LIB.itemById(specifData.resources, nd.resource.id);
+                if (!isHierarchyItem(r)) {
+                    if (LIB.isArrayWithContent(nd.nodes))
+                        console.warn("JSON-LD Export: Hierarchy Node " + nd.id + " with resource " + r.id + " of type " + r['class'].id
+                            + " is a leaf by type, but has children. Children are anyways included in the hierarchy.");
+                }
+                ttlStr += xAnElement(r);
+                if (LIB.isArrayWithContent(nd.nodes)) {
+                    ttlStr += toRdf.tab1(PigProperty.lists, toRdf.makeRdflList(nsData, nd.nodes.map(n => n.resource.id)));
                 }
                 ;
                 return true;
@@ -738,7 +740,7 @@ app.specif2turtle = (specifData, options) => {
                 + toRdf.tab1(ShaclProperty.property, LIB.isArrayWithContent(prpL) ? prpL.map(mapShPrp) : undefined);
         });
         pigRelationships.forEach(c => {
-            let prpL = [RdfProperty.label, RdfProperty.comment].concat(c[4], [c[5], c[6]]);
+            const prpL = [RdfProperty.label, RdfProperty.comment].concat(c[4], [c[5], c[6]]);
             ttlStr += toRdf.newLine()
                 + toRdf.tab0(c[0])
                 + toRdf.tab1(RdfProperty.type, 'owl:Class')
@@ -760,7 +762,7 @@ app.specif2turtle = (specifData, options) => {
                     + toRdf.tab0(c[0])
                     + toRdf.tab1(RdfProperty.type, cL.type)
                     + (c[1] ? toRdf.tab1(RdfProperty.subPropertyOf, c[1]) : '')
-                    + toRdf.tab1(RdfProperty.range, toRdf.makeOwlUnion(nsOnto, c[3]))
+                    + (c[3] ? toRdf.tab1(RdfProperty.range, toRdf.makeOwlUnion(nsOnto, c[3])) : '')
                     + toRdf.tab1(RdfProperty.label, c[4])
                     + toRdf.tab1(casProperty.definition, c[5]);
                 if (c[3] != undefined) {

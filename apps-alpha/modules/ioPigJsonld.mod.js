@@ -245,7 +245,7 @@ moduleManager.construct({
             return el;
         }
         function xResource(r) {
-            if (hierarchyItems.includes(r['class'].id))
+            if (isHierarchyItem(r))
                 return [];
             let e = xAnElement(r);
             e[PigProperty.itemType] = { '@id': PigItemType.anEntity };
@@ -305,20 +305,18 @@ moduleManager.construct({
             return g;
             function xAHierarchyItem(nd) {
                 const r = LIB.itemById(specifData.resources, nd.resource.id);
-                if (hierarchyItems.includes(r['class'].id)) {
-                    let hi = xAnElement(r);
-                    hi[PigProperty.itemType] = { '@id': PigItemType.anEntity };
-                    if (nd.nodes && nd.nodes.length > 0) {
-                        hi[PigProperty.lists] = nd.nodes.map(n => xAHierarchyItem(n));
-                    }
-                    ;
-                    g.push(hi);
-                }
-                else {
+                if (!isHierarchyItem(r)) {
                     if (LIB.isArrayWithContent(nd.nodes))
                         console.warn("JSON-LD Export: Hierarchy Node " + nd.id + " with resource " + r.id + " of type " + r['class'].id
-                            + " is a leaf by type, but has children. Children are ignored in the export.");
+                            + " is a leaf by type, but has children. Children are anyways included in the hierarchy.");
                 }
+                let hi = xAnElement(r);
+                hi[PigProperty.itemType] = { '@id': PigItemType.anEntity };
+                if (nd.nodes && nd.nodes.length > 0) {
+                    hi[PigProperty.lists] = nd.nodes.map(n => xAHierarchyItem(n));
+                }
+                ;
+                g.push(hi);
                 return { "@id": LIB.makeIdWithNamespace(nsData, nd.resource.id), [PigProperty.itemType]: { '@id': PigItemType.aTargetLink } };
             }
         }

@@ -77,6 +77,7 @@ const casProperty = {
     description: CONFIG.propClassDesc,
     definition: `skos:definition`,
     type: CONFIG.propClassType,
+    category: `${CONFIG.pfxNsSemi}Category`,
     modified: `${CONFIG.pfxNsDcmi}modified`,
     creator: `${CONFIG.pfxNsDcmi}creator`,
     license: `${CONFIG.pfxNsDcmi}license`
@@ -124,13 +125,18 @@ const pigEnumerations = [], pigEntities = [
     [PigProperty.lists, PigProperty.TargetLink, [PigItemType.Root, PigItemType.Tree], [PigItemType.Entity, PigItemType.Relationship, PigItemType.Organizer], 'lists', 'Lists an entity, a relationship or a subordinated organizer.'],
     [PigProperty.shows, PigProperty.TargetLink, [PigItemType.View], [PigItemType.Entity, PigItemType.Relationship], 'shows', 'Shows an entity or a relationship.'],
     [PigProperty.depicts, PigProperty.TargetLink, [PigItemType.View], [PigItemType.Entity], 'depicts', 'Depicts an entity; inverse of uml:ownedDiagram.']
-], pigNativeProperties = [casProperty.title, casProperty.description, casProperty.definition], diagramRels = ['SpecIF:shows', 'uml:ownedDiagram'], hierarchyItems = [CONFIG.resClassFolder, CONFIG.resClassOutline, CONFIG.resClassGlossary], excludeEntities = [PigItemType.Element].concat(pigEntities.map(en => en[0])), excludeRelationships = pigRelationships.map(rel => rel[0]), excludeProperties = pigProperties.concat(pigLinks).map(pr => pr[0]);
+], pigNativeProperties = [casProperty.title, casProperty.description, casProperty.definition], diagramRels = ['SpecIF:shows', 'uml:ownedDiagram'], excludeEntities = [PigItemType.Element].concat(pigEntities.map(en => en[0])), excludeRelationships = pigRelationships.map(rel => rel[0]), excludeProperties = pigProperties.concat(pigLinks).map(pr => pr[0]);
 function isPigNative(str) {
     return pigNativeProperties.includes(str);
 }
 function isEstablished(id) {
     const establishedNs = ['rdf', 'rdfs', 'owl', 'skos', 'sh', 'xs', 'xsd'];
     return establishedNs.includes(id.split(':')[0]) || isPigNative(id);
+}
+function isHierarchyItem(r) {
+    const hierarchyItems = [CONFIG.resClassFolder, CONFIG.resClassOutline, CONFIG.resClassGlossary];
+    return hierarchyItems.includes(r['class'].id)
+        || r.properties?.some(prp => prp['class'].id === casProperty.category && prp.values[0][0]?.text === CONFIG.reqifHierarchyRoot);
 }
 function makeShapeId(id) {
     return id.startsWith(nsOnto) ? id + sfx_shape : pfx_shape + id;
@@ -302,7 +308,7 @@ class CToRdf {
         let str = "";
         if (Array.isArray(L) && L.length > 0) {
             str = '(';
-            for (let l of L) {
+            for (const l of L) {
                 str += '\n\t\t\t' + LIB.makeIdWithNamespace(ont, l.id ?? l);
             }
             ;
@@ -374,6 +380,7 @@ app.specif2turtle = (specifData, options) => {
         + xStatements(specifData.statements)
         + xHierarchies(specifData.nodes)
         + toRdf.newLine();
+    console.debug('rdf.ttl', ttl);
     return ttl;
     function defineNamespaces() {
         const usedPrefixes = collectNamespaces(specifData);
@@ -612,7 +619,7 @@ app.specif2turtle = (specifData, options) => {
         if (LIB.isArrayWithContent(rL)) {
             let ttlStr = toRdf.heading('Entities');
             rL.forEach(r => {
-                if (!hierarchyItems.includes(r['class'].id)) {
+                if (!isHierarchyItem(r)) {
                     ttlStr += xAnElement(r);
                     switch (r['class'].id) {
                         case PigItemType.View:
@@ -680,20 +687,18 @@ app.specif2turtle = (specifData, options) => {
                 + toRdf.tab1(RdfProperty.label, 'Hierarchy Root')
                 + toRdf.tab1(RdfProperty.comment, '... anchoring all hierarchies of this graph (package)');
             ttlStr += toRdf.tab1(PigProperty.lists, toRdf.makeRdflList(nsData, nodes.map(nd => nd.resource.id)));
-            LIB.iterateSpecifNodes(nodes, (tree) => {
-                const r = LIB.itemById(specifData.resources, tree.resource.id);
-                if (hierarchyItems.includes(r['class'].id)) {
-                    ttlStr += xAnElement(r);
-                    if (LIB.isArrayWithContent(tree.nodes)) {
-                        ttlStr += toRdf.tab1(PigProperty.lists, toRdf.makeRdflList(nsData, tree.nodes.map(nd => nd.resource.id)));
-                    }
-                    ;
+            LIB.iterateSpecifNodes(nodes, (nd) => {
+                const r = LIB.itemById(specifData.resources, nd.resource.id);
+                if (!isHierarchyItem(r)) {
+                    if (LIB.isArrayWithContent(nd.nodes))
+                        console.warn("JSON-LD Export: Hierarchy Node " + nd.id + " with resource " + r.id + " of type " + r['class'].id
+                            + " is a leaf by type, but has children. Children are anyways included in the hierarchy.");
                 }
-                else {
-                    if (LIB.isArrayWithContent(tree.nodes))
-                        console.warn("RDF/Turtle Export: Hierarchy Node " + tree.id + " with resource " + r.id + " of type " + r['class'].id
-                            + " is a leaf by type, but has children. Children are ignored in the export.");
+                ttlStr += xAnElement(r);
+                if (LIB.isArrayWithContent(nd.nodes)) {
+                    ttlStr += toRdf.tab1(PigProperty.lists, toRdf.makeRdflList(nsData, nd.nodes.map(n => n.resource.id)));
                 }
+                ;
                 return true;
             });
             return ttlStr;

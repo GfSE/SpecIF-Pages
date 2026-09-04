@@ -59,7 +59,7 @@ function specif2xhtml(data, options) {
             + 'div.title { font-size:200%; margin-top:2.4rem } \n'
             + 'ul { padding-left: 1.2rem; } \n'
             + '.inline-label { font-size: 90%; font-style: italic; margin-top:0.9rem; } \n'
-            + 'p.metaTitle { color: ' + opts.metaFontColor + '; font-size: ' + (opts.metaFontSize.replace('%', '') * 1.2) + '%; margin-top:0.9rem; } \n'
+            + 'p.metaTitle { color: ' + opts.metaFontColor + '; font-size: ' + (opts.metaFontSize.replace('%', '') * 1.4) + '%; margin-top:0.9rem; } \n'
             + 'a { color: ' + opts.linkFontColor + '; ' + (opts.linkNotUnderlined ? 'text-decoration: none; ' : '') + '} \n'
             + 'table { width:100%; border: 1px solid #DDDDDD; border-collapse:collapse; vertical-align:top; margin: 0; padding: 0; } \n'
             + 'table th { background-color: #DDDDDD; margin: 0; padding: 0 0.2em 0 0.2em; font-size: 90% } \n'
@@ -67,6 +67,7 @@ function specif2xhtml(data, options) {
             + 'table.propertyTable, table.statementTable { color: ' + opts.metaFontColor + '; width:100%; border-left-style: none; border-right-style: none; border-collapse:collapse; margin: 0.9rem 0em 0em 0em; } \n'
             + 'table.propertyTable td, table.statementTable td { font-size: ' + opts.metaFontSize + '; border-left-style: none; border-right-style: none; border-collapse:collapse; } \n'
             + 'td.propertyTitle, td.statementTitle { font-style: italic; } \n'
+            + 'h5 { font-family:Arial,sans-serif; font-size:110%; font-weight: normal; margin: 0.9rem 0em 0em 0em; } \n'
             + 'h4 { font-family:Arial,sans-serif; font-size:120%; font-weight: normal; margin: 0.9rem 0em 0em 0em; page-break-after: avoid; } \n'
             + 'h3 { font-family:Arial,sans-serif; font-size:140%; font-weight: normal; margin: 1.2rem 0em 0em 0em; page-break-after: avoid; } \n'
             + 'h2 { font-family:Arial,sans-serif; font-size:160%; font-weight: normal; margin: 1.8rem 0em 0em 0em; page-break-after: avoid; } \n'
@@ -80,7 +81,7 @@ function specif2xhtml(data, options) {
     x.headings.forEach((h) => {
         if (h.level > lastLevel) {
             for (let l = h.level; l > lastLevel; l--)
-                x.toc += '<li><ul>';
+                x.toc += '<ul>';
             makeLi(h);
             lastLevel = h.level;
         }
@@ -89,7 +90,7 @@ function specif2xhtml(data, options) {
         }
         else {
             for (let l = lastLevel; l > h.level; l--)
-                x.toc += '</ul></li>';
+                x.toc += '</ul>';
             makeLi(h);
             lastLevel = h.level;
         }
