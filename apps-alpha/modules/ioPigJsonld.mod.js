@@ -314,9 +314,9 @@ moduleManager.construct({
                 hi[PigProperty.itemType] = { '@id': PigItemType.anEntity };
                 if (nd.nodes && nd.nodes.length > 0) {
                     hi[PigProperty.lists] = nd.nodes.map(n => xAHierarchyItem(n));
+                    g.push(hi);
                 }
                 ;
-                g.push(hi);
                 return { "@id": LIB.makeIdWithNamespace(nsData, nd.resource.id), [PigProperty.itemType]: { '@id': PigItemType.aTargetLink } };
             }
         }
